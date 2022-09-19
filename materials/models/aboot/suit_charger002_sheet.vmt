@@ -1,0 +1,13 @@
+"VertexLitGeneric"
+{
+	"$basetexture" "models/aboot/suit_charger002_sheet"
+	"$surfaceprop" "metal"
+	"$selfillum" "1"
+	"$selfillummask" "models/aboot/suit_charger002_illummask"
+	"%keywords" "combine"
+	"$phong" "1"
+	"$phongexponent" "2"
+	"$phongboost" "0.5"
+	"$phongfresnelranges" "[0 0.5 1]"
+	"$normalmapalphaenvmapmask" 1
+}
