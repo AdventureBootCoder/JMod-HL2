@@ -33,7 +33,6 @@ if(SERVER)then
 	function ENT:CustomInit()
 		self:DrawShadow(true)
 		self:SetUseType(ONOFF_USE)
-		self:SetState(STATE_OFF)
 		self.User=nil
 		self.ChargeSound=CreateSound(self,"items/suitcharge1.wav")
 	end
@@ -67,7 +66,7 @@ if(SERVER)then
 				local Tr=self.User:GetEyeTrace()
 				if((Tr.Hit)and(Tr.Entity==self))and(self.User:GetShootPos():Distance(self:GetPos())<70)then
 					self.User:SetArmor(self.User:Armor()+1)
-					self:ConsumeElectricity(1.333)
+					self:ConsumeElectricity(1.334)
 				else
 					self:TurnOff(true)
 				end
