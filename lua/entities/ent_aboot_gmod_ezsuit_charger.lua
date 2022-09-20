@@ -2,7 +2,7 @@ AddCSLuaFile()
 ENT.Type = "anim"
 ENT.PrintName = "EZ Suit Charger"
 ENT.Author = "AdventureBoots"
-ENT.Category = "JMod - EZ Misc."
+ENT.Category = "JMod - EZ HL:2"
 ENT.Information = ""
 ENT.Base = "ent_jack_gmod_ezmachine_base"
 ENT.Spawnable = true
