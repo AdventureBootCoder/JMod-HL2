@@ -9,6 +9,9 @@ ENT.Spawnable = true
 ENT.AdminSpawnable = false
 ENT.NoSitAllowed = true
 ----
+ENT.Model = "models/props_combine/suit_charger001.mdl"
+ENT.Mat = "models/aboot/suit_charger002_sheet"
+----
 ENT.EZconsumes = {JMod.EZ_RESOURCE_TYPES.BASICPARTS, JMod.EZ_RESOURCE_TYPES.POWER}
 ENT.EZupgradable = false
 
@@ -21,7 +24,6 @@ if(SERVER)then
 		local ent = ents.Create(self.ClassName)
 		ent:SetAngles(Ang)
 		ent:SetPos(SpawnPos)
-		JMod.Owner(ent,ply)
 		ent:Spawn()
 		ent:Activate()
 		ent.Weld = constraint.Weld(ent, tr.Entity, 0, tr.PhysicsBone, 5000, false, false)
@@ -29,11 +31,6 @@ if(SERVER)then
 	end
 
 	function ENT:CustomInit()
-		self:SetModel("models/props_combine/suit_charger001.mdl")
-		self:SetMaterial("models/aboot/suit_charger002_sheet")
-		self:PhysicsInit(SOLID_VPHYSICS)
-		self:SetMoveType(MOVETYPE_VPHYSICS)
-		self:SetSolid(SOLID_VPHYSICS)
 		self:DrawShadow(true)
 		self:SetUseType(ONOFF_USE)
 		self:SetState(STATE_IDLE)
@@ -114,19 +111,20 @@ elseif(CLIENT)then
 		self:AddCallback("BuildBonePositions",function(ent,numbones)
 			local ElecFrac = LerpedElec / 100
 			local DrainedFraction = 1 - ElecFrac -- this should be a float that goes from 0 to 1 as the device's power is drained
-			local Up,Right,Forward=ent:GetUp(),ent:GetRight(),ent:GetForward()
+			local RenderAng = ent:GetAngles()
+			local Up,Right,Forward=RenderAng:Up(),RenderAng:Right(),RenderAng:Forward()
 			local Vary=math.sin(CurTime()*12)/5
 			-- the booper
 			local BooperPos,BooperAng=ent:GetBonePosition(1)
-			if(DrainedFraction>=1)then
-				ent:SetBonePosition(1,BooperPos-Forward*1.2,BooperAng)
+			if(DrainedFraction >= 1)then
+				ent:SetBonePosition(1,BooperPos-Forward*1.5,BooperAng)
 			elseif(self:GetState() == STATE_CHARGIN)then -- this conditional should be true when the device is in use
 				ent:SetBonePosition(1,BooperPos-Forward*Vary,BooperAng)
 			end
 			-- the toober
 			local TooberPos,TooberAng=ent:GetBonePosition(2)
 			ent:SetBonePosition(2,TooberPos+Up*DrainedFraction*5.75,TooberAng)
-			LerpedElec = Lerp(FrameTime()*10, LerpedElec, self:GetElectricity())
+			LerpedElec = Lerp(math.ease.InOutCubic(FrameTime()*10), LerpedElec, self:GetElectricity())
 		end)
 	end
 end
