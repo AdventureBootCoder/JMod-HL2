@@ -109,8 +109,8 @@ elseif(CLIENT)then
 	function ENT:Initialize()
 		local LerpedElec=0
 		self:AddCallback("BuildBonePositions",function(ent,numbones)
-			local ElecFrac=LerpedElec/100
-			local DrainedFraction=1-ElecFrac
+			local ElecFrac = LerpedElec / 100
+			local DrainedFraction= 1 - ElecFrac
 			local Pos,Ang=ent:GetBonePosition(0)
 			local Up,Right,Forward=Ang:Up(),Ang:Right(),Ang:Forward()
 			local Vary=math.sin(CurTime()*12)/2+.5
