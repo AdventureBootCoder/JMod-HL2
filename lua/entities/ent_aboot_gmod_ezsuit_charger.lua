@@ -123,7 +123,7 @@ elseif(CLIENT)then
 			end
 			-- the toober
 			ent:SetBonePosition(2,Pos+Up*4-Forward*4.3-Right*(DrainedFraction*6),Ang)
-			LerpedElec=Lerp(FrameTime()*5,LerpedElec,self:GetElectricity())
+			LerpedElec=Lerp(math.ease.OutCubic(FrameTime()*5),LerpedElec,self:GetElectricity())
 		end)
 	end
 end
