@@ -1,6 +1,6 @@
 AddCSLuaFile()
 ENT.Type = "anim"
-ENT.PrintName = "EZ Suit Charger"
+ENT.PrintName = "EZ Health Charger"
 ENT.Author = "AdventureBoots"
 ENT.Category = "JMod - EZ HL:2"
 ENT.Information = ""
@@ -9,13 +9,17 @@ ENT.Spawnable = true
 ENT.AdminSpawnable = false
 ENT.NoSitAllowed = true
 ----
-ENT.Model = "models/props_combine/suit_charger001.mdl"
+ENT.Model = "models/props_combine/health_charger001.mdl"
 ENT.Mat = "models/aboot/suit_charger002_sheet"
 ----
-ENT.EZconsumes = {JMod.EZ_RESOURCE_TYPES.BASICPARTS, JMod.EZ_RESOURCE_TYPES.POWER}
+ENT.EZconsumes = {JMod.EZ_RESOURCE_TYPES.BASICPARTS, JMod.EZ_RESOURCE_TYPES.POWER, JMod.EZ_RESOURCE_TYPES.MEDICALSUPPLIES}
 ENT.EZupgradable = false
 
 local STATE_BROKEN,STATE_OFF,STATE_CHARGIN = -1,0,1
+
+function ENT:CustomSetUpDataTables()
+	self:NetworkVar("Int", 2, "Supplies")
+end
 
 if(SERVER)then
 	function ENT:SpawnFunction(ply,tr)
@@ -109,20 +113,6 @@ elseif(CLIENT)then
 		local LerpedElec=0
 		self:AddCallback("BuildBonePositions",function(ent,numbones)
 			local ElecFrac = LerpedElec / 100
-			local DrainedFraction= 1 - ElecFrac
-			local Pos,Ang=ent:GetBonePosition(0)
-			local Up,Right,Forward=Ang:Up(),Ang:Right(),Ang:Forward()
-			local Vary=math.sin(CurTime()*12)/2+.5
-			-- the booper
-			if(DrainedFraction>=.98)then
-				ent:SetBonePosition(1,Pos+Up*5.1-Right*7.8-Forward*4.25,Ang)
-			elseif(ent:GetState()==STATE_CHARGIN)then 
-				ent:SetBonePosition(1,Pos+Up*(5.2+1.3*Vary)-Right*7.8-Forward*4.25,Ang)
-			else
-				ent:SetBonePosition(1,Pos+Up*6.5-Right*7.8-Forward*4.25,Ang)
-			end
-			-- the toober
-			ent:SetBonePosition(2,Pos+Up*4-Forward*4.3-Right*(DrainedFraction*6),Ang)
 			LerpedElec=Lerp(math.ease.OutCubic(FrameTime()*5),LerpedElec,self:GetElectricity())
 		end)
 	end
