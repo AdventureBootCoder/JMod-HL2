@@ -10,15 +10,18 @@ ENT.AdminSpawnable = false
 ENT.NoSitAllowed = true
 ----
 ENT.Model = "models/props_combine/health_charger001.mdl"
-ENT.Mat = "models/aboot/suit_charger002_sheet"
+ENT.Mat = nil
 ----
 ENT.EZconsumes = {JMod.EZ_RESOURCE_TYPES.BASICPARTS, JMod.EZ_RESOURCE_TYPES.POWER, JMod.EZ_RESOURCE_TYPES.MEDICALSUPPLIES}
 ENT.EZupgradable = false
+ENT.StaticPerfSpecs = {
+	MaxSupplies = 100
+}
 
 local STATE_BROKEN,STATE_OFF,STATE_CHARGIN = -1,0,1
 
-function ENT:CustomSetUpDataTables()
-	self:NetworkVar("Int", 2, "Supplies")
+function ENT:CustomSetupDataTables()
+	self:NetworkVar("Int",2,"Supplies")
 end
 
 if(SERVER)then
@@ -37,8 +40,10 @@ if(SERVER)then
 	function ENT:CustomInit()
 		self:DrawShadow(false)
 		self:SetUseType(ONOFF_USE)
+		self:SetSupplies(self.MaxSupplies)
 		self.User=nil
 		self.ChargeSound=CreateSound(self,"items/suitcharge1.wav")
+		self:SetSubMaterial(1, "models/aboot/health_charger002")
 	end
 
 	function ENT:Use(activator,activatorAgain,onOff)
@@ -49,7 +54,7 @@ if(SERVER)then
 			return
 		elseif(State==STATE_OFF)then
 			if(tobool(onOff))then -- we got pressed
-				if((Dude:Armor()<100)and(self:GetElectricity()>0))then
+				if((Dude:Health()<100)and(self:GetElectricity()>0)and(self:GetSupplies()>0))then
 					self:TurnOn(Dude)
 				else
 					self:EmitSound("items/suitchargeno1.wav")
@@ -66,11 +71,12 @@ if(SERVER)then
 		local Time=CurTime()
 		local State=self:GetState()
 		if(State==STATE_CHARGIN)then
-			if((IsValid(self.User))and(self.User:Alive())and(self.User:Armor()<100)and(self:GetElectricity()>0))then
+			if((IsValid(self.User))and(self.User:Alive())and(self.User:Health()<100)and(self:GetElectricity()>0)and(self:GetSupplies()>0))then
 				local Tr=self.User:GetEyeTrace()
 				if((Tr.Hit)and(Tr.Entity==self))and(self.User:GetShootPos():Distance(self:GetPos())<70)then
-					self.User:SetArmor(self.User:Armor()+1)
-					self:ConsumeElectricity(1.334)
+					self.User:SetHealth(self.User:Health()+1)
+					self:ConsumeElectricity(0.656)
+					self:ConsumeSupplies(1.334)
 				else
 					self:TurnOff(true)
 				end
@@ -80,6 +86,14 @@ if(SERVER)then
 		end
 		self:NextThink(Time+.1)
 		return true
+	end
+
+	function ENT:ConsumeSupplies(amt)
+		local newAmt = math.Clamp(self:GetSupplies() - amt, 0, self.MaxSupplies)
+		self:SetSupplies(newAmt)
+		if(self:GetSupplies() <= 0)then
+			self:TurnOff()
+		end
 	end
 
 	function ENT:TurnOff(released)
