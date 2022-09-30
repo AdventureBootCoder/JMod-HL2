@@ -42,7 +42,7 @@ if(SERVER)then
 		self:SetUseType(ONOFF_USE)
 		self:SetSupplies(self.MaxSupplies)
 		self.User=nil
-		self.ChargeSound=CreateSound(self,"items/suitcharge1.wav")
+		self.ChargeSound=CreateSound(self,"items/medcharge4.wav")
 		self:SetSubMaterial(1, "models/aboot/health_charger002")
 	end
 
@@ -54,10 +54,11 @@ if(SERVER)then
 			return
 		elseif(State==STATE_OFF)then
 			if(tobool(onOff))then -- we got pressed
-				if((Dude:Health()<100)and(self:GetElectricity()>0)and(self:GetSupplies()>0))then
+				--if((self:GetElectricity()<=0))then JMod.Hint(activator, "nopower") end
+				if((Dude:Health()<100)and(self:GetSupplies()>0))then
 					self:TurnOn(Dude)
 				else
-					self:EmitSound("items/suitchargeno1.wav")
+					self:EmitSound("items/medshotno1.wav")
 				end
 			end
 		elseif(State==STATE_CHARGIN)then
@@ -71,12 +72,12 @@ if(SERVER)then
 		local Time=CurTime()
 		local State=self:GetState()
 		if(State==STATE_CHARGIN)then
-			if((IsValid(self.User))and(self.User:Alive())and(self.User:Health()<100)and(self:GetElectricity()>0)and(self:GetSupplies()>0))then
+			if((IsValid(self.User))and(self.User:Alive())and(self.User:Health()<100)and(self:GetSupplies()>0))then
 				local Tr=self.User:GetEyeTrace()
 				if((Tr.Hit)and(Tr.Entity==self))and(self.User:GetShootPos():Distance(self:GetPos())<70)then
 					self.User:SetHealth(self.User:Health()+1)
-					self:ConsumeElectricity(0.656)
-					self:ConsumeSupplies(1.334)
+					--self:ConsumeElectricity(0.5)
+					self:ConsumeSupplies(1.5)
 				else
 					self:TurnOff(true)
 				end
@@ -90,6 +91,7 @@ if(SERVER)then
 
 	function ENT:ConsumeSupplies(amt)
 		local newAmt = math.Clamp(self:GetSupplies() - amt, 0, self.MaxSupplies)
+		--print(newAmt)
 		self:SetSupplies(newAmt)
 		if(self:GetSupplies() <= 0)then
 			self:TurnOff()
@@ -102,7 +104,7 @@ if(SERVER)then
 		timer.Simple(0.5, function()
 			if(IsValid(self))then self.ChargeSound:Stop() end
 		end)
-		if not(released)then self:EmitSound("items/suitchargeno1.wav") end
+		if not(released)then self:EmitSound("items/medshotno1.wav") end
 		self.User=nil
 	end
 
@@ -111,7 +113,7 @@ if(SERVER)then
 		local Time=CurTime()
 		if(Time>nextOk)then
 			nextOk=Time+1
-			self:EmitSound("items/suitchargeok1.wav")
+			self:EmitSound("items/medshot4.wav")
 		end
 		self.ChargeSound:Play()
 		self.User=dude
@@ -124,10 +126,27 @@ if(SERVER)then
 
 elseif(CLIENT)then
 	function ENT:Initialize()
-		local LerpedElec=0
+		local LerpedSupplies = 0
 		self:AddCallback("BuildBonePositions",function(ent,numbones)
-			local ElecFrac = LerpedElec / 100
-			LerpedElec=Lerp(math.ease.OutCubic(FrameTime()*5),LerpedElec,self:GetElectricity())
+			local SupplyFrac = LerpedSupplies / 100
+			local DrainedFraction = 1 - SupplyFrac
+			local Pos,Ang = ent:GetBonePosition(0)
+			local Up,Right,Forward = Ang:Up(),Ang:Right(),Ang:Forward()
+			--local Vary = math.sin(CurTime()*12)/2+.5
+			-- the spinner
+			if(DrainedFraction <= 0.98)then
+				local spinAng = Ang:GetCopy()
+				spinAng:RotateAroundAxis(Up, 360*DrainedFraction)
+				ent:SetBonePosition(2, Pos-Right*5.25+Up*(6-DrainedFraction*5)+Forward*2.5, spinAng)
+			else
+				ent:SetBonePosition(2, Pos-Right*5.25+(Up*0.85)+Forward*2.5, Ang)
+			end
+			-- the healthbar (I'll figure it out eventually)
+			local MacTheMatrix = Matrix()
+			MacTheMatrix:Translate(Pos+Up*6.2+Forward*(7-DrainedFraction*6)+Right*1.1)
+			MacTheMatrix:Scale(Vector(1, 1, 1))
+			ent:SetBoneMatrix(1, MacTheMatrix)
+			LerpedSupplies=Lerp(math.ease.OutCubic(FrameTime()*5),LerpedSupplies,self:GetSupplies())
 		end)
 	end
 end
