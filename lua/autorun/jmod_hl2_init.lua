@@ -1,3 +1,9 @@
+--[[player_manager.AddValidModel( "Classic HEV Suit", 
+"models/ragenigga/player/hev_suit.mdl" );
+list.Set( "PlayerOptionsModel", "Classic HEV Suit", 
+"models/ragenigga/player/hev_suit.mdl" );
+player_manager.AddValidHands( "Classic HEV Suit", 
+"models/ragenigga/viewmodels/c_arms_classic.mdl", 0, "00000000" )]]--
 
 JMod.AdditionalArmorTable = JMod.AdditionalArmorTable or {}
 
@@ -65,5 +71,12 @@ JMod.AdditionalArmorTable["JMod HEV Suit"]={
 	dur=400,
 	ent="ent_aboot_gmod_ezarmor_hev"
 }
+local function LoadAdditionalArmor()
+	if JMod.AdditionalArmorTable and JMod.ArmorTable then
+		table.Merge(JMod.ArmorTable, JMod.AdditionalArmorTable)
+		JMod.GenerateArmorEntities(JMod.AdditionalArmorTable)
+	end
+end
+LoadAdditionalArmor()
 --[[if(SERVER)then
 end]]
