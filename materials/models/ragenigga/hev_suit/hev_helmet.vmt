@@ -2,9 +2,11 @@
 {
 	"$baseTexture" "models\ragenigga\hev_suit\hev_helmet"
 	"$blendtintbybasealpha" "1"
+ 	"$blendtintcoloroverbase" "0"
+	
 	Proxies
 	{
-		PlayerColor
+		Color
 		{
 			resultVar	$color2
 			default 		0.75 0.75 0.75

@@ -1,4 +1,15 @@
 "VertexLitGeneric"
 {
 	"$baseTexture" "models\ragenigga\hev_suit\hev_helmet_top"
+	"$blendtintbybasealpha" "1"
+ 	"$blendtintcoloroverbase" "0"
+	
+	Proxies
+	{
+		Color
+		{
+			resultVar	$color2
+			default 		0.75 0.75 0.75
+		}
+	}
 }

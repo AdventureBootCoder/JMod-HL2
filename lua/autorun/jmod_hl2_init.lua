@@ -27,7 +27,7 @@ JMod.AdditionalArmorTable["JMod HEV Suit"]={
 	mdl="models/props_junk/cardboard_box002a.mdl",
 	mat="models/bloocobalt/splinter cell/chemsuit/chemsuit_bm",
 	lbl="EZ HEV SUIT",
-	clr={ r=255, g=93, b=0 },
+	clr={ r=0, g=0, b=0 },
 	clrForced=false,
 	slots={
 		eyes=1,

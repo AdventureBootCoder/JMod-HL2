@@ -3,9 +3,11 @@
 	"$baseTexture" "models\ragenigga\hev_suit\arm_sheet"
 	"$bumpmap" "models\ragenigga\hev_suit\arm_sheet_normal"
 	"$blendtintbybasealpha" "1"
+ 	"$blendtintcoloroverbase" "0"
+	
 	Proxies
 	{
-		PlayerColor
+		Color
 		{
 			resultVar	$color2
 			default 		0.75 0.75 0.75
