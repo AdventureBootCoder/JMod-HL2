@@ -1,9 +1,9 @@
---[[player_manager.AddValidModel( "Classic HEV Suit", 
+player_manager.AddValidModel( "Classic HEV Suit", 
 "models/ragenigga/player/hev_suit.mdl" );
 list.Set( "PlayerOptionsModel", "Classic HEV Suit", 
 "models/ragenigga/player/hev_suit.mdl" );
 player_manager.AddValidHands( "Classic HEV Suit", 
-"models/ragenigga/viewmodels/c_arms_classic.mdl", 0, "00000000" )]]--
+"models/ragenigga/viewmodels/c_arms_classic.mdl", 0, "00000000" )
 
 JMod.AdditionalArmorTable = JMod.AdditionalArmorTable or {}
 

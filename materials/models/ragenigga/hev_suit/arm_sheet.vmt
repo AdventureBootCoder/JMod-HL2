@@ -10,7 +10,7 @@
 		Color
 		{
 			resultVar	$color2
-			default 		0.75 0.75 0.75
+			default 	"[0.75 0.75 0.75]"
 		}
 	}
 }

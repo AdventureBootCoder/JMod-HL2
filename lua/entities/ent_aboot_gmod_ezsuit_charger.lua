@@ -64,7 +64,7 @@ if(SERVER)then
 		if(State==STATE_CHARGIN)then
 			if((IsValid(self.User))and(self.User:Alive())and(self.User:Armor()<100)and(self:GetElectricity()>0))then
 				local Tr=self.User:GetEyeTrace()
-				if((Tr.Hit)and(Tr.Entity==self))and(self.User:GetShootPos():Distance(self:GetPos())<70)then
+				if((Tr.Hit)and(Tr.Entity==self))and(self.User:GetShootPos():Distance(self:GetPos())<100)then
 					self.User:SetArmor(self.User:Armor()+1)
 					self:ConsumeElectricity(1.334)
 				else

@@ -74,7 +74,7 @@ if(SERVER)then
 		if(State==STATE_CHARGIN)then
 			if((IsValid(self.User))and(self.User:Alive())and(self.User:Health()<100)and(self:GetSupplies()>0))then
 				local Tr=self.User:GetEyeTrace()
-				if((Tr.Hit)and(Tr.Entity==self))and(self.User:GetShootPos():Distance(self:GetPos())<70)then
+				if((Tr.Hit)and(Tr.Entity==self))and(self.User:GetShootPos():Distance(self:GetPos())<100)then
 					self.User:SetHealth(self.User:Health()+1)
 					--self:ConsumeElectricity(0.5)
 					self:ConsumeSupplies(1.5)
