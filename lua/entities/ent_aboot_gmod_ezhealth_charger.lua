@@ -12,6 +12,7 @@ ENT.NoSitAllowed = true
 ENT.Model = "models/props_combine/health_charger001.mdl"
 ENT.Mat = nil
 ----
+ENT.JModPreferredCarryAngles = Angle(0, 180, 0)
 ENT.EZconsumes = {JMod.EZ_RESOURCE_TYPES.BASICPARTS, JMod.EZ_RESOURCE_TYPES.POWER, JMod.EZ_RESOURCE_TYPES.MEDICALSUPPLIES}
 ENT.EZupgradable = false
 ENT.StaticPerfSpecs = {
@@ -142,11 +143,13 @@ elseif(CLIENT)then
 				ent:SetBonePosition(2, Pos-Right*5.25+(Up*0.85)+Forward*2.5, Ang)
 			end
 			-- the healthbar (I'll figure it out eventually)
-			local MacTheMatrix = Matrix()
-			MacTheMatrix:Translate(Pos+Up*6.2+Forward*(7-DrainedFraction*6)+Right*1.1)
-			MacTheMatrix:Scale(Vector(1, 1, 1))
-			ent:SetBoneMatrix(1, MacTheMatrix)
-			LerpedSupplies=Lerp(math.ease.OutCubic(FrameTime()*5),LerpedSupplies,self:GetSupplies())
+			if ent:GetBoneMatrix(1) then
+				local MacTheMatrix = Matrix()
+				MacTheMatrix:Translate(Pos+Up*6.2+Forward*(7-DrainedFraction*6)+Right*1.1)
+				MacTheMatrix:Scale(Vector(1, 1, 1))
+				ent:SetBoneMatrix(1, MacTheMatrix)
+				LerpedSupplies=Lerp(math.ease.OutCubic(FrameTime()*5),LerpedSupplies,self:GetSupplies())
+			end
 		end)
 	end
 end
