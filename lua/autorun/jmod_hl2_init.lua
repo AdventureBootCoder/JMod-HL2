@@ -24,6 +24,7 @@ local HEVArmorProtectionProfile={
 
 JMod.AdditionalArmorTable["ABoot HEV Suit"]={
 	PrintName="HEV Suit",
+	Category="JMod - EZ HL:2",
 	mdl = "models/custom/scifiboxes/crate_d.mdl",
 	--mdl="models/props_junk/cardboard_box002a.mdl",
 	--mat="models/ragenigga/hev_suit/hevsuit_sheet",
@@ -98,7 +99,7 @@ end)
 
 if(SERVER)then
 	local defaultHEVdisable = CreateConVar("ABoot_disable_HEV", "0", FCVAR_ARCHIVE, "Removes the HEV suit from players on spawn and when it's destroyed")
-	
+
 	local function RemoveHEVsuit(playa) 
 		playa:SetArmor(0)
 		if playa:IsSuitEquipped() then
@@ -153,6 +154,8 @@ if(SERVER)then
 	end)
 elseif CLIENT then 
 
+	local simpleWeaponSelect = CreateConVar("ABoot_simple_weapon_select", "1", FCVAR_ARCHIVE, "Enables a vey crude weapon select stand in for when you don't have an HEV suit. It's recomended you get a better one.")
+
 	--hook.Remove("RenderScreenspaceEffects", "HL2CombineBinoculars")
 	--[[hook.Add( "RenderScreenspaceEffects", "HL2CombineBinoculars", function()
 		playa = LocalPlayer()
@@ -161,22 +164,82 @@ elseif CLIENT then
 		end
 	end)]]--
 
+	-- Since weapons aren't guranteed to be in proper order, we have to do it ourselves
+	--[[local function OrderWeaponList(WeaponList) 
+		print("------------ \nOld weapon list:")
+		PrintTable(WeaponList)
+		print("------------")
+
+		local NewWeaponList = {}
+
+		for _, v in ipairs(WeaponList) do
+			local slot = v:GetSlot()
+			print("Slot: " .. slot)
+
+			table.insert(NewWeaponList, slot + 1, v)
+		end
+
+		print("------------ \n New weapon list:")
+		PrintTable(NewWeaponList)
+		print("------------")
+		for _, v in ipairs(NewWeaponList) do
+			local slot = v:GetSlot()
+			print("Slot: " .. slot)
+		end
+		return NewWeaponList
+	end]]--
+
 	local WeaponSwitchTime, WeaponIndex = 0, 0
 	--hook.Remove("InputMouseApply", "ABootSimpleWeaponSelect")
-	hook.Add("InputMouseApply", "ABootSimpleWeaponSelect", function(cmd, x, y, ang)
-		local MouseWheel, Time, Ply = cmd:GetMouseWheel(), CurTime(), LocalPlayer()
-		if Ply:IsSuitEquipped() then return end
-		local CurWep, Weapons = Ply:GetActiveWeapon(), Ply:GetWeapons()
 
-		if (MouseWheel ~= 0) and (WeaponSwitchTime < Time) and (Ply:Alive()) then
+	hook.Add("InputMouseApply", "ABootSimpleWeaponSelect", function(cmd, x, y, ang)
+		if not(simpleWeaponSelect:GetBool()) then return end
+		local MouseWheel, Time, Ply = cmd:GetMouseWheel(), CurTime(), LocalPlayer()
+		if (MouseWheel ~= 0) then
 			WeaponSwitchTime = Time + 0.5
+
+			if Ply:IsSuitEquipped() or not(Ply:Alive()) then return end
+
+			local CurWep, Weapons = Ply:GetActiveWeapon(), Ply:GetWeapons()
+
+			if not(IsValid(CurWep)) then return end 
+		
 			local CurWepIndex = table.KeyFromValue(Weapons, CurWep)
-			local NextWep = Weapons[CurWepIndex + MouseWheel]
+			local NextWepIndex = CurWepIndex + MouseWheel
+
+			if NextWepIndex > #Weapons then
+				NextWepIndex = math.Clamp(NextWepIndex - #Weapons, 1, #Weapons)
+			elseif NextWepIndex < 1 then
+				NextWepIndex = math.Clamp(NextWepIndex + #Weapons, 1, #Weapons)
+			end
+			
+			local NextWep = Weapons[NextWepIndex]
 
 			if IsValid(NextWep) then
 				input.SelectWeapon(NextWep)
 			end
 		end
 	end)
-	--PrintTable(LocalPlayer():GetWeapons())
+
+	--hook.Remove("PlayerButtonDown", "ABootHotBarWeaponSelect")
+
+	hook.Add("PlayerButtonDown", "ABootHotBarWeaponSelect", function(playa, button)
+		if not(simpleWeaponSelect:GetBool()) then return end
+		local slot = button - 2
+
+		if slot > 6 then return end
+		if not(playa:Alive()) or playa:IsSuitEquipped() then return end
+
+		local Weapons, CurWep = playa:GetWeapons(), playa:GetActiveWeapon()
+		local FirstInSlot = nil
+
+		for _, v in ipairs( Weapons ) do
+
+			--print("Weapon: " .. tostring(v), "Slot: " .. v:GetSlot(), "Slot position: " .. v:GetSlotPos())
+
+			if (v ~= CurWep) and (v:GetSlot() == slot) then
+				input.SelectWeapon(v)
+			end
+		end
+	end)
 end
