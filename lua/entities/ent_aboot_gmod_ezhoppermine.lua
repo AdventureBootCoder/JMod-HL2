@@ -9,7 +9,7 @@ ENT.NoSitAllowed = true
 ENT.Spawnable = true
 ENT.AdminSpawnable = true
 ---
-ENT.JModGUIcolorable = true
+ENT.JModGUIcolorable = false
 ENT.JModEZstorable = true
 ENT.EZscannerDanger = true
 ENT.JModPreferredCarryAngles = Angle(0, 0, 0)
@@ -19,10 +19,12 @@ ENT.BlacklistedNPCs = {"bullseye_strider_focus", "npc_turret_floor", "npc_turret
 ENT.WhitelistedNPCs = {"npc_rollermine"}
 
 ---
-local STATE_BROKEN, STATE_OFF, STATE_ARMING, STATE_ARMED, STATE_WARNING = -1, 0, 1, 2, 3
+local STATE_BROKEN, STATE_OFF, STATE_ARMING, STATE_ARMED, STATE_LAUNCHED = -1, 0, 1, 2, 3
 
 function ENT:SetupDataTables()
 	self:NetworkVar("Int", 0, "State")
+	self:NetworkVar("Entity", 0, "Target")
+	self:NetworkVar("Bool", 0, "Ally")
 end
 
 ---
@@ -50,7 +52,7 @@ if SERVER then
 		self:GetPhysicsObject():SetMass(20)
 		---
 		timer.Simple(.01, function()
-			self:GetPhysicsObject():SetMass(20)
+			self:GetPhysicsObject():SetMass(10)
 			self:GetPhysicsObject():Wake()
 		end)
 		---
@@ -62,11 +64,13 @@ if SERVER then
 		end
 		---
 		self.StillTicks = 0
-		--self:SetLegs(110)
-		--self:SetClaws(40)
-		self.AutoArm = true
+		self.AutoArm = false
+
+		self:SetLegs(70)
+		self:SetClaws(-70)
+
 		if self.AutoArm then
-			self:NextThink(CurTime() + math.Rand(.1, 1))
+			self:NextThink(CurTime() + .3)
 		end
 		self.WarningSnd = CreateSound(self, "npc/roller/mine/combine_mine_active_loop1.wav")
 	end
@@ -75,20 +79,21 @@ if SERVER then
 		if iname == "Detonate" and value > 0 then
 			self:Detonate()
 		elseif iname == "Arm" and value > 0 then
-			self:SetState(STATE_ARMING)
+			self:Arm(self.Owner or game.GetWorld())
 		end
 	end
 
-	function ENT:PhysicsCollide(data, physobj)
-		if data.DeltaTime > 0.2 then
-			if data.Speed > 10 then
-				if self:GetState() == STATE_WARNING then
-					self:Detonate()
-				else
-					self:EmitSound("Weapon.ImpactHard")
-				end
-			end
-		end
+	function ENT:SetLegs(angle)
+		self:ManipulateBoneAngles(1,Angle(0,0,angle))
+		self:ManipulateBoneAngles(3,Angle(0,0,angle))
+		self:ManipulateBoneAngles(5,Angle(0,0,angle))
+	end
+
+	function ENT:SetClaws(angle)
+		self:ManipulateBoneAngles(2,Angle(0,angle,0))
+		self:ManipulateBoneAngles(4,Angle(0,angle,0))
+		self:ManipulateBoneAngles(6,Angle(0,angle,0))
+		--sound.Play("snd_jack_metallicclick.wav", self:GetPos(), 70, 110)
 	end
 
 	function ENT:OnTakeDamage(dmginfo)
@@ -97,7 +102,7 @@ if SERVER then
 		if JMod.LinCh(dmginfo:GetDamage(), 10, 50) then
 			local Pos, State = self:GetPos(), self:GetState()
 
-			if State == STATE_ARMED then
+			if State == STATE_WARNING then
 				self:Detonate()
 			elseif not (State == STATE_BROKEN) then
 				sound.Play("Metal_Box.Break", Pos)
@@ -106,6 +111,8 @@ if SERVER then
 			end
 		end
 	end
+
+	local ArmAttempts = 0
 
 	function ENT:Use(activator)
 		local State = self:GetState()
@@ -116,9 +123,13 @@ if SERVER then
 		if State == STATE_OFF then
 			if Alt then
 				JMod.Owner(self, activator)
-				net.Start("JMod_ColorAndArm")
-				net.WriteEntity(self)
-				net.Send(activator)
+				if self.JModGUIcolorable then
+					net.Start("JMod_ColorAndArm")
+					net.WriteEntity(self)
+					net.Send(activator)
+				else
+					self:Arm(self.activator)
+				end
 			else
 				activator:PickupObject(self)
 				JMod.Hint(activator, "arm")
@@ -128,6 +139,18 @@ if SERVER then
 			self:SetState(STATE_OFF)
 			JMod.Owner(self, activator)
 			self:DrawShadow(true)
+		end
+	end
+
+	function ENT:PhysicsCollide(data, physobj)
+		if data.DeltaTime > 0.2 then
+			if data.Speed > 10 then
+				if self:GetState() == STATE_LAUNCHED then
+					self:Detonate()
+				else
+					self:EmitSound("Weapon.ImpactHard")
+				end
+			end
 		end
 	end
 
@@ -166,111 +189,143 @@ if SERVER then
 		self:Remove()
 	end
 
-	function ENT:Arm(armer, autoColor)
+	function ENT:Arm(armer)
 		local State = self:GetState()
 		if State ~= STATE_OFF then return end
 		JMod.Hint(armer, "mine friends")
 		JMod.Owner(self, armer)
 		self:SetState(STATE_ARMING)
-		self:EmitSound("snd_jack_minearm.wav", 60, 110)
+		--self:EmitSound("snd_jack_minearm.wav", 60, 110)
 
-		if autoColor then
-			local Tr = util.QuickTrace(self:GetPos() + Vector(0, 0, 10), Vector(0, 0, -50), self)
-
-			if Tr.Hit then
-				local Info = JMod.HitMatColors[Tr.MatType]
-
-				if Info then
-					self:SetColor(Info[1])
-
-					if Info[2] then
-						self:SetMaterial(Info[2])
-					end
-				end
-			end
-		end
-
-		timer.Simple(3, function()
+		timer.Simple(1, function()
 			if IsValid(self) then
 				if self:GetState() == STATE_ARMING then
-					self:SetState(STATE_ARMED)
-					self:DrawShadow(false)
-					local Tr = util.QuickTrace(self:GetPos() + Vector(0, 0, 20), Vector(0, 0, -40), self)
+					local Tr = util.QuickTrace(self:GetPos(), Vector(0, 0, -2), self)
 
 					if Tr.Hit then
 						self.Weld = constraint.Weld(Tr.Entity, self, 0, 0, 5000, false, false)
 						if self.Weld then
 							self.Weld:Activate()
+							self:SetLegs(0)
+							self:SetClaws(0)
+							self:EmitSound("npc/roller/blade_cut.wav", 100)
+							self:SetState(STATE_ARMED)
+							self:DrawShadow(false)
+							ArmAttempts = 0
 						end
+					else
+						self:Jump()
+						JPrint("ArmAttempts: " .. ArmAttempts )
 					end
+					self:NextThink(CurTime() + .5)
 				end
 			end
 		end)
 	end
 
-	function ENT:SetLegs(angle)
-		self:ManipulateBoneAngles(1,Angle(0,0,angle))
-		self:ManipulateBoneAngles(3,Angle(0,0,angle))
-		self:ManipulateBoneAngles(5,Angle(0,0,angle))
+	function ENT:Disarm()
+		self.WarningSnd:Stop()
+		self:EmitSound("npc/roller/mine/combine_mine_deactivate1.wav")
+		self:SetState(STATE_OFF)
+		self:SetLegs(75)
+		self:SetClaws(-75)
 	end
 
-	function ENT:SetClaws(angle)
-		self:ManipulateBoneAngles(2,Angle(0,angle,0))
-		self:ManipulateBoneAngles(4,Angle(0,angle,0))
-		self:ManipulateBoneAngles(6,Angle(0,angle,0))
-		sound.Play("snd_jack_metallicclick.wav",self:GetPos(),70,110)
+	function ENT:Jump()
+		local Phys = self:GetPhysicsObject()
+
+		if Phys:IsMotionEnabled() then
+			self:EmitSound("npc/roller/mine/rmine_blip3.wav")
+			Phys:ApplyForceOffset(Vector(0, 0, 3000), self:LocalToWorld(Vector(math.random()*2, math.random()*2, 0)))
+		end
+		timer.Simple(1, function()
+			if IsValid(self) and (self:GetState() == STATE_ARMING) and (ArmAttempts < 5) then
+				ArmAttempts = ArmAttempts + 1
+				self:SetState(STATE_OFF)
+				self:Arm(JMod.Owner(self) or game.GetWorld())
+			else
+				self:SetState(STATE_OFF)
+			end
+		end)
 	end
 
 	function ENT:Launch(targetPos)
+		self:SetState(STATE_LAUNCHED)
 		local SelfPos = self:GetPos()
 		local ToVec = targetPos - SelfPos
 		ToVec.z = 0
 		local ToDir = ToVec:GetNormalized()
 		local ToAng = ToDir:Angle()
 		ToAng:RotateAroundAxis(ToAng:Right(), 66)
+		ToDir = ToAng:Forward() 
 		local Dist = SelfPos:Distance(targetPos)
-		local Speed = math.sqrt((600 * Dist) / math.sin(2 * math.rad(66)))
-		ToDir = ToAng:Forward()*Speed
-
+		-----
+		local Speed = math.sqrt((600 * Dist) / math.sin(2 * math.rad(66))) -- Fancy math
+		-----
 		constraint.RemoveAll(self)
 
 		local Phys = self:GetPhysicsObject()
+
+		Phys:EnableMotion(true)
 		Phys:SetDragCoefficient(0)
-		Phys:SetVelocity(ToDir)
+		Phys:SetVelocity(ToDir * Speed)
 	end
 
-	function ENT:Think()
-		if istable(WireLib) then
-			WireLib.TriggerOutput(self, "State", self:GetState())
-		end
 
+	function ENT:Think()
 		local SelfPos, State, Time = self:GetPos(), self:GetState(), CurTime()
 
+		if istable(WireLib) then
+			WireLib.TriggerOutput(self, "State", State)
+		end
+
 		if State == STATE_ARMED then
-			for k, targ in pairs(ents.FindInSphere(SelfPos, 5000)) do
-				if not (targ == self) and (targ:IsPlayer() or targ:IsNPC() or targ:IsVehicle()) then
+			if not(IsValid(self.Weld)) then
+				self:Disarm()
+			end
+			JPrint(tostring(self:GetTarget()) .. " \t " .. tostring(self:GetAlly()))
 
-					if JMod.ShouldAttack(self, targ) and JMod.ClearLoS(self, targ) then
-						local targPos = targ:GetPos()
+			for k, targ in pairs(ents.FindInSphere(SelfPos, 200)) do
+				if not (targ == self) and (targ:IsPlayer() or targ:IsNPC() or targ:IsVehicle()) and JMod.ClearLoS(self, targ) then
+					
+					local targPos = targ:GetPos()
 
-						self:SetState(STATE_WARNING)
-						self.WarningSnd:Play()
-
-						if targPos:Distance(SelfPos) < 5000 then
-							timer.Simple(0.2 * JMod.Config.MineDelay, function()
-								if IsValid(self) then
-									if self:GetState() == STATE_WARNING then
-										self.WarningSnd:Stop()
-										self:EmitSound("npc/roller/mine/combine_mine_deploy1.wav", 100)
-										local TargetPos = targ:LocalToWorld(targ:OBBCenter()) + targ:GetVelocity()
-										self:Launch(TargetPos)
-									end
-								end
-							end)
+					if not(IsValid(self:GetTarget())) or SelfPos:Distance(self:GetTarget():GetPos()) > SelfPos:Distance(targPos) then
+						if JMod.ShouldAttack(self, targ) then
+							self.WarningSnd:Play()
+							self:SetAlly(false)
+						else
+							self.WarningSnd:Stop()
+							self:SetAlly(true)
 						end
-					else
-						self:SetState(STATE_ARMED)
+						self:SetTarget(targ)
+					end
+				end
+			end
+
+			if IsValid(self:GetTarget()) then
+				local Target, TargetPos = self:GetTarget(), self:GetTarget():GetPos()
+
+				if SelfPos:Distance(TargetPos) < 150 then
+					if not(self:GetAlly()) then
 						self.WarningSnd:Stop()
+						self:EmitSound("npc/roller/blade_in.wav")
+						self:SetLegs(70)
+						self:SetClaws(-70)
+						timer.Simple(0.2 * JMod.Config.MineDelay, function()
+							if IsValid(self) then
+								self:EmitSound("npc/roller/mine/rmine_blip3.wav")
+								local LaunchPos = Target:LocalToWorld(Target:OBBCenter()) + Target:GetVelocity()
+								self:Launch(LaunchPos)
+							end
+						end)
+					end
+				elseif SelfPos:Distance(TargetPos) > 200 then
+					self:SetTarget(nil)
+					self:SetAlly(false)
+					if self.WarningSnd:IsPlaying() then
+						self.WarningSnd:Stop()
+						self:EmitSound("npc/roller/mine/combine_mine_deactivate1.wav")
 					end
 				end
 			end
@@ -288,10 +343,10 @@ if SERVER then
 			end
 
 			if self.StillTicks > 4 then
-				self:Arm(self.Owner or game.GetWorld(), true)
+				self:Arm(JMod.Owner(self) or game.GetWorld())
 			end
 
-			self:NextThink(Time + .5)
+			self:NextThink(Time + .1)
 
 			return true
 		end
@@ -310,18 +365,52 @@ elseif CLIENT then
 
 	function ENT:Draw()
 		self:DrawModel()
-		local State, Vary = self:GetState(), math.sin(CurTime() * 50) / 2 + .5
+		local Up = self:GetUp()
+		local State= self:GetState()
 
 		if State == STATE_ARMING then
 			render.SetMaterial(GlowSprite)
-			render.DrawSprite(self:GetPos() + Vector(0, 0, 8), 20, 20, Color(255, 0, 0))
-			render.DrawSprite(self:GetPos() + Vector(0, 0, 8), 10, 10, Color(255, 0, 0))
-		elseif State == STATE_WARNING then
-			render.SetMaterial(GlowSprite)
-			render.DrawSprite(self:GetPos() + Vector(0, 0, 8), 30, 30, Color(255, 0, 0))
-			render.DrawSprite(self:GetPos() + Vector(0, 0, 8), 15, 15, Color(255, 0, 0))
+			render.DrawSprite(self:GetPos() + Up * 10, 20, 20, Color(0, 0, 255))
+			render.DrawSprite(self:GetPos() + Up * 10, 10, 10, Color(0, 0, 255))
+		elseif State == STATE_ARMED then
+			if IsValid(self:GetTarget()) and self:GetAlly() then
+				render.SetMaterial(GlowSprite)
+				render.DrawSprite(self:GetPos() + Up * 10, 20, 20, Color(0, 255, 0))
+				render.DrawSprite(self:GetPos() + Up * 10, 15, 15, Color(0, 255, 0))
+			elseif IsValid(self:GetTarget()) and (self:GetAlly() == false) then
+				render.SetMaterial(GlowSprite)
+				render.DrawSprite(self:GetPos() + Up * 10, 20, 20, Color(255, 0, 0))
+				render.DrawSprite(self:GetPos() + Up * 10, 15, 15, Color(255, 0, 0))
+			elseif not(IsValid(self:GetTarget())) then
+				render.SetMaterial(GlowSprite)
+				render.DrawSprite(self:GetPos() + Up * 10, 20, 20, Color(255, 255, 0))
+				render.DrawSprite(self:GetPos() + Up * 10, 15, 15, Color(255, 255, 0))
+			end
 		end
 	end
 
 	language.Add("ent_jack_gmod_ezhoppermine", "EZ Hopper Mine")
 end
+
+
+
+--[[
+	----Combine mine behavior, for refrence----
+	1)Start arming (about 1 sec delay)
+	2)Trace downward
+	2a)If hit, grab with claws and arm like normal
+	2b)If not hit, jump, and go to step 2
+	3)If applicible entity comes into range and sight, set as target
+	3a)If target is enemy, turn red and start warning
+	3b)If target ally, turn green and give no indicative sound
+	3c)If there are no applicible targets in range, set target to nil and go to step 3
+	4)If target gets to close and is enemy, disengage from the ground (about .5 delay)
+	5)Blip and jump towards target
+	
+	----Below are rules for whatever state the mine is in----
+
+	Rule 1)If picked up with the grav-gun, turn yellow (about 1 sec delay) 'disarm' and set to players side
+	Rule 1a)While being held, turn light blue and actuate claws
+	Rule 2)If dropped, go to step 1
+	Rule 3)If thrown at any great speed, explode
+]]--
