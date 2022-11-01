@@ -109,7 +109,7 @@ if(SERVER)then
 elseif(CLIENT)then
 	function ENT:Initialize()
 		local LerpedElec = 0
-		self:AddCallback("BuildBonePositions",function(ent,numbones)
+		self:AddCallback("BuildBonePositions", function(ent,numbones)
 
 			local ElecFrac = LerpedElec / 100
 			local DrainedFraction= 1 - ElecFrac
