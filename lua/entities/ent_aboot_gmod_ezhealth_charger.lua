@@ -129,7 +129,7 @@ if(SERVER)then
 elseif(CLIENT)then
 	function ENT:Initialize()
 		local LerpedSupplies = 0
-		self:AddCallback("BuildBonePositions",function(ent,numbones)
+		self:AddCallback("BuildBonePositions", function(ent, numbones)
 			local SupplyFrac = LerpedSupplies / 100
 			local DrainedFraction = 1 - SupplyFrac
 			local Pos,Ang = ent:GetBonePosition(0)

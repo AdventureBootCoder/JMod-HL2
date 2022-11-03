@@ -51,7 +51,7 @@ if SERVER then
 		self:SetUseType(SIMPLE_USE)
 		---
 		timer.Simple(.01, function()
-			self:GetPhysicsObject():SetMass(10)
+			--self:GetPhysicsObject():SetMass(10)
 			self:GetPhysicsObject():Wake()
 		end)
 		---
@@ -187,8 +187,8 @@ if SERVER then
 				if self:GetState() == STATE_ARMING then
 					local Tr = util.QuickTrace(self:GetPos(), Vector(0, 0, -2), self)
 
-					if Tr.Hit then
-						self.Weld = constraint.Weld(Tr.Entity, self, 0, 0, 5000, false, false)
+					if Tr.Hit and not(Tr.Entity:IsNPC() or Tr.Entity:IsPlayer()) then
+						self.Weld = constraint.Ballsocket(Tr.Entity, self, 0, 0, Vector(0, 0, -1), 5000, 0, 0)
 						if self.Weld then
 							self.Weld:Activate()
 							self:EmitSound("npc/roller/blade_cut.wav", 75)
@@ -251,7 +251,7 @@ if SERVER then
 
 				Phys:EnableMotion(true)
 				Phys:SetDragCoefficient(0)
-				Phys:SetVelocity((ToDir * Speed) + VectorRand(-1, 1))
+				Phys:SetVelocity(Phys:GetVelocity() + (ToDir * Speed) + VectorRand(-1, 1))
 			end
 		end)
 	end
@@ -263,6 +263,8 @@ if SERVER then
 		if istable(WireLib) then
 			WireLib.TriggerOutput(self, "State", State)
 		end
+
+		--print(self:GetCollisionGroup())
 
 		if State == STATE_ARMED then
 			if not(IsValid(self.Weld)) then
@@ -382,10 +384,10 @@ elseif CLIENT then
 				ent:SetLegs(75)
 				ent:SetClaws(-75)
 			elseif State == STATE_HELD then
-				local Vary = math.sin(CurTime() * 1)/2 + .5
+				local Vary = math.sin(CurTime() * 5)/2 + .5
 				ent:SetLegs(70 * LerpedMove)
 				ent:SetClaws(-70 * LerpedMove)
-				LerpedMove = Lerp(math.ease.InOutExpo(FrameTime() * 5), LerpedMove, Vary)
+				LerpedMove = Lerp(math.ease.InOutExpo(FrameTime() * 100), LerpedMove, Vary)
 			elseif State == STATE_LAUNCHED and LastState ~= State then
 				ent:SetLegs(70)
 				ent:SetClaws(-70)

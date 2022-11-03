@@ -25,9 +25,9 @@ local HEVArmorProtectionProfile={
 JMod.AdditionalArmorTable["ABoot HEV Suit"]={
 	PrintName="HEV Suit",
 	Category="JMod - EZ HL:2",
-	mdl = "models/custom/scifiboxes/crate_d.mdl",
-	--mdl="models/props_junk/cardboard_box002a.mdl",
-	--mat="models/ragenigga/hev_suit/hevsuit_sheet",
+	--mdl = "models/custom/scifiboxes/crate_d.mdl",
+	mdl="models/props_junk/cardboard_box002a.mdl",
+	mat="models/ragenigga/hev_suit/hevsuit_sheet",
 	lbl="EZ HEV SUIT",
 	clr={ r = 255, g = 190, b = 0 },
 	clrForced=false,
@@ -61,8 +61,8 @@ JMod.AdditionalArmorTable["ABoot HEV Suit"]={
 		chemicals = 50
 	},
 	snds={
-		eq="snd_jack_clothequip.wav",
-		uneq="snd_jack_clothunequip.wav"
+		eq="hl1/fvox/bell.wav",
+		uneq="hl1/fvox/deactivated.wav"
 	},
 	eff={
 		HEVsuit = true,
