@@ -34,7 +34,8 @@ if SERVER then
 		local ent = ents.Create(self.ClassName)
 		ent:SetAngles(Angle(0, 0, 0))
 		ent:SetPos(SpawnPos)
-		JMod.Owner(ent, ply)
+		JMod.SetOwner(ent, ply)
+		JMod.Colorify(ent)
 		ent:Spawn()
 		ent:Activate()
 
@@ -43,7 +44,7 @@ if SERVER then
 
 	function ENT:Initialize()
 		self:SetModel("models/props_combine/combine_mine01.mdl")
-		--self:SetMaterial("models/jacky_camouflage/digi2")
+		self:SetMaterial("models/aboot/ezcombine_mine.vmt")
 		self:PhysicsInit(SOLID_VPHYSICS)
 		self:SetMoveType(MOVETYPE_VPHYSICS)
 		self:SetSolid(SOLID_VPHYSICS)
@@ -64,7 +65,7 @@ if SERVER then
 		---
 		self.ArmAttempts = 0
 		self.StillTicks = 0
-		self.AutoArm = true
+		--self.AutoArm = false
 
 		if self.AutoArm then
 			self:NextThink(CurTime() + .3)
@@ -104,14 +105,9 @@ if SERVER then
 
 		if State == STATE_OFF then
 			if Alt then
-				JMod.Owner(self, activator)
-				if self.JModGUIcolorable then
-					net.Start("JMod_ColorAndArm")
-					net.WriteEntity(self)
-					net.Send(activator)
-				else
-					self:Arm(self.activator)
-				end
+				JMod.SetOwner(self, activator)
+				JMod.Colorify(self)
+				self:Arm(self.activator)
 			else
 				activator:PickupObject(self)
 				JMod.Hint(activator, "arm")
@@ -119,7 +115,8 @@ if SERVER then
 		elseif not (activator.KeyDown and activator:KeyDown(IN_SPEED)) then
 			self:EmitSound("snd_jack_minearm.wav", 60, 70)
 			self:Disarm()
-			JMod.Owner(self, activator)
+			JMod.SetOwner(self, activator)
+			JMod.Colorify(self)
 			self:DrawShadow(true)
 			if IsValid(self.Weld) then
 				SafeRemoveEntity(self.Weld)
@@ -177,8 +174,11 @@ if SERVER then
 	function ENT:Arm(armer)
 		local State = self:GetState()
 		if State ~= STATE_OFF then return end
-		JMod.Hint(armer, "mine friends")
-		JMod.Owner(self, armer)
+		if IsValid(armer) then
+			JMod.Hint(armer, "mine friends")
+			JMod.SetOwner(self, armer)
+			JMod.Colorify(self)
+		end
 		self:SetState(STATE_ARMING)
 		self:EmitSound("snd_jack_minearm.wav", 60, 110)
 
@@ -188,7 +188,7 @@ if SERVER then
 					local Tr = util.QuickTrace(self:GetPos(), Vector(0, 0, -2), self)
 
 					if Tr.Hit and not(Tr.Entity:IsNPC() or Tr.Entity:IsPlayer()) then
-						self.Weld = constraint.Ballsocket(Tr.Entity, self, 0, 0, Vector(0, 0, -1), 5000, 0, 0)
+						self.Weld = constraint.Ballsocket(Tr.Entity, self, 0, 0, Vector(0, 0, -1), 0, 0, 0)
 						if self.Weld then
 							self.Weld:Activate()
 							self:EmitSound("npc/roller/blade_cut.wav", 75)
@@ -223,7 +223,7 @@ if SERVER then
 			if IsValid(self) and (self:GetState() == STATE_ARMING) and (self.ArmAttempts < 5) then
 				self.ArmAttempts = self.ArmAttempts + 1
 				self:SetState(STATE_OFF)
-				self:Arm(JMod.Owner(self) or game.GetWorld())
+				self:Arm(JMod.GetOwner(self))
 			else
 				self:SetState(STATE_OFF)
 			end
@@ -327,7 +327,7 @@ if SERVER then
 			end
 
 			if self.StillTicks > 4 then
-				self:Arm(JMod.Owner(self) or game.GetWorld())
+				self:Arm(JMod.GetOwner(self))
 			end
 
 			self:NextThink(Time + .1)
@@ -347,7 +347,8 @@ if SERVER then
 	hook.Remove("GravGunOnDropped", "ABootGravGunHopperGrab")
 	hook.Add("GravGunOnPickedUp", "ABootGravGunHopperGrab", function(ply, ent)
 		if ent:GetClass() == "ent_aboot_gmod_ezhoppermine" then 
-			JMod.Owner(ent, ply)
+			JMod.SetOwner(ent, ply)
+			JMod.Colorify(ent)
 			ent:SetState(STATE_HELD)
 		end
 	end)
@@ -365,7 +366,9 @@ if SERVER then
 	end)
 
 	function ENT:OnRemove()
-		self.WarningSnd:Stop()
+		if self.WarningSnd then
+			self.WarningSnd:Stop()
+		end
 	end
 
 elseif CLIENT then
@@ -380,17 +383,14 @@ elseif CLIENT then
 			if State == STATE_ARMED and LastState ~= State then
 				ent:SetLegs(0)
 				ent:SetClaws(0)
-			elseif State == STATE_OFF and LastState ~= State then
-				ent:SetLegs(75)
-				ent:SetClaws(-75)
+			elseif State == (STATE_OFF or STATE_LAUNCHED or STATE_ARMING) and LastState ~= State then
+				ent:SetLegs(70)
+				ent:SetClaws(-70)
 			elseif State == STATE_HELD then
 				local Vary = math.sin(CurTime() * 5)/2 + .5
 				ent:SetLegs(70 * LerpedMove)
 				ent:SetClaws(-70 * LerpedMove)
 				LerpedMove = Lerp(math.ease.InOutExpo(FrameTime() * 100), LerpedMove, Vary)
-			elseif State == STATE_LAUNCHED and LastState ~= State then
-				ent:SetLegs(70)
-				ent:SetClaws(-70)
 			end
 
 			LastState = State
