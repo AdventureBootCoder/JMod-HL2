@@ -132,24 +132,29 @@ elseif(CLIENT)then
 		self:AddCallback("BuildBonePositions", function(ent, numbones)
 			local SupplyFrac = LerpedSupplies / 100
 			local DrainedFraction = 1 - SupplyFrac
-			local Pos,Ang = ent:GetBonePosition(0)
-			local Up,Right,Forward = Ang:Up(),Ang:Right(),Ang:Forward()
+			local Pos, Ang = ent:GetBonePosition(0)
+			local Up, Right, Forward = Ang:Up(), Ang:Right(), Ang:Forward()
 			--local Vary = math.sin(CurTime()*12)/2+.5
 			-- the spinner
 			if(DrainedFraction <= 0.98)then
-				local spinAng = Ang:GetCopy()
-				spinAng:RotateAroundAxis(Up, 360*DrainedFraction)
-				ent:SetBonePosition(2, Pos-Right*5.25+Up*(6-DrainedFraction*5)+Forward*2.5, spinAng)
+				local SpinAng = Ang:GetCopy()
+				SpinAng:RotateAroundAxis(Up, 360 * DrainedFraction)
+				ent:SetBonePosition(2, Pos - Right *5.25 + Up * (6 - DrainedFraction * 5) + Forward * 2.5, SpinAng)
 			else
-				ent:SetBonePosition(2, Pos-Right*5.25+(Up*0.85)+Forward*2.5, Ang)
+				ent:SetBonePosition(2, Pos-Right * 5.25 + (Up * 0.85) + Forward * 2.5, Ang)
 			end
 			-- the healthbar (I'll figure it out eventually)
 			if ent:GetBoneMatrix(1) then
 				local MacTheMatrix = Matrix()
-				MacTheMatrix:Translate(Pos+Up*6.2+Forward*(7-DrainedFraction*6)+Right*1.1)
-				MacTheMatrix:Scale(Vector(1, 1, 1))
+				local BarAng = Ang:GetCopy()
+				BarAng:RotateAroundAxis(Forward, -90)
+				BarAng:RotateAroundAxis(Right, 90)
+				--MacTheMatrix:Translate(Pos + Up * 5.5 + Forward * (7 - DrainedFraction * 6) + Right * 1.1)
+				MacTheMatrix:Translate(Pos + Up * 6.2 + Forward * 7 + Right * 1.12)
+				MacTheMatrix:Rotate(BarAng)
+				MacTheMatrix:Scale(Vector(1, DrainedFraction * -10, 1))
 				ent:SetBoneMatrix(1, MacTheMatrix)
-				LerpedSupplies=Lerp(math.ease.OutCubic(FrameTime()*5),LerpedSupplies,self:GetSupplies())
+				LerpedSupplies=Lerp(math.ease.OutCubic(FrameTime() * 5),LerpedSupplies,self:GetSupplies())
 			end
 		end)
 	end
