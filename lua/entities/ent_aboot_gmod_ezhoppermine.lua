@@ -166,8 +166,8 @@ if SERVER then
 		util.Effect("eff_jack_minesplode", plooie, true, true)
 		util.ScreenShake(SelfPos, 99999, 99999, 1, 500)
 		self:EmitSound("snd_jack_fragsplodeclose.wav", 90, 100)
-		JMod.Sploom(self.Owner, SelfPos, math.random(50, 100))
-		--JMod.FragSplosion(self, SelfPos, 1000, 20 * JMod.Config.MinePower, 3000, self.Owner, Up, 1.2, 3)
+		JMod.Sploom(JMod.GetOwner(self), SelfPos, math.random(80, 125))
+		--JMod.FragSplosion(self, SelfPos, 100, 20 * JMod.Config.MinePower, 1000, JMod.GetOwner(self), Up, 1.3, 3)
 		self:Remove()
 	end
 
@@ -275,7 +275,7 @@ if SERVER then
 			--JPrint(tostring(self:GetTarget()) .. " \t " .. tostring(self:GetAlly()))
 
 			for k, targ in pairs(ents.FindInSphere(SelfPos, 250)) do
-				if not (targ == self) and (targ:IsPlayer() or targ:IsNPC() or targ:IsVehicle()) and JMod.ClearLoS(self, targ) then
+				if not (targ == self) and (targ:IsPlayer() or targ:IsNPC() or targ:IsVehicle()) and JMod.ClearLoS(self, targ, true) then
 					
 					local targPos = targ:GetPos()
 
