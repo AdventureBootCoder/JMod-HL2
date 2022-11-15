@@ -231,6 +231,7 @@ if SERVER then
 	end
 
 	function ENT:Launch(targetPos)
+		self:SetState(STATE_LAUNCHED)
 		timer.Simple(0.2 * JMod.Config.MineDelay, function()
 			if IsValid(self) then
 				self:EmitSound("npc/roller/mine/rmine_blip3.wav")
@@ -298,7 +299,6 @@ if SERVER then
 
 				if SelfPos:Distance(TargetPos) < 150 then
 					if not(self:GetAlly()) then
-						self:SetState(STATE_LAUNCHED)
 						self.WarningSnd:Stop()
 						self:EmitSound("npc/roller/blade_in.wav")
 						local LaunchPos = Target:LocalToWorld(Target:OBBCenter()) + Target:GetVelocity()
@@ -379,11 +379,13 @@ elseif CLIENT then
 		local LerpedMove, LastState = 0, 0
 		self:AddCallback("BuildBonePositions", function(ent, numbones)
 			local State = ent:GetState()
-
-			if State == STATE_ARMED and LastState ~= State then
+			if (State == STATE_ARMED) and (LastState ~= State) then
 				ent:SetLegs(0)
 				ent:SetClaws(0)
-			elseif State == (STATE_OFF or STATE_LAUNCHED or STATE_ARMING) and LastState ~= State then
+			elseif State == (STATE_OFF or STATE_ARMING) and (LastState ~= State) then
+				ent:SetLegs(70)
+				ent:SetClaws(-70)
+			elseif (State == STATE_LAUNCHED) and (LastState ~= State) then 
 				ent:SetLegs(70)
 				ent:SetClaws(-70)
 			elseif State == STATE_HELD then
