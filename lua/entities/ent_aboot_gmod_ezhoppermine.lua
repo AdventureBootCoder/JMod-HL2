@@ -382,7 +382,7 @@ elseif CLIENT then
 			if (State == STATE_ARMED) and (LastState ~= State) then
 				ent:SetLegs(0)
 				ent:SetClaws(0)
-			elseif State == (STATE_OFF or STATE_ARMING) and (LastState ~= State) then
+			elseif (State == STATE_OFF or STATE_ARMING) and (LastState ~= State) then
 				ent:SetLegs(70)
 				ent:SetClaws(-70)
 			elseif (State == STATE_LAUNCHED) and (LastState ~= State) then 
