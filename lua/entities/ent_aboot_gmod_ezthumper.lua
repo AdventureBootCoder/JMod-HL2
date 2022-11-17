@@ -64,8 +64,9 @@ if(SERVER)then
 
 			-- store they desposit's key if we're inside of it
 			if (Dist <= v.siz) and (not(table.HasValue(self.BlacklistedResources, v.typ))) then 
-				if v.rate or (v.amt < 0) then break end
-				table.insert(DepositsInRange, k)
+				if (v.rate) or (v.amt > 0) then
+					table.insert(DepositsInRange, k)
+				end
 			end
 		end
 
@@ -201,13 +202,13 @@ if(SERVER)then
 				self.WellPos = nil
 				self.Weld = nil
 				self:TurnOff()
-
+				print("[HL:2 - JMOD] Invalid weld")
 				return
 			end
 
 			if not JMod.NaturalResourceTable[self.DepositKey] then 
 				self:TurnOff()
-
+				print("[HL:2 - JMOD] Invalid deposit key")
 				return
 			end
 
