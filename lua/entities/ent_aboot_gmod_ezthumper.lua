@@ -7,6 +7,7 @@ ENT.Category = "JMod - EZ HL:2"
 ENT.Spawnable = true -- Temporary, until the next phase of Econ2
 ENT.AdminOnly = false
 ENT.Base = "ent_jack_gmod_ezmachine_base"
+ENT.AutomaticFrameAdvance = true
 ENT.EZconsumes = {"power", "parts"}
 --
 ENT.Model = "models/props_combine/combinethumper002.mdl"
@@ -29,11 +30,27 @@ function ENT:CustomSetupDataTables()
 	self:NetworkVar("String", 0, "ResourceType")
 end
 if(SERVER)then
+	function ENT:SpawnFunction(ply, tr)
+		local SpawnPos = tr.HitPos + tr.HitNormal * 10
+		local ent = ents.Create(self.ClassName)
+		ent:SetAngles(Angle(0, 0, 0))
+		ent:SetPos(SpawnPos)
+		JMod.SetOwner(ent, ply)
+		JMod.Colorify(ent)
+		ent:Spawn()
+		ent:Activate()
+
+		return ent
+	end
+
+
 	function ENT:CustomInit()
 		self:SetProgress(0)
 		self:SetState(STATE_OFF)
 		self:TryPlace()
 		self.DepositKey = 0
+		self:NextThink(1)
+		self.LastState = 0
 	end
 
 	function ENT:UpdateDepositKey()
@@ -96,7 +113,7 @@ if(SERVER)then
 				if(IsValid(self.Weld) and self.DepositKey)then
 					self:TurnOn(self.Owner)
 				else
-					if self:GetState() > 0 then
+					if self:GetState() > STATE_OFF then
 						self:TurnOff()
 					end
 					JMod.Hint(self.Owner, "machine mounting problem")
@@ -107,15 +124,14 @@ if(SERVER)then
 
 	function ENT:TurnOn(activator)
 		if(self:GetElectricity() > 0)then
-			self:SetState(STATE_RUNNING)
-			self:SetSequence("idle")
-			self:ResetSequenceInfo()
 			self:EmitSound("ambient/machines/thumper_startup1.wav", 100)
-			timer.Simple(2, function()
-				self.SoundLoop = CreateSound(self, "ambient/machines/thumper_amb.wav")
-				--self.SoundLoop:SetSoundLevel(100)
-				self.SoundLoop:Play()
-				self:SetProgress(0)
+			self:SetProgress(0)
+			timer.Simple(2.8, function()
+				if IsValid(self) and self:GetState() == STATE_OFF then
+					self:SetState(STATE_RUNNING)
+					self.SoundLoop = CreateSound(self, "ambient/machines/thumper_amb.wav")
+					self.SoundLoop:Play()
+				end
 			end)
 		else
 			JMod.Hint(activator,"nopower")
@@ -123,11 +139,9 @@ if(SERVER)then
 	end
 	
 	function ENT:TurnOff()
-		self:SetSequence("idle")
-		self:ResetSequenceInfo()
-		self:SetPlaybackRate(0)
 		self:SetState(STATE_OFF)
 		self:ProduceResource(self:GetProgress())
+		self:EmitSound("ambient/machines/thumper_shutdown1.wav", 100)
 
 		if self.SoundLoop then
 			self.SoundLoop:Stop()
@@ -167,8 +181,14 @@ if(SERVER)then
 	
 	function ENT:Think()
 		local State, Time = self:GetState(), CurTime()
+
 		if State == STATE_BROKEN then
 			if self.SoundLoop then self.SoundLoop:Stop() end
+			if self.LastState ~= State then
+				self:ResetSequence("idle")
+				self:ResetSequenceInfo()
+				self:SetPlaybackRate(0)
+			end
 
 			if self:GetElectricity() > 0 then
 				if math.random(1,4) == 2 then JMod.DamageSpark(self) end
@@ -191,28 +211,63 @@ if(SERVER)then
 				return
 			end
 
-			self:ConsumeElectricity(.5)
-			-- This is just the rate at which we drill
-			local drillRate = JMod.EZ_GRADE_BUFFS[self:GetGrade()] ^ 2
-			
-			-- Get the amount of resouces left in the ground
-			local amtLeft = JMod.NaturalResourceTable[self.DepositKey].amt
-			--print("Amount left: "..amtLeft) --DEBUG
-			-- If there's nothing left, we shouldn't do anything
-			if amtLeft <= 0 then self:TryPlace() return end
-			-- While progress is less than 100
-			self:SetProgress(self:GetProgress() + drillRate)
-
-			if self:GetProgress() >= 100 then
-				local amtToDrill = math.min(JMod.NaturalResourceTable[self.DepositKey].amt, 100)
-				self:ProduceResource(amtToDrill)
-				JMod.DepleteNaturalResource(self.DepositKey, amtToDrill)
+			self:ConsumeElectricity(.02)
+			if self.LastState ~= State then
+				self:SetSequence("idle")
+				self:ResetSequenceInfo()
 			end
 
-			JMod.EmitAIsound(self:GetPos(), 300, .5, 256)
-		end
+			if self:IsSequenceFinished() then
+				self:EmitSound("ambient/machines/thumper_hit.wav")
+				util.ScreenShake(self:GetPos(), 100, 60, 0.8, 1000)
+				local Eff = EffectData()
+				Eff:SetOrigin(self:GetAttachment(1).Pos)
+				Eff:SetScale(254)
+				util.Effect("ThumperDust", Eff, true, true)
+				self:EmitSound("ambient/machines/thumper_dust.wav")
+				self:ResetSequenceInfo()
 
-		self:NextThink(CurTime() + 1)
+				-- This is just the rate at which we pump
+				local pumpRate = JMod.EZ_GRADE_BUFFS[self:GetGrade()]^2
+				
+				-- Here's where we do the rescource deduction, and barrel production
+				-- If it's a flow (i.e. water)
+				if JMod.NaturalResourceTable[self.DepositKey].rate then
+					-- We get the rate
+					local flowRate = JMod.NaturalResourceTable[self.DepositKey].rate
+					-- and set the progress to what it was last tick + our ability * the flowrate
+					self:SetProgress(self:GetProgress() + pumpRate * flowRate)
+
+					-- If the progress exceeds 100
+					if self:GetProgress() >= 100 then
+						-- Spawn barrel
+						local amtToPump = math.min(self:GetProgress(), 100)
+						self:ProduceResource(amtToPump)
+					end
+				else
+					self:SetProgress(self:GetProgress() + pumpRate)
+
+					if self:GetProgress() >= 100 then
+						local amtToPump = math.min(JMod.NaturalResourceTable[self.DepositKey].amt, 100)
+						self:ProduceResource(amtToPump)
+						JMod.DepleteNaturalResource(self.DepositKey, amtToPump)
+					end
+				end
+			end
+
+			JMod.EmitAIsound(self:GetPos(), 1000, .5, 256)
+
+		else
+			if self.LastState ~= State then
+				self:ResetSequence("idle")
+				self:ResetSequenceInfo()
+				self:SetPlaybackRate(0)
+			end
+		end
+		
+		self.LastState = State
+		self:NextThink(CurTime() + 0.1)
+		return true
 	end
 	
 	function ENT:ProduceResource()
@@ -222,8 +277,8 @@ if(SERVER)then
 		if amt <= 0 then return end
 
 		local pos = SelfPos
-		local spawnVec = self:WorldToLocal(Vector(SelfPos) + Up * 15 + Forward * 20)
-		JMod.MachineSpawnResource(self, self:GetResourceType(), amt, spawnVec, Angle(0, 0, -90), Forward*100, true, 200)
+		local spawnVec = self:WorldToLocal(Vector(SelfPos) + Up * 30 + Right * 80)
+		JMod.MachineSpawnResource(self, self:GetResourceType(), amt, spawnVec, Angle(0, 0, 0), Forward*100, true, 200)
 		self:SetProgress(self:GetProgress() - amt)
 	end
 
@@ -238,6 +293,7 @@ elseif(CLIENT)then
 			end
 		end)]]--
 	end
+	
 	function ENT:Draw()
 		self:DrawModel()
 		local Up, Right, Forward, Grade, Typ, State = self:GetUp(), self:GetRight(), self:GetForward(), self:GetGrade(), self:GetResourceType(), self:GetState()
@@ -266,7 +322,7 @@ elseif(CLIENT)then
 				DisplayAng:RotateAroundAxis(DisplayAng:Up(), 180)
 				DisplayAng:RotateAroundAxis(DisplayAng:Forward(), 90)
 				local Opacity = math.random(50,150)
-				cam.Start3D2D(SelfPos + Up * 40 - Right * 26 - Forward * 12, DisplayAng, .1)
+				cam.Start3D2D(SelfPos + Up * 40 - Right * 30 + Forward * 35, DisplayAng, .1)
                     surface.SetDrawColor(10, 10, 10, Opacity + 50)
                     surface.DrawRect(184, -200, 128, 128)
                     JMod.StandardRankDisplay(Grade, 248, -140, 118, Opacity + 50)

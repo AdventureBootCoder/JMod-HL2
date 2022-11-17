@@ -30,7 +30,7 @@ end
 ---
 if SERVER then
 	function ENT:SpawnFunction(ply, tr)
-		local SpawnPos = tr.HitPos + tr.HitNormal * 40
+		local SpawnPos = tr.HitPos + tr.HitNormal * 2
 		local ent = ents.Create(self.ClassName)
 		ent:SetAngles(Angle(0, 0, 0))
 		ent:SetPos(SpawnPos)
