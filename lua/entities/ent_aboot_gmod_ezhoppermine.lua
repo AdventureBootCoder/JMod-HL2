@@ -70,7 +70,7 @@ if SERVER then
 		if self.AutoArm then
 			self:NextThink(CurTime() + .3)
 		end
-		self.WarningSnd = CreateSound(self, "npc/roller/mine/combine_mine_active_loop1.wav")
+		self.WarningSnd = CreateSound(self, "NPC_CombineMine.ActiveLoop")
 	end
 
 	function ENT:TriggerInput(iname, value)
@@ -107,6 +107,7 @@ if SERVER then
 			if Alt then
 				JMod.SetOwner(self, activator)
 				JMod.Colorify(self)
+				self:EmitSound("snd_jack_minearm.wav", 60, 110)
 				self:Arm(self.activator)
 			else
 				activator:PickupObject(self)
@@ -130,7 +131,7 @@ if SERVER then
 				if self:GetState() == STATE_LAUNCHED then
 					self:Detonate()
 				else
-					self:EmitSound("Weapon.ImpactHard")
+					self:EmitSound("SolidMetal.ImpactSoft")
 				end
 			end
 		end
@@ -166,13 +167,15 @@ if SERVER then
 		util.Effect("eff_jack_minesplode", plooie, true, true)
 		util.ScreenShake(SelfPos, 99999, 99999, 1, 500)
 		self:EmitSound("snd_jack_fragsplodeclose.wav", 90, 100)
-		JMod.Sploom(JMod.GetOwner(self), SelfPos, math.random(80, 125))
+		JMod.Sploom(JMod.GetOwner(self), SelfPos, 150, 125)
 		--JMod.FragSplosion(self, SelfPos, 100, 20 * JMod.Config.MinePower, 1000, JMod.GetOwner(self), Up, 1.3, 3)
 		self:Remove()
 	end
 
 	function ENT:Arm(armer)
 		local State = self:GetState()
+
+		if IsValid(self:GetParent()) then return end
 		if State ~= STATE_OFF then return end
 		if IsValid(armer) then
 			JMod.Hint(armer, "mine friends")
@@ -180,18 +183,18 @@ if SERVER then
 			JMod.Colorify(self)
 		end
 		self:SetState(STATE_ARMING)
-		self:EmitSound("snd_jack_minearm.wav", 60, 110)
 
 		timer.Simple(1, function()
 			if IsValid(self) then
 				if self:GetState() == STATE_ARMING then
 					local Tr = util.QuickTrace(self:GetPos(), Vector(0, 0, -2), self)
+					local IsUp = self:GetUp().z > 0.3
 
-					if Tr.Hit and not(Tr.Entity:IsNPC() or Tr.Entity:IsPlayer()) then
-						self.Weld = constraint.Ballsocket(Tr.Entity, self, 0, 0, Vector(0, 0, -1), 0, 0, 0)
+					if (Tr.Hit) and not(Tr.Entity:IsNPC() or Tr.Entity:IsPlayer()) and (IsUp) then
+						self.Weld = constraint.Ballsocket(Tr.Entity, self, Tr.PhysicsBone, 0, Vector(0, 0, -1), 0, 0, 0)
 						if self.Weld then
 							self.Weld:Activate()
-							self:EmitSound("npc/roller/blade_cut.wav", 75)
+							self:EmitSound("NPC_CombineMine.CloseHooks")
 							self:SetState(STATE_ARMED)
 							self:DrawShadow(false)
 							self.ArmAttempts = 0
@@ -208,16 +211,17 @@ if SERVER then
 
 	function ENT:Disarm()
 		self.WarningSnd:Stop()
-		self:EmitSound("npc/roller/mine/combine_mine_deactivate1.wav")
+		self:EmitSound("NPC_CombineMine.TurnOff")
 		self:SetState(STATE_OFF)
 	end
 
-	function ENT:Jump()
+	function ENT:Jump(extraVelocity)
+		extraVelocity = extraVelocity or Vector(0, 0, 0)
 		local Phys = self:GetPhysicsObject()
 
 		if Phys:IsMotionEnabled() then
-			self:EmitSound("npc/roller/mine/rmine_blip3.wav")
-			Phys:ApplyForceOffset(Vector(0, 0, 3000), self:LocalToWorld(Vector(math.random()*2, math.random()*2, 0)))
+			self:EmitSound("NPC_CombineMine.FlipOver")
+			Phys:ApplyForceOffset(Vector(0, 0, 3000) + extraVelocity, self:LocalToWorld(Vector(math.random()*2, math.random()*2, 0)))
 		end
 		timer.Simple(1, function()
 			if IsValid(self) and (self:GetState() == STATE_ARMING) and (self.ArmAttempts < 5) then
@@ -234,7 +238,7 @@ if SERVER then
 		self:SetState(STATE_LAUNCHED)
 		timer.Simple(0.2 * JMod.Config.MineDelay, function()
 			if IsValid(self) then
-				self:EmitSound("npc/roller/mine/rmine_blip3.wav")
+				self:EmitSound("NPC_CombineMine.Hop")
 				local SelfPos = self:GetPos()
 				local ToVec = targetPos - SelfPos
 				ToVec.z = 0
@@ -275,7 +279,7 @@ if SERVER then
 			end
 			--JPrint(tostring(self:GetTarget()) .. " \t " .. tostring(self:GetAlly()))
 
-			for k, targ in pairs(ents.FindInSphere(SelfPos, 250)) do
+			for k, targ in pairs(ents.FindInSphere(SelfPos, 245)) do
 				if not (targ == self) and (targ:IsPlayer() or targ:IsNPC() or targ:IsVehicle()) and JMod.ClearLoS(self, targ, true) then
 					
 					local targPos = targ:GetPos()
@@ -300,16 +304,16 @@ if SERVER then
 				if SelfPos:Distance(TargetPos) < 150 then
 					if not(self:GetAlly()) then
 						self.WarningSnd:Stop()
-						self:EmitSound("npc/roller/blade_in.wav")
+						self:EmitSound("NPC_CombineMine.OpenHooks")
 						local LaunchPos = Target:LocalToWorld(Target:OBBCenter()) + Target:GetVelocity()
 						self:Launch(LaunchPos)
 					end
-				elseif SelfPos:Distance(TargetPos) > 250 then
+				elseif SelfPos:Distance(TargetPos) > 245 then
 					self:SetTarget(nil)
 					self:SetAlly(false)
 					if self.WarningSnd:IsPlaying() then
 						self.WarningSnd:Stop()
-						self:EmitSound("npc/roller/mine/combine_mine_deactivate1.wav")
+						self:EmitSound("NPC_CombineMine.TurnOff")
 					end
 				end
 			end
@@ -336,20 +340,41 @@ if SERVER then
 		end
 	end
 
+	local LastGravGunGrabTime = 0
 	function ENT:GravGunPunt( ply )
 		if self:GetState() == STATE_HELD then
 			self:SetState(STATE_LAUNCHED)
 			self:EmitSound("npc/roller/mine/rmine_predetonate.wav")
+
 			return true
+		else
+			ply:DropObject()
 		end
 	end
 
 	hook.Remove("GravGunOnDropped", "ABootGravGunHopperGrab")
 	hook.Add("GravGunOnPickedUp", "ABootGravGunHopperGrab", function(ply, ent)
 		if ent:GetClass() == "ent_aboot_gmod_ezhoppermine" then 
-			JMod.SetOwner(ent, ply)
-			JMod.Colorify(ent)
-			ent:SetState(STATE_HELD)
+			local State = ent:GetState()
+			LastGravGunGrabTime = CurTime()
+
+			if State == STATE_ARMED then
+				ent:GetPhysicsObject():ApplyForceCenter(VectorRand() * 20)
+				timer.Simple(2, function()
+					if IsValid(ent) and ent:IsPlayerHolding() then
+						if IsValid(ent.Weld) then
+							SafeRemoveEntity(ent.Weld)
+						end
+						JMod.SetOwner(ent, ply)
+						JMod.Colorify(ent)
+						ent:SetState(STATE_HELD)
+					end
+				end)
+			else
+				JMod.SetOwner(ent, ply)
+				JMod.Colorify(ent)
+				ent:SetState(STATE_HELD)
+			end
 		end
 	end)
 

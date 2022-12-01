@@ -8,18 +8,18 @@ player_manager.AddValidHands( "Classic HEV Suit",
 JMod.AdditionalArmorTable = JMod.AdditionalArmorTable or {}
 
 local HEVArmorProtectionProfile={
-	[DMG_BUCKSHOT]=.33,
-	[DMG_CLUB]=.50,
-	[DMG_SLASH]=.75,
-	[DMG_BULLET]=.33,
-	[DMG_BLAST]=.5,
-	[DMG_SNIPER]=.2,
-	[DMG_AIRBOAT]=.8,
-	[DMG_CRUSH]=.5,
-	[DMG_VEHICLE]=.65,
-	[DMG_BURN]=.80,
-	[DMG_PLASMA]=.60,
-	[DMG_ACID]=.5
+	[DMG_BUCKSHOT]= .33,
+	[DMG_CLUB]= .50,
+	[DMG_SLASH]= .75,
+	[DMG_BULLET]= .33,
+	[DMG_BLAST]= .5,
+	[DMG_SNIPER]= .2,
+	[DMG_AIRBOAT]= .8,
+	[DMG_CRUSH]= .5,
+	[DMG_VEHICLE]= .65,
+	[DMG_BURN]= .8,
+	[DMG_PLASMA]= .60,
+	[DMG_ACID]= .5
 }
 
 JMod.AdditionalArmorTable["ABoot HEV Suit"]={

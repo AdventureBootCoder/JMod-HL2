@@ -12,6 +12,7 @@ ENT.EZconsumes = {"power", "parts"}
 --
 ENT.Model = "models/props_combine/combinethumper002.mdl"
 ENT.Mass = 1000
+ENT.SpawnHeight = 400
 ENT.StaticPerfSpecs = {
 	MaxDurability = 100,
 	MaxElectricity = 100
@@ -29,21 +30,8 @@ function ENT:CustomSetupDataTables()
 	self:NetworkVar("Float", 1, "Progress")
 	self:NetworkVar("String", 0, "ResourceType")
 end
+---
 if(SERVER)then
-	function ENT:SpawnFunction(ply, tr)
-		local SpawnPos = tr.HitPos + tr.HitNormal * 10
-		local ent = ents.Create(self.ClassName)
-		ent:SetAngles(Angle(0, 0, 0))
-		ent:SetPos(SpawnPos)
-		JMod.SetOwner(ent, ply)
-		JMod.Colorify(ent)
-		ent:Spawn()
-		ent:Activate()
-
-		return ent
-	end
-
-
 	function ENT:CustomInit()
 		self:SetProgress(0)
 		self:SetState(STATE_OFF)
