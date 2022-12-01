@@ -1,0 +1,17 @@
+"VertexLitGeneric"
+{
+	"$baseTexture" 		"models/props_generic/bm_hevcrate01_skin0_invoice"
+//	"$bumpmap" 			"models/props_generic/bm_hevcrate01_skin0_normal"
+	
+	
+//	"$phong" "1"
+	"$phongexponent" "25"
+	"$phongboost"	"1"
+	"$phongfresnelranges"	"[0.15 0.8 2.5]"
+
+	"$surfaceprop" "wood"
+
+	"%keywords" "bms, Andrea"
+    "$model" 1
+
+}

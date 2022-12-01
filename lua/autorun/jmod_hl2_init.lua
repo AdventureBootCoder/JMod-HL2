@@ -25,11 +25,10 @@ local HEVArmorProtectionProfile={
 JMod.AdditionalArmorTable["ABoot HEV Suit"]={
 	PrintName="HEV Suit",
 	Category="JMod - EZ HL:2",
-	--mdl = "models/custom/scifiboxes/crate_d.mdl",
-	mdl="models/props_junk/cardboard_box002a.mdl",
-	mat="models/ragenigga/hev_suit/hevsuit_sheet",
+	mdl="models/props_generic/bm_hevcrate01.mdl",
+	--mat="models/props_generic/bm_hevcrate01_skin0.vmt",
 	lbl="EZ HEV SUIT",
-	clr={ r = 255, g = 190, b = 0 },
+	clr={ r = 255, g = 255, b = 255 },
 	clrForced=false,
 	slots={
 		eyes=1,
