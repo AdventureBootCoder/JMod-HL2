@@ -41,8 +41,7 @@ if SERVER then
 	end
 
 	function ENT:Initialize()
-		self:SetModel("models/items/ammocrate_smg1.mdl")
-		self:SetSubMaterial(0, "models/aboot/ezammocrate_clean_sheet.vmt")
+		self:SetModel("models/aboot/ammocrate_aboot.mdl")
 		--self:SetModelScale(1.5,0)
 		self:PhysicsInit(SOLID_VPHYSICS)
 		self:SetMoveType(MOVETYPE_VPHYSICS)
@@ -78,8 +77,22 @@ if SERVER then
 
 	function ENT:CalcWeight()
 		local Frac = self:GetResource() / self.MaxResource
-		self:GetPhysicsObject():SetMass(100 + Frac * 300)
+		self:GetPhysicsObject():SetMass(150 + Frac * 300)
 		self:GetPhysicsObject():Wake()
+
+		if self:GetResource() > 0 then
+			self:SetBodygroup(1, 2)
+
+			local Resource = self:GetResourceType()
+			if Resource == JMod.EZ_RESOURCE_TYPES.AMMO then
+				self:SetSubMaterial(2, "models/mat_jack_gmod_ezammobox")
+			elseif Resource == JMod.EZ_RESOURCE_TYPES.MUNITIONS then
+				self:SetSubMaterial(2, "models/mat_jack_gmod_ezmunitionbox")
+			end
+
+		else
+			self:SetBodygroup(1, 0)
+		end
 	end
 
 	function ENT:OnTakeDamage(dmginfo)
@@ -119,111 +132,82 @@ if SERVER then
 
 	function ENT:Close()
 		timer.Simple(0.5, function()
-			if IsValid(self) and self.LastOpenTime < CurTime() then
-				self:SetSequence("Close")
-				self:ResetSequenceInfo()
-				self:EmitSound("AmmoCrate.Close")
-			else
-				self:Close()
+			if IsValid(self) then
+				if self.LastOpenTime < CurTime() then
+					self:SetSequence("Close")
+					self:ResetSequenceInfo()
+					self:EmitSound("AmmoCrate.Close")
+				else
+					self:Close()
+				end
 			end
 		end)
 	end
 
-	function ENT:GiveAmmo(ply)
-			local Wep = ply:GetActiveWeapon()
+	function ENT:GivePlyAmmo(ply, ent, fillStack)
+		if ent:GetResource() <= 0 then return end
+		local Wep = ply:GetActiveWeapon()
 
-			if Wep then
-				local PrimType, SecType, PrimSize, SecSize, WepClass = Wep:GetPrimaryAmmoType(), Wep:GetSecondaryAmmoType(), Wep:GetMaxClip1(), Wep:GetMaxClip2(), Wep:GetClass()
-				if table.HasValue(JMod.Config.WeaponAmmoBlacklist, WepClass) then return end
-				local IsMunitionBox = ent.EZsupplies == "munitions"
-				--[[ PRIMARY --]]
-				local PrimName = game.GetAmmoName(PrimType)
+		if Wep then
+			local PrimType, SecType, PrimSize, SecSize, WepClass = Wep:GetPrimaryAmmoType(), Wep:GetSecondaryAmmoType(), Wep:GetMaxClip1(), Wep:GetMaxClip2(), Wep:GetClass()
+			local PrimMax, SecMax, PrimName, SecName = game.GetAmmoMax(PrimType), game.GetAmmoMax(SecType), game.GetAmmoName(PrimType), game.GetAmmoName(SecType)
+			
+			local IsMunitionBox = ent.EZsupplies == "munitions"
 
-				if PrimName and JMod.AmmoTable[PrimName] then
-					-- use JMOD ammo rules
-					local AmmoInfo, CurrentAmmo = JMod.AmmoTable[PrimName], ply:GetAmmoCount(PrimName)
-
-					if ent.EZsupplies == AmmoInfo.resourcetype then
-						local ResourceLeftInBox = ent:GetResource() * 3
-						local SpaceLeftInPlayerInv, MaxAmtToGive, AmtLeftInBox = AmmoInfo.carrylimit - CurrentAmmo, math.ceil(100 / AmmoInfo.sizemult), math.ceil(ResourceLeftInBox * 6 / AmmoInfo.sizemult)
-						local AmtToGive = math.min(SpaceLeftInPlayerInv, MaxAmtToGive, AmtLeftInBox)
-
-						if AmtToGive > 0 then
-							local ResourceToTake = math.ceil(AmtToGive / 18 * AmmoInfo.sizemult)
-							ply:GiveAmmo(AmtToGive, PrimType)
-							ent:UseEffect(ent:GetPos(), ent)
-							ent:SetResource(ent:GetResource() - ResourceToTake)
-
-							if ent:GetResource() <= 0 then
-								if not noRemove then
-									ent:Remove()
-								end
-
-								return
-							end
-						end
+			--[[ PRIMARY --]]
+			local IsPrimMunitions = table.HasValue(JMod.Config.AmmoTypesThatAreMunitions, PrimName)
+			if (IsPrimMunitions == IsMunitionBox) and not(table.HasValue(JMod.Config.WeaponAmmoBlacklist, PrimName)) then
+				if PrimType and (PrimType ~= -1) then
+					if PrimSize == -1 then
+						PrimSize = -PrimSize
 					end
-				else
-					-- use DEFAULT ammo rules
-					if table.HasValue(JMod.Config.WeaponsThatUseMunitions, WepClass) then
-						if not IsMunitionBox then return end
+
+					local CurrentAmmo, ResourceLeftInBox = ply:GetAmmoCount(PrimName), ent:GetResource()
+					local SpaceLeftInPlayerInv = PrimMax - CurrentAmmo
+					local AmmoMult = (game.GetAmmoPlayerDamage(PrimType) * 0.01)
+					local AmtToGive = 0
+
+					if fillStack then
+						AmtToGive = math.min(SpaceLeftInPlayerInv, math.floor(ResourceLeftInBox / AmmoMult))
 					else
-						if IsMunitionBox then return end
+						AmtToGive = math.min(PrimSize, math.floor(ResourceLeftInBox / AmmoMult))
 					end
 
-					if PrimType and (PrimType ~= -1) then
-						if PrimSize == -1 then
-							PrimSize = -PrimSize
-						end
-
-						local PrimMax = game.GetAmmoData(PrimType).maxcarry
-
-						if ply:GetAmmoCount(PrimType) <= PrimMax then
-							ply:GiveAmmo(PrimMax - ply:GetAmmoCount(PrimType), PrimType)
-							ent:UseEffect(ent:GetPos(), ent)
-							ent:SetResource(ent:GetResource() - 100 * .1)
-
-							if ent:GetResource() <= 0 then
-								if not noRemove then
-									ent:Remove()
-								end
-
-								return
-							end
-						end
+					--print("SpaceLeftInPlayerInv: " .. SpaceLeftInPlayerInv)
+					--print("AmmoMult: " .. AmmoMult)
+					--print("AmmoInBox: " .. math.floor(ResourceLeftInBox / AmmoMult))
+					
+					if ply:GetAmmoCount(PrimType) < PrimMax then
+						ply:GiveAmmo(AmtToGive, PrimType)
+						ent:SetResource(ResourceLeftInBox - math.ceil(AmtToGive * AmmoMult))
+						ent:UseEffect(ent:GetPos(), ent)
 					end
 				end
-
-				--[[ SECONDARY --]]
-				local SecName = game.GetAmmoName(SecType)
-
-				if PrimName and JMod.AmmoTable[PrimName] then
-				else -- use JMOD ammo rules -- TODO, no jmod weapons use secondary ammo currently
-					-- use DEFAULT ammo rules
-					if table.HasValue(JMod.Config.WeaponsThatUseMunitions, WepClass) then
-						if not IsMunitionBox then return end
-					else
-						if IsMunitionBox then return end
+			end
+			
+			if ent:GetResource() <= 0 then return end
+			--[[ SECONDARY --]]
+			local IsSecMunitions = table.HasValue(JMod.Config.AmmoTypesThatAreMunitions, SecName)
+			if (IsSecMunitions == IsMunitionBox) and not(table.HasValue(JMod.Config.WeaponAmmoBlacklist, SecName)) then
+				if SecType and (SecType ~= -1) then
+					if SecSize == -1 then
+						SecSize = -SecSize
 					end
 
-					if SecType and (SecType ~= -1) then
-						if SecSize == -1 then
-							SecSize = -SecSize
+					local CurrentAmmo, ResourceLeftInBox = ply:GetAmmoCount(SecName), ent:GetResource()
+					local SpaceLeftInPlayerInv = SecMax - CurrentAmmo
+					local AmmoMult = game.GetAmmoPlayerDamage(SecType) / 10
+					local AmtToGive = math.min(SpaceLeftInPlayerInv, math.floor(ResourceLeftInBox / AmmoMult))
+
+					if ply:GetAmmoCount(SecType) < SecMax then
+						if fillStack then
+							ply:GiveAmmo(AmtToGive, SecType)
+							ent:SetResource(ResourceLeftInBox - math.ceil(AmtToGive * AmmoMult))
+						else
+							ply:GiveAmmo(SecSize, SecType)
+							ent:SetResource(ResourceLeftInBox - 10)
 						end
-
-						if ply:GetAmmoCount(SecType) <= SecSize * 5 * JMod.Config.AmmoCarryLimitMult then
-							ply:GiveAmmo(math.ceil(SecSize / 2), SecType)
-							ent:UseEffect(ent:GetPos(), ent)
-							ent:SetResource(ent:GetResource() - 100 * .1)
-
-							if ent:GetResource() <= 0 then
-								if not noRemove then
-									ent:Remove()
-								end
-
-								return
-							end
-						end
+						ent:UseEffect(ent:GetPos(), ent)
 					end
 				end
 			end
@@ -241,10 +225,7 @@ if SERVER then
 		end
 
 		if Alt then
-			local Wep = activator:GetActiveWeapon()
-			local PriAmmo, SecAmmo = Wep:GetPrimaryAmmoType(), Wep:GetSecondaryAmmoType()
-			--local ClipsLeft = 
-			JMod.GiveAmmo(activator, self, true)
+			self:GivePlyAmmo(activator, self, true)
 		else
 			local Box, Given = ents.Create(JMod.EZ_RESOURCE_ENTITIES[self:GetResourceType()]), math.min(Resource, 100)
 			Box:SetPos(self:GetPos() + self:GetUp() * 5)
@@ -271,7 +252,6 @@ if SERVER then
 	function ENT:OnRemove()
 	end
 
-	--aw fuck you
 	function ENT:TryLoadResource(typ, amt)
 		local Time = CurTime()
 		if self.NextLoad > Time then return 0 end
@@ -298,8 +278,12 @@ if SERVER then
 		return 0
 	end
 elseif CLIENT then
-	--53, 51, 31, 220 Box sample
-	local TxtCol = Color(14, 12, 1, 240)
+	function ENT:Initialize()
+		self:DrawShadow(true)
+		--self.MaxResource = 100 * 15
+	end
+	-- 53, 51, 31, 220 Box sample
+	--local TxtCol = Color(14, 12, 1, 240)
 
 	function ENT:Draw()
 		local Ang, Pos = self:GetAngles(), self:GetPos()
@@ -309,7 +293,13 @@ elseif CLIENT then
 		self:DrawModel()
 
 		if DetailDraw then
-			local Up, Right, Forward, Resource = Ang:Up(), Ang:Right(), Ang:Forward(), tostring(self:GetResource())
+			local Up, Right, Forward, Resource = Ang:Up(), Ang:Right(), Ang:Forward(), self:GetResource()
+			local BasePos = Pos - Up * 5
+
+			--local BoxAng = Ang:GetCopy()
+			--BoxAng:RotateAroundAxis(Up, 90)
+			--JMod.RenderModel(self.AmmoBoxModel, BasePos + Right * 20, AmmoAng, Vector(1, 0.9, 1))
+
 			Ang:RotateAroundAxis(Ang:Right(), 90)
 			Ang:RotateAroundAxis(Ang:Up(), -90)
 			cam.Start3D2D(Pos + Up * 14 - Forward * 16, Ang, .15)

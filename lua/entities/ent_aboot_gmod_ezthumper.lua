@@ -12,7 +12,7 @@ ENT.EZconsumes = {"power", "parts"}
 --
 ENT.Model = "models/props_combine/combinethumper002.mdl"
 ENT.Mass = 1000
-ENT.SpawnHeight = 400
+ENT.SpawnHeight = 10
 ENT.StaticPerfSpecs = {
 	MaxDurability = 100,
 	MaxElectricity = 100
@@ -34,11 +34,13 @@ end
 if(SERVER)then
 	function ENT:CustomInit()
 		self:SetProgress(0)
-		self:SetState(STATE_OFF)
-		self:TryPlace()
 		self.DepositKey = 0
-		self:NextThink(1)
 		self.LastState = 0
+		timer.Simple(0.01, function() 
+			self:TryPlace()
+		end)
+		self:NextThink(1)
+		
 	end
 
 	function ENT:UpdateDepositKey()
@@ -83,7 +85,7 @@ if(SERVER)then
 	end
 
 	function ENT:TryPlace()
-		local Tr = util.QuickTrace(self:GetPos() + Vector(0, 0, 100), Vector(0, 0, -500), self)
+		local Tr = util.QuickTrace(self:GetPos() + Vector(0, 0, 10), Vector(0, 0, -50), self)
 		if((Tr.Hit)and(Tr.HitWorld))then
 			local Yaw = self:GetAngles().y
 			self:SetAngles(Angle(0, Yaw,0))
