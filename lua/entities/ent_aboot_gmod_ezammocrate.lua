@@ -149,7 +149,7 @@ if SERVER then
 		local Wep = ply:GetActiveWeapon()
 
 		if Wep then
-			local PrimType, SecType, PrimSize, SecSize, WepClass = Wep:GetPrimaryAmmoType(), Wep:GetSecondaryAmmoType(), Wep:GetMaxClip1(), Wep:GetMaxClip2(), Wep:GetClass()
+			local PrimType, SecType, PrimSize, SecSize = Wep:GetPrimaryAmmoType(), Wep:GetSecondaryAmmoType(), Wep:GetMaxClip1(), Wep:GetMaxClip2()
 			local PrimMax, SecMax, PrimName, SecName = game.GetAmmoMax(PrimType), game.GetAmmoMax(SecType), game.GetAmmoName(PrimType), game.GetAmmoName(SecType)
 			
 			local IsMunitionBox = ent.EZsupplies == "munitions"
@@ -174,10 +174,10 @@ if SERVER then
 						AmtToGive = math.min(PrimSize, math.floor(ResourceLeftInBox / ResourceUnitPerAmmo))
 					end
 
-					print("AmmoDMG: " .. game.GetAmmoPlayerDamage(PrimType))
-					print("AmmoMult: " .. ResourceUnitPerAmmo)
-					print("AmmoInBox: " .. math.floor(ResourceLeftInBox / ResourceUnitPerAmmo))
-					print("SpaceLeftInPlayerInv: " .. SpaceLeftInPlayerInv)
+					--print("AmmoDMG: " .. game.GetAmmoPlayerDamage(PrimType))
+					--print("AmmoMult: " .. ResourceUnitPerAmmo)
+					--print("AmmoInBox: " .. math.floor(ResourceLeftInBox / ResourceUnitPerAmmo))
+					--print("SpaceLeftInPlayerInv: " .. SpaceLeftInPlayerInv)
 					
 					if ply:GetAmmoCount(PrimType) < PrimMax * JMod.Config.AmmoCarryLimitMult then
 						ply:GiveAmmo(AmtToGive, PrimType)
