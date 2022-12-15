@@ -360,7 +360,7 @@ if SERVER then
 
 			if State == STATE_ARMED then
 				ent:GetPhysicsObject():ApplyForceCenter(VectorRand() * 20)
-				timer.Simple(2, function()
+				timer.Simple(1.5, function()
 					if IsValid(ent) and ent:IsPlayerHolding() then
 						if IsValid(ent.Weld) then
 							SafeRemoveEntity(ent.Weld)

@@ -8,7 +8,10 @@ ENT.Spawnable = true -- Temporary, until the next phase of Econ2
 ENT.AdminOnly = false
 ENT.Base = "ent_jack_gmod_ezmachine_base"
 ENT.AutomaticFrameAdvance = true
-ENT.EZconsumes = {"power", "parts"}
+ENT.EZconsumes = {
+	JMod.EZ_RESOURCE_TYPES.BASICPARTS,
+	JMod.EZ_RESOURCE_TYPES.POWER
+}
 --
 ENT.Model = "models/props_combine/combinethumper002.mdl"
 ENT.Mass = 1000
@@ -98,7 +101,7 @@ if(SERVER)then
 			end
 			self:UpdateDepositKey()
 			if not self.DepositKey then
-				JMod.Hint(self.Owner, "oil derrick")
+				--JMod.Hint(self.Owner, "oil derrick")
 			elseif(GroundIsSolid)then
 				if not(IsValid(self.Weld))then self.Weld = constraint.Weld(self, Tr.Entity, 0, 0, 50000, false, false) end
 				if(IsValid(self.Weld) and self.DepositKey)then
