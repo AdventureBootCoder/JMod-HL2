@@ -154,7 +154,7 @@ elseif(CLIENT)then
 				MacTheMatrix:Rotate(BarAng)
 				MacTheMatrix:Scale(Vector(1, DrainedFraction * -10, 1))
 				ent:SetBoneMatrix(1, MacTheMatrix)
-				LerpedSupplies=Lerp(math.ease.OutCubic(FrameTime() * 5),LerpedSupplies,self:GetSupplies())
+				LerpedSupplies = Lerp(math.ease.OutCubic(FrameTime() * 5), LerpedSupplies, self:GetSupplies())
 			end
 		end)
 	end

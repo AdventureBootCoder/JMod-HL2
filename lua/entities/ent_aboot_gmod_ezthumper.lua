@@ -14,7 +14,7 @@ ENT.EZconsumes = {
 }
 --
 ENT.Model = "models/props_combine/combinethumper002.mdl"
-ENT.Mass = 1000
+ENT.Mass = 4000
 ENT.SpawnHeight = 10
 ENT.StaticPerfSpecs = {
 	MaxDurability = 100,
