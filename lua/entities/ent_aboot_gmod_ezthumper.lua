@@ -18,7 +18,7 @@ ENT.Mass = 4000
 ENT.SpawnHeight = 10
 ENT.StaticPerfSpecs = {
 	MaxDurability = 100,
-	MaxElectricity = 100
+	MaxElectricity = 400
 }
 ENT.DynamicPerfSpecs = {
 	Armor = 2
@@ -78,7 +78,7 @@ if(SERVER)then
 			end
 		end
 		if(ClosestDeposit)then 
-			self.DepositKey = ClosestDeposit 
+			self.DepositKey = ClosestDeposit
 			self:SetResourceType(JMod.NaturalResourceTable[self.DepositKey].typ)
 			--print("Our deposit is "..self.DepositKey) --DEBUG
 		else 
@@ -88,11 +88,12 @@ if(SERVER)then
 	end
 
 	function ENT:TryPlace()
-		local Tr = util.QuickTrace(self:GetPos() + Vector(0, 0, 10), Vector(0, 0, -50), self)
-		if((Tr.Hit)and(Tr.HitWorld))then
-			local Yaw = self:GetAngles().y
-			self:SetAngles(Angle(0, Yaw,0))
-			self:SetPos(Tr.HitPos + Tr.HitNormal * 0.1)
+		local Tr = util.QuickTrace(self:GetPos() + Vector(0, 0, 30), Vector(0, 0, -50), self)
+		if (Tr.Hit) and (Tr.HitWorld) then
+			local Roll = Tr.HitNormal:Angle().z
+			local Yaw = Tr.HitNormal:Angle().y
+			self:SetAngles(Angle(0, Yaw - 90, 0))
+			self:SetPos(Tr.HitPos + Tr.HitNormal * 0.1 * -Roll * 20)
 			--
 			local GroundIsSolid = true
 			for i = 1, 50 do
@@ -101,7 +102,7 @@ if(SERVER)then
 			end
 			self:UpdateDepositKey()
 			if not self.DepositKey then
-				--JMod.Hint(self.Owner, "oil derrick")
+				JMod.Hint(self.Owner, "oil derrick")
 			elseif(GroundIsSolid)then
 				if not(IsValid(self.Weld))then self.Weld = constraint.Weld(self, Tr.Entity, 0, 0, 50000, false, false) end
 				if(IsValid(self.Weld) and self.DepositKey)then
@@ -191,8 +192,7 @@ if(SERVER)then
 			return
 		elseif State == STATE_RUNNING then
 			if not IsValid(self.Weld) then
-				self.DepositKey = nil
-				self.WellPos = nil
+				self.DepositKey = 0
 				self.Weld = nil
 				self:TurnOff()
 				print("[HL:2 - JMOD] Invalid weld")
@@ -270,8 +270,7 @@ if(SERVER)then
 
 		if amt <= 0 then return end
 
-		local pos = SelfPos
-		local spawnVec = self:WorldToLocal(Vector(SelfPos) + Up * 30 + Right * 80)
+		local spawnVec = self:WorldToLocal(Vector(SelfPos) + Up * 135 + Right * 80)
 		JMod.MachineSpawnResource(self, self:GetResourceType(), amt, spawnVec, Angle(0, 0, 0), Forward*100, true, 200)
 		self:SetProgress(self:GetProgress() - amt)
 	end

@@ -98,6 +98,14 @@ if SERVER then
 	function ENT:OnTakeDamage(dmginfo)
 		self:TakePhysicsDamage(dmginfo)
 
+		local Attacker = dmginfo:GetAttacker()
+		local HL2Ammo = {"AR2", "Pistol", "XBowBolt", "SMG1", "357", "Buckshot", "RPG_Round", "slam", "Grenade", "AlyxGun", "SniperRound"}
+		if (IsValid(Attacker) and Attacker:IsPlayer()) and (Attacker:GetActiveWeapon():GetClass() == "weapon_crowbar") then
+			for k, v in ipairs(HL2Ammo) do
+				self:GivePlyAmmo(Attacker, true, v)
+			end
+		end
+
 		if dmginfo:GetDamage() > self.DamageThreshold then
 			local Pos = self:GetPos()
 			sound.Play("Wood_Crate.Break", Pos)
@@ -108,6 +116,7 @@ if SERVER then
 					local Box = ents.Create(JMod.EZ_RESOURCE_ENTITIES[self:GetResourceType()])
 					Box:SetPos(Pos + self:GetUp() * 20)
 					Box:SetAngles(self:GetAngles())
+					Box:SetVelocity(self:GetVelocity())
 					Box:Spawn()
 					Box:Activate()
 				end
@@ -144,15 +153,15 @@ if SERVER then
 		end)
 	end
 
-	function ENT:GivePlyAmmo(ply, ent, fillStack)
-		if ent:GetResource() <= 0 then return end
+	function ENT:GivePlyAmmo(ply, fillStack, ammoType)
+		if self:GetResource() <= 0 then return end
 		local Wep = ply:GetActiveWeapon()
 
 		if Wep then
-			local PrimType, SecType, PrimSize, SecSize = Wep:GetPrimaryAmmoType(), Wep:GetSecondaryAmmoType(), Wep:GetMaxClip1(), Wep:GetMaxClip2()
+			local PrimType, SecType, PrimSize, SecSize = (game.GetAmmoID(ammoType) or Wep:GetPrimaryAmmoType()), Wep:GetSecondaryAmmoType(), Wep:GetMaxClip1(), Wep:GetMaxClip2()
 			local PrimMax, SecMax, PrimName, SecName = game.GetAmmoMax(PrimType), game.GetAmmoMax(SecType), game.GetAmmoName(PrimType), game.GetAmmoName(SecType)
 			
-			local IsMunitionBox = ent.EZsupplies == "munitions"
+			local IsMunitionBox = self.EZsupplies == "munitions"
 
 			--[[ PRIMARY --]]
 			local IsPrimMunitions = table.HasValue(JMod.Config.AmmoTypesThatAreMunitions, PrimName)
@@ -162,7 +171,7 @@ if SERVER then
 						PrimSize = -PrimSize
 					end
 
-					local CurrentAmmo, ResourceLeftInBox = ply:GetAmmoCount(PrimName), ent:GetResource()
+					local CurrentAmmo, ResourceLeftInBox = ply:GetAmmoCount(PrimName), self:GetResource()
 					local SpaceLeftInPlayerInv = PrimMax - CurrentAmmo
 					local AmmoPerResourceUnit = PrimMax / 30
 					local ResourceUnitPerAmmo = 1 / AmmoPerResourceUnit
@@ -181,13 +190,13 @@ if SERVER then
 					
 					if ply:GetAmmoCount(PrimType) < PrimMax * JMod.Config.AmmoCarryLimitMult then
 						ply:GiveAmmo(AmtToGive, PrimType)
-						ent:SetResource(ResourceLeftInBox - math.ceil(AmtToGive * ResourceUnitPerAmmo))
-						ent:UseEffect(ent:GetPos(), ent)
+						self:SetResource(ResourceLeftInBox - math.ceil(AmtToGive * ResourceUnitPerAmmo))
+						self:UseEffect(self:GetPos(), self)
 					end
 				end
 			end
 			
-			if ent:GetResource() <= 0 then return end
+			if self:GetResource() <= 0 then return end
 			--[[ PRIMARY --]]
 			local IsSecMunitions = table.HasValue(JMod.Config.AmmoTypesThatAreMunitions, SecName)
 			if (IsSecMunitions == IsMunitionBox) and not(table.HasValue(JMod.Config.WeaponAmmoBlacklist, SecName)) then
@@ -196,7 +205,7 @@ if SERVER then
 						SecSize = -SecSize
 					end
 
-					local CurrentAmmo, ResourceLeftInBox = ply:GetAmmoCount(SecName), ent:GetResource()
+					local CurrentAmmo, ResourceLeftInBox = ply:GetAmmoCount(SecName), self:GetResource()
 					local SpaceLeftInPlayerInv = SecMax - CurrentAmmo
 					local AmmoPerResourceUnit = SecMax / 30
 					local ResourceUnitPerAmmo = 1 / AmmoPerResourceUnit
@@ -210,8 +219,8 @@ if SERVER then
 					
 					if ply:GetAmmoCount(SecType) < SecMax * JMod.Config.AmmoCarryLimitMult then
 						ply:GiveAmmo(AmtToGive, SecType)
-						ent:SetResource(ResourceLeftInBox - math.ceil(AmtToGive * ResourceUnitPerAmmo))
-						ent:UseEffect(ent:GetPos(), ent)
+						self:SetResource(ResourceLeftInBox - math.ceil(AmtToGive * ResourceUnitPerAmmo))
+						self:UseEffect(self:GetPos(), self)
 					end
 				end
 			end
@@ -229,7 +238,7 @@ if SERVER then
 		end
 
 		if Alt then
-			self:GivePlyAmmo(activator, self, true)
+			self:GivePlyAmmo(activator, true)
 		else
 			local Box, Given = ents.Create(JMod.EZ_RESOURCE_ENTITIES[self:GetResourceType()]), math.min(Resource, 100)
 			Box:SetPos(self:GetPos() + self:GetUp() * 5)
