@@ -1,7 +1,7 @@
 ﻿-- Jackarunda 2021
 AddCSLuaFile()
 ENT.Type = "anim"
-ENT.PrintName = "EZ Ship Container"
+ENT.PrintName = "EZ Shipping Container"
 ENT.Author = "Jackarunda, AdventureBoots"
 ENT.Category = "JMod - EZ HL:2"
 ENT.NoSitAllowed = true
@@ -78,8 +78,8 @@ if SERVER then
 	function ENT:PhysicsCollide(data, physobj)
 		if data.DeltaTime > 0.2 then
 			if data.Speed > 100 then
-				self.Entity:EmitSound("Wood_Crate.ImpactHard")
-				self.Entity:EmitSound("Wood_Box.ImpactHard")
+				self.Entity:EmitSound("Metal_Box.ImpactSoft")
+				self.Entity:EmitSound("Metal_Box.ImpactHard")
 			end
 		end
 	end
@@ -95,8 +95,8 @@ if SERVER then
 
 		if dmginfo:GetDamage() > self.DamageThreshold then
 			local Pos = self:GetPos()
-			sound.Play("Wood_Crate.Break", Pos)
-			sound.Play("Wood_Box.Break", Pos)
+			sound.Play("Metal_Box.Break", Pos)
+			sound.Play("Metal_Box.Break", Pos)
 
 			if self.ChildEntity ~= "" and self:GetResource() > 0 then
 				for i = 1, math.floor(self:GetResource() / 100) do
@@ -189,5 +189,5 @@ elseif CLIENT then
 		end
 	end
 
-	language.Add("ent_jack_gmod_ezcontainer", "EZ Shipment Container")
+	language.Add("ent_jack_gmod_ezcontainer", "EZ Shipping Container")
 end
