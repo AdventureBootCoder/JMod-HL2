@@ -9,7 +9,7 @@ ENT.Spawnable = true
 ENT.AdminSpawnable = true
 ---
 ENT.JModPreferredCarryAngles = Angle(0, 0, 0)
-ENT.DamageThreshold = 120
+ENT.DamageThreshold = 500
 ---
 
 ---
@@ -45,7 +45,7 @@ if SERVER then
 		---
 		self:SetResource(0)
 		
-		self.MaxResource = 100 * 900 -- standard size
+		self.MaxResource = 100 * 900 -- MAGA size
 		self.EZconsumes = {}
 
 		for k, v in pairs(JMod.EZ_RESOURCE_TYPES) do
@@ -55,7 +55,7 @@ if SERVER then
 		self.Contents = {}
 
 		for k, v in pairs(JMod.EZ_RESOURCE_TYPES) do
-			self.Contents[v] = {}
+			self.Contents[v] = 0
 		end
 
 		self.NextLoad = 0
@@ -64,15 +64,6 @@ if SERVER then
 		timer.Simple(.01, function()
 			self:CalcWeight()
 		end)
-	end
-
-	function ENT:ApplySupplyType(typ)
-		self.EZsupplies = typ
-		if typ == "generic" then
-			self.ChildEntity = ""
-		else
-			self.ChildEntity = JMod.EZ_RESOURCE_ENTITIES[typ]
-		end
 	end
 
 	function ENT:PhysicsCollide(data, physobj)
@@ -86,8 +77,14 @@ if SERVER then
 
 	function ENT:CalcWeight()
 		local Frac = self:GetResource() / self.MaxResource
-		self:GetPhysicsObject():SetMass(100 + Frac * 300)
+		self:GetPhysicsObject():SetMass(4000 + Frac * 300)
 		self:GetPhysicsObject():Wake()
+		self:SetResource(0)
+		for k, v in pairs(self.Contents) do
+			if v > 0 then
+				self:SetResource(self:GetResource() + v)
+			end
+		end
 	end
 
 	function ENT:OnTakeDamage(dmginfo)
@@ -98,13 +95,15 @@ if SERVER then
 			sound.Play("Metal_Box.Break", Pos)
 			sound.Play("Metal_Box.Break", Pos)
 
-			if self.ChildEntity ~= "" and self:GetResource() > 0 then
-				for i = 1, math.floor(self:GetResource() / 100) do
-					local Box = ents.Create(self.ChildEntity)
-					Box:SetPos(Pos + self:GetUp() * 20)
-					Box:SetAngles(self:GetAngles())
-					Box:Spawn()
-					Box:Activate()
+			if self:GetResource() > 0 then
+				for k, v in pairs(self.Contents) do
+					for i = 1, math.floor(v.Amt / 100) do
+						local Box = ents.Create(v.Ent)
+						Box:SetPos(Pos + self:GetUp() * 20)
+						Box:SetAngles(self:GetAngles())
+						Box:Spawn()
+						Box:Activate()
+					end
 				end
 			end
 
@@ -114,19 +113,45 @@ if SERVER then
 
 	function ENT:Use(activator)
 		JMod.Hint(activator, "crate")
-		local Resource = self:GetResource()
-		if Resource <= 0 then return end
-		--[[local Box, Given = ents.Create(self.ChildEntity), math.min(Resource, 100)
-		Box:SetPos(self:GetPos() + self:GetUp() * 5)
-		Box:SetAngles(self:GetAngles())
-		Box:Spawn()
-		Box:Activate()
-		Box:SetResource(Given)
-		Box.NextLoad = CurTime() + 2
-		self:SetResource(Resource - Given)]]--
-		self:EmitSound("Ammo_Crate.Close")
-		self:CalcWeight()
+		--if self:GetResource() <= 0 then return end
+		local TrimmedTable = {}
+		for k, v in pairs(self.Contents) do
+			if v > 0 then
+				TrimmedTable[k] = v
+			end
+		end
+		net.Start("ABoot_ContainerMenu")
+			net.WriteEntity(self)
+			net.WriteTable(TrimmedTable)
+		net.Send(activator)
+
+		self:EmitSound("Ammo_Crate.Open")
 	end
+
+	net.Receive("ABoot_ContainerMenu", function() 
+		local Container = net.ReadEntity()
+		local ResourceType = net.ReadString()
+		local Amount = net.ReadUInt(17)
+
+		if not IsValid(Container) then return end
+		if Container.Contents[ResourceType] <= 0 then return end
+		local Needed = math.min(Amount, Container.Contents[ResourceType])
+		for i = 1, Needed / 100 do
+			timer.Simple(0.3 * i, function()
+				if not IsValid(Container) then return end
+				local Box, Given = ents.Create(JMod.EZ_RESOURCE_ENTITIES[ResourceType]), math.min(Needed, 100)
+				Box:SetPos(Container:GetPos() + Container:GetRight() * 250 + Container:GetUp() * 30)
+				Box:SetAngles(Container:GetAngles())
+				Box:Spawn()
+				Box:Activate()
+				Box:SetResource(Given)
+				Box.NextLoad = CurTime() + 2
+				Needed = Needed - Given
+				Container.Contents[ResourceType] = Container.Contents[ResourceType] - Given
+				Container:CalcWeight()
+			end)
+		end
+	end)
 
 	function ENT:Think()
 	end
@@ -135,7 +160,6 @@ if SERVER then
 	function ENT:OnRemove()
 	end
 
-	--aw fuck you
 	function ENT:TryLoadResource(typ, amt)
 		local Time = CurTime()
 		if self.NextLoad > Time then self.NextLoad = math.min(self.NextLoad, Time + .5) return 0 end
@@ -147,12 +171,8 @@ if SERVER then
 		if Missing <= 0 then return 0 end
 		local Accepted = math.min(Missing, amt)
 
-		self.Contents[typ].Amt = Accepted
-		if not self.Contents[typ].Ent then
-			self.Contents[typ].Ent = JMod.EZ_RESOURCE_ENTITIES[typ]
-		end
+		self.Contents[typ] = self.Contents[typ] + Accepted
 
-		self:SetResource(Resource + Accepted)
 		self:CalcWeight()
 		self.NextLoad = Time + .5
 
@@ -163,7 +183,7 @@ elseif CLIENT then
 	local TxtCol = Color(5, 5, 5, 220)
 
 	function ENT:Initialize()
-		self.MaxResource = 100 * 200
+		self.MaxResource = 100 * 900
 	end
 
 	function ENT:Draw()
@@ -177,17 +197,35 @@ elseif CLIENT then
 			Ang:RotateAroundAxis(Ang:Right(), 90)
 			Ang:RotateAroundAxis(Ang:Up(), -90)
 			cam.Start3D2D(Pos + Up * 40 - Forward * 65 + Right * 10, Ang, .4)
-			draw.SimpleText("ABOOT MANUFACTURING", "JMod-Stencil", 0, 0, TxtCol, TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP)
+			draw.SimpleText("ADVENTURE INDUSTRIES", "JMod-Stencil", 0, 0, TxtCol, TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP)
 			draw.SimpleText(Resource .. "/" .. tostring(self.MaxResource), "JMod-Stencil", 0, 85, TxtCol, TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP)
 			cam.End3D2D()
 			---
 			Ang:RotateAroundAxis(Ang:Right(), 180)
 			cam.Start3D2D(Pos + Up * 40 + Forward * 65 - Right * 10, Ang, .4)
-			draw.SimpleText("ABOOT MANUFACTURING", "JMod-Stencil", 0, 0, TxtCol, TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP)
+			draw.SimpleText("ADVENTURE INDUSTRIES", "JMod-Stencil", 0, 0, TxtCol, TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP)
 			draw.SimpleText(Resource .. "/" .. tostring(self.MaxResource), "JMod-Stencil", 0, 85, TxtCol, TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP)
 			cam.End3D2D()
 		end
 	end
+
+	net.Receive("ABoot_ContainerMenu", function() 
+		local Container = net.ReadEntity()
+		local Contents = net.ReadTable()
+		print("We recived the message from " .. tostring(Container))
+		PrintTable(Contents)
+		local i = 1
+		for k, v in pairs(Contents) do
+			timer.Simple(v * 0.003 + 1, function()
+				net.Start("ABoot_ContainerMenu")
+					net.WriteEntity(Container)
+					net.WriteString(k)
+					net.WriteUInt(v, 17)
+				net.SendToServer()
+			end)
+			i = i + 1
+		end
+	end)
 
 	language.Add("ent_jack_gmod_ezcontainer", "EZ Shipping Container")
 end

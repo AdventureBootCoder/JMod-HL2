@@ -97,6 +97,7 @@ hook.Add("Move", "JMOD_HL2_ARMOR_MOVE", function(ply, mv, cmd)
 end)
 
 if(SERVER)then
+	util.AddNetworkString("ABoot_ContainerMenu")
 	local defaultHEVdisable = CreateConVar("aboot_disable_hev", "0", FCVAR_ARCHIVE, "Removes the HEV suit from players on spawn and when it's destroyed. \nNo more running around with an invisible HEV suit")
 
 	local function RemoveHEVsuit(playa) 
@@ -134,23 +135,8 @@ if(SERVER)then
 			--print(tobool(gmod_suit))
 		end
 		
-		--[[if NextArmorThink < Time then
-			NextArmorThink = Time + 1
-
-			for k, playa in pairs(player.GetAll()) do
-				if playa.EZarmor and playa:Alive() then
-					if playa.EZarmor.effects.HEVsuit then
-						for id, armorData in pairs(playa.EZarmor.items) do
-							local Info = JMod.ArmorTable[armorData.name]
-						end
-					end
-					--JMod.CalcSpeed(playa)
-					JMod.EZarmorSync(playa)
-				end
-			end
-		end]]--
-		
 	end)
+
 elseif CLIENT then 
 
 	local simpleWeaponSelect = CreateConVar("aboot_simple_weapon_select", "1", FCVAR_ARCHIVE, "Enables a vey crude weapon select stand in for when you don't have an HEV suit. It's recomended you get a better one.")
