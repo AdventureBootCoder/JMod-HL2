@@ -9,7 +9,7 @@ ENT.Spawnable = true
 ENT.AdminSpawnable = true
 ---
 ENT.JModPreferredCarryAngles = Angle(0, 0, 0)
-ENT.DamageThreshold = 500
+ENT.DamageThreshold = 1000
 ---
 
 ---
@@ -59,6 +59,7 @@ if SERVER then
 		end
 
 		self.NextLoad = 0
+		self.NextUse = 0
 
 		---
 		timer.Simple(.01, function()
@@ -97,8 +98,8 @@ if SERVER then
 
 			if self:GetResource() > 0 then
 				for k, v in pairs(self.Contents) do
-					for i = 1, math.floor(v.Amt / 100) do
-						local Box = ents.Create(v.Ent)
+					for i = 1, math.floor(v / 100) do
+						local Box = ents.Create(JMod.EZ_RESOURCE_ENTITIES[k])
 						Box:SetPos(Pos + self:GetUp() * 20)
 						Box:SetAngles(self:GetAngles())
 						Box:Spawn()
@@ -112,6 +113,9 @@ if SERVER then
 	end
 
 	function ENT:Use(activator)
+		local Time = CurTime()
+		if self.NextUse > Time then return end
+		self.NextUse = Time + 1
 		JMod.Hint(activator, "crate")
 		--if self:GetResource() <= 0 then return end
 		local TrimmedTable = {}
@@ -134,23 +138,25 @@ if SERVER then
 		local Amount = net.ReadUInt(17)
 
 		if not IsValid(Container) then return end
-		if Container.Contents[ResourceType] <= 0 then return end
-		local Needed = math.min(Amount, Container.Contents[ResourceType])
+		local AmountLeft = Container.Contents[ResourceType]
+		if AmountLeft <= 0 then return end
+		local Needed = math.min(Amount, AmountLeft)
 		for i = 1, Needed / 100 do
 			timer.Simple(0.3 * i, function()
 				if not IsValid(Container) then return end
 				local Box, Given = ents.Create(JMod.EZ_RESOURCE_ENTITIES[ResourceType]), math.min(Needed, 100)
-				Box:SetPos(Container:GetPos() + Container:GetRight() * 250 + Container:GetUp() * 30)
+				Box:SetPos(Container:GetPos() + Container:GetRight() * -210 + Container:GetUp() * 20)
 				Box:SetAngles(Container:GetAngles())
 				Box:Spawn()
 				Box:Activate()
 				Box:SetResource(Given)
 				Box.NextLoad = CurTime() + 2
 				Needed = Needed - Given
-				Container.Contents[ResourceType] = Container.Contents[ResourceType] - Given
 				Container:CalcWeight()
 			end)
 		end
+		Container.Contents[ResourceType] = Container.Contents[ResourceType] - Needed
+		Container.NextUse = CurTime() + 1
 	end)
 
 	function ENT:Think()
@@ -180,6 +186,7 @@ if SERVER then
 	end
 
 elseif CLIENT then
+	include("jmod/cl_gui.lua")
 	local TxtCol = Color(5, 5, 5, 220)
 
 	function ENT:Initialize()
@@ -209,21 +216,169 @@ elseif CLIENT then
 		end
 	end
 
+	local blurMat = Material("pp/blurscreen")
+	local Dynamic = 0
+	local function BlurBackground(panel)
+		if not (IsValid(panel) and panel:IsVisible()) then return end
+		local layers, density, alpha = 1, 1, 255
+		local x, y = panel:LocalToScreen(0, 0)
+		surface.SetDrawColor(255, 255, 255, alpha)
+		surface.SetMaterial(blurMat)
+		local FrameRate, Num, Dark = 1 / FrameTime(), 5, 150
+	
+		for i = 1, Num do
+			blurMat:SetFloat("$blur", (i / layers) * density * Dynamic)
+			blurMat:Recompute()
+			render.UpdateScreenEffectTexture()
+			surface.DrawTexturedRect(-x, -y, ScrW(), ScrH())
+		end
+	
+		surface.SetDrawColor(0, 0, 0, Dark * Dynamic)
+		surface.DrawRect(0, 0, panel:GetWide(), panel:GetTall())
+		Dynamic = math.Clamp(Dynamic + (1 / FrameRate) * 7, 0, 1)
+	end
+
 	net.Receive("ABoot_ContainerMenu", function() 
 		local Container = net.ReadEntity()
 		local Contents = net.ReadTable()
-		print("We recived the message from " .. tostring(Container))
-		PrintTable(Contents)
-		local i = 1
-		for k, v in pairs(Contents) do
-			timer.Simple(v * 0.003 + 1, function()
-				net.Start("ABoot_ContainerMenu")
-					net.WriteEntity(Container)
-					net.WriteString(k)
-					net.WriteUInt(v, 17)
-				net.SendToServer()
-			end)
-			i = i + 1
+
+		JMod.SelectionMenuIcons = JMod.SelectionMenuIcons or {}
+		-- first, populate icons
+		for name, info in pairs(Contents) do
+			if not JMod.SelectionMenuIcons[name] then
+				local IsResource = false
+
+				for k, v in pairs(JMod.EZ_RESOURCE_ENTITIES) do
+					if v == JMod.EZ_RESOURCE_ENTITIES[name] then
+						IsResource = true
+						JMod.SelectionMenuIcons[name] = JMod.EZ_RESOURCE_TYPE_ICONS_SMOL[k]
+					end
+				end
+			end
+		end
+		
+		local MotherFrame = vgui.Create("DFrame")
+		MotherFrame.positiveClosed = false
+		MotherFrame.storted = false
+		MotherFrame:SetSize(500, 700)
+		MotherFrame:SetVisible(true)
+		MotherFrame:SetDraggable(true)
+		MotherFrame:ShowCloseButton(true)
+		MotherFrame:SetTitle("EZ Shipping Container")
+
+		function MotherFrame:Paint()
+			if not self.storted then
+				self.storted = true
+				surface.PlaySound("snds_jack_gmod/ez_gui/menu_open.wav")
+			end
+	
+			BlurBackground(self)
+		end
+
+		MotherFrame:MakePopup()
+		MotherFrame:Center()
+
+		function MotherFrame:OnKeyCodePressed(key)
+			if key == KEY_Q or key == KEY_ESCAPE or key == KEY_E then
+				self:Close()
+			end
+		end
+
+		function MotherFrame:OnClose()
+			if not self.positiveClosed then
+				surface.PlaySound("snds_jack_gmod/ez_gui/menu_close.wav")
+			end
+		end
+
+		local W, H = MotherFrame:GetWide(), MotherFrame:GetTall()
+
+		local TabPanel = vgui.Create("DPanel", MotherFrame)
+		local TabPanelX, TabPanelW = 10, W - 20
+
+		TabPanel:SetPos(TabPanelX, 30)
+		TabPanel:SetSize(TabPanelW, H - 40)
+
+		function TabPanel:Paint(w, h)
+			surface.SetDrawColor(0, 0, 0, 50)
+			surface.DrawRect(0, 0, w, h)
+		end
+
+		local W, H = TabPanel:GetWide(), TabPanel:GetTall()
+		local Scroll = vgui.Create("DScrollPanel", TabPanel)
+		Scroll:SetSize(W - 200, H - 20)
+		Scroll:SetPos(10, 10)
+		---
+		local Y, AlphabetizedItemNames = 0, table.GetKeys(Contents)
+		table.sort(AlphabetizedItemNames, function(a, b) return a < b end)
+
+		for k, itemName in pairs(AlphabetizedItemNames) do
+			local Butt = Scroll:Add("DButton")
+			Butt:SetSize(W - 40, 42)
+			Butt:SetPos(0, Y)
+			Butt:SetText("")
+			local itemInfo = Contents[itemName]
+
+			Butt.enabled = true
+			Butt:SetMouseInputEnabled(true)
+			Butt.hovered = false
+
+			function Butt:Paint(w, h)
+				local Hovr = self:IsHovered()
+
+				if Hovr then
+					if not self.hovered then
+						self.hovered = true
+
+						if self.enabled then
+							surface.PlaySound("snds_jack_gmod/ez_gui/hover_ready.wav")
+						end
+					end
+				else
+					self.hovered = false
+				end
+
+				local Brite = (Hovr and 50) or 30
+
+				if self.enabled then
+					surface.SetDrawColor(Brite, Brite, Brite, 60)
+				else
+					surface.SetDrawColor(0, 0, 0, (Hovr and 50) or 20)
+				end
+
+				surface.DrawRect(0, 0, w, h)
+				local ItemIcon = JMod.SelectionMenuIcons[itemName]
+
+				if ItemIcon then
+					surface.SetMaterial(ItemIcon)
+					surface.SetDrawColor(255, 255, 255, (self.enabled and 255) or 40)
+					surface.DrawTexturedRect(5, 5, 32, 32)
+				end
+
+				draw.SimpleText(string.upper(itemName).." x"..tostring(itemInfo), "DermaDefault", (ItemIcon and 47) or 5, 15, Color(255, 255, 255, (self.enabled and 255) or 40), TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP)
+
+			end
+
+			function Butt:DoClick()
+				if self.enabled then
+					timer.Simple(.5, function()
+						if IsValid(Container) then
+							net.Start("ABoot_ContainerMenu")
+								net.WriteEntity(Container)
+								net.WriteString(itemName)
+								net.WriteUInt(itemInfo, 17)
+							net.SendToServer()
+						end
+					end)
+
+					surface.PlaySound("snds_jack_gmod/ez_gui/click_big.wav")
+					MotherFrame.positiveClosed = true
+					MotherFrame:Close()
+				else
+					surface.PlaySound("snds_jack_gmod/ez_gui/miss.wav")
+				end
+			end
+
+			Y = Y + 47
 		end
 	end)
 
