@@ -23,7 +23,7 @@ ENT.StaticPerfSpecs = {
 local STATE_BROKEN,STATE_OFF,STATE_CHARGIN = -1,0,1
 
 function ENT:CustomSetupDataTables()
-	self:NetworkVar("Int",2,"Supplies")
+	self:NetworkVar("Int", 2, "Supplies")
 end
 
 if(SERVER)then
@@ -42,7 +42,6 @@ if(SERVER)then
 	function ENT:CustomInit()
 		self:DrawShadow(false)
 		self:SetUseType(ONOFF_USE)
-		self:SetSupplies(self.MaxSupplies)
 		self.User=nil
 		self.ChargeSound=CreateSound(self,"items/medcharge4.wav")
 		self:SetSubMaterial(1, "models/aboot/health_charger002")

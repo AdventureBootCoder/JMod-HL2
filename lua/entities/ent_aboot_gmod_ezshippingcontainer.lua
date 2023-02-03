@@ -124,6 +124,7 @@ if SERVER then
 				TrimmedTable[k] = v
 			end
 		end
+		if table.IsEmpty(TrimmedTable) then return end
 		net.Start("ABoot_ContainerMenu")
 			net.WriteEntity(self)
 			net.WriteTable(TrimmedTable)
