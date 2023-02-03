@@ -138,10 +138,11 @@ if SERVER then
 		local Amount = net.ReadUInt(17)
 
 		if not IsValid(Container) then return end
+
 		local AmountLeft = Container.Contents[ResourceType]
 		if AmountLeft <= 0 then return end
 		local Needed = math.min(Amount, AmountLeft)
-		for i = 1, Needed / 100 do
+		for i = 1, math.ceil(Needed / 100) do
 			timer.Simple(0.3 * i, function()
 				if not IsValid(Container) then return end
 				local Box, Given = ents.Create(JMod.EZ_RESOURCE_ENTITIES[ResourceType]), math.min(Needed, 100)
@@ -304,8 +305,23 @@ elseif CLIENT then
 		end
 
 		local W, H = TabPanel:GetWide(), TabPanel:GetTall()
+
+		local RequestedAmount = 100
+		local AmountSlider = vgui.Create( "DNumSlider", TabPanel )
+		AmountSlider:SetPos(10, 575) -- Set the position
+		AmountSlider:SetSize(250, 100) -- Set the size
+		AmountSlider:SetText("Requested Amount") -- Set the text above the slider
+		AmountSlider:SetMin(0) -- Set the minimum number you can slide to
+		AmountSlider:SetMax(10000) -- Set the maximum number you can slide to
+		AmountSlider:SetDecimals(0) -- Decimal places - zero for whole number
+		AmountSlider:SetValue(RequestedAmount)
+
+		function AmountSlider:OnValueChanged(num)
+			RequestedAmount = AmountSlider:GetValue()
+		end
+
 		local Scroll = vgui.Create("DScrollPanel", TabPanel)
-		Scroll:SetSize(W - 200, H - 20)
+		Scroll:SetSize(W - 10, H - 100)
 		Scroll:SetPos(10, 10)
 		---
 		local Y, AlphabetizedItemNames = 0, table.GetKeys(Contents)
@@ -365,7 +381,7 @@ elseif CLIENT then
 							net.Start("ABoot_ContainerMenu")
 								net.WriteEntity(Container)
 								net.WriteString(itemName)
-								net.WriteUInt(itemInfo, 17)
+								net.WriteUInt(RequestedAmount, 17)
 							net.SendToServer()
 						end
 					end)
