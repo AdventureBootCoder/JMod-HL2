@@ -45,7 +45,7 @@ if SERVER then
 		---
 		self:SetResource(0)
 		
-		self.MaxResource = 100 * 900 -- MAGA size
+		self.MaxResource = 100 * 450 -- MAGA size
 		self.EZconsumes = {}
 
 		for k, v in pairs(JMod.EZ_RESOURCE_TYPES) do
@@ -192,7 +192,7 @@ elseif CLIENT then
 	local TxtCol = Color(5, 5, 5, 220)
 
 	function ENT:Initialize()
-		self.MaxResource = 100 * 900
+		self.MaxResource = 100 * 450
 	end
 
 	function ENT:Draw()
@@ -211,7 +211,7 @@ elseif CLIENT then
 			cam.End3D2D()
 			---
 			Ang:RotateAroundAxis(Ang:Right(), 180)
-			cam.Start3D2D(Pos + Up * 40 + Forward * 65 - Right * 10, Ang, .4)
+			cam.Start3D2D(Pos + Up * 40 + Forward * 65 - Right * 10.1, Ang, .4)
 			draw.SimpleText("ADVENTURE INDUSTRIES", "JMod-Stencil", 0, 0, TxtCol, TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP)
 			draw.SimpleText(Resource .. "/" .. tostring(self.MaxResource), "JMod-Stencil", 0, 85, TxtCol, TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP)
 			cam.End3D2D()
