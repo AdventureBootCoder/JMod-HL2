@@ -45,7 +45,7 @@ if SERVER then
 		---
 		self:SetResource(0)
 		
-		self.MaxResource = 100 * 450 -- MAGA size
+		self.MaxResource = 100 * 400 -- MAGA size
 		self.EZconsumes = {}
 
 		for k, v in pairs(JMod.EZ_RESOURCE_TYPES) do
@@ -192,7 +192,7 @@ elseif CLIENT then
 	local TxtCol = Color(5, 5, 5, 220)
 
 	function ENT:Initialize()
-		self.MaxResource = 100 * 450
+		self.MaxResource = 100 * 400
 	end
 
 	function ENT:Draw()
