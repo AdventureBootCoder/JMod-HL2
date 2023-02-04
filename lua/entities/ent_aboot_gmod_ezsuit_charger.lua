@@ -92,6 +92,7 @@ if(SERVER)then
 
 	local nextOk=0
 	function ENT:TurnOn(dude)
+		if self:GetState() > STATE_OFF then return end
 		local Time = CurTime()
 		if(Time > nextOk)then
 			nextOk = Time + 1

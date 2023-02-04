@@ -118,6 +118,7 @@ if(SERVER)then
 	end
 
 	function ENT:TurnOn(activator)
+		if self:GetState() > STATE_OFF then return end
 		if(self:GetElectricity() > 0)then
 			self:EmitSound("ambient/machines/thumper_startup1.wav", 100)
 			self:SetProgress(0)

@@ -109,15 +109,16 @@ if(SERVER)then
 		self.User=nil
 	end
 
-	local nextOk=0
+	local nextOk = 0
 	function ENT:TurnOn(dude)
-		local Time=CurTime()
-		if(Time>nextOk)then
-			nextOk=Time+1
+		if self:GetState() > STATE_OFF then return end
+		local Time = CurTime()
+		if(Time > nextOk)then
+			nextOk = Time + 1
 			self:EmitSound("items/medshot4.wav")
 		end
 		self.ChargeSound:Play()
-		self.User=dude
+		self.User = dude
 		self:SetState(STATE_CHARGIN)
 	end
 
