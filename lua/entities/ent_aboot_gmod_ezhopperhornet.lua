@@ -4,7 +4,7 @@ ENT.Type = "anim"
 ENT.Author = "AdventureBoots"
 ENT.Category = "JMod - EZ HL:2"
 ENT.Information = "Magnum Opus"
-ENT.PrintName = "EZ Hopper Mine"
+ENT.PrintName = "EZ Hornet Mine"
 ENT.NoSitAllowed = true
 ENT.Spawnable = true
 ENT.AdminSpawnable = true
@@ -129,7 +129,11 @@ if SERVER then
 		if data.DeltaTime > 0.2 then
 			if data.Speed > 10 then
 				if self:GetState() == STATE_LAUNCHED then
-					self:Detonate()
+					if IsValid(self:GetTarget()) then 
+						self:Detonate()
+					else
+						self:Disarm()
+					end
 				else
 					self:EmitSound("SolidMetal.ImpactSoft")
 				end
@@ -142,34 +146,19 @@ if SERVER then
 		self.Exploded = true
 		local SelfPos = self:LocalToWorld(self:OBBCenter())
 		local Up = Vector(0, 0, 1)
-		local EffectType = 1
-		local Traec = util.QuickTrace(self:GetPos(), Vector(0, 0, -5), self)
+		local TargetPos = (IsValid(self:GetTarget()) and self:GetTarget():LocalToWorld(self:GetTarget():OBBCenter())) or -Up
+		local Dir = ((TargetPos - SelfPos) + VectorRand() * .01):GetNormalized()
 
-		if Traec.Hit then
-			if (Traec.MatType == MAT_DIRT) or (Traec.MatType == MAT_SAND) then
-				EffectType = 1
-			elseif (Traec.MatType == MAT_CONCRETE) or (Traec.MatType == MAT_TILE) then
-				EffectType = 2
-			elseif (Traec.MatType == MAT_METAL) or (Traec.MatType == MAT_GRATE) then
-				EffectType = 3
-			elseif Traec.MatType == MAT_WOOD then
-				EffectType = 4
-			end
-		else
-			EffectType = 5
-		end
-
-		local plooie = EffectData()
-		plooie:SetOrigin(SelfPos)
-		plooie:SetScale(1)
-		plooie:SetRadius(EffectType)
-		plooie:SetNormal(Up)
-		util.Effect("eff_jack_minesplode", plooie, true, true)
-		util.ScreenShake(SelfPos, 99999, 99999, 1, 500)
+		local Eff = EffectData()
+		Eff:SetOrigin(SelfPos)
+		Eff:SetScale(0.5)
+		Eff:SetNormal(Dir)
+		util.Effect("eff_jack_gmod_efpburst", Eff, true, true)
+		util.ScreenShake(SelfPos, 99999, 99999, .1, 1000)
+		
 		self:EmitSound("snd_jack_fragsplodeclose.wav", 90, 100)
-		JMod.Sploom(JMod.GetOwner(self), SelfPos, 150, 125)
-		--JMod.FragSplosion(self, SelfPos, 100, 20 * JMod.Config.MinePower, 1000, JMod.GetOwner(self), Up, 1.3, 3)
-		self:Remove()
+		JMod.RicPenBullet(self, SelfPos, Dir, 1000 * JMod.Config.MinePower, true, true)
+		SafeRemoveEntity(self)
 	end
 
 	function ENT:Arm(armer)
@@ -191,7 +180,7 @@ if SERVER then
 					local IsUp = self:GetUp().z > 0.3
 
 					if (Tr.Hit) and not(Tr.Entity:IsNPC() or Tr.Entity:IsPlayer()) and (IsUp) then
-						self.Weld = constraint.Ballsocket(Tr.Entity, self, Tr.PhysicsBone, 0, Vector(0, 0, -1), 0, 0, 0)
+						self.Weld = constraint.Weld(Tr.Entity, self, Tr.PhysicsBone, 0, 5000, false, false)
 						if self.Weld then
 							self.Weld:Activate()
 							self:EmitSound("NPC_CombineMine.CloseHooks")
@@ -244,11 +233,12 @@ if SERVER then
 				ToVec.z = 0
 				local ToDir = ToVec:GetNormalized()
 				local ToAng = ToDir:Angle()
-				ToAng:RotateAroundAxis(ToAng:Right(), 66)
+				local LaunchAngle = 80
+				ToAng:RotateAroundAxis(ToAng:Right(), LaunchAngle)
 				ToDir = ToAng:Forward() 
 				local Dist = SelfPos:Distance(targetPos)
 				-----
-				local Speed = math.sqrt((600 * Dist) / math.sin(2 * math.rad(66))) -- Fancy math
+				local Speed = math.sqrt((600 * Dist) / math.sin(2 * math.rad(LaunchAngle))) -- Fancy math
 				-----
 				constraint.RemoveAll(self)
 
@@ -262,6 +252,7 @@ if SERVER then
 	end
 
 	local LerpedMove = 0
+	local AttackDist = 500 --245
 	function ENT:Think()
 		local SelfPos, State, Time = self:GetPos(), self:GetState(), CurTime()
 
@@ -277,9 +268,9 @@ if SERVER then
 
 				return true
 			end
-			--JPrint(tostring(self:GetTarget()) .. " \t " .. tostring(self:GetAlly()))
+			--jprint(tostring(self:GetTarget()) .. " \t " .. tostring(self:GetAlly()))
 
-			for k, targ in pairs(ents.FindInSphere(SelfPos, 245)) do
+			for k, targ in pairs(ents.FindInSphere(SelfPos, AttackDist)) do
 				if not (targ == self) and (targ:IsPlayer() or targ:IsNPC() or targ:IsVehicle()) and JMod.ClearLoS(self, targ, true) then
 					
 					local targPos = targ:GetPos()
@@ -301,14 +292,14 @@ if SERVER then
 			if IsValid(self:GetTarget()) then
 				local Target, TargetPos = self:GetTarget(), self:GetTarget():GetPos()
 
-				if SelfPos:Distance(TargetPos) < 150 then
+				if SelfPos:Distance(TargetPos) < AttackDist * 0.75 then
 					if not(self:GetAlly()) then
 						self.WarningSnd:Stop()
 						self:EmitSound("NPC_CombineMine.OpenHooks")
 						local LaunchPos = Target:LocalToWorld(Target:OBBCenter()) + Target:GetVelocity()
 						self:Launch(LaunchPos)
 					end
-				elseif SelfPos:Distance(TargetPos) > 245 then
+				elseif SelfPos:Distance(TargetPos) > AttackDist then
 					self:SetTarget(nil)
 					self:SetAlly(false)
 					if self.WarningSnd:IsPlaying() then
@@ -319,6 +310,28 @@ if SERVER then
 			end
 
 			self:NextThink(Time + .3)
+
+			return true
+		elseif State == STATE_LAUNCHED then
+			timer.Simple(.3, function()
+				--jprint(self:GetPhysicsObject():GetVelocity().z)
+				if not IsValid(self) then return end
+				if self:GetPhysicsObject():GetVelocity().z >= 5 then
+					self:Detonate()
+				end
+			end)
+			if not IsValid(self:GetTarget()) then 
+				for k, targ in pairs(ents.FindInSphere(SelfPos, AttackDist)) do
+					if (targ ~= self) and JMod.ShouldAttack(self, targ) and JMod.ClearLoS(self, targ, true) then
+						self:SetTarget(targ)
+						break
+					else 
+						self:Disarm()
+					end
+				end
+			end
+
+			self:NextThink(Time)
 
 			return true
 		elseif self.AutoArm then
@@ -352,14 +365,13 @@ if SERVER then
 		end
 	end
 
-	hook.Remove("GravGunOnDropped", "ABootGravGunHopperGrab")
-	hook.Add("GravGunOnPickedUp", "ABootGravGunHopperGrab", function(ply, ent)
-		if ent:GetClass() == "ent_aboot_gmod_ezhoppermine" then 
+	hook.Remove("GravGunOnDropped", "ABootGravGunHornetGrab")
+	hook.Add("GravGunOnPickedUp", "ABootGravGunHornetGrab", function(ply, ent)
+		if ent:GetClass() == "ent_aboot_gmod_ezhopperhornet" then 
 			local State = ent:GetState()
 			LastGravGunGrabTime = CurTime()
 
 			if State == STATE_ARMED then
-				ent:GetPhysicsObject():ApplyForceCenter(VectorRand() * 20)
 				timer.Simple(1.5, function()
 					if IsValid(ent) and ent:IsPlayerHolding() then
 						if IsValid(ent.Weld) then
@@ -378,9 +390,9 @@ if SERVER then
 		end
 	end)
 
-	hook.Remove("GravGunOnDropped", "ABootGravGunHopperDrop")
-	hook.Add("GravGunOnDropped", "ABootGravGunHopperDrop", function(ply, ent)
-		if ent:GetClass() == "ent_aboot_gmod_ezhoppermine" then
+	hook.Remove("GravGunOnDropped", "ABootGravGunHornetDrop")
+	hook.Add("GravGunOnDropped", "ABootGravGunHornetDrop", function(ply, ent)
+		if ent:GetClass() == "ent_aboot_gmod_ezhopperhornet" then
 			if ent:GetState() == STATE_HELD then
 				ent:SetState(STATE_OFF)
 				if ply:KeyDown(JMod.Config.AltFunctionKey) then
@@ -468,7 +480,7 @@ elseif CLIENT then
 		end
 	end
 
-	language.Add("ent_jack_gmod_ezhoppermine", "EZ Hopper Mine")
+	language.Add("ent_jack_gmod_ezhoppermine", "EZ Hornet Mine")
 end
 
 
