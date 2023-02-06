@@ -43,7 +43,7 @@ if(SERVER)then
 			self:TryPlace()
 		end)
 		self:NextThink(1)
-		
+		self.EZupgradable = true
 	end
 
 	function ENT:UpdateDepositKey()
@@ -286,6 +286,7 @@ elseif(CLIENT)then
 				LerpedThump = Lerp(math.ease.OutCubic(FrameTime() * 5), LerpedThump, Vary)
 			end
 		end)]]--
+		self.Screen = JMod.MakeModel(self, "models/props_combine/combine_smallmonitor001.mdl")
 	end
 	
 	function ENT:Draw()
@@ -310,13 +311,16 @@ elseif(CLIENT)then
 		if(Obscured)then DetailDraw=false end -- if obscured, at least disable details
 		if(State == STATE_BROKEN)then DetailDraw = false end -- look incomplete to indicate damage, save on gpu comp too
 		if(DetailDraw)then
+			local ScreenAng = SelfAng:GetCopy()
+			ScreenAng:RotateAroundAxis(ScreenAng:Up(), 90)
+			JMod.RenderModel(self.Screen, SelfPos + Up * 30 - Right * 10 + Forward * 10, ScreenAng, Vector(1, 1.5, 1.5), nil, JMod.EZ_GRADE_MATS[self:GetGrade()])
 			if (Closeness < 20000) and (State == STATE_RUNNING) then
 				local DisplayAng = SelfAng:GetCopy()
 				DisplayAng:RotateAroundAxis(DisplayAng:Right(), 0)
 				DisplayAng:RotateAroundAxis(DisplayAng:Up(), 180)
 				DisplayAng:RotateAroundAxis(DisplayAng:Forward(), 90)
 				local Opacity = math.random(50,150)
-				cam.Start3D2D(SelfPos + Up * 40 - Right * 30 + Forward * 35, DisplayAng, .1)
+				cam.Start3D2D(SelfPos + Up * 40 - Right * 23 + Forward * 35, DisplayAng, .1)
                     surface.SetDrawColor(10, 10, 10, Opacity + 50)
                     surface.DrawRect(184, -200, 128, 128)
                     JMod.StandardRankDisplay(Grade, 248, -140, 118, Opacity + 50)
@@ -324,7 +328,7 @@ elseif(CLIENT)then
                     local ExtractCol = Color(100, 255, 100, Opacity)
                     draw.SimpleTextOutlined(string.upper(Typ) or "N/A", "JMod-Display", 250, -30, ExtractCol, TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP, 3, Color(0, 0, 0, Opacity))
                     draw.SimpleTextOutlined("POWER", "JMod-Display", 250, 0, Color(255, 255, 255, Opacity), TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP, 3, Color(0, 0, 0, Opacity))
-                    local ElecFrac=self:GetElectricity()/100
+                    local ElecFrac=self:GetElectricity()/400
                     local R,G,B=JMod.GoodBadColor(ElecFrac)
                     draw.SimpleTextOutlined(tostring(math.Round(ElecFrac * 100)).."%", "JMod-Display", 250, 30, Color(R, G, B, Opacity), TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP, 3, Color(0, 0, 0, Opacity))
                     draw.SimpleTextOutlined("PROGRESS", "JMod-Display", 250, 60, Color(255, 255, 255, Opacity), TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP, 3, Color(0, 0, 0, Opacity))
