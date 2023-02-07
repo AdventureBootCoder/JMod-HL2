@@ -153,74 +153,90 @@ if SERVER then
 		end)
 	end
 
+	local IsAmmoOnTable = function(ammoName, tableToCheck)
+		if not ammoName then return false end
+		local IsListed = false
+		for k, v in ipairs(tableToCheck) do
+			if ammoName == v then
+				IsListed = true
+				break
+			elseif string.find(v, '%*$') then
+				IsListed = (string.find(ammoName, '^'..string.sub(v, 1, -2)) ~= nil)
+				break
+			end
+		end
+		return IsListed
+	end
+
 	function ENT:GivePlyAmmo(ply, fillStack, ammoType)
 		if self:GetResource() <= 0 then return end
 		local Wep = ply:GetActiveWeapon()
 
 		if Wep then
-			local PrimType, SecType, PrimSize, SecSize = (game.GetAmmoID(ammoType) or Wep:GetPrimaryAmmoType()), Wep:GetSecondaryAmmoType(), Wep:GetMaxClip1(), Wep:GetMaxClip2()
+			local PrimType, SecType, PrimSize, SecSize = (ammotype and game.GetAmmoID(ammoType)) or Wep:GetPrimaryAmmoType(), Wep:GetSecondaryAmmoType(), Wep:GetMaxClip1(), Wep:GetMaxClip2()
 			local PrimMax, SecMax, PrimName, SecName = game.GetAmmoMax(PrimType), game.GetAmmoMax(SecType), game.GetAmmoName(PrimType), game.GetAmmoName(SecType)
 			
 			local IsMunitionBox = self.EZsupplies == "munitions"
 
 			--[[ PRIMARY --]]
-			local IsPrimMunitions = table.HasValue(JMod.Config.AmmoTypesThatAreMunitions, PrimName)
-			if (IsPrimMunitions == IsMunitionBox) and not(table.HasValue(JMod.Config.WeaponAmmoBlacklist, PrimName)) then
-				if PrimType and (PrimType ~= -1) then
-					if PrimSize == -1 then
-						PrimSize = -PrimSize
-					end
+			if PrimName then 
+				PrimMax = PrimMax * JMod.Config.AmmoCarryLimitMult
+				local IsPrimMunitions = table.HasValue(JMod.Config.AmmoTypesThatAreMunitions, PrimName)
+				if (IsPrimMunitions == IsMunitionBox) and not(IsAmmoOnTable(PrimName, JMod.Config.WeaponAmmoBlacklist)) then
+					if PrimType and (PrimType ~= -1) then
+						if PrimSize == -1 then
+							PrimSize = -PrimSize
+						end
 
-					local CurrentAmmo, ResourceLeftInBox = ply:GetAmmoCount(PrimName), self:GetResource()
-					local SpaceLeftInPlayerInv = PrimMax - CurrentAmmo
-					local AmmoPerResourceUnit = PrimMax / 30
-					local ResourceUnitPerAmmo = 1 / AmmoPerResourceUnit
-					local AmtToGive = 0
+						local CurrentAmmo, ResourceLeftInBox = ply:GetAmmoCount(PrimName), self:GetResource()
+						local SpaceLeftInPlayerInv = PrimMax - CurrentAmmo
+						local AmmoPerResourceUnit = PrimMax / 30
+						local ResourceUnitPerAmmo = 1 / AmmoPerResourceUnit
+						local AmtToGive = math.min(PrimSize, math.floor(ResourceLeftInBox / ResourceUnitPerAmmo), SpaceLeftInPlayerInv)
 
-					if fillStack then
-						AmtToGive = math.min(SpaceLeftInPlayerInv, math.floor(ResourceLeftInBox / ResourceUnitPerAmmo))
-					else
-						AmtToGive = math.min(PrimSize, math.floor(ResourceLeftInBox / ResourceUnitPerAmmo))
-					end
-
-					--print("AmmoDMG: " .. game.GetAmmoPlayerDamage(PrimType))
-					--print("AmmoMult: " .. ResourceUnitPerAmmo)
-					--print("AmmoInBox: " .. math.floor(ResourceLeftInBox / ResourceUnitPerAmmo))
-					--print("SpaceLeftInPlayerInv: " .. SpaceLeftInPlayerInv)
-					
-					if ply:GetAmmoCount(PrimType) < PrimMax * JMod.Config.AmmoCarryLimitMult then
-						ply:GiveAmmo(AmtToGive, PrimType)
-						self:SetResource(ResourceLeftInBox - math.ceil(AmtToGive * ResourceUnitPerAmmo))
-						self:UseEffect(self:GetPos(), self)
+						if fillStack then
+							AmtToGive = math.min(SpaceLeftInPlayerInv, math.floor(ResourceLeftInBox / ResourceUnitPerAmmo))
+						else
+							AmtToGive = math.min(SpaceLeftInPlayerInv, PrimSize, math.floor(ResourceLeftInBox / ResourceUnitPerAmmo))
+						end
+						
+						if ply:GetAmmoCount(PrimType) < PrimMax then
+							ply:GiveAmmo(AmtToGive, PrimType)
+							self:SetResource(ResourceLeftInBox - math.ceil(AmtToGive * ResourceUnitPerAmmo))
+							self:UseEffect(self:GetPos(), self)
+						end
 					end
 				end
 			end
 			
 			if self:GetResource() <= 0 then return end
-			--[[ PRIMARY --]]
-			local IsSecMunitions = table.HasValue(JMod.Config.AmmoTypesThatAreMunitions, SecName)
-			if (IsSecMunitions == IsMunitionBox) and not(table.HasValue(JMod.Config.WeaponAmmoBlacklist, SecName)) then
-				if SecType and (SecType ~= -1) then
-					if SecSize == -1 then
-						SecSize = -SecSize
-					end
+			--[[ SECONDARY --]]
+			if SecName then 
+				SecMax = SecMax * JMod.Config.AmmoCarryLimitMult
+				local IsSecMunitions = table.HasValue(JMod.Config.AmmoTypesThatAreMunitions, SecName)
+				if (IsSecMunitions == IsMunitionBox) and not(IsAmmoOnTable(SecName, JMod.Config.WeaponAmmoBlacklist)) then
+					if SecType and (SecType ~= -1) then
+						if SecSize == -1 then
+							SecSize = -SecSize
+						end
 
-					local CurrentAmmo, ResourceLeftInBox = ply:GetAmmoCount(SecName), self:GetResource()
-					local SpaceLeftInPlayerInv = SecMax - CurrentAmmo
-					local AmmoPerResourceUnit = SecMax / 30
-					local ResourceUnitPerAmmo = 1 / AmmoPerResourceUnit
-					local AmtToGive = 0
+						local CurrentAmmo, ResourceLeftInBox = ply:GetAmmoCount(SecName), self:GetResource()
+						local SpaceLeftInPlayerInv = SecMax - CurrentAmmo
+						local AmmoPerResourceUnit = SecMax / 30
+						local ResourceUnitPerAmmo = 1 / AmmoPerResourceUnit
+						local AmtToGive = 0
 
-					if fillStack then
-						AmtToGive = math.min(SpaceLeftInPlayerInv, math.floor(ResourceLeftInBox / ResourceUnitPerAmmo))
-					else
-						AmtToGive = math.min(SecSize, math.floor(ResourceLeftInBox / ResourceUnitPerAmmo))
-					end
-					
-					if ply:GetAmmoCount(SecType) < SecMax * JMod.Config.AmmoCarryLimitMult then
-						ply:GiveAmmo(AmtToGive, SecType)
-						self:SetResource(ResourceLeftInBox - math.ceil(AmtToGive * ResourceUnitPerAmmo))
-						self:UseEffect(self:GetPos(), self)
+						if fillStack then
+							AmtToGive = math.min(SpaceLeftInPlayerInv, math.floor(ResourceLeftInBox / ResourceUnitPerAmmo))
+						else
+							AmtToGive = math.min(SpaceLeftInPlayerInv, SecSize, math.floor(ResourceLeftInBox / ResourceUnitPerAmmo))
+						end
+						
+						if ply:GetAmmoCount(SecType) < SecMax then
+							ply:GiveAmmo(AmtToGive, SecType)
+							self:SetResource(ResourceLeftInBox - math.ceil(AmtToGive * ResourceUnitPerAmmo))
+							self:UseEffect(self:GetPos(), self)
+						end
 					end
 				end
 			end

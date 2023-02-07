@@ -45,6 +45,11 @@ if(SERVER)then
 		self.User=nil
 		self.ChargeSound=CreateSound(self,"items/medcharge4.wav")
 		self:SetSubMaterial(1, "models/aboot/health_charger002")
+		if self.SpawnFull then
+			self:SetSupplies(self.MaxSupplies)
+		else
+			self:SetSupplies(0)
+		end
 	end
 
 	function ENT:Use(activator,activatorAgain,onOff)

@@ -1,7 +1,7 @@
 ﻿-- Jackarunda 2021
 AddCSLuaFile()
 ENT.Type = "anim"
-ENT.PrintName = "EZ Shipping Container"
+ENT.PrintName = "EZ Experimental Container"
 ENT.Author = "Jackarunda, AdventureBoots"
 ENT.Category = "JMod - EZ HL:2"
 ENT.NoSitAllowed = true
@@ -14,7 +14,7 @@ ENT.DamageThreshold = 1000
 
 ---
 function ENT:SetupDataTables()
-	self:NetworkVar("Int", 0, "Resource")
+	self:NetworkVar("Int", 0, "Room")
 end
 
 ---
@@ -43,9 +43,9 @@ if SERVER then
 		self:SetUseType(SIMPLE_USE)
 		self:SetSkin(math.random(0, 2))
 		---
-		self:SetResource(0)
+		self:SetRoom(0)
 		
-		self.MaxVolume = 100 * 400 -- MAGA size
+		self.MaxRoom = 100 * 400 -- MAGA size
 		self.EZconsumes = {}
 
 		for k, v in pairs(JMod.EZ_RESOURCE_TYPES) do
@@ -77,13 +77,13 @@ if SERVER then
 	end
 
 	function ENT:CalcWeight()
-		local Frac = self:GetResource() / self.MaxVolume
+		local Frac = self:GetRoom() / self.MaxVolume
 		self:GetPhysicsObject():SetMass(4000 + Frac * 300)
 		self:GetPhysicsObject():Wake()
-		self:SetResource(0)
+		self:SetRoom(0)
 		for k, v in pairs(self.Contents) do
-			if v > 0 then
-				self:SetResource(self:GetResource() + v)
+			if v.Volume > 0 then
+				self:SetRoom(self:GetRoom() + v.Volume)
 			end
 		end
 	end
@@ -96,7 +96,7 @@ if SERVER then
 			sound.Play("Metal_Box.Break", Pos)
 			sound.Play("Metal_Box.Break", Pos)
 
-			if self:GetResource() > 0 then
+			if self:GetRoom() > 0 then
 				for k, v in pairs(self.Contents) do
 					for i = 1, math.floor(v / 100) do
 						local Box = ents.Create(JMod.EZ_RESOURCE_ENTITIES[k])
@@ -117,7 +117,7 @@ if SERVER then
 		if self.NextUse > Time then return end
 		self.NextUse = Time + 1
 		JMod.Hint(activator, "crate")
-		--if self:GetResource() <= 0 then return end
+		--if self:GetRoom() <= 0 then return end
 		local TrimmedTable = {}
 		for k, v in pairs(self.Contents) do
 			if v > 0 then
@@ -135,18 +135,18 @@ if SERVER then
 
 	net.Receive("ABoot_ContainerMenu", function() 
 		local Container = net.ReadEntity()
-		local ResourceType = net.ReadString()
+		local StoredEnt = net.ReadString()
 		local Amount = net.ReadUInt(17)
 
 		if not IsValid(Container) then return end
 
-		local AmountLeft = Container.Contents[ResourceType]
+		local AmountLeft = Container.Contents[StoredEnt]
 		if AmountLeft <= 0 then return end
 		local Needed = math.min(Amount, AmountLeft)
 		for i = 1, math.ceil(Needed / 100) do
 			timer.Simple(0.3 * i, function()
 				if not IsValid(Container) then return end
-				local Box, Given = ents.Create(JMod.EZ_RESOURCE_ENTITIES[ResourceType]), math.min(Needed, 100)
+				local Box, Given = ents.Create(StoredEnt), math.min(Needed, 100)
 				Box:SetPos(Container:GetPos() + Container:GetRight() * -210 + Container:GetUp() * 20)
 				Box:SetAngles(Container:GetAngles())
 				Box:Spawn()
@@ -157,7 +157,7 @@ if SERVER then
 				Container:CalcWeight()
 			end)
 		end
-		Container.Contents[ResourceType] = Container.Contents[ResourceType] - Needed
+		Container.Contents[StoredEnt] = nil
 		Container.NextUse = CurTime() + 1
 	end)
 
