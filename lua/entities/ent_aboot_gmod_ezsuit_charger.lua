@@ -26,6 +26,9 @@ if(SERVER)then
 		local ent = ents.Create(self.ClassName)
 		ent:SetAngles(Ang)
 		ent:SetPos(SpawnPos)
+		if JMod.Config.SpawnMachinesFull then
+			ent.SpawnFull = true
+		end
 		ent:Spawn()
 		ent:Activate()
 		ent.Weld = constraint.Weld(ent, tr.Entity, 0, tr.PhysicsBone, 50000, false, false)

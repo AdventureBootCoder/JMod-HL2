@@ -180,7 +180,7 @@ if SERVER then
 					local IsUp = self:GetUp().z > 0.3
 
 					if (Tr.Hit) and not(Tr.Entity:IsNPC() or Tr.Entity:IsPlayer()) and (IsUp) then
-						self.Weld = constraint.Weld(Tr.Entity, self, Tr.PhysicsBone, 0, 5000, false, false)
+						self.Weld = constraint.Weld(Tr.Entity, self, Tr.PhysicsBone, 0, 50000, false, false)
 						if self.Weld then
 							self.Weld:Activate()
 							self:EmitSound("NPC_CombineMine.CloseHooks")
@@ -269,13 +269,12 @@ if SERVER then
 				return true
 			end
 			--jprint(tostring(self:GetTarget()) .. " \t " .. tostring(self:GetAlly()))
-
 			for k, targ in pairs(ents.FindInSphere(SelfPos, AttackDist)) do
-				if not (targ == self) and (targ:IsPlayer() or targ:IsNPC() or targ:IsVehicle()) and JMod.ClearLoS(self, targ, true) then
+				if (targ ~= self) and (targ:IsPlayer() or targ:IsNPC() or targ:IsVehicle()) and JMod.ClearLoS(self, targ, true) then
 					
 					local targPos = targ:GetPos()
 
-					if not(IsValid(self:GetTarget())) or SelfPos:Distance(self:GetTarget():GetPos()) > SelfPos:Distance(targPos) then
+					if not(IsValid(self:GetTarget())) or (SelfPos:Distance(self:GetTarget():GetPos()) > SelfPos:Distance(targPos)) then
 						self:SetTarget(targ)
 					end
 
@@ -453,7 +452,7 @@ elseif CLIENT then
 	function ENT:Draw()
 		self:DrawModel()
 		local Up = self:GetUp()
-		local State= self:GetState()
+		local State = self:GetState()
 
 		if State == STATE_ARMING then
 			render.SetMaterial(GlowSprite)
