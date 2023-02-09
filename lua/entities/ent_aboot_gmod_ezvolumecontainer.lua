@@ -45,19 +45,8 @@ if SERVER then
 		---
 		self:SetRoom(0)
 		
-		self.MaxRoom = 100 * 400 -- MAGA size
-		self.EZconsumes = {}
-
-		for k, v in pairs(JMod.EZ_RESOURCE_TYPES) do
-			table.insert(self.EZconsumes, v)
-		end
-
+		self.MaxVolume = 6500000 -- MAGA size
 		self.Contents = {}
-
-		for k, v in pairs(JMod.EZ_RESOURCE_TYPES) do
-			self.Contents[v] = 0
-		end
-
 		self.NextLoad = 0
 		self.NextUse = 0
 
@@ -73,19 +62,34 @@ if SERVER then
 				self.Entity:EmitSound("Metal_Box.ImpactSoft")
 				self.Entity:EmitSound("Metal_Box.ImpactHard")
 			end
+			local Ent = data.HitEntity
+			timer.Simple(0, function()
+				if IsValid(Enty) and not(Ent:IsPlayer()) and IsValid(data.HitObject) then
+					self:TryLoadEntity(Ent)
+				end
+			end)
 		end
 	end
 
 	function ENT:CalcWeight()
-		local Frac = self:GetRoom() / self.MaxVolume
+		--[[local Frac = self:GetRoom() / self.MaxVolume
 		self:GetPhysicsObject():SetMass(4000 + Frac * 300)
-		self:GetPhysicsObject():Wake()
+		self:GetPhysicsObject():Wake()]]--
+		local OurMass = 4000
 		self:SetRoom(0)
 		for k, v in pairs(self.Contents) do
+			if IsValid(Entity(tonumber(k)):GetPhysicsObject()) then
+				local ContainedEntMass = Entity(tonumber(k)):GetPhysicsObject():GetMass()
+				if ContainedEntMass > 0 then
+					OurMass = OurMass + ContainedEntMass
+				end
+			end
 			if v.Volume > 0 then
 				self:SetRoom(self:GetRoom() + v.Volume)
 			end
 		end
+		self:GetPhysicsObject():SetMass(OurMass)
+		self:GetPhysicsObject():Wake()
 	end
 
 	function ENT:OnTakeDamage(dmginfo)
@@ -98,13 +102,7 @@ if SERVER then
 
 			if self:GetRoom() > 0 then
 				for k, v in pairs(self.Contents) do
-					for i = 1, math.floor(v / 100) do
-						local Box = ents.Create(JMod.EZ_RESOURCE_ENTITIES[k])
-						Box:SetPos(Pos + self:GetUp() * 20)
-						Box:SetAngles(self:GetAngles())
-						Box:Spawn()
-						Box:Activate()
-					end
+					
 				end
 			end
 
@@ -117,17 +115,18 @@ if SERVER then
 		if self.NextUse > Time then return end
 		self.NextUse = Time + 1
 		JMod.Hint(activator, "crate")
-		--if self:GetRoom() <= 0 then return end
 		local TrimmedTable = {}
 		for k, v in pairs(self.Contents) do
-			if v > 0 then
-				TrimmedTable[k] = v
+			if IsValid(Entity(tonumber(k))) then
+				TrimmedTable[k] = {v.Ent, v.Volume}
+			else
+				self.Contents[k] = nil
 			end
 		end
 		if table.IsEmpty(TrimmedTable) then return end
 		net.Start("ABoot_ContainerMenu")
 			net.WriteEntity(self)
-			net.WriteTable(TrimmedTable)
+			net.WriteTable(self.Contents)
 		net.Send(activator)
 
 		self:EmitSound("Ammo_Crate.Open")
@@ -136,29 +135,31 @@ if SERVER then
 	net.Receive("ABoot_ContainerMenu", function() 
 		local Container = net.ReadEntity()
 		local StoredEnt = net.ReadString()
-		local Amount = net.ReadUInt(17)
 
 		if not IsValid(Container) then return end
+		timer.Simple(0.5, function()
+			if not IsValid(Entity(tonumber(StoredEnt))) then return end
+			local UnpackedEnt = Entity(tonumber(StoredEnt))
+			local Maxs, Mins = UnpackedEnt:OBBMaxs(), UnpackedEnt:OBBMins()
+			local SideLengths = Maxs - Mins
+			UnpackedEnt:SetPos(Container:GetPos() + Container:GetRight() * (-210 - SideLengths.x) + Container:GetUp() * (SideLengths.z / 2))
+			UnpackedEnt:SetAngles(Container:GetAngles())
+			UnpackedEnt:SetNoDraw(false)
+			UnpackedEnt:SetNotSolid(false)
+			local Phys = UnpackedEnt:GetPhysicsObject()
 
-		local AmountLeft = Container.Contents[StoredEnt]
-		if AmountLeft <= 0 then return end
-		local Needed = math.min(Amount, AmountLeft)
-		for i = 1, math.ceil(Needed / 100) do
-			timer.Simple(0.3 * i, function()
-				if not IsValid(Container) then return end
-				local Box, Given = ents.Create(StoredEnt), math.min(Needed, 100)
-				Box:SetPos(Container:GetPos() + Container:GetRight() * -210 + Container:GetUp() * 20)
-				Box:SetAngles(Container:GetAngles())
-				Box:Spawn()
-				Box:Activate()
-				Box:SetResource(Given)
-				Box.NextLoad = CurTime() + 2
-				Needed = Needed - Given
+			if IsValid(Phys) then
+				Phys:Wake()
+				Phys:SetVelocity(Container:GetPhysicsObject():GetVelocity())
+			end
+			if IsValid(Container) then
 				Container:CalcWeight()
-			end)
-		end
-		Container.Contents[StoredEnt] = nil
+			end
+		end)
+
+		Container.Contents[tonumber(StoredEnt)] = nil
 		Container.NextUse = CurTime() + 1
+		--PrintTable(Container.Contents)
 	end)
 
 	function ENT:Think()
@@ -166,33 +167,39 @@ if SERVER then
 
 	--pfahahaha
 	function ENT:OnRemove()
+		for k, v in pairs(self.Contents) do 
+			if IsValid(Entity(tonumber(k))) then 
+				SafeRemoveEntity(Entity(tonumber(k)))
+			end 
+		end
 	end
 
-	function ENT:TryLoadResource(typ, amt)
+	function ENT:TryLoadEntity(ent)
 		local Time = CurTime()
-		if self.NextLoad > Time then self.NextLoad = math.min(self.NextLoad, Time + .5) return 0 end
-		if amt < 1 then return 0 end
+		if not IsValid(ent) then return false end
+		local Index, Phys = ent:EntIndex(), ent:GetPhysicsObject()
+		local SpaceNeeded = math.Round(Phys:GetVolume() or Phys:GetMass() ^ 3)
+		if SpaceNeeded > (self.MaxVolume - self:GetRoom()) then return end
+		self.Contents[Index] = {}
+		self.Contents[Index].Ent = ent:GetClass()
+		self.Contents[Index].Volume = math.Round(Phys:GetVolume() or Phys:GetMass() ^ 3)
+		constraint.RemoveAll(ent)
+		ent:SetParent(ent)
+		ent:SetNoDraw(true)
+		ent:SetNotSolid(true)
 
-		-- Consider the loaded type
-		local Resource = self:GetResource()
-		local Missing = self.MaxVolume - Resource
-		if Missing <= 0 then return 0 end
-		local Accepted = math.min(Missing, amt)
-
-		self.Contents[typ] = self.Contents[typ] + Accepted
+		Phys:Sleep()
 
 		self:CalcWeight()
-		self.NextLoad = Time + .5
 
-		return Accepted
+		return true
 	end
 
 elseif CLIENT then
-	include("jmod/cl_gui.lua")
 	local TxtCol = Color(5, 5, 5, 220)
 
 	function ENT:Initialize()
-		self.MaxVolume = 100 * 400
+		self.MaxVolume = 6500000
 	end
 
 	function ENT:Draw()
@@ -202,18 +209,18 @@ elseif CLIENT then
 		self:DrawModel()
 
 		if DetailDraw then
-			local Up, Right, Forward, Resource = Ang:Up(), Ang:Right(), Ang:Forward(), tostring(self:GetResource())
+			local Up, Right, Forward, Room = Ang:Up(), Ang:Right(), Ang:Forward(), tostring(self:GetRoom())
 			Ang:RotateAroundAxis(Ang:Right(), 90)
 			Ang:RotateAroundAxis(Ang:Up(), -90)
 			cam.Start3D2D(Pos + Up * 40 - Forward * 65 + Right * 10, Ang, .4)
 			draw.SimpleText("ADVENTURE INDUSTRIES", "JMod-Stencil", 0, 0, TxtCol, TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP)
-			draw.SimpleText(Resource .. "/" .. tostring(self.MaxVolume), "JMod-Stencil", 0, 85, TxtCol, TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP)
+			draw.SimpleText(Room .. "/" .. tostring(self.MaxVolume), "JMod-Stencil", 0, 85, TxtCol, TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP)
 			cam.End3D2D()
 			---
 			Ang:RotateAroundAxis(Ang:Right(), 180)
 			cam.Start3D2D(Pos + Up * 40 + Forward * 65 - Right * 10.1, Ang, .4)
 			draw.SimpleText("ADVENTURE INDUSTRIES", "JMod-Stencil", 0, 0, TxtCol, TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP)
-			draw.SimpleText(Resource .. "/" .. tostring(self.MaxVolume), "JMod-Stencil", 0, 85, TxtCol, TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP)
+			draw.SimpleText(Room .. "/" .. tostring(self.MaxVolume), "JMod-Stencil", 0, 85, TxtCol, TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP)
 			cam.End3D2D()
 		end
 	end
@@ -246,16 +253,9 @@ elseif CLIENT then
 
 		JMod.SelectionMenuIcons = JMod.SelectionMenuIcons or {}
 		-- first, populate icons
-		for name, info in pairs(Contents) do
-			if not JMod.SelectionMenuIcons[name] then
-				local IsResource = false
-
-				for k, v in pairs(JMod.EZ_RESOURCE_ENTITIES) do
-					if v == JMod.EZ_RESOURCE_ENTITIES[name] then
-						IsResource = true
-						JMod.SelectionMenuIcons[name] = JMod.EZ_RESOURCE_TYPE_ICONS_SMOL[k]
-					end
-				end
+		for index, info in pairs(Contents) do
+			if not JMod.SelectionMenuIcons[info.Ent] then
+				
 			end
 		end
 		
@@ -328,12 +328,12 @@ elseif CLIENT then
 		local Y, AlphabetizedItemNames = 0, table.GetKeys(Contents)
 		table.sort(AlphabetizedItemNames, function(a, b) return a < b end)
 
-		for k, itemName in pairs(AlphabetizedItemNames) do
+		for index, info in pairs(Contents) do
 			local Butt = Scroll:Add("DButton")
 			Butt:SetSize(W - 40, 42)
 			Butt:SetPos(0, Y)
 			Butt:SetText("")
-			local itemInfo = Contents[itemName]
+			local itemName = info.Ent
 
 			Butt.enabled = true
 			Butt:SetMouseInputEnabled(true)
@@ -371,7 +371,7 @@ elseif CLIENT then
 					surface.DrawTexturedRect(5, 5, 32, 32)
 				end
 
-				draw.SimpleText(string.upper(itemName).." x"..tostring(itemInfo), "DermaDefault", (ItemIcon and 47) or 5, 15, Color(255, 255, 255, (self.enabled and 255) or 40), TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP)
+				draw.SimpleText((language.GetPhrase(itemName) or itemName).." - Volume: "..tostring(info.Volume), "DermaDefault", (ItemIcon and 47) or 5, 15, Color(255, 255, 255, (self.enabled and 255) or 40), TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP)
 
 			end
 
@@ -381,8 +381,7 @@ elseif CLIENT then
 						if IsValid(Container) then
 							net.Start("ABoot_ContainerMenu")
 								net.WriteEntity(Container)
-								net.WriteString(itemName)
-								net.WriteUInt(RequestedAmount, 17)
+								net.WriteString(index)
 							net.SendToServer()
 						end
 					end)

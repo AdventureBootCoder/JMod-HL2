@@ -238,7 +238,7 @@ if SERVER then
 				ToDir = ToAng:Forward() 
 				local Dist = SelfPos:Distance(targetPos)
 				-----
-				local Speed = math.sqrt((600 * Dist) / math.sin(2 * math.rad(LaunchAngle))) -- Fancy math
+				local Speed = math.sqrt((800 * Dist) / math.sin(2 * math.rad(LaunchAngle))) -- Fancy math
 				-----
 				constraint.RemoveAll(self)
 
@@ -278,7 +278,7 @@ if SERVER then
 						self:SetTarget(targ)
 					end
 
-					if IsValid(self:GetTarget()) and JMod.ShouldAttack(self, self:GetTarget()) then
+					if IsValid(self:GetTarget()) and JMod.ShouldAttack(self, self:GetTarget(), false, true) then
 						self.WarningSnd:Play()
 						self:SetAlly(false)
 					else

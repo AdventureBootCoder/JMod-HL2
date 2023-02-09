@@ -244,11 +244,12 @@ if SERVER then
 				ToVec.z = 0
 				local ToDir = ToVec:GetNormalized()
 				local ToAng = ToDir:Angle()
-				ToAng:RotateAroundAxis(ToAng:Right(), 66)
-				ToDir = ToAng:Forward() 
 				local Dist = SelfPos:Distance(targetPos)
+				local LaunchAngle = Dist * 0.33
+				ToAng:RotateAroundAxis(ToAng:Right(), LaunchAngle)
+				ToDir = ToAng:Forward() 
 				-----
-				local Speed = math.sqrt((600 * Dist) / math.sin(2 * math.rad(66))) -- Fancy math
+				local Speed = math.sqrt((600 * Dist) / math.sin(2 * math.rad(LaunchAngle))) -- Fancy math
 				-----
 				constraint.RemoveAll(self)
 
@@ -262,6 +263,7 @@ if SERVER then
 	end
 
 	local LerpedMove = 0
+	local AttackDist = 300 --245
 	function ENT:Think()
 		local SelfPos, State, Time = self:GetPos(), self:GetState(), CurTime()
 
@@ -279,7 +281,7 @@ if SERVER then
 			end
 			--JPrint(tostring(self:GetTarget()) .. " \t " .. tostring(self:GetAlly()))
 
-			for k, targ in pairs(ents.FindInSphere(SelfPos, 245)) do
+			for k, targ in pairs(ents.FindInSphere(SelfPos, AttackDist)) do
 				if not (targ == self) and (targ:IsPlayer() or targ:IsNPC() or targ:IsVehicle()) and JMod.ClearLoS(self, targ, true) then
 					
 					local targPos = targ:GetPos()
@@ -301,14 +303,14 @@ if SERVER then
 			if IsValid(self:GetTarget()) then
 				local Target, TargetPos = self:GetTarget(), self:GetTarget():GetPos()
 
-				if SelfPos:Distance(TargetPos) < 150 then
+				if SelfPos:Distance(TargetPos) < AttackDist * 0.75 then
 					if not(self:GetAlly()) then
 						self.WarningSnd:Stop()
 						self:EmitSound("NPC_CombineMine.OpenHooks")
-						local LaunchPos = Target:LocalToWorld(Target:OBBCenter()) + Target:GetVelocity()
+						local LaunchPos = Target:LocalToWorld(Target:OBBCenter() + Vector(0, 0, math.random(0, 10))) + Target:GetVelocity()
 						self:Launch(LaunchPos)
 					end
-				elseif SelfPos:Distance(TargetPos) > 245 then
+				elseif SelfPos:Distance(TargetPos) > AttackDist then
 					self:SetTarget(nil)
 					self:SetAlly(false)
 					if self.WarningSnd:IsPlaying() then
