@@ -5,7 +5,7 @@ ENT.PrintName = "EZ Experimental Container"
 ENT.Author = "Jackarunda, AdventureBoots"
 ENT.Category = "JMod - EZ HL:2"
 ENT.NoSitAllowed = true
-ENT.Spawnable = true
+ENT.Spawnable = false
 ENT.AdminSpawnable = true
 ---
 ENT.JModPreferredCarryAngles = Angle(0, 0, 0)
@@ -64,11 +64,43 @@ if SERVER then
 			end
 			local Ent = data.HitEntity
 			timer.Simple(0, function()
-				if IsValid(Enty) and not(Ent:IsPlayer()) and IsValid(data.HitObject) then
-					self:TryLoadEntity(Ent)
+				if IsValid(Ent) and not(Ent:IsPlayer()) and IsValid(data.HitObject) and (Ent:GetClass() ~= "ent_aboot_gmod_ezmanifesto") then
+					for k, v in pairs(constraint.GetAllConstrainedEntities(Ent)) do
+						if (v:GetClass() == "ent_aboot_gmod_ezmanifesto") then
+							self:TryLoadEntity(Ent)
+							break
+						end
+					end
 				end
 			end)
 		end
+	end
+
+	function ENT:TryLoadEntity(ent)
+		local Time = CurTime()
+		if not IsValid(ent) then return false end
+		local Index, Phys = ent:EntIndex(), ent:GetPhysicsObject()
+		if istable(self.Contents[Index]) then return end
+		if not IsValid(Phys) then return false end
+		local SpaceNeeded = math.Round(Phys:GetVolume() or Phys:GetMass() ^ 3)
+		if SpaceNeeded > (self.MaxVolume - self:GetRoom()) then return end
+		self.Contents[Index] = {}
+		self.Contents[Index].Ent = ent:GetClass()
+		self.Contents[Index].Volume = math.Round(Phys:GetVolume() or Phys:GetMass() ^ 3)
+		constraint.RemoveAll(ent)
+		ent:SetParent(ent)
+		ent:SetNoDraw(true)
+		ent:SetNotSolid(true)
+		Phys:Sleep()
+		
+		ent:SetPos(self:GetPos())
+		ent:SetVelocity(Vector(0, 0, 0))
+		
+		print(Phys:GetVelocity())
+
+		self:CalcWeight()
+
+		return true
 	end
 
 	function ENT:CalcWeight()
@@ -78,11 +110,13 @@ if SERVER then
 		local OurMass = 4000
 		self:SetRoom(0)
 		for k, v in pairs(self.Contents) do
-			if IsValid(Entity(tonumber(k)):GetPhysicsObject()) then
-				local ContainedEntMass = Entity(tonumber(k)):GetPhysicsObject():GetMass()
-				if ContainedEntMass > 0 then
-					OurMass = OurMass + ContainedEntMass
+			if IsValid(Entity(tonumber(k))) then
+				OurMass = OurMass + Entity(tonumber(k)):GetPhysicsObject():GetMass()
+			else
+				if IsValid(Entity(tonumber(k))) then
+					SafeRemoveEntity(Entity(tonumber(k)))
 				end
+				self.Contents[k] = nil
 			end
 			if v.Volume > 0 then
 				self:SetRoom(self:GetRoom() + v.Volume)
@@ -123,7 +157,7 @@ if SERVER then
 				self.Contents[k] = nil
 			end
 		end
-		if table.IsEmpty(TrimmedTable) then return end
+		if table.IsEmpty(TrimmedTable) then self:CalcWeight() return end
 		net.Start("ABoot_ContainerMenu")
 			net.WriteEntity(self)
 			net.WriteTable(self.Contents)
@@ -172,27 +206,6 @@ if SERVER then
 				SafeRemoveEntity(Entity(tonumber(k)))
 			end 
 		end
-	end
-
-	function ENT:TryLoadEntity(ent)
-		local Time = CurTime()
-		if not IsValid(ent) then return false end
-		local Index, Phys = ent:EntIndex(), ent:GetPhysicsObject()
-		local SpaceNeeded = math.Round(Phys:GetVolume() or Phys:GetMass() ^ 3)
-		if SpaceNeeded > (self.MaxVolume - self:GetRoom()) then return end
-		self.Contents[Index] = {}
-		self.Contents[Index].Ent = ent:GetClass()
-		self.Contents[Index].Volume = math.Round(Phys:GetVolume() or Phys:GetMass() ^ 3)
-		constraint.RemoveAll(ent)
-		ent:SetParent(ent)
-		ent:SetNoDraw(true)
-		ent:SetNotSolid(true)
-
-		Phys:Sleep()
-
-		self:CalcWeight()
-
-		return true
 	end
 
 elseif CLIENT then
