@@ -307,20 +307,6 @@ elseif CLIENT then
 
 		local W, H = TabPanel:GetWide(), TabPanel:GetTall()
 
-		local RequestedAmount = 100
-		local AmountSlider = vgui.Create( "DNumSlider", TabPanel )
-		AmountSlider:SetPos(10, 575) -- Set the position
-		AmountSlider:SetSize(250, 100) -- Set the size
-		AmountSlider:SetText("Requested Amount") -- Set the text above the slider
-		AmountSlider:SetMin(0) -- Set the minimum number you can slide to
-		AmountSlider:SetMax(10000) -- Set the maximum number you can slide to
-		AmountSlider:SetDecimals(0) -- Decimal places - zero for whole number
-		AmountSlider:SetValue(RequestedAmount)
-
-		function AmountSlider:OnValueChanged(num)
-			RequestedAmount = AmountSlider:GetValue()
-		end
-
 		local Scroll = vgui.Create("DScrollPanel", TabPanel)
 		Scroll:SetSize(W - 10, H - 100)
 		Scroll:SetPos(10, 10)
