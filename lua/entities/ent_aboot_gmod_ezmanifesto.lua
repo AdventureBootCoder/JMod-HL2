@@ -65,25 +65,12 @@ if SERVER then
 		local Time = CurTime()
 
 		if tobool(onOff) then
-			local State = self:GetActive()
-			local Alt = Dude:KeyDown(JMod.Config.AltFunctionKey)
-
-			if State == false then
-				if Alt then
-					self:EmitSound("snd_jack_minearm.wav", 60, 70)
-					self:SetActive(true)
-				else
-					constraint.RemoveAll(self)
-					self.StuckStick = nil
-					self.StuckTo = nil
-					Dude:PickupObject(self)
-					self.NextStick = Time + .5
-					JMod.Hint(Dude, "sticky")
-				end
-			else
-				self:EmitSound("snd_jack_minearm.wav", 60, 70)
-				self:SetActive(false)
-			end
+			constraint.RemoveAll(self)
+			self.StuckStick = nil
+			self.StuckTo = nil
+			Dude:PickupObject(self)
+			self.NextStick = Time + .5
+			JMod.Hint(Dude, "sticky")
 		else
 			if self:IsPlayerHolding() and (self.NextStick < Time) then
 				local Tr = util.QuickTrace(Dude:GetShootPos(), Dude:GetAimVector() * 80, {self, Dude})
