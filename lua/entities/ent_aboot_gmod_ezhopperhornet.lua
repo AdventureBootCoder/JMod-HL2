@@ -278,7 +278,7 @@ if SERVER then
 						self:SetTarget(targ)
 					end
 
-					if IsValid(self:GetTarget()) and JMod.ShouldAttack(self, self:GetTarget(), false, true) then
+					if IsValid(self:GetTarget()) and JMod.ShouldAttack(self, self:GetTarget()) then
 						self.WarningSnd:Play()
 						self:SetAlly(false)
 					else

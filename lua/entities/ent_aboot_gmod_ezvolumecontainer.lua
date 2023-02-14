@@ -88,7 +88,7 @@ if SERVER then
 		self.Contents[Index].Ent = ent:GetClass()
 		self.Contents[Index].Volume = math.Round(Phys:GetVolume() or Phys:GetMass() ^ 3)
 		constraint.RemoveAll(ent)
-		ent:SetParent(ent)
+		ent:SetParent(self)
 		ent:SetNoDraw(true)
 		ent:SetNotSolid(true)
 		Phys:Sleep()
@@ -180,6 +180,7 @@ if SERVER then
 			UnpackedEnt:SetAngles(Container:GetAngles())
 			UnpackedEnt:SetNoDraw(false)
 			UnpackedEnt:SetNotSolid(false)
+			UnpackedEnt:SetParent(nil)
 			local Phys = UnpackedEnt:GetPhysicsObject()
 
 			if IsValid(Phys) then
