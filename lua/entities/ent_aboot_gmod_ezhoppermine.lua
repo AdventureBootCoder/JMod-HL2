@@ -129,9 +129,11 @@ if SERVER then
 		if data.DeltaTime > 0.2 then
 			if data.Speed > 10 then
 				if self:GetState() == STATE_LAUNCHED then
-					if IsValid(self) then
-						self:Detonate()
-					end
+					timer.Simple(0, function()
+						if IsValid(self) then
+							self:Detonate()
+						end
+					end)
 				else
 					self:EmitSound("SolidMetal.ImpactSoft")
 				end
