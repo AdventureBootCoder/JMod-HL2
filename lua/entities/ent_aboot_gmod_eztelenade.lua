@@ -16,8 +16,10 @@ if SERVER then
 	end
 	function ENT:Arm()
 		self:SetState(JMod.EZ_STATE_ARMED)
-
-		timer.Simple(2, function()
+		if IsValid(self.TeleMarker) then 
+			self.TeleMarker:SetActivated(true)
+		end
+		timer.Simple(3, function()
 			if IsValid(self) then
 				self:Detonate()
 			end
@@ -28,6 +30,14 @@ if SERVER then
 		self:SetState(JMod.EZ_STATE_PRIMED)
 		self:EmitSound("snd_jack_cloakon.wav", 60, 100)
 		self:SetBodygroup(1, 0)
+
+		local Marker = ents.Create("ent_aboot_gmod_eztelemarker")
+		Marker:SetPos(self:GetPos() + Vector(0, 0, 5))
+		Marker:SetAngles(self:GetAngles())
+		JMod.SetOwner(Marker, self.Owner)
+		Marker:Spawn()
+		Marker:Activate()
+		self.TeleMarker = Marker
 	end
 
 	function ENT:Detonate()
@@ -39,7 +49,7 @@ if SERVER then
 		self:EmitSound("weapons/physcannon/energy_sing_explosion2.wav", 90, 140)
 		local plooie = EffectData()
 		plooie:SetOrigin(SelfPos)
-		util.Effect("eff_jack_gmod_flashbang", plooie, true, true)
+		--util.Effect("eff_jack_gmod_flashbang", plooie, true, true)
 		util.ScreenShake(SelfPos, 20, 20, .2, 1000)
 
 		for k, v in pairs(ents.FindInSphere(SelfPos, 200)) do
@@ -52,67 +62,64 @@ if SERVER then
 
 		timer.Simple(.1, function()
 			if not IsValid(self) then return end
-			util.BlastDamage(self, self.Owner or self, SelfPos, 1000, 2)
+			util.BlastDamage(self, self.Owner or self, SelfPos, 500, 1)
 			self:SetCollisionGroup(COLLISION_GROUP_DEBRIS)
 		end)
 
 		timer.Simple(.5, function() 
 			if not IsValid(self) then return end
-			if IsValid(self.Owner) and self.Owner:Alive() then 
-				local PlyHullMin, PlyHullMax = self.Owner:GetHull()
-				--print(PlyHullMin, PlyHullMax)
-				for i = 1, 200 do
-					local RandVec = SelfPos + VectorRand(16, 100)
+			if not IsValid(self.TeleMarker) then return end 
+			for _, v in pairs(ents.FindInSphere(self.TeleMarker:GetPos(), 245)) do
+				if IsValid(v) and IsValid(v:GetPhysicsObject()) and v:GetClass() ~= "ent_aboot_gmod_eztelemarker" then
+					local BBMin, BBMax = v:GetCollisionBounds()
+					if v:IsPlayer() and v:Alive() then
+						BBMin, BBMax = v:GetHull()
+					end
+					--print(v, BBMin, BBMax)
+					local RelativeVec = self.TeleMarker:GetPos() - v:GetPos()--v:LocalToWorld(v:OBBCenter())
 					local BBcheck = util.TraceHull({
-						start = SelfPos + Vector(0, 0, 2),
-						endpos = RandVec,
-						mins = PlyHullMin * 1.1,
-						maxs = PlyHullMax * 1.1,
+						start = RelativeVec,
+						endpos = RelativeVec,
+						mins = BBMin * 1,
+						maxs = BBMax * 1,
 						mask = MASK_SOLID,
 						filter = self
 					})
-					if not(BBcheck.Hit) then
+					print(v, self:WorldToLocal(RelativeVec), BBcheck.Hit)
+					--if not(BBcheck.Hit) then
 						PointsToCheck = {
-							Vector(PlyHullMin[1], PlyHullMin[2], PlyHullMin[3]),
-							Vector(PlyHullMax[1], PlyHullMin[2], PlyHullMin[3]),
-							Vector(PlyHullMin[1], PlyHullMax[2], PlyHullMin[3]),
-							Vector(PlyHullMax[1], PlyHullMax[2], PlyHullMin[3]),
-							Vector(PlyHullMin[1], PlyHullMin[2], PlyHullMax[3]),
-							Vector(PlyHullMax[1], PlyHullMin[2], PlyHullMax[3]),
-							Vector(PlyHullMin[1], PlyHullMax[2], PlyHullMax[3]),
-							Vector(PlyHullMax[1], PlyHullMax[2], PlyHullMax[3])
+							Vector(BBMin[1], BBMin[2], BBMin[3]),
+							Vector(BBMax[1], BBMin[2], BBMin[3]),
+							Vector(BBMin[1], BBMax[2], BBMin[3]),
+							Vector(BBMax[1], BBMax[2], BBMin[3]),
+							Vector(BBMin[1], BBMin[2], BBMax[3]),
+							Vector(BBMax[1], BBMin[2], BBMax[3]),
+							Vector(BBMin[1], BBMax[2], BBMax[3]),
+							Vector(BBMax[1], BBMax[2], BBMax[3])
 						}
 						local Good = true
-						for _, v in ipairs(PointsToCheck) do
-							local PointCheck = util.IsInWorld(RandVec + v)
-							if not PointCheck then
+						for _, p in ipairs(PointsToCheck) do
+							if (bit.band(util.PointContents(p), CONTENTS_SOLID) == CONTENTS_SOLID) then
 								Good = false
 								break
 							end
 						end
-						if Good then
-							self.Owner:SetPos(SelfPos)
-							self.Owner:SetVelocity(self:GetPhysicsObject():GetVelocity())
-							break
-						end
-					end
+						--if Good then
+							v:SetPos(self:GetPos() - RelativeVec)
+							v:SetVelocity(self:GetPhysicsObject():GetVelocity())
+						--end
+					--end
 				end
 			end
 		end)
-
+		self.TeleMarker:SetActivated(false)
 		SafeRemoveEntityDelayed(self, 10)
 	end
 
-	function util.IsAllInWorld( ent )
-		if IsValid( ent ) and IsEntity( ent ) then
-			local inworld = ent:IsInWorld()
-			local vec1, vec2 = ent:GetCollisionBounds()
-			local realvec1, realvec2 = ent:WorldToLocal( vec1 ), ent:WorldToLocal( vec2 )
-			if inworld and util.IsInWorld( realvec1 ) and util.IsInWorld( realvec2 ) then
-				return true
-			end
+	function ENT:OnRemove()
+		if IsValid(self.TeleMarker) then 
+			SafeRemoveEntity(self.TeleMarker)
 		end
-		return false
 	end
 
 elseif CLIENT then

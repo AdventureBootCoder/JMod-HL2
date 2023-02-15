@@ -129,7 +129,9 @@ if SERVER then
 		if data.DeltaTime > 0.2 then
 			if data.Speed > 10 then
 				if self:GetState() == STATE_LAUNCHED then
-					self:Detonate()
+					if IsValid(self) then
+						self:Detonate()
+					end
 				else
 					self:EmitSound("SolidMetal.ImpactSoft")
 				end
@@ -137,12 +139,40 @@ if SERVER then
 		end
 	end
 
+	function ENT:Launch(targetPos)
+		self:SetState(STATE_LAUNCHED)
+		timer.Simple(0.2 * JMod.Config.MineDelay, function()
+			if IsValid(self) then
+				self:EmitSound("NPC_CombineMine.Hop")
+				local SelfPos = self:GetPos()
+				local ToVec = targetPos - SelfPos
+				ToVec.z = 0
+				local ToDir = ToVec:GetNormalized()
+				local ToAng = ToDir:Angle()
+				local Dist = SelfPos:Distance(targetPos)
+				local LaunchAngle = Dist * 0.33
+				ToAng:RotateAroundAxis(ToAng:Right(), LaunchAngle)
+				ToDir = ToAng:Forward() 
+				-----
+				local Speed = math.sqrt((600 * Dist) / math.sin(2 * math.rad(LaunchAngle))) -- Fancy math
+				-----
+				constraint.RemoveAll(self)
+
+				local Phys = self:GetPhysicsObject()
+
+				Phys:EnableMotion(true)
+				Phys:SetDragCoefficient(0)
+				Phys:SetVelocity(Phys:GetVelocity() + (ToDir * Speed) + VectorRand(-1, 1))
+			end
+		end)
+	end
+
 	function ENT:Detonate()
 		if self.Exploded then return end
 		self.Exploded = true
 		local SelfPos = self:LocalToWorld(self:OBBCenter())
 		local Up = Vector(0, 0, 1)
-		local EffectType = 1
+		--[[local EffectType = 1
 		local Traec = util.QuickTrace(self:GetPos(), Vector(0, 0, -5), self)
 
 		if Traec.Hit then
@@ -164,12 +194,12 @@ if SERVER then
 		plooie:SetScale(1)
 		plooie:SetRadius(EffectType)
 		plooie:SetNormal(Up)
-		util.Effect("eff_jack_minesplode", plooie, true, true)
+		util.Effect("eff_jack_minesplode", plooie, true, true)]]--
 		util.ScreenShake(SelfPos, 99999, 99999, 1, 500)
 		self:EmitSound("snd_jack_fragsplodeclose.wav", 90, 100)
 		JMod.Sploom(JMod.GetOwner(self), SelfPos, 150, 125)
-		JMod.FragSplosion(self, SelfPos, 100, 20 * JMod.Config.MinePower, 1000, JMod.GetOwner(self), Up, 1.3, 10)
-		self:Remove()
+		JMod.FragSplosion(self, SelfPos, 500, 20 * JMod.Config.MinePower, 500, JMod.GetOwner(self), Up, 1.3, 15)
+		SafeRemoveEntity(self)
 	end
 
 	function ENT:Arm(armer)
@@ -230,34 +260,6 @@ if SERVER then
 				self:Arm(JMod.GetOwner(self))
 			else
 				self:SetState(STATE_OFF)
-			end
-		end)
-	end
-
-	function ENT:Launch(targetPos)
-		self:SetState(STATE_LAUNCHED)
-		timer.Simple(0.2 * JMod.Config.MineDelay, function()
-			if IsValid(self) then
-				self:EmitSound("NPC_CombineMine.Hop")
-				local SelfPos = self:GetPos()
-				local ToVec = targetPos - SelfPos
-				ToVec.z = 0
-				local ToDir = ToVec:GetNormalized()
-				local ToAng = ToDir:Angle()
-				local Dist = SelfPos:Distance(targetPos)
-				local LaunchAngle = Dist * 0.33
-				ToAng:RotateAroundAxis(ToAng:Right(), LaunchAngle)
-				ToDir = ToAng:Forward() 
-				-----
-				local Speed = math.sqrt((600 * Dist) / math.sin(2 * math.rad(LaunchAngle))) -- Fancy math
-				-----
-				constraint.RemoveAll(self)
-
-				local Phys = self:GetPhysicsObject()
-
-				Phys:EnableMotion(true)
-				Phys:SetDragCoefficient(0)
-				Phys:SetVelocity(Phys:GetVelocity() + (ToDir * Speed) + VectorRand(-1, 1))
 			end
 		end)
 	end

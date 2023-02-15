@@ -44,6 +44,11 @@ if(SERVER)then
 		end)
 		self:NextThink(1)
 		self.EZupgradable = true
+		--self:SetMaterial("models/aboot/aboot_combinethumper002_mat.vmt")
+		timer.Simple(0, function() 
+			self:TryPlace()
+			self:SetColor(Color(255, 255, 255))
+		end)
 	end
 
 	function ENT:UpdateDepositKey()
@@ -148,12 +153,12 @@ if(SERVER)then
 		local State = self:GetState()
 		local OldOwner = self.Owner
 		local alt = activator:KeyDown(JMod.Config.AltFunctionKey)
-		JMod.SetOwner(self,activator)
-		if(IsValid(self.Owner))then
+		JMod.SetOwner(self, activator)
+		--[[if(IsValid(self.Owner))then
 			if(OldOwner ~= self.Owner)then -- if owner changed then reset team color
 				JMod.Colorify(self)
 			end
-		end
+		end]]--
 
 		if State == STATE_BROKEN then
 			JMod.Hint(activator, "destroyed", self)
