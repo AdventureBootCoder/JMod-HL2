@@ -244,9 +244,11 @@ if SERVER then
 
 				local Phys = self:GetPhysicsObject()
 
-				Phys:EnableMotion(true)
-				Phys:SetDragCoefficient(0)
-				Phys:SetVelocity(Phys:GetVelocity() + (ToDir * Speed) + VectorRand(-1, 1))
+				timer.Simple(0, function()
+					Phys:EnableMotion(true)
+					Phys:SetDragCoefficient(0)
+					Phys:AddVelocity((ToDir * Speed) + VectorRand(-1, 1))
+				end)
 			end
 		end)
 	end
