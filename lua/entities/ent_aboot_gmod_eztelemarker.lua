@@ -64,39 +64,62 @@ if SERVER then
 		if Active ~= self.LastState then
 			if Active == true then
 				self:EmitSound("weapons/physcannon/physcannon_charge.wav", 90, 60)
-				self.TimeSinceActivated = CurTime()
 			end
 			self.LastState = Active
 		end
 	end
 
 elseif CLIENT then
+	function ENT:Initialize()
+		self.TimeSinceActivated = CurTime()
+		self.Scl = 0.1
+		self.Rotation = 1
+	end
+
+	local Refract, White, AccretionDisk, Glow, TeleGlow = Material("mat_jack_gmod_gravlens"), Color(255, 255, 255, 255), Material("sprites/mat_jack_gmod_blurrycircle"), Material("sprites/mat_jack_basicglow"), Color(225, 255, 93, 150)
+
 	function ENT:Draw()
+		local Active, Pos= self:GetActivated(), self:LocalToWorld(self:OBBCenter())
+		local Up = self:GetRight()
+
 		self:DrawModel()
+
+		if Active then
+			render.SetMaterial(Refract)
+			local QuadPos = Pos
+			render.DrawQuadEasy(QuadPos, Up, 100 * self.Scl, 100 * self.Scl, White, Rotation)
+			render.DrawQuadEasy(QuadPos, -Up, 100 * self.Scl, 100 * self.Scl, White, Rotation)
+			render.SetMaterial(Glow)
+			render.DrawSprite(Pos, 200 * self.Scl, 200 * self.Scl, TeleGlow)
+
+			self.Rotation = self.Rotation + FrameTime() * 100
+			self.Scl = self.Scl + FrameTime()
+		end
 	end
 
 	function ENT:Think()
 		local Active, Time = self:GetActivated(), CurTime()
+		local Pos, Ang = self:LocalToWorld(self:OBBCenter()), self:GetAngles()
 		if Active then
-			for k, v in ipairs(ents.FindInSphere(self:GetPos(), 245)) do
-				if not isstring(v.EZoldMaterial) then
-					if self:ShouldTeleport(v) then
-						v.EZoldMaterial = v:GetMaterial()
-						v:SetMaterial("models/props_combine/com_shield001b")
-						timer.Simple(3, function() 
-							if IsValid(v) and isstring(v.EZoldMaterial) then 
-								v:SetMaterial(v.EZoldMaterial)
-								v.EZoldMaterial = nil
-							end 
-						end)
-					end
-				end
+			local Up, Right, Forward, Mult, Col = Ang:Up(), Ang:Right(), Ang:Forward(), .8, self:GetColor()
+			local R, G, B = math.Clamp(Col.r + 20, 0, 255), math.Clamp(Col.g + 20, 0, 255), math.Clamp(Col.b + 20, 0, 255)
+			local DLight = DynamicLight(self:EntIndex())
+
+			if DLight then
+				DLight.Pos = Pos + Up * 10 + Vector(0, 0, 20)
+				DLight.r = R
+				DLight.g = G
+				DLight.b = B
+				DLight.Brightness = math.Rand(.5, 1) * Mult ^ 2
+				DLight.Size = math.random(1300, 1500) * Mult ^ 2
+				DLight.Decay = 15000
+				DLight.DieTime = CurTime() + .3
+				DLight.Style = 0
 			end
 		end
 		if Active ~= self.LastState then
 			if Active == true then
-				self:EmitSound("weapons/physcannon/physcannon_charge.wav", 90, 60)
-				self.TimeSinceActivated = Time
+				self.TimeSinceActivated = CurTime()
 			end
 			self.LastState = Active
 		end

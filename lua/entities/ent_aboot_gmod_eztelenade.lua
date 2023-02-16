@@ -113,11 +113,11 @@ if SERVER then
 							v:GetPhysicsObject():Wake()
 							v:SetPos(self:GetPos() - RelativeVec)
 							v:SetVelocity(self:GetPhysicsObject():GetVelocity())
-							if isstring(v.EZoldMaterial) then
+							--[[if isstring(v.EZoldMaterial) then
 								print(v.EZoldMaterial)
 								v:SetMaterial(v.EZoldMaterial)
 								v.EZoldMaterial = nil
-							end
+							end]]--
 						end
 					end
 				end
