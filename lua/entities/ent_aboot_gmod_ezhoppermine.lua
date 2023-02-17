@@ -129,7 +129,7 @@ if SERVER then
 		if data.DeltaTime > 0.2 then
 			if data.Speed > 10 then
 				if self:GetState() == STATE_LAUNCHED then
-					timer.Simple(0, function()
+					timer.Simple(0.01, function()
 						if IsValid(self) then
 							self:Detonate()
 						end
@@ -152,7 +152,7 @@ if SERVER then
 				local ToDir = ToVec:GetNormalized()
 				local ToAng = ToDir:Angle()
 				local Dist = SelfPos:Distance(targetPos)
-				local LaunchAngle = Dist * 0.33
+				local LaunchAngle = 60
 				ToAng:RotateAroundAxis(ToAng:Right(), LaunchAngle)
 				ToDir = ToAng:Forward() 
 				-----

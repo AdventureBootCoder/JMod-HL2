@@ -63,7 +63,25 @@ if SERVER then
 		local Active = self:GetActivated()
 		if Active ~= self.LastState then
 			if Active == true then
+
 				self:EmitSound("weapons/physcannon/physcannon_charge.wav", 90, 60)
+
+				timer.Simple(2.5, function()
+					if not(IsValid(self)) then return end
+					self:EmitSound("snd_jack_wormhole.wav", 105, 100, 1)
+					local PortalOpen = EffectData()
+					PortalOpen:SetOrigin(self:GetPos() + Vector(0, 0, 40))
+					PortalOpen:SetScale(self.TeleRange)
+					util.Effect("eff_jack_gmod_portalopen", PortalOpen, true, true)
+
+					timer.Simple(.75,function()
+						if not(IsValid(self)) then return end
+						local PortalClose = EffectData()
+						PortalClose:SetOrigin(self:GetPos() + Vector(0, 0, 40))
+						PortalClose:SetScale(self.TeleRange)
+						util.Effect("eff_jack_gmod_portalclose", PortalClose, true, true)
+					end)
+				end)
 			end
 			self.LastState = Active
 		end
@@ -74,6 +92,18 @@ elseif CLIENT then
 		self.TimeSinceActivated = CurTime()
 		self.Scl = 0.1
 		self.Rotation = 1
+		self.TeleRange = 200
+		self.ColorMods = {
+			["$pp_colour_addr"] = 0,
+			["$pp_colour_addg"] = 0,
+			["$pp_colour_addb"] = 0,
+			["$pp_colour_brightness"] = 0,
+			["$pp_colour_contrast"] = 1,
+			["$pp_colour_colour"] = 1,
+			["$pp_colour_mulr"] = 0,
+			["$pp_colour_mulg"] = 0,
+			["$pp_colour_mulb"] = 0
+		}
 	end
 
 	local Refract, White, AccretionDisk, Glow, TeleGlow = Material("mat_jack_gmod_gravlens"), Color(255, 255, 255, 255), Material("sprites/mat_jack_gmod_blurrycircle"), Material("sprites/mat_jack_basicglow"), Color(225, 255, 93, 150)
@@ -87,13 +117,17 @@ elseif CLIENT then
 		if Active then
 			render.SetMaterial(Refract)
 			local QuadPos = Pos
-			render.DrawQuadEasy(QuadPos, Up, 100 * self.Scl, 100 * self.Scl, White, Rotation)
-			render.DrawQuadEasy(QuadPos, -Up, 100 * self.Scl, 100 * self.Scl, White, Rotation)
+			render.DrawQuadEasy(QuadPos, Up, 50 * self.Scl, 50 * self.Scl, White, Rotation)
+			render.DrawQuadEasy(QuadPos, -Up, 50 * self.Scl, 50 * self.Scl, White, Rotation)
 			render.SetMaterial(Glow)
 			render.DrawSprite(Pos, 200 * self.Scl, 200 * self.Scl, TeleGlow)
-
-			self.Rotation = self.Rotation + FrameTime() * 100
-			self.Scl = self.Scl + FrameTime()
+			
+			local Delta = FrameTime()
+			self.Rotation = self.Rotation + Delta * 100
+			self.Scl = self.Scl + Delta
+			self.ColorMods["$pp_colour_brightness"] = self.ColorMods["$pp_colour_brightness"] + 0.3 * Delta
+			self.ColorMods["$pp_colour_contrast"] = self.ColorMods["$pp_colour_contrast"] + 0.02 * Delta
+			--self.ColorMods["$pp_colour_colour"] = self.ColorMods["$pp_colour_colour"] - 1 * Delta
 		end
 	end
 
@@ -116,6 +150,7 @@ elseif CLIENT then
 				DLight.DieTime = CurTime() + .3
 				DLight.Style = 0
 			end
+
 		end
 		if Active ~= self.LastState then
 			if Active == true then
@@ -131,15 +166,20 @@ elseif CLIENT then
 	hook.Add("RenderScreenspaceEffects", "ABoot_TeleportEffect", function()
 		local Ply = LocalPlayer()
 		local Teleporting = false
+		local Teleporter = nil
 		for _, v in ipairs(ents.FindByClass("ent_aboot_gmod_eztelemarker")) do
-			if (v:GetPos():Distance(Ply:GetPos()) < 245) and v:GetActivated() and v:ShouldTeleport(Ply) then
+			if (v:GetActivated() and v:GetPos():Distance(Ply:GetPos()) < v.TeleRange) and v:ShouldTeleport(Ply) then
 				Teleporting = true
+				Teleporter = v
 			end
 		end
 		if Teleporting then
+			DrawColorModify(Teleporter.ColorMods)
 			render.UpdateScreenEffectTexture()
 			render.SetMaterial(Overlay)
 			render.DrawScreenQuad(true)
+			--render.SetMaterial(Overlay)
+			--render.DrawScreenQuad(false)
 		end
 	end)
 

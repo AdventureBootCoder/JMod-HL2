@@ -13,7 +13,9 @@ ENT.SpoonScale = 1
 if SERVER then
 	function ENT:CustomInit()
 		self:SetBodygroup(1, 1)
+		self.TeleRange = 200
 	end
+
 	function ENT:Arm()
 		self:SetState(JMod.EZ_STATE_ARMED)
 		if IsValid(self.TeleMarker) then 
@@ -23,6 +25,21 @@ if SERVER then
 			if IsValid(self) then
 				self:Detonate()
 			end
+		end)
+		timer.Simple(2.5, function()
+			if not(IsValid(self)) then return end
+			self:EmitSound("snd_jack_wormhole.wav", 105, 100, 1)
+			local PortalOpen = EffectData()
+			PortalOpen:SetOrigin(self:GetPos() + Vector(0, 0, 40))
+			PortalOpen:SetScale(self.TeleRange)
+			util.Effect("eff_jack_gmod_portalopen", PortalOpen, true, true)
+			timer.Simple(0.75, function()
+				if not(IsValid(self)) then return end
+				local PortalClose = EffectData()
+				PortalClose:SetOrigin(self:GetPos() + Vector(0, 0, 40))
+				PortalClose:SetScale(self.TeleRange)
+				util.Effect("eff_jack_gmod_portalclose", PortalClose, true, true)
+			end)
 		end)
 	end
 
@@ -39,6 +56,7 @@ if SERVER then
 		Marker:Activate()
 		self.TeleMarker = Marker
 		Marker.ToNade = self
+		Marker.TeleRange = self.TeleRange
 	end
 
 	function ENT:Detonate()
@@ -54,76 +72,64 @@ if SERVER then
 		end
 
 		self:SetColor(Color(0, 0, 0))
+		JMod.Sploom(self.Owner, self:GetPos(), 20)
+		self:EmitSound("snd_jack_fragsplodeclose.wav", 90, 140)
+		local plooie = EffectData()
+		plooie:SetOrigin(SelfPos)
+		util.Effect("eff_jack_gmod_flashbang", plooie, true, true)
+		util.ScreenShake(SelfPos, 20, 20, .2, 1000)
 
-		timer.Simple(.15, function() 
-			if not IsValid(self) then return end
-			--JMod.Sploom(self.Owner, self:GetPos(), 20)
-			self:EmitSound("snd_jack_fragsplodeclose.wav", 90, 140)
-			local plooie = EffectData()
-			plooie:SetOrigin(SelfPos)
-			util.Effect("eff_jack_gmod_flashbang", plooie, true, true)
-			util.ScreenShake(SelfPos, 20, 20, .2, 1000)
-		end)
-
-		timer.Simple(.4, function()
+		--timer.Simple(.4, function()
 			if not IsValid(self) then return end
 			util.BlastDamage(self, JMod.GetOwner(self), SelfPos, 500, 1)
 			self:EmitSound("weapons/physcannon/energy_sing_explosion2.wav", 90, 140)
-		end)
+		--end)
 
 		timer.Simple(.5, function() 
 			if not IsValid(self) then return end
 			if not IsValid(self.TeleMarker) then return end 
-			for _, v in pairs(ents.FindInSphere(self.TeleMarker:GetPos(), 245)) do
+			for _, v in pairs(ents.FindInSphere(self.TeleMarker:GetPos(), self.TeleRange)) do
 				if self.TeleMarker:ShouldTeleport(v) then
-					local BBMin, BBMax = v:GetCollisionBounds()
-					if v:IsPlayer() and v:Alive() then
-						BBMin, BBMax = v:GetHull()
-					end
-					--print(v, BBMin, BBMax)
-					local RelativeVec = self.TeleMarker:GetPos() - v:GetPos()--v:LocalToWorld(v:OBBCenter())
-					local BBcheck = util.TraceHull({
-						start = RelativeVec,
-						endpos = RelativeVec,
-						mins = BBMin * 1,
-						maxs = BBMax * 1,
-						mask = MASK_SOLID,
-						filter = self
-					})
-					--print(v, self:WorldToLocal(RelativeVec), BBcheck.Hit)
-					if not(BBcheck.Hit) then
-						PointsToCheck = {
-							Vector(BBMin[1], BBMin[2], BBMin[3]),
-							Vector(BBMax[1], BBMin[2], BBMin[3]),
-							Vector(BBMin[1], BBMax[2], BBMin[3]),
-							Vector(BBMax[1], BBMax[2], BBMin[3]),
-							Vector(BBMin[1], BBMin[2], BBMax[3]),
-							Vector(BBMax[1], BBMin[2], BBMax[3]),
-							Vector(BBMin[1], BBMax[2], BBMax[3]),
-							Vector(BBMax[1], BBMax[2], BBMax[3])
-						}
-						local Good = true
-						for _, p in ipairs(PointsToCheck) do
-							if (bit.band(util.PointContents(RelativeVec + p), CONTENTS_SOLID) == CONTENTS_SOLID) then
-								Good = false
-								break
-							end
+					for i = 1, 100 do
+						local BBMin, BBMax = v:GetCollisionBounds()
+						if v:IsPlayer() and v:Alive() then
+							BBMin, BBMax = v:GetHull()
 						end
-						if Good then
+						--print(v, BBMin, BBMax)
+						--local RelativeVec = self.TeleMarker:GetPos() - v:GetPos()
+						local StartVec = SelfPos + Vector(0, 0, 5)
+						local RandomVec = StartVec + VectorRand(10, self.TeleRange)
+						RandomVec[3] = RandomVec[3] * 0.25 -- We don't need it to go up or down very much.
+						local BBcheck = util.TraceHull({
+							start = StartVec,
+							endpos = RandomVec,
+							mins = BBMin,
+							maxs = BBMax,
+							mask = MASK_SOLID,
+							filter = self
+						})
+						--print(v, self:WorldToLocal(RelativeVec), BBcheck.Hit)
+						if not BBcheck.StartSolid then
+							v:SetPos(BBcheck.HitPos)
 							v:GetPhysicsObject():Wake()
-							v:SetPos(self:GetPos() - RelativeVec)
 							v:SetVelocity(self:GetPhysicsObject():GetVelocity())
-							--[[if isstring(v.EZoldMaterial) then
-								print(v.EZoldMaterial)
-								v:SetMaterial(v.EZoldMaterial)
-								v.EZoldMaterial = nil
-							end]]--
+							timer.Simple(math.Rand(0.1, 0.5), function()
+								if IsValid(v) and v:GetPhysicsObject():IsPenetrating() then
+									local DisDmg = DamageInfo()
+									DisDmg:SetDamage(100000)
+									DisDmg:SetDamageType(DMG_DISSOLVE)
+									DisDmg:SetInflictor(self or game.GetWorld())
+									DisDmg:SetAttacker(JMod.GetOwner(self))
+									v:TakeDamageInfo(DisDmg)
+								end
+							end)
+							break
 						end
 					end
 				end
 			end
+			self.TeleMarker:SetActivated(false)
 		end)
-		self.TeleMarker:SetActivated(false)
 		SafeRemoveEntityDelayed(self, 10)
 	end
 
@@ -134,8 +140,14 @@ if SERVER then
 	end
 
 elseif CLIENT then
+	local Pinch = Material("sprites/mat_jack_gravipinch")
+
 	function ENT:Draw()
+		local SelfPos = self:GetPos()
 		self:DrawModel()
+		
+		--[[render.SetMaterial(Pinch)
+		render.DrawSprite(SelfPos + Vector(0, 0, 40), 200, 200)]]--
 	end
 
 	language.Add("ent_jack_gmod_eztelenade", "EZ Teleport Grenade")
