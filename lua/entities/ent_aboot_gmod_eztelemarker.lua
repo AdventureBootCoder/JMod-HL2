@@ -125,9 +125,6 @@ elseif CLIENT then
 			local Delta = FrameTime()
 			self.Rotation = self.Rotation + Delta * 100
 			self.Scl = self.Scl + Delta
-			self.ColorMods["$pp_colour_brightness"] = self.ColorMods["$pp_colour_brightness"] + 0.3 * Delta
-			self.ColorMods["$pp_colour_contrast"] = self.ColorMods["$pp_colour_contrast"] + 0.02 * Delta
-			--self.ColorMods["$pp_colour_colour"] = self.ColorMods["$pp_colour_colour"] - 1 * Delta
 		end
 	end
 
@@ -151,6 +148,10 @@ elseif CLIENT then
 				DLight.Style = 0
 			end
 
+			local Delta = FrameTime()
+			self.ColorMods["$pp_colour_brightness"] = self.ColorMods["$pp_colour_brightness"] + 0.3 * Delta
+			self.ColorMods["$pp_colour_contrast"] = self.ColorMods["$pp_colour_contrast"] + 0.02 * Delta
+			--self.ColorMods["$pp_colour_colour"] = self.ColorMods["$pp_colour_colour"] - 1 * Delta
 		end
 		if Active ~= self.LastState then
 			if Active == true then

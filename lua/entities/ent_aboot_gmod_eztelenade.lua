@@ -97,12 +97,14 @@ if SERVER then
 						end
 						--print(v, BBMin, BBMax)
 						--local RelativeVec = self.TeleMarker:GetPos() - v:GetPos()
-						local StartVec = SelfPos + Vector(0, 0, 5)
-						local RandomVec = StartVec + VectorRand(10, self.TeleRange)
+						local RandomVec = VectorRand(10, self.TeleRange)
 						RandomVec[3] = RandomVec[3] * 0.25 -- We don't need it to go up or down very much.
+						local EndVec = SelfPos + RandomVec
+						local StartVec = SelfPos + Vector(0, 0, 5 + BBMin[3])
+
 						local BBcheck = util.TraceHull({
 							start = StartVec,
-							endpos = RandomVec,
+							endpos = EndVec,
 							mins = BBMin,
 							maxs = BBMax,
 							mask = MASK_SOLID,
@@ -113,7 +115,7 @@ if SERVER then
 							v:SetPos(BBcheck.HitPos)
 							v:GetPhysicsObject():Wake()
 							v:SetVelocity(self:GetPhysicsObject():GetVelocity())
-							timer.Simple(math.Rand(0.1, 0.5), function()
+							--[[timer.Simple(math.Rand(0.1, 0.5), function()
 								if IsValid(v) and v:GetPhysicsObject():IsPenetrating() then
 									local DisDmg = DamageInfo()
 									DisDmg:SetDamage(100000)
@@ -122,7 +124,7 @@ if SERVER then
 									DisDmg:SetAttacker(JMod.GetOwner(self))
 									v:TakeDamageInfo(DisDmg)
 								end
-							end)
+							end)]]--
 							break
 						end
 					end
