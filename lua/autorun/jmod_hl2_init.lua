@@ -1,102 +1,28 @@
-player_manager.AddValidModel( "Classic HEV Suit", 
-"models/ragenigga/player/hev_suit.mdl" );
-list.Set( "PlayerOptionsModel", "Classic HEV Suit", 
-"models/ragenigga/player/hev_suit.mdl" );
-player_manager.AddValidHands( "Classic HEV Suit", 
-"models/ragenigga/viewmodels/c_arms_classic.mdl", 0, "00000000" )
 
-JMod.AdditionalArmorTable = JMod.AdditionalArmorTable or {}
+JModHL2 = JModHL2 or {}
 
-local HEVArmorProtectionProfile={
-	[DMG_BUCKSHOT]= .33,
-	[DMG_CLUB]= .50,
-	[DMG_SLASH]= .75,
-	[DMG_BULLET]= .33,
-	[DMG_BLAST]= .5,
-	[DMG_SNIPER]= .2,
-	[DMG_AIRBOAT]= .8,
-	[DMG_CRUSH]= .5,
-	[DMG_VEHICLE]= .65,
-	[DMG_BURN]= .8,
-	[DMG_PLASMA]= .60,
-	[DMG_ACID]= .5
-}
-
-JMod.AdditionalArmorTable["ABoot HEV Suit"]={
-	PrintName="HEV Suit",
-	Category="JMod - EZ HL:2",
-	mdl="models/props_generic/bm_hevcrate01.mdl",
-	--mat="models/props_generic/bm_hevcrate01_skin0.vmt",
-	lbl="EZ HEV SUIT",
-	clr={ r = 255, g = 255, b = 255 },
-	clrForced=false,
-	slots={
-		eyes=1,
-		mouthnose=1,
-		head=1,
-		chest=1,
-		abdomen=1,
-		pelvis=1,
-		leftthigh=1,
-		leftcalf=1,
-		rightthigh=1,
-		rightcalf=1,
-		rightshoulder=1,
-		rightforearm=1,
-		leftshoulder=1,
-		leftforearm=1
-	},
-	def=table.Inherit({
-		[DMG_NERVEGAS]=1,
-		[DMG_RADIATION]=1,
-		[DMG_ACID]=1,
-		[DMG_POISON]=1,
-	},HEVArmorProtectionProfile),
-	resist={
-		[DMG_ACID]=.75,
-		[DMG_POISON]=.90
-	},
-	chrg={
-		chemicals = 50
-	},
-	snds={
-		eq="hl1/fvox/bell.wav",
-		uneq="hl1/fvox/deactivated.wav"
-	},
-	eff={
-		HEVsuit = true,
-		speedBoost = 1.5
-	},
-	plymdl="models/ragenigga/player/hev_suit.mdl", -- https://steamcommunity.com/sharedfiles/filedetails/?id=1341386337&searchtext=hev+suit
-	mskmat="mats_aboot_gmod_sprites/helmet_vignette1.png",
-	sndlop="snds_jack_gmod/mask_breathe.wav",
-	wgt=0.1,
-	dur=400,
-	ent="ent_aboot_gmod_ezarmor_hev"
-}
-local function LoadAdditionalArmor()
-	if JMod.AdditionalArmorTable and JMod.ArmorTable then
-		table.Merge(JMod.ArmorTable, JMod.AdditionalArmorTable)
-		JMod.GenerateArmorEntities(JMod.AdditionalArmorTable)
+for i, f in pairs(file.Find("jmodhl2/*.lua", "LUA")) do
+	if string.Left(f, 3) == "sv_" then
+		if SERVER then
+			include("jmodhl2/" .. f)
+		end
+	elseif string.Left(f, 3) == "cl_" then
+		if CLIENT then
+			include("jmodhl2/" .. f)
+		else
+			AddCSLuaFile("jmodhl2/" .. f)
+		end
+	elseif string.Left(f, 3) == "sh_" then
+		AddCSLuaFile("jmodhl2/" .. f)
+		include("jmodhl2/" .. f)
+	else
+		print("JMod detected unaccounted-for lua file '" .. f .. "'-check prefixes!")
 	end
 end
 
-LoadAdditionalArmor()
-
-hook.Add("Move", "JMOD_HL2_ARMOR_MOVE", function(ply, mv, cmd)
-    if mv:KeyDown(IN_SPEED)then 
-		if ply.IsProne and ply:IsProne() then return end
-
-		if ply.EZarmor and ply.EZarmor.effects and ply.EZarmor.effects.speedBoost then
-			local origSpeed = mv:GetMaxSpeed()
-			local origClientSpeed = mv:GetMaxClientSpeed()
-			mv:SetMaxSpeed(origSpeed * ply.EZarmor.effects.speedBoost)
-			mv:SetMaxClientSpeed(origClientSpeed * ply.EZarmor.effects.speedBoost)
-		end
-	end
-end)
-
 if(SERVER)then
+	local SND_READY  = "jumpmod/jumpmod_ready.wav"
+	resource.AddFile("sound/" .. SND_READY)
 	util.AddNetworkString("ABoot_ContainerMenu")
 	local defaultHEVdisable = CreateConVar("aboot_disable_hev", "0", FCVAR_ARCHIVE, "Removes the HEV suit from players on spawn and when it's destroyed. \nNo more running around with an invisible HEV suit")
 
@@ -125,16 +51,23 @@ if(SERVER)then
 		end
 	end)
 
+	hook.Remove("Think", "JMOD_HL2_THINK")
 	hook.Add("Think", "JMOD_HL2_THINK", function()
 		local Time = CurTime()
 
-		if NextMainThink < Time then
-			NextMainThink = Time + 1
+		for k, ply in ipairs(player.GetAll()) do
+			if not(ply.EZarmor and ply.EZarmor.effects and ply.EZarmor.effects.jumpmod) then continue end
 
-			--JPrint("Aux Power: " .. playa:GetSuitPower() .. " " .. "Oxygen: " .. playa.EZoxygen)
-			--print(tobool(gmod_suit))
+			local val = math.Clamp(ply.EZarmor.effects.jumpcharges + FrameTime() * 0.35, 0, 3)
+			if val < 1 then
+				ply.jumpmod_usealert = true
+			elseif val >= 1 and ply.jumpmod_usealert then
+				ply.jumpmod_usealert = nil
+				ply:SendLua([[surface.PlaySound("]] .. SND_READY .. [[")]])
+			end
+
+			ply.EZarmor.effects.jumpcharges = val
 		end
-		
 	end)
 
 elseif CLIENT then 
