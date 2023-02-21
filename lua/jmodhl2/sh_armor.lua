@@ -9,7 +9,7 @@ JMod.AdditionalArmorTable = JMod.AdditionalArmorTable or {}
 
 local HEVArmorProtectionProfile={
 	[DMG_BUCKSHOT]= .33,
-	[DMG_CLUB]= .50,
+	[DMG_CLUB]= .6,
 	[DMG_SLASH]= .75,
 	[DMG_BULLET]= .33,
 	[DMG_BLAST]= .5,
@@ -29,22 +29,22 @@ JMod.AdditionalArmorTable["ABoot HEV Suit"]={
 	--mat="models/props_generic/bm_hevcrate01_skin0.vmt",
 	lbl = "MK.II HEV SUIT",
 	clr={ r = 255, g = 255, b = 255 },
-	clrForced=false,
+	clrForced = false,
 	slots={
-		eyes=1,
-		mouthnose=1,
-		head=1,
-		chest=1,
-		abdomen=1,
-		pelvis=1,
-		leftthigh=1,
-		leftcalf=1,
-		rightthigh=1,
-		rightcalf=1,
-		rightshoulder=1,
-		rightforearm=1,
-		leftshoulder=1,
-		leftforearm=1
+		eyes = 1,
+		mouthnose = 1,
+		head = 1,
+		chest = 1,
+		abdomen = 1,
+		pelvis = 1,
+		leftthigh = 1,
+		leftcalf = 1,
+		rightthigh = 1,
+		rightcalf = 1,
+		rightshoulder = 1,
+		rightforearm = 1,
+		leftshoulder = 1,
+		leftforearm = 1
 	},
 	def=table.Inherit({
 		[DMG_NERVEGAS]=1,
@@ -53,8 +53,8 @@ JMod.AdditionalArmorTable["ABoot HEV Suit"]={
 		[DMG_POISON]=1,
 	},HEVArmorProtectionProfile),
 	resist={
-		[DMG_ACID]=.75,
-		[DMG_POISON]=.90
+		[DMG_ACID]=.90,
+		[DMG_POISON]=.99
 	},
 	chrg={
 		chemicals = 50
@@ -65,14 +65,14 @@ JMod.AdditionalArmorTable["ABoot HEV Suit"]={
 	},
 	eff={
 		HEVsuit = true,
-		speedBoost = 1.5
+		speedBoost = 1.1
 	},
 	plymdl="models/ragenigga/player/hev_suit.mdl", -- https://steamcommunity.com/sharedfiles/filedetails/?id=1341386337&searchtext=hev+suit
 	mskmat="mats_aboot_gmod_sprites/helmet_vignette1.png",
 	sndlop="snds_jack_gmod/mask_breathe.wav",
-	wgt=0.1,
-	dur=400,
-	ent="ent_aboot_gmod_ezarmor_hev"
+	wgt = 40,
+	dur = 625,
+	ent = "ent_aboot_gmod_ezarmor_hev"
 }
 JMod.AdditionalArmorTable["ABoot Jump Module"]={
 	PrintName = "EZ Jump Module",
@@ -107,7 +107,7 @@ JMod.AdditionalArmorTable["ABoot Jump Module"]={
 	siz = Vector(.7, .7, .7),
 	pos = Vector(0, 5, 0),
 	ang = Angle(0, 0, 90),
-	wgt = 10,
+	wgt = 20,
 	dur = 100,
 	ent = "ent_aboot_gmod_ezarmor_jumpmodule"
 }
@@ -193,7 +193,7 @@ hook.Add("OnPlayerHitGround", "JMOD_HL2_HITGROUND", function(ply, water, float, 
 	if water then return end
 
 	ply.EZjumpmod_canuse = true
-	ply.played_sound = false
+	ply.played_sound = nil
 	if SERVER and IsFirstTimePredicted() then
 		if speed > 1000 then
 			ply:EmitSound(JModHL2.EZ_JUMPSNDS.LONGFALL, 75, 100, 0.7)
@@ -201,6 +201,9 @@ hook.Add("OnPlayerHitGround", "JMOD_HL2_HITGROUND", function(ply, water, float, 
 			ply:EmitSound(JModHL2.EZ_JUMPSNDS.FALL, 70, 100, 0.7)
 		end
 	end
+end)
 
-	return true
+hook.Remove("GetFallDamage", "JMOD_HL2_FALLDAMAGE")
+hook.Add("GetFallDamage", "JMOD_HL2_FALLDAMAGE", function(ply, sped)
+	if ply.EZarmor and ply.EZarmor.effects and ply.EZarmor.effects.jumpmod and not ply.played_sound then return 0 end
 end)
