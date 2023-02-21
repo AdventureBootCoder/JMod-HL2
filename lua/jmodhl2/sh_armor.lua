@@ -109,6 +109,7 @@ JMod.AdditionalArmorTable["ABoot Jump Module"]={
 	ang = Angle(0, 0, 90),
 	wgt = 20,
 	dur = 100,
+	HEVreq = true,
 	ent = "ent_aboot_gmod_ezarmor_jumpmodule"
 }
 local function LoadAdditionalArmor()
@@ -135,7 +136,7 @@ hook.Add("Move", "JMOD_HL2_ARMOR_MOVE", function(ply, mv, cmd)
 	end
 end)
 
-local function EZDoJump(ply)
+local function DoJump(ply)
 	local charges = ply:GetNW2Float(tag_counter, 0)
 
 	if charges < 1 then return end
@@ -174,7 +175,7 @@ hook.Add("KeyPress", "JMOD_HL2_KEYPRESS", function(ply, key)
 	if key == IN_JUMP then
 		local LongJump = ply.EZjumpmod_keypress and CurTime() - ply.EZjumpmod_keypress < 0.4 and not ply:IsOnGround()
 		if LongJump then
-			EZDoJump(ply)
+			DoJump(ply)
 		else
 			ply.EZjumpmod_keypress = CurTime()
 		end
@@ -191,9 +192,10 @@ hook.Remove("OnPlayerHitGround", "JMOD_HL2_HITGROUND")
 hook.Add("OnPlayerHitGround", "JMOD_HL2_HITGROUND", function(ply, water, float, speed)
 	if not(ply.EZarmor and ply.EZarmor.effects and ply.EZarmor.effects.jumpmod) then return end
 	if water then return end
+	--if not ply.played_sound then return end
 
 	ply.EZjumpmod_canuse = true
-	ply.played_sound = nil
+	ply.played_sound = false
 	if SERVER and IsFirstTimePredicted() then
 		if speed > 1000 then
 			ply:EmitSound(JModHL2.EZ_JUMPSNDS.LONGFALL, 75, 100, 0.7)
@@ -205,5 +207,5 @@ end)
 
 hook.Remove("GetFallDamage", "JMOD_HL2_FALLDAMAGE")
 hook.Add("GetFallDamage", "JMOD_HL2_FALLDAMAGE", function(ply, sped)
-	if ply.EZarmor and ply.EZarmor.effects and ply.EZarmor.effects.jumpmod and not ply.played_sound then return 0 end
+	if ply.EZarmor and ply.EZarmor.effects and ply.EZarmor.effects.jumpmod then return 0 end
 end)

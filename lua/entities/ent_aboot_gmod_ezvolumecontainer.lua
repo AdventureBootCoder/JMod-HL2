@@ -261,7 +261,7 @@ elseif CLIENT then
 		Dynamic = math.Clamp(Dynamic + (1 / FrameRate) * 7, 0, 1)
 	end
 
-	net.Receive("ABoot_ContainerMenu", function() 
+	net.Receive("ABoot_VolumeContainerMenu", function() 
 		local Container = net.ReadEntity()
 		local Contents = net.ReadTable()
 

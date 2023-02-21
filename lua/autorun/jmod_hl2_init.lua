@@ -16,7 +16,7 @@ for i, f in pairs(file.Find("jmodhl2/*.lua", "LUA")) do
 		AddCSLuaFile("jmodhl2/" .. f)
 		include("jmodhl2/" .. f)
 	else
-		print("JMod detected unaccounted-for lua file '" .. f .. "'-check prefixes!")
+		print("JMod[HL2] detected unaccounted-for lua file '" .. f .. "'-check prefixes!")
 	end
 end
 
@@ -39,6 +39,7 @@ if(SERVER)then
 	end
 
 	util.AddNetworkString("ABoot_ContainerMenu")
+	util.AddNetworkString("ABoot_VolumeContainerMenu")
 	local defaultHEVdisable = CreateConVar("aboot_disable_hev", "0", FCVAR_ARCHIVE, "Removes the HEV suit from players on spawn and when it's destroyed. \nNo more running around with an invisible HEV suit")
 
 	local function RemoveHEVsuit(playa) 
@@ -63,6 +64,13 @@ if(SERVER)then
 			end
 		elseif defaultHEVdisable:GetBool() and playa:IsSuitEquipped() then
 			RemoveHEVsuit(playa)
+		end
+		for id, items in pairs(playa.EZarmor.items) do
+			if JMod.ArmorTable[items.name].HEVreq then
+				if not (playa.EZarmor.effects and playa.EZarmor.effects.HEVsuit) then
+					JMod.RemoveArmorByID(playa, id)
+				end
+			end
 		end
 	end)
 
