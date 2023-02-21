@@ -1,29 +1,24 @@
-local tag = "jmod_hl2"
+local tag = "aboot_jumpmod"
 local tag_counter = tag .. "_counter"
 
-local shouldshow    = CreateClientConVar(tag .. "_hud", "1")
-local scrw, scrh    = ScrW(), ScrH()
-local w_offset      = 0.305
-local h_offset      = 0.975
-local x_offset      = CreateClientConVar(tag .. "_hud_x", scrw * w_offset)
-local y_offset      = CreateClientConVar(tag .. "_hud_y", scrh * h_offset)
-local bar_width     = 0.0075
-local bar_height    = 0.065
-local margin        = 0.002
-local black         = Color(0, 0, 0, 80)
-local bar_col_full  = Color(255, 243, 100, 240)
-local bar_col_empty = Color(255, 0, 0, 105)
+local shouldshow = CreateClientConVar(tag .. "_hud", "1")
+local scrw, scrh = ScrW(), ScrH()
+local w_offset, h_offset= 0.305, 0.975
+local x_offset = CreateClientConVar(tag .. "_hud_x", scrw * w_offset)
+local y_offset = CreateClientConVar(tag .. "_hud_y", scrh * h_offset)
+local bar_width, bar_height, margin = 0.0075, 0.065, 0.002
+local black, bar_col_full, bar_col_empty = Color(0, 0, 0, 80), Color(255, 243, 100, 240), Color(255, 0, 0, 105)
 
 hook.Remove("HUDPaint", "JMOD_HL2_HUDPAINT")
 hook.Add("HUDPaint", "JMOD_HL2_HUDPAINT", function()
 	if not shouldshow:GetBool() then return end
 	local Ply = LocalPlayer()
-	if Ply.jump_module then
+	if Ply.EZarmor and Ply.EZarmor.effects and Ply.EZarmor.effects.jumpmod then
 
 		local x = x_offset:GetInt()
 		local y = y_offset:GetInt()
 
-		local charge = math.Clamp(charge + FrameTime() * 0.35, 0, 3)
+		local charge = Ply:GetNW2Float(tag_counter, 0)
 		local bar1 = math.min(charge, 1)
 		local bar2 = math.min(charge - bar1, 1)
 		local bar3 = math.max(math.min(charge - bar1 * 2, 1), 0)

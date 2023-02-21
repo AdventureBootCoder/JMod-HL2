@@ -25,7 +25,7 @@ local HEVArmorProtectionProfile={
 JMod.AdditionalArmorTable["ABoot HEV Suit"]={
 	PrintName="EZ HEV Suit",
 	Category="JMod - EZ HL:2",
-	mdl="models/props_generic/bm_hevcrate01.mdl",
+	mdl="models/blackmesa/props_generic/bm_hevcrate01.mdl",
 	--mat="models/props_generic/bm_hevcrate01_skin0.vmt",
 	lbl = "MK.II HEV SUIT",
 	clr={ r = 255, g = 255, b = 255 },
@@ -77,7 +77,7 @@ JMod.AdditionalArmorTable["ABoot HEV Suit"]={
 JMod.AdditionalArmorTable["ABoot Jump Module"]={
 	PrintName = "EZ Jump Module",
 	Category = "JMod - EZ HL:2",
-	mdl = "models/blackmesa/entities/w_longjump.mdl",
+	mdl = "models/blackmesa/jumpmod/w_longjump.mdl",
 	clr = { r = 255, g = 255, b = 255 },
 	clrForced = false,
 	slots = {
@@ -101,13 +101,11 @@ JMod.AdditionalArmorTable["ABoot Jump Module"]={
 		uneq="jumpmod/bootup_sequence/bootup_moduleacq.wav"
 	},
 	eff={
-		jumpmod = true,
-		jumpmod_canuse = true,
-		jumpcharges = 3
+		jumpmod = true
 	},
 	bon = "ValveBiped.Bip01_Spine2",
 	siz = Vector(.7, .7, .7),
-	pos = Vector(0, 7, 0),
+	pos = Vector(0, 5, 0),
 	ang = Angle(0, 0, 90),
 	wgt = 10,
 	dur = 100,
@@ -121,6 +119,8 @@ local function LoadAdditionalArmor()
 end
 
 LoadAdditionalArmor()
+local tag = "aboot_jumpmod"
+local tag_counter = tag .. "_counter"
 
 hook.Add("Move", "JMOD_HL2_ARMOR_MOVE", function(ply, mv, cmd)
     if mv:KeyDown(IN_SPEED)then 
@@ -135,27 +135,11 @@ hook.Add("Move", "JMOD_HL2_ARMOR_MOVE", function(ply, mv, cmd)
 	end
 end)
 
-local tag = "jumpmod"
-local tag_counter = tag .. "_counter"
-
-local SND_DENY     = tag .. "/jumpmod_deny.wav"
-local SND_BOOST1   = tag .. "/jumpmod_boost1.wav"
-local SND_BOOST2   = tag .. "/jumpmod_boost2.wav"
-local SND_FALL     = tag .. "/jumpmod_fall.wav"
-local SND_LONGFALL = tag .. "/jumpmod_long1.wav"
-local SND_BREAK    = tag .. "/jumpmod_break.wav"
-
-if SERVER then
-	for k,v in ipairs({SND_DENY, SND_BOOST1, SND_BOOST2, SND_FALL, SND_BREAK, SND_LONGFALL}) do
-		resource.AddSingleFile("sound/" .. v)
-	end
-end
-
-local function DoJump(ply)
-	local charges = ply.EZarmor.effects.jumpcharges
+local function EZDoJump(ply)
+	local charges = ply:GetNW2Float(tag_counter, 0)
 
 	if charges < 1 then return end
-	if not ply.EZarmor.effects.jumpmod_canuse then return end
+	if not ply.EZjumpmod_canuse then return end
 
 	local vel = ply:GetVelocity()
 	vel.x = math.Clamp(vel.x, -500, 500)
@@ -166,57 +150,55 @@ local function DoJump(ply)
 	if not IsFirstTimePredicted() then return end
 
 	if SERVER then
-		ply:EmitSound(math.random() > 0.5 and SND_BOOST1 or SND_BOOST2, 70, 100, 0.7)
+		ply:EmitSound(math.random() > 0.5 and JModHL2.EZ_JUMPSNDS.BOOST1 or JModHL2.EZ_JUMPSNDS.BOOST2, 70, 100, 0.7)
 	end
 
 	charges = charges - 1
-	ply.EZarmor.effects.jumpcharges = charges
-	ply.EZarmor.effects.jumpmod_canuse = false
+	ply:SetNW2Float(tag_counter, charges)
+	ply.EZjumpmod_canuse = false
 
 	if SERVER and charges <= 1 then
 		ply:SendLua([[
-			surface.PlaySound("]] .. SND_DENY .. [[")
+			surface.PlaySound("]] .. JModHL2.EZ_JUMPSNDS.DENY .. [[")
 		]])
-		--surface.PlaySound(SND_DENY)
 	end
 end
 
-local played_sound = false
-hook.Remove("KeyPress", "JMod_HL2_KEYPRESS")
-hook.Add("KeyPress", "JMod_HL2_KEYPRESS", function(ply, key)
+--local played_sound = false
+hook.Remove("KeyPress", "JMOD_HL2_KEYPRESS")
+hook.Add("KeyPress", "JMOD_HL2_KEYPRESS", function(ply, key)
 	if ply.IsProne and ply:IsProne() then return end
-
 	if not(ply.EZarmor and ply.EZarmor.effects and ply.EZarmor.effects.jumpmod) then return end
 	if ply:GetMoveType() ~= MOVETYPE_WALK then return end
 
 	if key == IN_JUMP then
-		local LongJump = ply.jumpmod_keypress and CurTime() - ply.jumpmod_keypress < 0.4 and not ply:IsOnGround()
+		local LongJump = ply.EZjumpmod_keypress and CurTime() - ply.EZjumpmod_keypress < 0.4 and not ply:IsOnGround()
 		if LongJump then
-			DoJump(ply)
+			EZDoJump(ply)
 		else
-			ply.jumpmod_keypress = CurTime()
+			ply.EZjumpmod_keypress = CurTime()
 		end
 	end
 
 	local vel = ply:WorldToLocal(ply:GetVelocity() + ply:GetPos())
-	if SERVER and IsFirstTimePredicted() and vel.x > 100 and key == IN_BACK and not ply.EZarmor.effects.jumpmod_canuse and not played_sound then
-		played_sound = true
-		ply:EmitSound(SND_BREAK, 70, 100, 0.7)
+	if SERVER and IsFirstTimePredicted() and vel.x > 100 and key == IN_BACK and not ply.EZjumpmod_canuse and not ply.played_sound then
+		ply.played_sound = true
+		ply:EmitSound(JModHL2.EZ_JUMPSNDS.BREAK, 70, 100, 0.7)
 	end
 end)
 
-hook.Remove("OnPlayerHitGround", "JMod_HL2_HITGROUND")
-hook.Add("OnPlayerHitGround", "JMod_HL2_HITGROUND", function(ply, water, float, speed)
+hook.Remove("OnPlayerHitGround", "JMOD_HL2_HITGROUND")
+hook.Add("OnPlayerHitGround", "JMOD_HL2_HITGROUND", function(ply, water, float, speed)
 	if not(ply.EZarmor and ply.EZarmor.effects and ply.EZarmor.effects.jumpmod) then return end
 	if water then return end
 
-	ply.EZarmor.effects.jumpmod_canuse = true
-	played_sound = false
+	ply.EZjumpmod_canuse = true
+	ply.played_sound = false
 	if SERVER and IsFirstTimePredicted() then
 		if speed > 1000 then
-			ply:EmitSound(SND_LONGFALL, 75, 100, 0.7)
+			ply:EmitSound(JModHL2.EZ_JUMPSNDS.LONGFALL, 75, 100, 0.7)
 		elseif speed > 525 then
-			ply:EmitSound(SND_FALL, 70, 100, 0.7)
+			ply:EmitSound(JModHL2.EZ_JUMPSNDS.FALL, 70, 100, 0.7)
 		end
 	end
 

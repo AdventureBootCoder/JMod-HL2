@@ -20,9 +20,24 @@ for i, f in pairs(file.Find("jmodhl2/*.lua", "LUA")) do
 	end
 end
 
+local tag = "aboot_jumpmod"
+local tag_counter = tag .. "_counter"
+
+JModHL2.EZ_JUMPSNDS = {
+	READY    = tag .. "/jumpmod_ready.wav",
+	DENY     = tag .. "/jumpmod_deny.wav",
+	BOOST1   = tag .. "/jumpmod_boost1.wav",
+	BOOST2   = tag .. "/jumpmod_boost2.wav",
+	FALL     = tag .. "/jumpmod_fall.wav",
+	LONGFALL = tag .. "/jumpmod_long1.wav",
+	BREAK    = tag .. "/jumpmod_break.wav"
+}
+
 if(SERVER)then
-	local SND_READY  = "jumpmod/jumpmod_ready.wav"
-	resource.AddFile("sound/" .. SND_READY)
+	for k,v in ipairs(JModHL2.EZ_JUMPSNDS) do
+		resource.AddSingleFile("sound/" .. v)
+	end
+
 	util.AddNetworkString("ABoot_ContainerMenu")
 	local defaultHEVdisable = CreateConVar("aboot_disable_hev", "0", FCVAR_ARCHIVE, "Removes the HEV suit from players on spawn and when it's destroyed. \nNo more running around with an invisible HEV suit")
 
@@ -58,15 +73,16 @@ if(SERVER)then
 		for k, ply in ipairs(player.GetAll()) do
 			if not(ply.EZarmor and ply.EZarmor.effects and ply.EZarmor.effects.jumpmod) then continue end
 
-			local val = math.Clamp(ply.EZarmor.effects.jumpcharges + FrameTime() * 0.35, 0, 3)
+			local val = math.Clamp(ply:GetNW2Float(tag_counter, 3) + FrameTime() * 0.35, 0, 3)
 			if val < 1 then
-				ply.jumpmod_usealert = true
-			elseif val >= 1 and ply.jumpmod_usealert then
-				ply.jumpmod_usealert = nil
-				ply:SendLua([[surface.PlaySound("]] .. SND_READY .. [[")]])
+				ply.EZjumpmod_usealert = true
+			elseif val >= 1 and ply.EZjumpmod_usealert then
+				ply.EZjumpmod_usealert = nil
+				ply:SendLua([[surface.PlaySound("]] .. JModHL2.EZ_JUMPSNDS.READY .. [[")]])
 			end
 
-			ply.EZarmor.effects.jumpcharges = val
+			ply:SetNW2Float(tag_counter, val)
+			--jprint(ply:GetNW2Float())
 		end
 	end)
 
