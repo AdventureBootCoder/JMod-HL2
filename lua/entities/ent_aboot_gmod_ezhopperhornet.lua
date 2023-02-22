@@ -77,7 +77,7 @@ if SERVER then
 		if iname == "Detonate" and value > 0 then
 			self:Detonate()
 		elseif iname == "Arm" and value > 0 then
-			self:Arm(self.Owner or game.GetWorld())
+			self:Arm(self.EZowner or game.GetWorld())
 		end
 	end
 

@@ -51,7 +51,7 @@ if SERVER then
 		local Marker = ents.Create("ent_aboot_gmod_eztelemarker")
 		Marker:SetPos(self:GetPos() + Vector(0, 0, 5))
 		Marker:SetAngles(self:GetAngles())
-		JMod.SetEZowner(Marker, self.Owner)
+		JMod.SetEZowner(Marker, self.EZowner)
 		Marker:Spawn()
 		Marker:Activate()
 		self.TeleMarker = Marker
@@ -72,7 +72,7 @@ if SERVER then
 		end
 
 		self:SetColor(Color(0, 0, 0))
-		JMod.Sploom(self.Owner, self:GetPos(), 20)
+		JMod.Sploom(self.EZowner, self:GetPos(), 20)
 		self:EmitSound("snd_jack_fragsplodeclose.wav", 90, 140)
 		local plooie = EffectData()
 		plooie:SetOrigin(SelfPos)

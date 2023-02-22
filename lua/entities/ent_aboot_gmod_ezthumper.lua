@@ -107,16 +107,16 @@ if(SERVER)then
 			end
 			self:UpdateDepositKey()
 			if not self.DepositKey then
-				JMod.Hint(self.Owner, "oil derrick")
+				JMod.Hint(self.EZowner, "oil derrick")
 			elseif(GroundIsSolid)then
 				if not(IsValid(self.Weld))then self.Weld = constraint.Weld(self, Tr.Entity, 0, 0, 50000, false, false) end
 				if(IsValid(self.Weld) and self.DepositKey)then
-					self:TurnOn(self.Owner)
+					self:TurnOn(self.EZowner)
 				else
 					if self:GetState() > STATE_OFF then
 						self:TurnOff()
 					end
-					JMod.Hint(self.Owner, "machine mounting problem")
+					JMod.Hint(self.EZowner, "machine mounting problem")
 				end
 			end
 		end
@@ -151,11 +151,11 @@ if(SERVER)then
 
 	function ENT:Use(activator)
 		local State = self:GetState()
-		local OldOwner = self.Owner
+		local OldOwner = self.EZowner
 		local alt = activator:KeyDown(JMod.Config.AltFunctionKey)
 		JMod.SetEZowner(self, activator)
-		--[[if(IsValid(self.Owner))then
-			if(OldOwner ~= self.Owner)then -- if owner changed then reset team color
+		--[[if(IsValid(self.EZowner))then
+			if(OldOwner ~= self.EZowner)then -- if owner changed then reset team color
 				JMod.Colorify(self)
 			end
 		end]]--
