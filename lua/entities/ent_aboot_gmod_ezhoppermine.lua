@@ -34,7 +34,7 @@ if SERVER then
 		local ent = ents.Create(self.ClassName)
 		ent:SetAngles(Angle(0, 0, 0))
 		ent:SetPos(SpawnPos)
-		JMod.SetOwner(ent, ply)
+		JMod.SetEZowner(ent, ply)
 		JMod.Colorify(ent)
 		ent:Spawn()
 		ent:Activate()
@@ -105,7 +105,7 @@ if SERVER then
 
 		if State == STATE_OFF then
 			if Alt then
-				JMod.SetOwner(self, activator)
+				JMod.SetEZowner(self, activator)
 				JMod.Colorify(self)
 				self:EmitSound("snd_jack_minearm.wav", 60, 110)
 				self:Arm(self.activator)
@@ -116,7 +116,7 @@ if SERVER then
 		elseif not (activator.KeyDown and activator:KeyDown(IN_SPEED)) then
 			self:EmitSound("snd_jack_minearm.wav", 60, 70)
 			self:Disarm()
-			JMod.SetOwner(self, activator)
+			JMod.SetEZowner(self, activator)
 			JMod.Colorify(self)
 			self:DrawShadow(true)
 			if IsValid(self.Weld) then
@@ -200,8 +200,8 @@ if SERVER then
 		util.Effect("eff_jack_minesplode", plooie, true, true)]]--
 		util.ScreenShake(SelfPos, 99999, 99999, 1, 500)
 		self:EmitSound("snd_jack_fragsplodeclose.wav", 90, 100)
-		JMod.Sploom(JMod.GetOwner(self), SelfPos, 150, 125)
-		JMod.FragSplosion(self, SelfPos, 500, 20 * JMod.Config.MinePower, 500, JMod.GetOwner(self), Up, 1.3, 15)
+		JMod.Sploom(JMod.GetEZowner(self), SelfPos, 150, 125)
+		JMod.FragSplosion(self, SelfPos, 500, 20 * JMod.Config.MinePower, 500, JMod.GetEZowner(self), Up, 1.3, 15)
 		SafeRemoveEntity(self)
 	end
 
@@ -212,7 +212,7 @@ if SERVER then
 		if State ~= STATE_OFF then return end
 		if IsValid(armer) then
 			JMod.Hint(armer, "mine friends")
-			JMod.SetOwner(self, armer)
+			JMod.SetEZowner(self, armer)
 			JMod.Colorify(self)
 		end
 		self:SetState(STATE_ARMING)
@@ -260,7 +260,7 @@ if SERVER then
 			if IsValid(self) and (self:GetState() == STATE_ARMING) and (self.ArmAttempts < 5) then
 				self.ArmAttempts = self.ArmAttempts + 1
 				self:SetState(STATE_OFF)
-				self:Arm(JMod.GetOwner(self))
+				self:Arm(JMod.GetEZowner(self))
 			else
 				self:SetState(STATE_OFF)
 			end
@@ -338,7 +338,7 @@ if SERVER then
 			end
 
 			if self.StillTicks > 4 then
-				self:Arm(JMod.GetOwner(self))
+				self:Arm(JMod.GetEZowner(self))
 			end
 
 			self:NextThink(Time + .1)
@@ -372,13 +372,13 @@ if SERVER then
 						if IsValid(ent.Weld) then
 							SafeRemoveEntity(ent.Weld)
 						end
-						JMod.SetOwner(ent, ply)
+						JMod.SetEZowner(ent, ply)
 						JMod.Colorify(ent)
 						ent:SetState(STATE_HELD)
 					end
 				end)
 			else
-				JMod.SetOwner(ent, ply)
+				JMod.SetEZowner(ent, ply)
 				JMod.Colorify(ent)
 				ent:SetState(STATE_HELD)
 			end

@@ -143,9 +143,9 @@ local function DoJump(ply)
 	if not ply.EZjumpmod_canuse then return end
 
 	local vel = ply:GetVelocity()
-	vel.x = math.Clamp(vel.x, -500, 500)
-	vel.y = math.Clamp(vel.y, -500, 500)
-	vel.z = math.Clamp(vel.z, 100, 150)
+	vel.x = math.Clamp(vel.x, -500, 500) * .8
+	vel.y = math.Clamp(vel.y, -500, 500) * .8
+	vel.z = math.Clamp(vel.z, 100, 150) * 1.5
 
 	ply:SetVelocity(vel * 1)
 	if not IsFirstTimePredicted() then return end

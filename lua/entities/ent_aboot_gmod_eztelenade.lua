@@ -51,7 +51,7 @@ if SERVER then
 		local Marker = ents.Create("ent_aboot_gmod_eztelemarker")
 		Marker:SetPos(self:GetPos() + Vector(0, 0, 5))
 		Marker:SetAngles(self:GetAngles())
-		JMod.SetOwner(Marker, self.Owner)
+		JMod.SetEZowner(Marker, self.Owner)
 		Marker:Spawn()
 		Marker:Activate()
 		self.TeleMarker = Marker
@@ -81,7 +81,7 @@ if SERVER then
 
 		--timer.Simple(.4, function()
 			if not IsValid(self) then return end
-			util.BlastDamage(self, JMod.GetOwner(self), SelfPos, 500, 1)
+			util.BlastDamage(self, JMod.GetEZowner(self), SelfPos, 500, 1)
 			self:EmitSound("weapons/physcannon/energy_sing_explosion2.wav", 90, 140)
 		--end)
 
@@ -128,7 +128,7 @@ if SERVER then
 									DisDmg:SetDamage(100000)
 									DisDmg:SetDamageType(DMG_DISSOLVE)
 									DisDmg:SetInflictor(self or game.GetWorld())
-									DisDmg:SetAttacker(JMod.GetOwner(self))
+									DisDmg:SetAttacker(JMod.GetEZowner(self))
 									v:TakeDamageInfo(DisDmg)
 								end
 							end)]]--
