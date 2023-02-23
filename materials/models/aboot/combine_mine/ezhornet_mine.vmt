@@ -1,0 +1,26 @@
+"VertexLitGeneric"
+{
+	"$basetexture" "models/aboot/ezcombine_mine_sheet"
+	"$bumpmap" "models/aboot/ezcombine_mine_normal"
+	"$surfaceprop" "metal"
+	"$selfillummask" "models/aboot/ezcombine_mine_illummask"
+	"$selfillum" "1"
+	"%keywords" "combine"
+
+	"$phong" "1"
+	"$phongboost" "5"
+	"$phongexponent" "15"
+	"$phongfresnelranges"	"[.1 .5 1.0]"
+
+	"$blendtintbybasealpha" "1"
+ 	"$blendtintcoloroverbase" "1"
+	
+	Proxies
+	{
+		Color
+		{
+			resultVar	$color2
+			default		"0 0.7 0"
+		}
+	}
+}

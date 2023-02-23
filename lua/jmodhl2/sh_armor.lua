@@ -65,7 +65,7 @@ JMod.AdditionalArmorTable["ABoot HEV Suit"]={
 	},
 	eff={
 		HEVsuit = true,
-		speedBoost = 1.1
+		speedBoost = 1.2
 	},
 	plymdl="models/ragenigga/player/hev_suit.mdl", -- https://steamcommunity.com/sharedfiles/filedetails/?id=1341386337&searchtext=hev+suit
 	mskmat="mats_aboot_gmod_sprites/helmet_vignette1.png",
@@ -143,9 +143,9 @@ local function DoJump(ply)
 	if not ply.EZjumpmod_canuse then return end
 
 	local vel = ply:GetVelocity()
-	vel.x = math.Clamp(vel.x, -500, 500) * .8
-	vel.y = math.Clamp(vel.y, -500, 500) * .8
-	vel.z = math.Clamp(vel.z, 100, 150) * 1.5
+	vel.x = math.Clamp(vel.x, -500, 500) * .5
+	vel.y = math.Clamp(vel.y, -500, 500) * .5
+	vel.z = math.Clamp(vel.z, 100, 150) * 2.5
 
 	ply:SetVelocity(vel * 1)
 	if not IsFirstTimePredicted() then return end
@@ -182,7 +182,7 @@ hook.Add("KeyPress", "JMOD_HL2_KEYPRESS", function(ply, key)
 	end
 
 	local vel = ply:WorldToLocal(ply:GetVelocity() + ply:GetPos())
-	if SERVER and IsFirstTimePredicted() and vel.x > 100 and key == IN_BACK and not ply.EZjumpmod_canuse and not ply.played_sound then
+	if SERVER and IsFirstTimePredicted() and ((vel.x > 100) or (vel.y > 100)) and key == IN_BACK and not ply.EZjumpmod_canuse and not ply.played_sound then
 		ply.played_sound = true
 		ply:EmitSound(JModHL2.EZ_JUMPSNDS.BREAK, 70, 100, 0.7)
 	end

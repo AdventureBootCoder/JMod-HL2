@@ -78,15 +78,22 @@ if(SERVER)then
 	end
 
 	function ENT:Think()
-		local Time=CurTime()
-		local State=self:GetState()
-		if(State==STATE_CHARGIN)then
-			if((IsValid(self.User))and(self.User:Alive())and(self.User:Health()<100)and(self:GetSupplies()>0))then
-				local Tr=self.User:GetEyeTrace()
-				if((Tr.Hit)and(Tr.Entity==self))and(self.User:GetShootPos():Distance(self:GetPos())<100)then
-					self.User:SetHealth(self.User:Health()+1)
-					--self:ConsumeElectricity(0.5)
+		local Time = CurTime()
+		local State = self:GetState()
+		if State == STATE_CHARGIN then
+
+			if((IsValid(self.User))and(self.User:Alive())and(self.User:Health() < 100)and(self:GetSupplies() > 0))then
+				local Tr = self.User:GetEyeTrace()
+
+				if((Tr.Hit) and (Tr.Entity == self))and( self.User:GetShootPos():Distance(self:GetPos()) < 100)then
+
+					self.User:SetHealth(self.User:Health() + 1)
 					self:ConsumeSupplies(1.5)
+
+					if self.User.EZbleeding > 0 then
+						self.User:PrintMessage(HUD_PRINTCENTER, "stopping bleeding")
+						self.User.EZbleeding = math.Clamp(Ent.EZbleeding - 2 * JMod.Config.MedKitHealMult, 0, 9e9)
+					end
 				else
 					self:TurnOff(true)
 				end
@@ -94,7 +101,7 @@ if(SERVER)then
 				self:TurnOff()
 			end
 		end
-		self:NextThink(Time+.1)
+		self:NextThink(Time + .1)
 		return true
 	end
 
