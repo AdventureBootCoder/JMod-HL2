@@ -44,7 +44,7 @@ if SERVER then
 
 	function ENT:Initialize()
 		self:SetModel("models/props_combine/combine_mine01.mdl")
-		self:SetMaterial("models/aboot/ezcombine_mine.vmt")
+		self:SetMaterial("models/aboot/combine_mine/ezhornet_mine.vmt")
 		self:PhysicsInit(SOLID_VPHYSICS)
 		self:SetMoveType(MOVETYPE_VPHYSICS)
 		self:SetSolid(SOLID_VPHYSICS)

@@ -51,10 +51,14 @@ if(SERVER)then
 
 	local NextMainThink, NextArmorThink = 0, 0
 
-	hook.Add("PlayerSpawn", "ABootHL2ArmorRemove", function(playa)
+	hook.Add("PlayerSpawn", "ABootHL2PlySpawn", function(playa)
 		if defaultHEVdisable:GetBool() then
 			RemoveHEVsuit(playa)
 		end
+	end)
+
+	hook.Add("PlayerDeath", tag, function(ply)
+		ply:SetNW2Float(tag_counter, 0)
 	end)
 
 	hook.Add("JModHookEZArmorSync", "ABootHL2ArmorCheck", function(playa)
@@ -88,8 +92,13 @@ if(SERVER)then
 				ply.EZjumpmod_usealert = nil
 				ply:SendLua([[surface.PlaySound("]] .. JModHL2.EZ_JUMPSNDS.READY .. [[")]])
 			end
+			if (val < 3) and (ply:GetSuitPower() >= 1.25) then
+				ply:SetSuitPower(math.Clamp(ply:GetSuitPower() - .25, 0, 100))
+			end
 
-			ply:SetNW2Float(tag_counter, val)
+			if ply:GetSuitPower() >= 1 then
+				ply:SetNW2Float(tag_counter, val)
+			end
 			--jprint(ply:GetNW2Float())
 		end
 	end)

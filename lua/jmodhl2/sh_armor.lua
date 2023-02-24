@@ -137,28 +137,39 @@ hook.Add("Move", "JMOD_HL2_ARMOR_MOVE", function(ply, mv, cmd)
 end)
 
 local function DoJump(ply)
-	local charges = ply:GetNW2Float(tag_counter, 0)
+	local Charges = ply:GetNW2Float(tag_counter, 0)
 
-	if charges < 1 then return end
+	if Charges < 1 then return end
 	if not ply.EZjumpmod_canuse then return end
 
-	local vel = ply:GetVelocity()
-	vel.x = math.Clamp(vel.x, -500, 500) * .5
-	vel.y = math.Clamp(vel.y, -500, 500) * .5
-	vel.z = math.Clamp(vel.z, 100, 150) * 2.5
+	local Vel = ply:GetVelocity()
+	local Aim = ply:GetAimVector()
+	--Vel.x = math.Clamp(Vel.x, -500, 500) * .5
+	--Vel.y = math.Clamp(Vel.y, -500, 500) * .5
+	--Vel.z = math.Clamp(Vel.z, 100, 150) * 2
 
-	ply:SetVelocity(vel * 1)
+	--ply:SetVelocity(Vel * 1)
+
+	local NewVel = Vector(Aim.x * 500, Aim.y * 500, 0)
+	NewVel.x = math.Clamp(NewVel.x, -500, 500) * .5
+	NewVel.y = math.Clamp(NewVel.y, -500, 500) * .5
+	NewVel.z = math.Clamp(Vel.z, 100, 150) * 2.5
+	print("Aim Vector:", Aim)
+	print("Added Velocity:", NewVel)
+
+	ply:SetVelocity(NewVel * 1)
 	if not IsFirstTimePredicted() then return end
 
 	if SERVER then
 		ply:EmitSound(math.random() > 0.5 and JModHL2.EZ_JUMPSNDS.BOOST1 or JModHL2.EZ_JUMPSNDS.BOOST2, 70, 100, 0.7)
 	end
 
-	charges = charges - 1
-	ply:SetNW2Float(tag_counter, charges)
-	ply.EZjumpmod_canuse = false
+	Charges = Charges - 1
+	ply:SetNW2Float(tag_counter, Charges)
+	--ply.EZjumpmod_canuse = false
+	ply.EZsafeFall = true
 
-	if SERVER and charges <= 1 then
+	if SERVER and Charges <= 1 then
 		ply:SendLua([[
 			surface.PlaySound("]] .. JModHL2.EZ_JUMPSNDS.DENY .. [[")
 		]])
@@ -196,7 +207,7 @@ hook.Add("OnPlayerHitGround", "JMOD_HL2_HITGROUND", function(ply, water, float, 
 
 	ply.EZjumpmod_canuse = true
 	ply.played_sound = false
-	if SERVER and IsFirstTimePredicted() then
+	if SERVER and IsFirstTimePredicted() and ply.EZsafeFall then
 		if speed > 1000 then
 			ply:EmitSound(JModHL2.EZ_JUMPSNDS.LONGFALL, 75, 100, 0.7)
 		elseif speed > 525 then
@@ -207,5 +218,9 @@ end)
 
 hook.Remove("GetFallDamage", "JMOD_HL2_FALLDAMAGE")
 hook.Add("GetFallDamage", "JMOD_HL2_FALLDAMAGE", function(ply, sped)
-	if ply.EZarmor and ply.EZarmor.effects and ply.EZarmor.effects.jumpmod then return 0 end
+	if ply.EZsafeFall then 
+		ply.EZsafeFall = false 
+
+		return 0 
+	end
 end)

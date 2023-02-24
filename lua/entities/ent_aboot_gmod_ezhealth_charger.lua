@@ -87,12 +87,13 @@ if(SERVER)then
 
 				if((Tr.Hit) and (Tr.Entity == self))and( self.User:GetShootPos():Distance(self:GetPos()) < 100)then
 
-					self.User:SetHealth(self.User:Health() + 1)
-					self:ConsumeSupplies(1.5)
-
 					if self.User.EZbleeding > 0 then
 						self.User:PrintMessage(HUD_PRINTCENTER, "stopping bleeding")
-						self.User.EZbleeding = math.Clamp(Ent.EZbleeding - 2 * JMod.Config.MedKitHealMult, 0, 9e9)
+						self.User.EZbleeding = math.Clamp(self.User.EZbleeding - 2 * JMod.Config.MedKitHealMult, 0, 9e9)
+						self:ConsumeSupplies(.5)
+					else
+						self.User:SetHealth(self.User:Health() + 1)
+						self:ConsumeSupplies(1.5)
 					end
 				else
 					self:TurnOff(true)

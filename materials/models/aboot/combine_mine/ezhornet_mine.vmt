@@ -1,10 +1,10 @@
 "VertexLitGeneric"
 {
-	"$basetexture" "models/aboot/ezcombine_mine_sheet"
+	"$basetexture" "models/aboot/combine_mine/ezhornet_mine_sheet"
 	"$bumpmap" "models/aboot/ezcombine_mine_normal"
 	"$surfaceprop" "metal"
-	"$selfillummask" "models/aboot/ezcombine_mine_illummask"
-	"$selfillum" "1"
+//	"$selfillummask" "models/aboot/ezcombine_mine_illummask"
+//	"$selfillum" "1"
 	"%keywords" "combine"
 
 	"$phong" "1"
@@ -13,7 +13,7 @@
 	"$phongfresnelranges"	"[.1 .5 1.0]"
 
 	"$blendtintbybasealpha" "1"
- 	"$blendtintcoloroverbase" "1"
+ 	"$blendtintcoloroverbase" "0"
 	
 	Proxies
 	{
