@@ -9,7 +9,7 @@ ENT.Spawnable = true
 ENT.AdminSpawnable = true
 ENT.AutomaticFrameAdvance = true
 ---
-ENT.JModPreferredCarryAngles = Angle(0, 0, 0)
+ENT.JModPreferredCarryAngles = Angle(0, 180, 0)
 ENT.DamageThreshold = 240
 ---
 function ENT:SetupDataTables()
@@ -102,7 +102,12 @@ if SERVER then
 		local HL2Ammo = {"AR2", "Pistol", "XBowBolt", "SMG1", "357", "Buckshot", "RPG_Round", "slam", "Grenade", "AlyxGun", "SniperRound"}
 		if (IsValid(Attacker) and Attacker:IsPlayer()) and (Attacker:GetActiveWeapon():GetClass() == "weapon_crowbar") then
 			for k, v in ipairs(HL2Ammo) do
-				self:GivePlyAmmo(Attacker, true, v)
+				self:Open(true)
+				timer.Simple(1, function()
+					if IsValid(self) and IsValid(activator) then
+						self:GivePlyAmmo(activator, true)
+					end
+				end)
 			end
 		end
 
@@ -254,16 +259,26 @@ if SERVER then
 		end
 
 		if Alt then
-			self:GivePlyAmmo(activator, true)
+			timer.Simple(0.5, function()
+				if IsValid(self) and IsValid(activator) then
+					self:GivePlyAmmo(activator, true)
+				end
+			end)
 		else
 			local Box, Given = ents.Create(JMod.EZ_RESOURCE_ENTITIES[self:GetResourceType()]), math.min(Resource, 100)
-			Box:SetPos(self:GetPos() + self:GetUp() * 5)
-			Box:SetAngles(self:GetAngles())
-			Box:Spawn()
-			Box:Activate()
-			Box:SetResource(Given)
-			activator:PickupObject(Box)
-			Box.NextLoad = CurTime() + 2
+			timer.Simple(0.5, function()
+				if IsValid(self) then
+					Box:SetPos(self:GetPos() + self:GetUp() * 5)
+					Box:SetAngles(self:GetAngles())
+					Box:Spawn()
+					Box:Activate()
+					Box:SetResource(Given)
+					Box.NextLoad = CurTime() + 2
+					if IsValid(activator) and activator:Alive() then
+						activator:PickupObject(Box)
+					end
+				end
+			end)
 			self:SetResource(Resource - Given)
 		end
 		self:CalcWeight()

@@ -13,6 +13,7 @@ ENT.JModGUIcolorable = false
 ENT.JModEZstorable = true
 ENT.EZscannerDanger = true
 ENT.JModPreferredCarryAngles = Angle(0, 0, 0)
+ENT.EZhopperMine = true
 
 ENT.BlacklistedNPCs = {"bullseye_strider_focus", "npc_turret_floor", "npc_turret_ceiling", "npc_turret_ground"}
 
@@ -84,16 +85,16 @@ if SERVER then
 	function ENT:OnTakeDamage(dmginfo)
 		self:TakePhysicsDamage(dmginfo)
 
-		if JMod.LinCh(dmginfo:GetDamage(), 10, 50) then
+		if JMod.LinCh(dmginfo:GetDamage(), 100, 1000) then
 			local Pos, State = self:GetPos(), self:GetState()
 
-			if State == STATE_LAUNCHED then
+			--if State == STATE_LAUNCHED then
 				self:Detonate()
 			--[[elseif not (State == STATE_BROKEN) then
 				sound.Play("Metal_Box.Break", Pos)
 				self:SetState(STATE_BROKEN)
 				SafeRemoveEntityDelayed(self, 10)]]--
-			end
+			--end
 		end
 	end
 
@@ -162,9 +163,11 @@ if SERVER then
 
 				local Phys = self:GetPhysicsObject()
 				timer.Simple(0, function()
-					Phys:EnableMotion(true)
-					Phys:SetDragCoefficient(0)
-					Phys:AddVelocity((ToDir * Speed) + VectorRand(-1, 1))
+					if IsValid(Phys) then
+						Phys:EnableMotion(true)
+						Phys:SetDragCoefficient(0)
+						Phys:AddVelocity((ToDir * Speed) + VectorRand(-1, 1))
+					end
 				end)
 			end
 		end)
@@ -224,7 +227,7 @@ if SERVER then
 					local IsUp = self:GetUp().z > 0.3
 
 					if (Tr.Hit) and not(Tr.Entity:IsNPC() or Tr.Entity:IsPlayer()) and (IsUp) then
-						self.Weld = constraint.Ballsocket(Tr.Entity, self, Tr.PhysicsBone, 0, Vector(0, 0, -1), 0, 0, 0)
+						self.Weld = constraint.Weld(Tr.Entity, self, Tr.PhysicsBone, 0, 50000, false, false)
 						if self.Weld then
 							self.Weld:Activate()
 							self:EmitSound("NPC_CombineMine.CloseHooks")
@@ -276,15 +279,13 @@ if SERVER then
 			WireLib.TriggerOutput(self, "State", State)
 		end
 
-		--print(self:GetCollisionGroup())
-
 		if State == STATE_ARMED then
 			if not(IsValid(self.Weld)) then
 				self:Disarm()
 
 				return true
 			end
-			--JPrint(tostring(self:GetTarget()) .. " \t " .. tostring(self:GetAlly()))
+			--jprint(tostring(self:GetTarget()) .. " \t " .. tostring(self:GetAlly()))
 
 			for k, targ in pairs(ents.FindInSphere(SelfPos, AttackDist)) do
 				if not (targ == self) and (targ:IsPlayer() or targ:IsNPC() or targ:IsVehicle()) and JMod.ClearLoS(self, targ, true) then
@@ -361,7 +362,7 @@ if SERVER then
 
 	hook.Remove("GravGunOnDropped", "ABootGravGunHopperGrab")
 	hook.Add("GravGunOnPickedUp", "ABootGravGunHopperGrab", function(ply, ent)
-		if ent:GetClass() == "ent_aboot_gmod_ezhoppermine" then 
+		if ent.EZhopperMine then 
 			local State = ent:GetState()
 			LastGravGunGrabTime = CurTime()
 
@@ -387,7 +388,7 @@ if SERVER then
 
 	hook.Remove("GravGunOnDropped", "ABootGravGunHopperDrop")
 	hook.Add("GravGunOnDropped", "ABootGravGunHopperDrop", function(ply, ent)
-		if ent:GetClass() == "ent_aboot_gmod_ezhoppermine" then
+		if ent.EZhopperMine then
 			if ent:GetState() == STATE_HELD then
 				ent:SetState(STATE_OFF)
 				if ply:KeyDown(JMod.Config.AltFunctionKey) then

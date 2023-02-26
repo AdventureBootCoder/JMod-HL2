@@ -1,6 +1,7 @@
 -- AdventureBoots 2022
 AddCSLuaFile()
 ENT.Type = "anim"
+ENT.Base = "ent_aboot_gmod_ezhoppermine"
 ENT.Author = "AdventureBoots"
 ENT.Category = "JMod - EZ HL:2"
 ENT.Information = "Magnum Opus"
@@ -13,6 +14,7 @@ ENT.JModGUIcolorable = false
 ENT.JModEZstorable = true
 ENT.EZscannerDanger = true
 ENT.JModPreferredCarryAngles = Angle(0, 0, 0)
+ENT.EZhopperMine = true
 
 ENT.BlacklistedNPCs = {"bullseye_strider_focus", "npc_turret_floor", "npc_turret_ceiling", "npc_turret_ground"}
 
@@ -84,16 +86,16 @@ if SERVER then
 	function ENT:OnTakeDamage(dmginfo)
 		self:TakePhysicsDamage(dmginfo)
 
-		if JMod.LinCh(dmginfo:GetDamage(), 10, 50) then
+		if JMod.LinCh(dmginfo:GetDamage(), 100, 10000) then
 			local Pos, State = self:GetPos(), self:GetState()
 
-			if State == STATE_LAUNCHED then
+			--if State == STATE_LAUNCHED then
 				self:Detonate()
 			--[[elseif not (State == STATE_BROKEN) then
 				sound.Play("Metal_Box.Break", Pos)
 				self:SetState(STATE_BROKEN)
 				SafeRemoveEntityDelayed(self, 10)]]--
-			end
+			--end
 		end
 	end
 
@@ -192,7 +194,6 @@ if SERVER then
 						end
 					else
 						self:Jump()
-						--JPrint("ArmAttempts: " .. self.ArmAttempts )
 					end
 					self:NextThink(CurTime() + .5)
 				end
@@ -240,16 +241,18 @@ if SERVER then
 				ToDir = ToAng:Forward() 
 				local Dist = SelfPos:Distance(targetPos)
 				-----
-				local Speed = math.sqrt((800 * Dist) / math.sin(2 * math.rad(LaunchAngle))) -- Fancy math
+				local Speed = math.sqrt((600 * Dist) / math.sin(2 * math.rad(LaunchAngle))) -- Fancy math
+				--local Speed = math.sqrt(160000 / math.sin(2 * math.rad(LaunchAngle)))
 				-----
 				constraint.RemoveAll(self)
 
 				local Phys = self:GetPhysicsObject()
-
 				timer.Simple(0, function()
-					Phys:EnableMotion(true)
-					Phys:SetDragCoefficient(0)
-					Phys:AddVelocity((ToDir * Speed) + VectorRand(-1, 1))
+					if IsValid(Phys) then
+						Phys:EnableMotion(true)
+						Phys:SetDragCoefficient(0)
+						Phys:AddVelocity((ToDir * Speed) + VectorRand(-1, 1))
+					end
 				end)
 			end
 		end)
@@ -263,8 +266,6 @@ if SERVER then
 		if istable(WireLib) then
 			WireLib.TriggerOutput(self, "State", State)
 		end
-
-		--print(self:GetCollisionGroup())
 
 		if State == STATE_ARMED then
 			if not(IsValid(self.Weld)) then
@@ -316,10 +317,10 @@ if SERVER then
 
 			return true
 		elseif State == STATE_LAUNCHED then
+			--jprint(self:GetPhysicsObject():GetVelocity().z)
 			timer.Simple(.3, function()
-				--jprint(self:GetPhysicsObject():GetVelocity().z)
 				if not IsValid(self) then return end
-				if self:GetPhysicsObject():GetVelocity().z >= 5 then
+				if self:GetPhysicsObject():GetVelocity().z <= 1 and not self:IsPlayerHolding() then
 					self:Detonate()
 				end
 			end)
@@ -356,133 +357,7 @@ if SERVER then
 		end
 	end
 
-	local LastGravGunGrabTime = 0
-	function ENT:GravGunPunt( ply )
-		if self:GetState() == STATE_HELD then
-			self:SetState(STATE_LAUNCHED)
-			self:EmitSound("npc/roller/mine/rmine_predetonate.wav")
-
-			return true
-		else
-			ply:DropObject()
-		end
-	end
-
-	hook.Remove("GravGunOnDropped", "ABootGravGunHornetGrab")
-	hook.Add("GravGunOnPickedUp", "ABootGravGunHornetGrab", function(ply, ent)
-		if ent:GetClass() == "ent_aboot_gmod_ezhopperhornet" then 
-			local State = ent:GetState()
-			LastGravGunGrabTime = CurTime()
-
-			if State == STATE_ARMED then
-				timer.Simple(1.5, function()
-					if IsValid(ent) and ent:IsPlayerHolding() then
-						if IsValid(ent.Weld) then
-							SafeRemoveEntity(ent.Weld)
-						end
-						JMod.SetEZowner(ent, ply)
-						JMod.Colorify(ent)
-						ent:SetState(STATE_HELD)
-					end
-				end)
-			else
-				JMod.SetEZowner(ent, ply)
-				JMod.Colorify(ent)
-				ent:SetState(STATE_HELD)
-			end
-		end
-	end)
-
-	hook.Remove("GravGunOnDropped", "ABootGravGunHornetDrop")
-	hook.Add("GravGunOnDropped", "ABootGravGunHornetDrop", function(ply, ent)
-		if ent:GetClass() == "ent_aboot_gmod_ezhopperhornet" then
-			if ent:GetState() == STATE_HELD then
-				ent:SetState(STATE_OFF)
-				if ply:KeyDown(JMod.Config.AltFunctionKey) then
-					ent:Arm(ply)
-				end
-			end
-		end
-	end)
-
-	function ENT:OnRemove()
-		if self.WarningSnd then
-			self.WarningSnd:Stop()
-		end
-	end
-
 elseif CLIENT then
-	function ENT:Initialize()
-		self:SetLegs(70)
-		self:SetClaws(-70)
-
-		local LerpedMove, LastState = 0, 0
-		self:AddCallback("BuildBonePositions", function(ent, numbones)
-			local State = ent:GetState()
-			if (State == STATE_ARMED) and (LastState ~= State) then
-				ent:SetLegs(0)
-				ent:SetClaws(0)
-			elseif (State == STATE_OFF or STATE_ARMING) and (LastState ~= State) then
-				ent:SetLegs(70)
-				ent:SetClaws(-70)
-			elseif (State == STATE_LAUNCHED) and (LastState ~= State) then 
-				ent:SetLegs(70)
-				ent:SetClaws(-70)
-			elseif State == STATE_HELD then
-				local Vary = math.sin(CurTime() * 5)/2 + .5
-				ent:SetLegs(70 * LerpedMove)
-				ent:SetClaws(-70 * LerpedMove)
-				LerpedMove = Lerp(math.ease.InOutExpo(FrameTime() * 100), LerpedMove, Vary)
-			end
-
-			LastState = State
-		end)
-	end
-
-	function ENT:SetLegs(angle)
-		self:ManipulateBoneAngles(1,Angle(0,0,angle))
-		self:ManipulateBoneAngles(3,Angle(0,0,angle))
-		self:ManipulateBoneAngles(5,Angle(0,0,angle))
-	end
-
-	function ENT:SetClaws(angle)
-		self:ManipulateBoneAngles(2,Angle(0,angle,0))
-		self:ManipulateBoneAngles(4,Angle(0,angle,0))
-		self:ManipulateBoneAngles(6,Angle(0,angle,0))
-	end
-	--
-	local GlowSprite = Material("sprites/mat_jack_basicglow")
-
-	function ENT:Draw()
-		self:DrawModel()
-		local Up = self:GetUp()
-		local State = self:GetState()
-
-		if State == STATE_ARMING then
-			render.SetMaterial(GlowSprite)
-			render.DrawSprite(self:GetPos() + Up * 10, 20, 20, Color(0, 0, 255))
-			render.DrawSprite(self:GetPos() + Up * 10, 10, 10, Color(0, 0, 255))
-		elseif State == STATE_ARMED then
-			if IsValid(self:GetTarget()) and self:GetAlly() then
-				render.SetMaterial(GlowSprite)
-				render.DrawSprite(self:GetPos() + Up * 10, 20, 20, Color(0, 255, 0))
-				render.DrawSprite(self:GetPos() + Up * 10, 15, 15, Color(0, 255, 0))
-			elseif IsValid(self:GetTarget()) and (self:GetAlly() == false) then
-				render.SetMaterial(GlowSprite)
-				render.DrawSprite(self:GetPos() + Up * 10, 20, 20, Color(255, 0, 0))
-				render.DrawSprite(self:GetPos() + Up * 10, 15, 15, Color(255, 0, 0))
-			end
-		elseif State == STATE_LAUNCHED then
-			render.SetMaterial(GlowSprite)
-			render.DrawSprite(self:GetPos() + Up * 10, 20, 20, Color(255, 0, 0))
-			render.DrawSprite(self:GetPos() + Up * 10, 15, 15, Color(255, 0, 0))
-		elseif State == STATE_HELD then
-			render.SetMaterial(GlowSprite)
-			render.DrawSprite(self:GetPos() + Up * 10, 20, 20, Color(0, 0, 255))
-			render.DrawSprite(self:GetPos() + Up * 10, 15, 15, Color(0, 0, 255))
-		end
-	end
-
 	language.Add("ent_jack_gmod_ezhoppermine", "EZ Hornet Mine")
 end
 
