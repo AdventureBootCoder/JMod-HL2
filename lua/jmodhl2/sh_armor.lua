@@ -23,12 +23,12 @@ local HEVArmorProtectionProfile={
 }
 
 JMod.AdditionalArmorTable["ABoot HEV Suit"]={
-	PrintName="EZ HEV Suit",
-	Category="JMod - EZ HL:2",
-	mdl="models/blackmesa/props_generic/bm_hevcrate01.mdl",
+	PrintName = "EZ HEV Suit",
+	Category = "JMod - EZ HL:2",
+	mdl = "models/blackmesa/props_generic/bm_hevcrate01.mdl",
 	--mat="models/props_generic/bm_hevcrate01_skin0.vmt",
 	lbl = "MK.II HEV SUIT",
-	clr={ r = 255, g = 255, b = 255 },
+	clr = {  r = 189, g = 100, b = 24 },
 	clrForced = false,
 	slots={
 		eyes = 1,
@@ -78,7 +78,7 @@ JMod.AdditionalArmorTable["ABoot Jump Module"]={
 	PrintName = "EZ Jump Module",
 	Category = "JMod - EZ HL:2",
 	mdl = "models/blackmesa/jumpmod/w_longjump.mdl",
-	clr = { r = 255, g = 255, b = 255 },
+	clr = { r = 189, g = 100, b = 24 },
 	clrForced = false,
 	slots = {
 		back = 1
