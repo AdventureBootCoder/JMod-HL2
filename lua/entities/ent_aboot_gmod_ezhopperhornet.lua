@@ -148,9 +148,9 @@ if SERVER then
 	function ENT:Detonate()
 		if self.Exploded then return end
 		self.Exploded = true
-		local SelfPos = self:LocalToWorld(self:OBBCenter())
-		local Up = Vector(0, 0, 1)
-		local TargetPos = (IsValid(self:GetTarget()) and self:GetTarget():LocalToWorld(self:GetTarget():OBBCenter())) or -Up
+		local SelfPos, Up = self:LocalToWorld(self:OBBCenter()), Vector(0, 0, 1)
+		local Targ = self:GetTarget()
+		local TargetPos = (IsValid(Targ) and Targ:LocalToWorld(Targ:OBBCenter())) or -Up
 		local Dir = ((TargetPos - SelfPos) + VectorRand() * .01):GetNormalized()
 
 		local Eff = EffectData()
@@ -161,7 +161,7 @@ if SERVER then
 		util.ScreenShake(SelfPos, 99999, 99999, .1, 1000)
 		
 		self:EmitSound("snd_jack_fragsplodeclose.wav", 90, 100)
-		JMod.RicPenBullet(self, SelfPos, Dir, 1000 * JMod.Config.MinePower, true, true)
+		JMod.RicPenBullet(self, SelfPos, Dir, (1000 or ((Targ:IsVehicle() or Targ:InVehicle()) and 5000)) * JMod.Config.MinePower, true, true)
 		SafeRemoveEntity(self)
 	end
 
@@ -241,8 +241,8 @@ if SERVER then
 				ToDir = ToAng:Forward() 
 				local Dist = SelfPos:Distance(targetPos)
 				-----
-				local Speed = math.sqrt((600 * Dist) / math.sin(2 * math.rad(LaunchAngle))) -- Fancy math
-				--local Speed = math.sqrt(160000 / math.sin(2 * math.rad(LaunchAngle)))
+				--local Speed = math.sqrt((600 * Dist) / math.sin(2 * math.rad(LaunchAngle))) -- Fancy math
+				local Speed = math.sqrt(100000 / math.sin(2 * math.rad(LaunchAngle)))
 				-----
 				constraint.RemoveAll(self)
 
@@ -275,7 +275,7 @@ if SERVER then
 			end
 			--jprint(tostring(self:GetTarget()) .. " \t " .. tostring(self:GetAlly()))
 			for k, targ in pairs(ents.FindInSphere(SelfPos, AttackDist)) do
-				if (targ ~= self) and (targ:IsPlayer() or targ:IsNPC() or targ:IsVehicle()) and JMod.ClearLoS(self, targ, true) then
+				if (targ ~= self) and (targ:IsPlayer() and targ:InVehicle()) or (targ:IsPlayer() or targ:IsNPC() or targ:IsVehicle()) and JMod.ClearLoS(self, targ, true) then
 					
 					local targPos = targ:GetPos()
 

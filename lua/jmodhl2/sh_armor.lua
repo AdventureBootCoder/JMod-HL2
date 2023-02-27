@@ -154,8 +154,8 @@ local function DoJump(ply)
 	NewVel.x = math.Clamp(NewVel.x, -500, 500) * .5
 	NewVel.y = math.Clamp(NewVel.y, -500, 500) * .5
 	NewVel.z = math.Clamp(Vel.z, 100, 150) * 2.5
-	print("Aim Vector:", Aim)
-	print("Added Velocity:", NewVel)
+	--print("Aim Vector:", Aim)
+	--print("Added Velocity:", NewVel)
 
 	ply:SetVelocity(NewVel * 1)
 	if not IsFirstTimePredicted() then return end
@@ -218,9 +218,11 @@ end)
 
 hook.Remove("GetFallDamage", "JMOD_HL2_FALLDAMAGE")
 hook.Add("GetFallDamage", "JMOD_HL2_FALLDAMAGE", function(ply, sped)
-	if ply.EZsafeFall then 
-		ply.EZsafeFall = false 
+	local Charges = ply:GetNW2Float(tag_counter, 0)
 
-		return 0 
+	if Charges > 1 then
+		Charges = Charges - 1
+		ply:SetNW2Float(tag_counter, Charges)
+		return 0
 	end
 end)

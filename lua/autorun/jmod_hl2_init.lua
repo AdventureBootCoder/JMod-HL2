@@ -92,7 +92,7 @@ if(SERVER)then
 				ply.EZjumpmod_usealert = nil
 				ply:SendLua([[surface.PlaySound("]] .. JModHL2.EZ_JUMPSNDS.READY .. [[")]])
 			end
-			if (val < 3) and (ply:GetSuitPower() >= 1.25) then
+			if (GetConVar("gmod_suit"):GetBool()) and (ply:GetSuitPower() >= 1.25) and (val < 3) then
 				ply:SetSuitPower(math.Clamp(ply:GetSuitPower() - .25, 0, 100))
 			end
 
