@@ -166,8 +166,8 @@ local function DoJump(ply)
 
 	Charges = Charges - 1
 	ply:SetNW2Float(tag_counter, Charges)
-	--ply.EZjumpmod_canuse = false
-	ply.EZsafeFall = true
+	--ply.EZjumpmod_canuse = false -- I want to see if this will impact balance or no
+	--ply.EZjumpModSafeFall = true -- Trying different techniques.
 
 	if SERVER and Charges <= 1 then
 		ply:SendLua([[
@@ -199,15 +199,18 @@ hook.Add("KeyPress", "JMOD_HL2_KEYPRESS", function(ply, key)
 	end
 end)
 
+local SafeFallReduction = .75
+
 hook.Remove("OnPlayerHitGround", "JMOD_HL2_HITGROUND")
 hook.Add("OnPlayerHitGround", "JMOD_HL2_HITGROUND", function(ply, water, float, speed)
 	if not(ply.EZarmor and ply.EZarmor.effects and ply.EZarmor.effects.jumpmod) then return end
 	if water then return end
 	--if not ply.played_sound then return end
+	local Charges = ply:GetNW2Float(tag_counter, 0)
 
 	ply.EZjumpmod_canuse = true
 	ply.played_sound = false
-	if SERVER and IsFirstTimePredicted() and ply.EZsafeFall then
+	if SERVER and IsFirstTimePredicted() and (Charges >= SafeFallReduction) then
 		if speed > 1000 then
 			ply:EmitSound(JModHL2.EZ_JUMPSNDS.LONGFALL, 75, 100, 0.7)
 		elseif speed > 525 then
@@ -220,8 +223,8 @@ hook.Remove("GetFallDamage", "JMOD_HL2_FALLDAMAGE")
 hook.Add("GetFallDamage", "JMOD_HL2_FALLDAMAGE", function(ply, sped)
 	local Charges = ply:GetNW2Float(tag_counter, 0)
 
-	if Charges > 1 then
-		Charges = Charges - 1
+	if Charges >= SafeFallReduction then
+		Charges = Charges - SafeFallReduction
 		ply:SetNW2Float(tag_counter, Charges)
 		return 0
 	end
