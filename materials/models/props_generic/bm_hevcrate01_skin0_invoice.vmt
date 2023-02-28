@@ -2,7 +2,9 @@
 {
 	"$baseTexture" 		"models/props_generic/bm_hevcrate01_skin0_invoice"
 //	"$bumpmap" 			"models/props_generic/bm_hevcrate01_skin0_normal"
-	
+
+	"$blendtintbybasealpha" "1"
+ 	"$blendtintcoloroverbase" "0"
 	
 //	"$phong" "1"
 	"$phongexponent" "25"

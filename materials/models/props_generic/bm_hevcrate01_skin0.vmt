@@ -6,6 +6,8 @@
 //	"$selfillum" "1"
 //	"$selfillumtint"		"[0.02 0.02 0.02]"
 //	"$selfillummask"		"models/props_generic/bm_supplycrate01_skin_0_2_si"
+	"$blendtintbybasealpha" "1"
+ 	"$blendtintcoloroverbase" "0"
 
 	"$phong"					"1"
 	"$phongexponent"			"25"

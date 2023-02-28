@@ -2,7 +2,7 @@
 AddCSLuaFile()
 ENT.Type = "anim"
 ENT.Author = "AdventureBoots"
-ENT.PrintName = "EZ Thumper"
+ENT.PrintName = "EZ Big Thumper"
 ENT.Category = "JMod - EZ HL:2"
 ENT.Spawnable = true
 ENT.AdminOnly = false
@@ -13,19 +13,19 @@ ENT.EZconsumes = {
 	JMod.EZ_RESOURCE_TYPES.POWER
 }
 --
-ENT.Model = "models/props_combine/combinethumper002.mdl"
-ENT.Mass = 4000
+ENT.Model = "models/props_combine/combinethumper001a.mdl"
+ENT.Mass = 6000
 ENT.SpawnHeight = 10
 ENT.StaticPerfSpecs = {
-	MaxDurability = 100,
-	MaxElectricity = 400
+	MaxDurability = 600,
+	MaxElectricity = 800
 }
 ENT.DynamicPerfSpecs = {
 	Armor = 2
 }
 --
 --ENT.WhitelistedResources = {}
-ENT.BlacklistedResources = {"geothermal", "geo", "water", "oil"}
+ENT.BlacklistedResources = {"geothermal", "geo"}
 
 local STATE_BROKEN, STATE_OFF, STATE_RUNNING = -1, 0, 1
 ---
@@ -211,24 +211,24 @@ if(SERVER)then
 				return
 			end
 
-			self:ConsumeElectricity(.02)
+			self:ConsumeElectricity(.04)
 			if self.LastState ~= State then
 				self:SetSequence("idle")
 				self:ResetSequenceInfo()
 			end
 
 			if self:IsSequenceFinished() then
-				self:EmitSound("ambient/machines/thumper_hit.wav")
+				self:EmitSound("ambient/machines/thumper_hit.wav", 120, 90)
 				util.ScreenShake(self:GetPos(), 100, 60, 0.8, 1000)
 				local Eff = EffectData()
 				Eff:SetOrigin(self:GetAttachment(1).Pos)
-				Eff:SetScale(254)
+				Eff:SetScale(508)
 				util.Effect("ThumperDust", Eff, true, true)
 				self:EmitSound("ambient/machines/thumper_dust.wav")
 				self:ResetSequenceInfo()
 
 				-- This is just the rate at which we pump
-				local pumpRate = JMod.EZ_GRADE_BUFFS[self:GetGrade()]^2
+				local pumpRate = (JMod.EZ_GRADE_BUFFS[self:GetGrade()]^2) * 1.5
 				
 				-- Here's where we do the rescource deduction, and barrel production
 				-- If it's a flow (i.e. water)
@@ -255,7 +255,7 @@ if(SERVER)then
 				end
 			end
 
-			JMod.EmitAIsound(self:GetPos(), 1000, .5, 256)
+			JMod.EmitAIsound(self:GetPos(), 1000, .5, 512)
 
 		else
 			if self.LastState ~= State then
@@ -291,7 +291,7 @@ elseif(CLIENT)then
 				LerpedThump = Lerp(math.ease.OutCubic(FrameTime() * 5), LerpedThump, Vary)
 			end
 		end)]]--
-		self.Screen = JMod.MakeModel(self, "models/props_combine/combine_smallmonitor001.mdl")
+		self.Screen = JMod.MakeModel(self, "models/props_combine/combine_intmonitor003.mdl")
 	end
 	
 	function ENT:Draw()
@@ -318,14 +318,15 @@ elseif(CLIENT)then
 		if(DetailDraw)then
 			local ScreenAng = SelfAng:GetCopy()
 			ScreenAng:RotateAroundAxis(ScreenAng:Up(), 90)
-			JMod.RenderModel(self.Screen, SelfPos + Up * 30 - Right * 10 + Forward * 10, ScreenAng, Vector(1, 1.5, 1.5), nil, JMod.EZ_GRADE_MATS[self:GetGrade()])
+			local ScreenPos = SelfPos + Up * 60 - Right * 50 + Forward
+			JMod.RenderModel(self.Screen, ScreenPos, ScreenAng, Vector(.5, .75, .75), nil, JMod.EZ_GRADE_MATS[self:GetGrade()])
 			if (Closeness < 20000) and (State == STATE_RUNNING) then
 				local DisplayAng = SelfAng:GetCopy()
 				DisplayAng:RotateAroundAxis(DisplayAng:Right(), 0)
 				DisplayAng:RotateAroundAxis(DisplayAng:Up(), 180)
 				DisplayAng:RotateAroundAxis(DisplayAng:Forward(), 90)
 				local Opacity = math.random(50,150)
-				cam.Start3D2D(SelfPos + Up * 40 - Right * 23 + Forward * 35, DisplayAng, .1)
+				cam.Start3D2D(ScreenPos - Right * 15 + Forward * 25 + Up * 12, DisplayAng, .1)
                     surface.SetDrawColor(10, 10, 10, Opacity + 50)
                     surface.DrawRect(184, -200, 128, 128)
                     JMod.StandardRankDisplay(Grade, 248, -140, 118, Opacity + 50)
@@ -333,7 +334,7 @@ elseif(CLIENT)then
                     local ExtractCol = Color(100, 255, 100, Opacity)
                     draw.SimpleTextOutlined(string.upper(Typ) or "N/A", "JMod-Display", 250, -30, ExtractCol, TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP, 3, Color(0, 0, 0, Opacity))
                     draw.SimpleTextOutlined("POWER", "JMod-Display", 250, 0, Color(255, 255, 255, Opacity), TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP, 3, Color(0, 0, 0, Opacity))
-                    local ElecFrac=self:GetElectricity()/400
+                    local ElecFrac=self:GetElectricity()/800
                     local R,G,B=JMod.GoodBadColor(ElecFrac)
                     draw.SimpleTextOutlined(tostring(math.Round(ElecFrac * 100)).."%", "JMod-Display", 250, 30, Color(R, G, B, Opacity), TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP, 3, Color(0, 0, 0, Opacity))
                     draw.SimpleTextOutlined("PROGRESS", "JMod-Display", 250, 60, Color(255, 255, 255, Opacity), TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP, 3, Color(0, 0, 0, Opacity))
