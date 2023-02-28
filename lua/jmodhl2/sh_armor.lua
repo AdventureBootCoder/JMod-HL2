@@ -199,7 +199,7 @@ hook.Add("KeyPress", "JMOD_HL2_KEYPRESS", function(ply, key)
 	end
 end)
 
-local SafeFallReduction = .75
+--local SafeFallReduction = .75
 
 hook.Remove("OnPlayerHitGround", "JMOD_HL2_HITGROUND")
 hook.Add("OnPlayerHitGround", "JMOD_HL2_HITGROUND", function(ply, water, float, speed)
@@ -210,7 +210,7 @@ hook.Add("OnPlayerHitGround", "JMOD_HL2_HITGROUND", function(ply, water, float, 
 
 	ply.EZjumpmod_canuse = true
 	ply.played_sound = false
-	if SERVER and IsFirstTimePredicted() and (Charges >= SafeFallReduction) then
+	if SERVER and IsFirstTimePredicted() then
 		if speed > 1000 then
 			ply:EmitSound(JModHL2.EZ_JUMPSNDS.LONGFALL, 75, 100, 0.7)
 		elseif speed > 525 then
@@ -223,9 +223,15 @@ hook.Remove("GetFallDamage", "JMOD_HL2_FALLDAMAGE")
 hook.Add("GetFallDamage", "JMOD_HL2_FALLDAMAGE", function(ply, sped)
 	local Charges = ply:GetNW2Float(tag_counter, 0)
 
-	if Charges >= SafeFallReduction then
-		Charges = Charges - SafeFallReduction
-		ply:SetNW2Float(tag_counter, Charges)
-		return 0
-	end
+	--if Charges >= SafeFallReduction then
+		local RemaingCharges = Charges - (sped / 500)
+		--Charges = SafeFallReduction
+		ply:SetNW2Float(tag_counter, RemaingCharges)
+		if  ply:GetNW2Float(tag_counter, 0) > 0 then
+			return 0
+		else
+			print(math.Round( (sped ^ 2 / 8000) / ((Charges - RemaingCharges) * 15) ))
+			return math.Round( (sped ^ 2 / 8000) / ((Charges - RemaingCharges) * 15) )
+		end
+	--end
 end)

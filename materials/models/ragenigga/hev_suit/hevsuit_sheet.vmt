@@ -1,15 +1,15 @@
 "VertexLitGeneric"
 {
 	"$baseTexture" "models\ragenigga\hev_suit\hevsuit_sheet"
-	"$bumpmap" "models\ragenigga\hev_suit\player_Chrome1"
+	"$bumpmap" "models\ragenigga\hev_suit\hevsuit_sheet_normal"
 	"$surfaceprop" "metal"
 	"$model" "1"
 
 	"$normalmapalphaenvmapmask" "1"
 	"$envmap" "env_cubemap"
-	"$envmaptint" "[0.09 0.09 0.09]"
+	"$envmaptint" "[0.5 0.5 0.5]"
 	"$envmapcontrast" "1"
-	"$envmapsaturation" "0.5"
+	"$envmapsaturation" "1"
 
 	"$blendtintbybasealpha" "1"
  	"$blendtintcoloroverbase" "0"
@@ -18,11 +18,11 @@
 //	"$detailblendfactor" "0.4"
 //	"$detailblendmode" "0"
 
-	"$phong" "1"
-    "$phongexponent" "23"
-    "$phongboost" "2.2"
-    "$phongtint" "[1 1 1]"
-	"$phongfresnelranges"	"[0.5 2 5]"
+//	"$phong" "1"
+    "$phongboost" "1"
+	"$phongexponent" "10"
+	"$phongtint" "[1 1 1]"
+	"$phongfresnelranges"	"[1 1 1]"
 	
 //	Proxies
 //	{

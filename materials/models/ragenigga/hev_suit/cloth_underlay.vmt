@@ -3,5 +3,5 @@
 	"$baseTexture" "models\ragenigga\hev_suit\cloth_underlay"
 
 	"$blendtintbybasealpha" "1"
- 	"$blendtintcoloroverbase" "0"
+ 	"$blendtintcoloroverbase" "1"
 }
