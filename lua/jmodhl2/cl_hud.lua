@@ -7,7 +7,7 @@ local w_offset, h_offset= 0.305, 0.975
 local x_offset = CreateClientConVar(tag .. "_hud_x", scrw * w_offset)
 local y_offset = CreateClientConVar(tag .. "_hud_y", scrh * h_offset)
 local bar_width, bar_height, margin = 0.0075, 0.065, 0.002
-local black, bar_col_full, bar_col_empty = Color(0, 0, 0, 80), Color(255, 243, 100, 240), Color(255, 0, 0, 105)
+local black, bar_col_full, bar_col_empty = Color(0, 0, 0, 80), Color(255, 236, 12, 240), Color(255, 0, 0, 105)
 
 hook.Remove("HUDPaint", "JMOD_HL2_HUDPAINT")
 hook.Add("HUDPaint", "JMOD_HL2_HUDPAINT", function()
@@ -38,5 +38,10 @@ hook.Add("HUDPaint", "JMOD_HL2_HUDPAINT", function()
 		--bar1
 		surface.SetDrawColor(bar1 < 1 and bar_col_empty or bar_col_full)
 		surface.DrawRect(x + (scrw * (bar_width + margin) * 2), y - (scrh * (bar1 * bar_height)), scrw * bar_width, scrh * (bar1 * bar_height))
+		if Ply:GetNW2Bool("EZjumpmod_canuse", false) and charge >= 1 then
+			draw.DrawText("READY", "JMod-Stencil-MS", x + (scrw * (bar_width + margin) * 3), y - (scrh * bar_height) + 15, bar_col_full, TEXT_ALIGN_LEFT)
+		else
+			draw.DrawText("WAIT", "JMod-Stencil-MS", x + (scrw * (bar_width + margin) * 3), y - (scrh * bar_height) + 15, bar_col_empty, TEXT_ALIGN_LEFT)
+		end
 	end
 end)
