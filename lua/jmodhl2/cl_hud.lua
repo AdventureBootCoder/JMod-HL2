@@ -2,12 +2,12 @@ local tag = "aboot_jumpmod"
 local tag_counter = tag .. "_counter"
 
 local shouldshow = CreateClientConVar(tag .. "_hud", "1")
-local scrw, scrh = ScrW(), ScrH()
-local w_offset, h_offset= 0.305, 0.975
-local x_offset = CreateClientConVar(tag .. "_hud_x", scrw * w_offset)
-local y_offset = CreateClientConVar(tag .. "_hud_y", scrh * h_offset)
-local bar_width, bar_height, margin = 0.0075, 0.065, 0.002
-local black, bar_col_full, bar_col_empty = Color(0, 0, 0, 80), Color(255, 236, 12, 240), Color(255, 0, 0, 105)
+local SCR_W, SCR_H = ScrW(), ScrH()
+local OFFSET_W, OFFSET_H= 0.305, 0.975
+local x_offset = CreateClientConVar(tag .. "_hud_x", SCR_W * OFFSET_W)
+local y_offset = CreateClientConVar(tag .. "_hud_y", SCR_H * OFFSET_H)
+local BAR_WIDTH, BAR_HEIGHT, MARGIN = 0.0075, 0.065, 0.002
+local BLACK, BAR_COL_FULL, BAR_COL_EMPTY = Color(0, 0, 0, 80), Color(255, 236, 12, 240), Color(255, 0, 0, 105)
 
 hook.Remove("HUDPaint", "JMOD_HL2_HUDPAINT")
 hook.Add("HUDPaint", "JMOD_HL2_HUDPAINT", function()
@@ -23,25 +23,25 @@ hook.Add("HUDPaint", "JMOD_HL2_HUDPAINT", function()
 		local bar2 = math.min(charge - bar1, 1)
 		local bar3 = math.max(math.min(charge - bar1 * 2, 1), 0)
 
-		draw.RoundedBox(10, x - 8, y - (scrh * 0.075), scrw * 0.035, scrh * 0.075, black)
+		draw.RoundedBox(10, x - 8, y - (SCR_H * 0.075), SCR_W * 0.035, SCR_H * 0.075, BLACK)
 		--outlines
-		surface.SetDrawColor(bar_col_empty:Unpack())
-		surface.DrawOutlinedRect(x, y - (scrh * bar_height), scrw * bar_width, scrh *  bar_height)
-		surface.DrawOutlinedRect(x + scrw * (bar_width + margin), y - (scrh * bar_height), scrw * bar_width, scrh *  bar_height)
-		surface.DrawOutlinedRect(x + scrw * (bar_width + margin) * 2, y - (scrh * bar_height), scrw * bar_width, scrh *  bar_height)
+		surface.SetDrawColor(BAR_COL_EMPTY:Unpack())
+		surface.DrawOutlinedRect(x, y - (SCR_H * BAR_HEIGHT), SCR_W * BAR_WIDTH, SCR_H *  BAR_HEIGHT)
+		surface.DrawOutlinedRect(x + SCR_W * (BAR_WIDTH + MARGIN), y - (SCR_H * BAR_HEIGHT), SCR_W * BAR_WIDTH, SCR_H *  BAR_HEIGHT)
+		surface.DrawOutlinedRect(x + SCR_W * (BAR_WIDTH + MARGIN) * 2, y - (SCR_H * BAR_HEIGHT), SCR_W * BAR_WIDTH, SCR_H *  BAR_HEIGHT)
 		--bar3
-		surface.SetDrawColor(bar3 < 1 and bar_col_empty or bar_col_full)
-		surface.DrawRect(x, y - (scrh * (bar3 * bar_height)), scrw * bar_width, scrh * (bar3 * bar_height))
+		surface.SetDrawColor(bar3 < 1 and BAR_COL_EMPTY or BAR_COL_FULL)
+		surface.DrawRect(x, y - (SCR_H * (bar3 * BAR_HEIGHT)), SCR_W * BAR_WIDTH, SCR_H * (bar3 * BAR_HEIGHT))
 		--bar2
-		surface.SetDrawColor(bar2 < 1 and bar_col_empty or bar_col_full)
-		surface.DrawRect(x + (scrw * (bar_width + margin)), y - (scrh * (bar2 * bar_height)), scrw * bar_width, scrh * (bar2 * bar_height))
+		surface.SetDrawColor(bar2 < 1 and BAR_COL_EMPTY or BAR_COL_FULL)
+		surface.DrawRect(x + (SCR_W * (BAR_WIDTH + MARGIN)), y - (SCR_H * (bar2 * BAR_HEIGHT)), SCR_W * BAR_WIDTH, SCR_H * (bar2 * BAR_HEIGHT))
 		--bar1
-		surface.SetDrawColor(bar1 < 1 and bar_col_empty or bar_col_full)
-		surface.DrawRect(x + (scrw * (bar_width + margin) * 2), y - (scrh * (bar1 * bar_height)), scrw * bar_width, scrh * (bar1 * bar_height))
+		surface.SetDrawColor(bar1 < 1 and BAR_COL_EMPTY or BAR_COL_FULL)
+		surface.DrawRect(x + (SCR_W * (BAR_WIDTH + MARGIN) * 2), y - (SCR_H * (bar1 * BAR_HEIGHT)), SCR_W * BAR_WIDTH, SCR_H * (bar1 * BAR_HEIGHT))
 		if Ply:GetNW2Bool("EZjumpmod_canuse", false) and charge >= 1 then
-			draw.DrawText("READY", "JMod-Stencil-MS", x + (scrw * (bar_width + margin) * 3), y - (scrh * bar_height) + 15, bar_col_full, TEXT_ALIGN_LEFT)
+			draw.DrawText("READY", "HudDefault", x + (SCR_W * (BAR_WIDTH + MARGIN) * 3), y - (SCR_H * BAR_HEIGHT) + 50, BAR_COL_FULL, TEXT_ALIGN_LEFT)
 		else
-			draw.DrawText("WAIT", "JMod-Stencil-MS", x + (scrw * (bar_width + margin) * 3), y - (scrh * bar_height) + 15, bar_col_empty, TEXT_ALIGN_LEFT)
+			draw.DrawText("WAIT", "HudDefault", x + (SCR_W * (BAR_WIDTH + MARGIN) * 3), y - (SCR_H * BAR_HEIGHT) + 50, BAR_COL_EMPTY, TEXT_ALIGN_LEFT)
 		end
 	end
 end)
