@@ -1,0 +1,14 @@
+"VertexLitGeneric"
+{
+	"$baseTexture" "models\aboot\hev_suit\cloth_underlay"
+	"$bumpmap" "models\aboot\hev_suit\cloth_underlay_normal"
+
+	"$blendtintbybasealpha" "0"
+ 	"$blendtintcoloroverbase" "0"
+
+	"$phong" "1"
+    "$phongboost" ".05"
+	"$phongexponent" "10"
+	"$phongtint" "[1 1 1]"
+	"$phongfresnelranges"	"[1 1 1]"
+}

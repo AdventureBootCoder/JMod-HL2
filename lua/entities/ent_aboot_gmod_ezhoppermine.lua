@@ -349,7 +349,8 @@ if SERVER then
 	end
 
 	local LastGravGunGrabTime = 0
-	function ENT:GravGunPunt( ply )
+	function ENT:GravGunPunt(ply)
+		--print("We got punted")
 		if self:GetState() == STATE_HELD then
 			self:SetState(STATE_LAUNCHED)
 			self:EmitSound("npc/roller/mine/rmine_predetonate.wav")

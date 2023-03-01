@@ -1,8 +1,8 @@
-player_manager.AddValidModel( "Classic HEV Suit", 
-"models/ragenigga/player/hev_suit.mdl" );
-list.Set( "PlayerOptionsModel", "Classic HEV Suit", 
-"models/ragenigga/player/hev_suit.mdl" );
-player_manager.AddValidHands( "Classic HEV Suit", 
+player_manager.AddValidModel( "ABoot HEV Suit", 
+"models/aboot/player/hev_suit.mdl" );
+list.Set( "PlayerOptionsModel", "ABoot HEV Suit", 
+"models/aboot/player/hev_suit.mdl" );
+player_manager.AddValidHands( "ABoot HEV Suit", 
 "models/ragenigga/viewmodels/c_arms_classic.mdl", 0, "00000000" )
 
 JMod.AdditionalArmorTable = JMod.AdditionalArmorTable or {}
@@ -67,7 +67,7 @@ JMod.AdditionalArmorTable["ABoot HEV Suit"]={
 		HEVsuit = true,
 		speedBoost = 1.2
 	},
-	plymdl="models/ragenigga/player/hev_suit.mdl", -- https://steamcommunity.com/sharedfiles/filedetails/?id=1341386337&searchtext=hev+suit
+	plymdl="models/aboot/player/hev_suit.mdl", -- https://steamcommunity.com/sharedfiles/filedetails/?id=1341386337&searchtext=hev+suit
 	mskmat="mats_aboot_gmod_sprites/helmet_vignette1.png",
 	sndlop="snds_jack_gmod/mask_breathe.wav",
 	wgt = 40,
@@ -97,8 +97,8 @@ JMod.AdditionalArmorTable["ABoot Jump Module"]={
 		power = 30
 	},
 	snds={
-		eq="jumpmod/bootup_sequence/bootup_jetconnects.wav",
-		uneq="jumpmod/bootup_sequence/bootup_moduleacq.wav"
+		eq="aboot_jumpmod/bootup_sequence/bootup_jetconnects.wav",
+		uneq="aboot_jumpmod/bootup_sequence/bootup_moduleacq.wav"
 	},
 	eff={
 		jumpmod = true
@@ -143,7 +143,8 @@ local function DoJump(ply)
 	if not ply.EZjumpmod_canuse then return end
 
 	local Vel = ply:GetVelocity()
-	local Aim = ply:GetAimVector()
+	--local Aim = ply:GetAimVector()
+	local Aim = ply:GetForward()
 	--Vel.x = math.Clamp(Vel.x, -500, 500) * .5
 	--Vel.y = math.Clamp(Vel.y, -500, 500) * .5
 	--Vel.z = math.Clamp(Vel.z, 100, 150) * 2
@@ -166,7 +167,11 @@ local function DoJump(ply)
 
 	Charges = Charges - 1
 	ply:SetNW2Float(tag_counter, Charges)
-	--ply.EZjumpmod_canuse = false -- I want to see if this will impact balance or no
+	ply.EZjumpmod_canuse = false -- I want to see if this will impact balance or no
+	timer.Create(ply:Nick().."jumpmod_timer", 0.5, 1, function()
+		ply.EZjumpmod_canuse = true
+	end)
+	timer.Start(ply:Nick().."jumpmod_timer")
 	--ply.EZjumpModSafeFall = true -- Trying different techniques.
 
 	if SERVER and Charges <= 1 then
@@ -209,6 +214,7 @@ hook.Add("OnPlayerHitGround", "JMOD_HL2_HITGROUND", function(ply, water, float, 
 	local Charges = ply:GetNW2Float(tag_counter, 0)
 
 	ply.EZjumpmod_canuse = true
+	timer.Stop(ply:Nick().."jumpmod_timer")
 	ply.played_sound = false
 	if SERVER and IsFirstTimePredicted() then
 		if speed > 1000 then
@@ -224,14 +230,14 @@ hook.Add("GetFallDamage", "JMOD_HL2_FALLDAMAGE", function(ply, sped)
 	local Charges = ply:GetNW2Float(tag_counter, 0)
 
 	--if Charges >= SafeFallReduction then
-		local RemaingCharges = Charges - (sped / 500)
+		local RemaingCharges = Charges - (sped / 800)
 		--Charges = SafeFallReduction
 		ply:SetNW2Float(tag_counter, RemaingCharges)
 		if  ply:GetNW2Float(tag_counter, 0) > 0 then
 			return 0
 		else
-			print(math.Round( (sped ^ 2 / 8000) / ((Charges - RemaingCharges) * 15) ))
-			return math.Round( (sped ^ 2 / 8000) / ((Charges - RemaingCharges) * 15) )
+			--print(math.Round( (sped ^ 2 / 8000) / ((Charges - RemaingCharges) * 10) ))
+			return math.Round( (sped ^ 2 / 8000) / ((Charges - RemaingCharges) * 5) )
 		end
 	--end
 end)

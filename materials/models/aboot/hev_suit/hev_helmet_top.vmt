@@ -1,0 +1,33 @@
+"VertexLitGeneric"
+{
+	"$baseTexture" "models\aboot\hev_suit\hev_helmet_top"
+	"$bumpmap" "models\aboot\hev_suit\player_Chrome1"
+
+//	"$normalmapalphaenvmapmask" "1"
+	"$envmap" "env_cubemap"
+	"$envmaptint" "[0.09 0.09 0.09]"
+	"$envmapcontrast" "1.5"
+	"$envmapsaturation" "0.5"
+
+	"$blendtintbybasealpha" "1"
+ 	"$blendtintcoloroverbase" "0"
+
+	"$detailscale" "5"
+    "$detailblendfactor" "0.4"
+    "$detailblendmode" "0"
+
+//	"$phong" "1"
+    "$phongexponent" "23"
+    "$phongboost" "2.2"
+    "$phongtint" "[1 1 1]"
+	"$phongfresnelranges"	"[0.5 2 5]"
+	
+//	Proxies
+//	{
+//		Color
+//		{
+//			resultVar	$color2
+//			default 	"[0.75 0.75 0.75]"
+//		}
+//	}
+}

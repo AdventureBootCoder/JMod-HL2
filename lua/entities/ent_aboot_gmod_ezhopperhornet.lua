@@ -77,7 +77,7 @@ if SERVER then
 
 	function ENT:TriggerInput(iname, value)
 		if iname == "Detonate" and value > 0 then
-			self:Detonate()
+			self:Detonate(true)
 		elseif iname == "Arm" and value > 0 then
 			self:Arm(self.EZowner or game.GetWorld())
 		end
@@ -132,11 +132,7 @@ if SERVER then
 			if data.Speed > 10 then
 				if self:GetState() == STATE_LAUNCHED then
 					timer.Simple(0.01, function()
-						if IsValid(self:GetTarget()) and IsValid(self) then 
-							self:Detonate()
-						else
-							self:Disarm()
-						end
+						self:Detonate(true)
 					end)
 				else
 					self:EmitSound("SolidMetal.ImpactSoft")
@@ -145,24 +141,41 @@ if SERVER then
 		end
 	end
 
-	function ENT:Detonate()
-		if self.Exploded then return end
-		self.Exploded = true
-		local SelfPos, Up = self:LocalToWorld(self:OBBCenter()), Vector(0, 0, 1)
-		local Targ = self:GetTarget()
-		local TargetPos = (IsValid(Targ) and Targ:LocalToWorld(Targ:OBBCenter())) or -Up
-		local Dir = ((TargetPos - SelfPos) + VectorRand() * .01):GetNormalized()
+	local LerpedMove = 0
+	local AttackDist = 500 --245
 
-		local Eff = EffectData()
-		Eff:SetOrigin(SelfPos)
-		Eff:SetScale(0.5)
-		Eff:SetNormal(Dir)
-		util.Effect("eff_jack_gmod_efpburst", Eff, true, true)
-		util.ScreenShake(SelfPos, 99999, 99999, .1, 1000)
-		
-		self:EmitSound("snd_jack_fragsplodeclose.wav", 90, 100)
-		JMod.RicPenBullet(self, SelfPos, Dir, (1000 or ((Targ:IsVehicle() or Targ:InVehicle()) and 5000)) * JMod.Config.MinePower, true, true)
-		SafeRemoveEntity(self)
+	function ENT:Detonate(findTarget)
+		if self.Exploded then return end
+		if findTarget then
+			self:FindTarget(true)
+		end
+
+		local SelfPos, Up = self:LocalToWorld(self:OBBCenter()), Vector(0, 0, 1)
+
+		if IsValid(self:GetTarget()) then
+			local Targ = self:GetTarget()
+			local TargetPos = (IsValid(Targ) and Targ:LocalToWorld(Targ:OBBCenter())) or -Up
+			local Dir = ((TargetPos - SelfPos) + VectorRand() * .01):GetNormalized()
+
+			local Eff = EffectData()
+			Eff:SetOrigin(SelfPos)
+			Eff:SetScale(0.5)
+			Eff:SetNormal(Dir)
+			util.Effect("eff_jack_gmod_efpburst", Eff, true, true)
+			util.ScreenShake(SelfPos, 99999, 99999, .1, 1000)
+			
+			self:EmitSound("snd_jack_fragsplodeclose.wav", 90, 100)
+			JMod.RicPenBullet(self, SelfPos, Dir, (1000 or ((Targ:IsVehicle() or Targ:InVehicle()) and 5000)) * JMod.Config.MinePower, true, true)
+			SafeRemoveEntity(self)
+			self.Exploded = true
+		elseif findTarget then
+			self:Disarm()
+			self.AutoArm = true
+		else
+			JMod.RicPenBullet(self, SelfPos, -self:GetUp(), 1000 * JMod.Config.MinePower, true, true)
+			SafeRemoveEntity(self)
+			self.Exploded = true
+		end
 	end
 
 	function ENT:Arm(armer)
@@ -258,10 +271,37 @@ if SERVER then
 		end)
 	end
 
-	local LerpedMove = 0
-	local AttackDist = 500 --245
+	function ENT:FindTarget(enemyOnly)
+		local SelfPos = self:GetPos()
+		--jprint(tostring(self:GetTarget()) .. " \t " .. tostring(self:GetAlly()))
+		self:SetTarget(nil)
+		for k, targ in pairs(ents.FindInSphere(SelfPos, AttackDist)) do
+			if (targ ~= self) and (targ:IsPlayer() and targ:InVehicle()) or (targ:IsPlayer() or targ:IsNPC() or targ:IsVehicle()) and JMod.ClearLoS(self, targ, true) then
+				
+				local targPos = targ:GetPos()
+
+				if not(IsValid(self:GetTarget())) or (SelfPos:Distance(self:GetTarget():GetPos()) > SelfPos:Distance(targPos)) then
+					if enemyOnly and JMod.ShouldAttack(self, targ) then
+						self:SetTarget(targ)
+					else
+						self:SetTarget(targ)
+					end
+				end
+			end
+		end
+
+		if IsValid(self:GetTarget()) and JMod.ShouldAttack(self, self:GetTarget()) then
+			self.WarningSnd:Play()
+			self:SetAlly(false)
+		else
+			self.WarningSnd:Stop()
+			self:SetAlly(true)
+		end
+	end
+
 	function ENT:Think()
 		local SelfPos, State, Time = self:GetPos(), self:GetState(), CurTime()
+		local Target = self:GetTarget()
 
 		if istable(WireLib) then
 			WireLib.TriggerOutput(self, "State", State)
@@ -273,29 +313,10 @@ if SERVER then
 
 				return true
 			end
-			--jprint(tostring(self:GetTarget()) .. " \t " .. tostring(self:GetAlly()))
-			for k, targ in pairs(ents.FindInSphere(SelfPos, AttackDist)) do
-				if (targ ~= self) and (targ:IsPlayer() and targ:InVehicle()) or (targ:IsPlayer() or targ:IsNPC() or targ:IsVehicle()) and JMod.ClearLoS(self, targ, true) then
-					
-					local targPos = targ:GetPos()
-
-					if not(IsValid(self:GetTarget())) or (SelfPos:Distance(self:GetTarget():GetPos()) > SelfPos:Distance(targPos)) then
-						self:SetTarget(targ)
-					end
-
-					if IsValid(self:GetTarget()) and JMod.ShouldAttack(self, self:GetTarget()) then
-						self.WarningSnd:Play()
-						self:SetAlly(false)
-					else
-						self.WarningSnd:Stop()
-						self:SetAlly(true)
-					end
-				end
-			end
-
-			if IsValid(self:GetTarget()) then
-				local Target, TargetPos = self:GetTarget(), self:GetTarget():GetPos()
-
+			
+			self:FindTarget(false)
+			if IsValid(Target) then
+				local TargetPos = Target:GetPos()
 				if SelfPos:Distance(TargetPos) < AttackDist * 0.75 then
 					if not(self:GetAlly()) then
 						self.WarningSnd:Stop()
@@ -321,10 +342,13 @@ if SERVER then
 			timer.Simple(.3, function()
 				if not IsValid(self) then return end
 				if self:GetPhysicsObject():GetVelocity().z <= 1 and not self:IsPlayerHolding() then
-					self:Detonate()
+					self:FindTarget(true)
+					if IsValid(Target) then
+						self:Detonate(false)
+					end
 				end
 			end)
-			if not IsValid(self:GetTarget()) then 
+			--[[if not IsValid(self:GetTarget()) then 
 				for k, targ in pairs(ents.FindInSphere(SelfPos, AttackDist)) do
 					if (targ ~= self) and JMod.ShouldAttack(self, targ) and JMod.ClearLoS(self, targ, true) then
 						self:SetTarget(targ)
@@ -333,7 +357,7 @@ if SERVER then
 						self:Disarm()
 					end
 				end
-			end
+			end]]--
 
 			self:NextThink(Time)
 
@@ -354,6 +378,17 @@ if SERVER then
 			self:NextThink(Time + .1)
 
 			return true
+		end
+	end
+
+	function ENT:GravGunPunt(ply)
+		if self:GetState() == STATE_HELD then
+			self:SetState(STATE_LAUNCHED)
+			self:EmitSound("npc/roller/mine/rmine_predetonate.wav")
+
+			return true
+		else
+			ply:DropObject()
 		end
 	end
 
