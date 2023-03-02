@@ -281,11 +281,8 @@ if SERVER then
 				local targPos = targ:GetPos()
 
 				if not(IsValid(self:GetTarget())) or (SelfPos:Distance(self:GetTarget():GetPos()) > SelfPos:Distance(targPos)) then
-					if enemyOnly and JMod.ShouldAttack(self, targ) then
-						self:SetTarget(targ)
-					else
-						self:SetTarget(targ)
-					end
+					if enemyOnly and not JMod.ShouldAttack(self, targ) then return end
+					self:SetTarget(targ)
 				end
 			end
 		end
