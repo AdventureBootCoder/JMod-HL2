@@ -10,9 +10,9 @@ ENT.AdminSpawnable = true
 ---
 ENT.JModPreferredCarryAngles = Angle(0, 0, 0)
 ENT.EZguidable = false
-ENT.EZbombBaySize = 6
+ENT.EZbombBaySize = 12
 ---
-local STATE_BROKEN, STATE_OFF, STATE_ARMED = -1, 0, 1
+local STATE_BROKEN, STATE_OFF, STATE_ARMED, STATE_COOKING = -1, 0, 1, 2
 
 function ENT:SetupDataTables()
 	self:NetworkVar("Int", 0, "State")
@@ -37,16 +37,17 @@ if SERVER then
 	end
 
 	function ENT:Initialize()
-		self.Entity:SetModel("models/combine_helicopter/helicopter_bomb01.mdl")
-		self.Entity:PhysicsInit(SOLID_VPHYSICS)
-		self.Entity:SetMoveType(MOVETYPE_VPHYSICS)
-		self.Entity:SetSolid(SOLID_VPHYSICS)
-		self.Entity:DrawShadow(true)
-		self.Entity:SetUseType(SIMPLE_USE)
+		self:SetModel("models/combine_helicopter/helicopter_bomb01.mdl")
+		self:PhysicsInit(SOLID_VPHYSICS)
+		self:SetMoveType(MOVETYPE_VPHYSICS)
+		self:SetSolid(SOLID_VPHYSICS)
+		self:DrawShadow(true)
+		self:SetUseType(SIMPLE_USE)
+		self:SetSkin(1)
 
 		---
 		timer.Simple(.01, function()
-			self:GetPhysicsObject():SetMass(150)
+			--self:GetPhysicsObject():SetMass(150)
 			self:GetPhysicsObject():Wake()
 			self:GetPhysicsObject():EnableDrag(false)
 		end)
@@ -54,6 +55,7 @@ if SERVER then
 		---
 		self:SetState(STATE_OFF)
 		self.LastUse = 0
+		self.CookingTimer = 0
 
 		if istable(WireLib) then
 			self.Inputs = WireLib.CreateInputs(self, {"Detonate", "Arm"}, {"Directly detonates the bomb", "Arms bomb when > 0"})
@@ -78,7 +80,8 @@ if SERVER then
 			end
 
 			if (data.Speed > 500) and (self:GetState() == STATE_ARMED) then
-				self:Detonate()
+				if self:GetState() == STATE_COOKING then return end
+				self:SetState(STATE_COOKING)
 
 				return
 			end
@@ -127,6 +130,7 @@ if SERVER then
 				self:EmitSound("snds_jack_gmod/bomb_arm.wav", 70, 110)
 				self.EZdroppableBombArmedTime = CurTime()
 				JMod.Hint(activator, "impactdet")
+				self:SetSkin(0)
 			else
 				JMod.Hint(activator, "double tap to arm")
 			end
@@ -139,6 +143,7 @@ if SERVER then
 				self:SetState(STATE_OFF)
 				self:EmitSound("snds_jack_gmod/bomb_disarm.wav", 70, 110)
 				self.EZdroppableBombArmedTime = nil
+				self:SetSkin(1)
 			else
 				JMod.Hint(activator, "double tap to disarm")
 			end
@@ -178,10 +183,10 @@ if SERVER then
 		end
 
 		---
-		util.BlastDamage(game.GetWorld(), Att, SelfPos + Vector(0, 0, 300), 350, 100)
+		util.BlastDamage(game.GetWorld(), Att, SelfPos + Vector(0, 0, 300), 700, 140)
 
 		timer.Simple(.25, function()
-			util.BlastDamage(game.GetWorld(), Att, SelfPos, 800, 100)
+			util.BlastDamage(game.GetWorld(), Att, SelfPos, 1600, 120)
 		end)
 
 		for k, ent in pairs(ents.FindInSphere(SelfPos, 250)) do
@@ -220,12 +225,21 @@ if SERVER then
 	end
 
 	function ENT:Think()
+		local State = self:GetState()
 		if istable(WireLib) then
-			WireLib.TriggerOutput(self, "State", self:GetState())
+			WireLib.TriggerOutput(self, "State", State)
 		end
 
 		local Phys, UseAeroDrag = self:GetPhysicsObject(), true
 		--JMod.AeroDrag(self, -self:GetRight(), 6)
+		if State == STATE_COOKING then
+			self.CookingTimer = self.CookingTimer + .1
+			self:SetSkin((self:GetSkin() == 1 and 0) or (self:GetSkin() == 0 and 1))
+			jprint(self.CookingTimer)
+			if self.CookingTimer >= 6 then
+				self:Detonate()
+			end
+		end
 		self:NextThink(CurTime() + .1)
 
 		return true
@@ -250,5 +264,5 @@ elseif CLIENT then
 		self.Mdl:DrawModel()
 	end]]--
 
-	language.Add("ent_jack_gmod_ezhebomb", "EZ Thin-Skinned Bomb")
+	language.Add("ent_jack_gmod_ezhelibomb", "EZ Helicopter Bomb")
 end
