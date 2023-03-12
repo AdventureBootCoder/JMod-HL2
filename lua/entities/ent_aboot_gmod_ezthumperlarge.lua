@@ -201,13 +201,13 @@ if(SERVER)then
 				self.DepositKey = 0
 				self.Weld = nil
 				self:TurnOff()
-				print("[HL:2 - JMOD] Invalid weld")
+				--print("[HL:2 - JMOD] Invalid weld")
 				return
 			end
 
 			if not JMod.NaturalResourceTable[self.DepositKey] then 
 				self:TurnOff()
-				print("[HL:2 - JMOD] Invalid deposit key")
+				--print("[HL:2 - JMOD] Invalid deposit key")
 				return
 			end
 

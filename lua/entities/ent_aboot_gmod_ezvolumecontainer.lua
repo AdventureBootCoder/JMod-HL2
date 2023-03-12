@@ -158,7 +158,7 @@ if SERVER then
 			end
 		end
 		if table.IsEmpty(TrimmedTable) then self:CalcWeight() return end
-		net.Start("ABoot_ContainerMenu")
+		net.Start("ABoot_VolumeContainerMenu")
 			net.WriteEntity(self)
 			net.WriteTable(self.Contents)
 		net.Send(activator)
@@ -166,7 +166,7 @@ if SERVER then
 		self:EmitSound("Ammo_Crate.Open")
 	end
 
-	net.Receive("ABoot_ContainerMenu", function() 
+	net.Receive("ABoot_VolumeContainerMenu", function() 
 		local Container = net.ReadEntity()
 		local StoredEnt = net.ReadString()
 
@@ -379,7 +379,7 @@ elseif CLIENT then
 				if self.enabled then
 					timer.Simple(.5, function()
 						if IsValid(Container) then
-							net.Start("ABoot_ContainerMenu")
+							net.Start("ABoot_VolumeContainerMenu")
 								net.WriteEntity(Container)
 								net.WriteString(index)
 							net.SendToServer()

@@ -188,7 +188,7 @@ if SERVER then
 	end
 
 elseif CLIENT then
-	include("jmod/cl_gui.lua")
+	--include("jmod/cl_gui.lua")
 	local TxtCol = Color(5, 5, 5, 220)
 
 	function ENT:Initialize()
@@ -313,7 +313,7 @@ elseif CLIENT then
 		AmountSlider:SetSize(250, 100) -- Set the size
 		AmountSlider:SetText("Requested Amount") -- Set the text above the slider
 		AmountSlider:SetMin(0) -- Set the minimum number you can slide to
-		AmountSlider:SetMax(10000) -- Set the maximum number you can slide to
+		AmountSlider:SetMax(Container.MaxResource) -- Set the maximum number you can slide to
 		AmountSlider:SetDecimals(0) -- Decimal places - zero for whole number
 		AmountSlider:SetValue(RequestedAmount)
 

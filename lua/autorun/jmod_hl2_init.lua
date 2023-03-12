@@ -78,7 +78,7 @@ if(SERVER)then
 		end
 	end)
 
-	hook.Remove("Think", "JMOD_HL2_THINK")
+	--hook.Remove("Think", "JMOD_HL2_THINK")
 	hook.Add("Think", "JMOD_HL2_THINK", function()
 		local Time = CurTime()
 

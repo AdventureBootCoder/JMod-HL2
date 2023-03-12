@@ -173,7 +173,7 @@ local function DoJump(ply)
 end
 
 local played_sound = false
-hook.Remove("KeyPress", "JMOD_HL2_KEYPRESS")
+--hook.Remove("KeyPress", "JMOD_HL2_KEYPRESS")
 hook.Add("KeyPress", "JMOD_HL2_KEYPRESS", function(ply, key)
 	if ply.IsProne and ply:IsProne() then return end
 	if not(ply.EZarmor and ply.EZarmor.effects and ply.EZarmor.effects.jumpmod) then return end
@@ -195,7 +195,7 @@ hook.Add("KeyPress", "JMOD_HL2_KEYPRESS", function(ply, key)
 	end
 end)
 
-hook.Remove("OnPlayerHitGround", "JMOD_HL2_HITGROUND")
+--hook.Remove("OnPlayerHitGround", "JMOD_HL2_HITGROUND")
 hook.Add("OnPlayerHitGround", "JMOD_HL2_HITGROUND", function(ply, water, float, speed)
 	if not(ply.EZarmor and ply.EZarmor.effects and ply.EZarmor.effects.jumpmod) then return end
 	if water then return end
@@ -213,7 +213,7 @@ hook.Add("OnPlayerHitGround", "JMOD_HL2_HITGROUND", function(ply, water, float, 
 	end
 end)
 
-hook.Remove("GetFallDamage", "JMOD_HL2_FALLDAMAGE")
+--hook.Remove("GetFallDamage", "JMOD_HL2_FALLDAMAGE")
 hook.Add("GetFallDamage", "JMOD_HL2_FALLDAMAGE", function(ply, sped)
 	local Charges = ply:GetNW2Float(tag_counter, 0)
 	local RemaingCharges = Charges - (sped / 800)

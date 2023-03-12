@@ -39,9 +39,6 @@ if(SERVER)then
 		self:SetProgress(0)
 		self.DepositKey = 0
 		self.LastState = 0
-		timer.Simple(0.01, function() 
-			self:TryPlace()
-		end)
 		self:NextThink(1)
 		self.EZupgradable = true
 		--self:SetMaterial("models/aboot/aboot_combinethumper002_mat.vmt")
@@ -95,9 +92,12 @@ if(SERVER)then
 	function ENT:TryPlace()
 		local Tr = util.QuickTrace(self:GetPos() + Vector(0, 0, 30), Vector(0, 0, -50), self)
 		if (Tr.Hit) and (Tr.HitWorld) then
-			local Roll = Tr.HitNormal:Angle().z
-			local Yaw = Tr.HitNormal:Angle().y
-			self:SetAngles(Angle(0, Yaw - 90, 0))
+			local SelfAng = self:GetAngles()
+			local Pitch = math.abs(Tr.HitNormal:Angle().y) > 5 and Tr.HitNormal:Angle().y or 0
+			local Yaw = math.abs(Tr.HitNormal:Angle().y) > 5 and Tr.HitNormal:Angle().y or SelfAng.y
+			local Roll = math.abs(Tr.HitNormal:Angle().r) > 5 and Tr.HitNormal:Angle().z or 0
+			--self:SetAngles(Angle(0, Yaw - 90, 0))
+			self:SetAngles(Angle(Pitch, Yaw, Roll))
 			self:SetPos(Tr.HitPos + Tr.HitNormal * 0.1 * -Roll * 20)
 			--
 			local GroundIsSolid = true
@@ -201,13 +201,13 @@ if(SERVER)then
 				self.DepositKey = 0
 				self.Weld = nil
 				self:TurnOff()
-				print("[HL:2 - JMOD] Invalid weld")
+				--print("[HL:2 - JMOD] Invalid weld")
 				return
 			end
 
 			if not JMod.NaturalResourceTable[self.DepositKey] then 
 				self:TurnOff()
-				print("[HL:2 - JMOD] Invalid deposit key")
+				--print("[HL:2 - JMOD] Invalid deposit key")
 				return
 			end
 
