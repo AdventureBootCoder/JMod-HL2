@@ -215,12 +215,16 @@ end)
 
 --hook.Remove("GetFallDamage", "JMOD_HL2_FALLDAMAGE")
 hook.Add("GetFallDamage", "JMOD_HL2_FALLDAMAGE", function(ply, sped)
+	if not(ply.EZarmor and ply.EZarmor.effects and ply.EZarmor.effects.jumpmod) then return end
 	local Charges = ply:GetNW2Float(tag_counter, 0)
-	local RemaingCharges = Charges - (sped / 800)
+	local RemaingCharges = math.Round(Charges - (sped / 100), 2)
+	local UsedCharges = Charges - RemaingCharges
 	ply:SetNW2Float(tag_counter, RemaingCharges)
-	if  ply:GetNW2Float(tag_counter, 0) > 0 then
+	if ply:GetNW2Float(tag_counter, 0) > 0 then
 		return 0
+	elseif JMod.Config.QoL.RealisticFallDamage then
+		return math.Round((sped ^ 2 / 8000) / (UsedCharges * 5))
 	else
-		return math.Round( (sped ^ 2 / 8000) / ((Charges - RemaingCharges) * 5) )
+		return math.Round(10 / (UsedCharges * 5))
 	end
 end)

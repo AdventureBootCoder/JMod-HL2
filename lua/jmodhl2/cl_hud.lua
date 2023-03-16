@@ -13,7 +13,7 @@ hook.Remove("HUDPaint", "JMOD_HL2_HUDPAINT")
 hook.Add("HUDPaint", "JMOD_HL2_HUDPAINT", function()
 	if not shouldshow:GetBool() then return end
 	local Ply = LocalPlayer()
-	if Ply.EZarmor and Ply.EZarmor.effects and Ply.EZarmor.effects.jumpmod then
+	if Ply:Alive() and Ply.EZarmor and Ply.EZarmor.effects and Ply.EZarmor.effects.jumpmod then
 
 		local x = x_offset:GetInt()
 		local y = y_offset:GetInt()
