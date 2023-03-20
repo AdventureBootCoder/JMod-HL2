@@ -22,106 +22,180 @@ local HEVArmorProtectionProfile={
 	[DMG_ACID]= .5
 }
 
-JMod.AdditionalArmorTable["ABoot HEV Suit"]={
-	PrintName = "EZ HEV Suit",
-	Category = "JMod - EZ HL:2",
-	mdl = "models/blackmesa/props_generic/bm_hevcrate01.mdl",
-	--mat="models/props_generic/bm_hevcrate01_skin0.vmt",
-	lbl = "MK.II HEV SUIT",
-	clr = {  r = 189, g = 100, b = 24 },
-	clrForced = false,
-	slots={
-		eyes = 1,
-		mouthnose = 1,
-		head = 1,
-		chest = 1,
-		abdomen = 1,
-		pelvis = 1,
-		leftthigh = 1,
-		leftcalf = 1,
-		rightthigh = 1,
-		rightcalf = 1,
-		rightshoulder = 1,
-		rightforearm = 1,
-		leftshoulder = 1,
-		leftforearm = 1
-	},
-	def=table.Inherit({
-		[DMG_NERVEGAS]=1,
-		[DMG_RADIATION]=1,
-		[DMG_ACID]=1,
-		[DMG_POISON]=1,
-	},HEVArmorProtectionProfile),
-	resist={
-		[DMG_ACID]=.90,
-		[DMG_POISON]=.99
-	},
-	chrg={
-		chemicals = 50
-	},
-	snds={
-		eq="hl1/fvox/bell.wav",
-		uneq="hl1/fvox/deactivated.wav"
-	},
-	eff={
-		HEVsuit = true,
-		speedBoost = 1.2
-	},
-	plymdl="models/aboot/player/hev_suit.mdl", -- https://steamcommunity.com/sharedfiles/filedetails/?id=1341386337&searchtext=hev+suit
-	mskmat="mats_aboot_gmod_sprites/helmet_vignette1.png",
-	sndlop="snds_jack_gmod/mask_breathe.wav",
-	wgt = 40,
-	dur = 625,
-	ent = "ent_aboot_gmod_ezarmor_hev"
+local NonArmorProtectionProfile = {
+	[DMG_BUCKSHOT] = .05,
+	[DMG_BLAST] = .05,
+	[DMG_BULLET] = .05,
+	[DMG_SNIPER] = .05,
+	[DMG_AIRBOAT] = .05,
+	[DMG_CLUB] = .05,
+	[DMG_SLASH] = .05,
+	[DMG_CRUSH] = .05,
+	[DMG_VEHICLE] = .05,
+	[DMG_BURN] = .05,
+	[DMG_PLASMA] = .05,
+	[DMG_ACID] = .05
 }
-JMod.AdditionalArmorTable["ABoot Jump Module"]={
-	PrintName = "EZ Jump Module",
-	Category = "JMod - EZ HL:2",
-	mdl = "models/blackmesa/jumpmod/w_longjump.mdl",
-	clr = { r = 189, g = 100, b = 24 },
-	clrForced = false,
-	slots = {
-		back = 1
+
+JMod.HL2ArmorTable = {
+	["ABoot HEV Suit"]={
+		PrintName = "EZ HEV Suit",
+		Category = "JMod - EZ HL:2",
+		mdl = "models/blackmesa/props_generic/bm_hevcrate01.mdl",
+		--mat="models/props_generic/bm_hevcrate01_skin0.vmt",
+		lbl = "MK.II HEV SUIT",
+		clr = {  r = 189, g = 100, b = 24 },
+		clrForced = false,
+		slots={
+			eyes = 1,
+			mouthnose = 1,
+			head = 1,
+			chest = 1,
+			abdomen = 1,
+			pelvis = 1,
+			leftthigh = 1,
+			leftcalf = 1,
+			rightthigh = 1,
+			rightcalf = 1,
+			rightshoulder = 1,
+			rightforearm = 1,
+			leftshoulder = 1,
+			leftforearm = 1
+		},
+		def=table.Inherit({
+			[DMG_NERVEGAS]=1,
+			[DMG_RADIATION]=1,
+			[DMG_ACID]=1,
+			[DMG_POISON]=1,
+		},HEVArmorProtectionProfile),
+		resist={
+			[DMG_ACID]=.90,
+			[DMG_POISON]=.99
+		},
+		chrg={
+			chemicals = 50
+		},
+		snds={
+			eq="hl1/fvox/bell.wav",
+			uneq="hl1/fvox/deactivated.wav"
+		},
+		eff={
+			HEVsuit = true,
+			speedBoost = 1.2
+		},
+		plymdl="models/aboot/player/hev_suit.mdl", -- https://steamcommunity.com/sharedfiles/filedetails/?id=1341386337&searchtext=hev+suit
+		mskmat="mats_aboot_gmod_sprites/helmet_vignette1.png",
+		sndlop="snds_jack_gmod/mask_breathe.wav",
+		wgt = 40,
+		dur = 625,
+		ent = "ent_aboot_gmod_ezarmor_hev"
 	},
-	def=table.Inherit({
-		[DMG_NERVEGAS]=1,
-		[DMG_RADIATION]=1,
-		[DMG_ACID]=1,
-		[DMG_POISON]=1,
-	},HEVArmorProtectionProfile),
-	resist={
-		[DMG_ACID]=.75,
-		[DMG_POISON]=.90
+	["ABoot Jump Module"]={
+		PrintName = "EZ Jump Module",
+		Category = "JMod - EZ HL:2",
+		mdl = "models/blackmesa/jumpmod/w_longjump.mdl",
+		clr = { r = 189, g = 100, b = 24 },
+		clrForced = false,
+		slots = {
+			back = 1
+		},
+		def=table.Inherit({
+			[DMG_NERVEGAS]=1,
+			[DMG_RADIATION]=1,
+			[DMG_ACID]=1,
+			[DMG_POISON]=1,
+		},HEVArmorProtectionProfile),
+		resist={
+			[DMG_ACID]=.75,
+			[DMG_POISON]=.90
+		},
+		chrg={
+			power = 30
+		},
+		snds={
+			eq="aboot_jumpmod/bootup_sequence/bootup_jetconnects.wav",
+			uneq="aboot_jumpmod/bootup_sequence/bootup_moduleacq.wav"
+		},
+		eff={
+			jumpmod = true
+		},
+		bon = "ValveBiped.Bip01_Spine2",
+		siz = Vector(.7, .7, .7),
+		pos = Vector(0, 5, 0),
+		ang = Angle(0, 0, 90),
+		wgt = 20,
+		dur = 100,
+		HEVreq = true,
+		ent = "ent_aboot_gmod_ezarmor_jumpmodule"
 	},
-	chrg={
-		power = 30
-	},
-	snds={
-		eq="aboot_jumpmod/bootup_sequence/bootup_jetconnects.wav",
-		uneq="aboot_jumpmod/bootup_sequence/bootup_moduleacq.wav"
-	},
-	eff={
-		jumpmod = true
-	},
-	bon = "ValveBiped.Bip01_Spine2",
-	siz = Vector(.7, .7, .7),
-	pos = Vector(0, 5, 0),
-	ang = Angle(0, 0, 90),
-	wgt = 20,
-	dur = 100,
-	HEVreq = true,
-	ent = "ent_aboot_gmod_ezarmor_jumpmodule"
+	["Aboot Headcrab"] = {
+		PrintName = "Headcrab Armor",
+		Category = "JMod - EZ HL:2",
+		mdl = "models/headcrabclassic.mdl",
+		Spawnable = false,
+		clr = { r = 255, g = 255, b = 255 },
+		clrForced = true,
+		slots = {
+			eyes = 1,
+			mouthnose = 1,
+			head = 1,
+			ears = 1
+		},
+		def = table.Inherit({
+			[DMG_NERVEGAS]=1,
+			[DMG_RADIATION]=1,
+			[DMG_ACID]=1,
+			[DMG_POISON]=1,
+		}, NonArmorProtectionProfile),
+		resist={
+			[DMG_ACID]=.75,
+			[DMG_POISON]=.90
+		},
+		eff={
+			zombie = true
+		},
+		snds={
+			eq="npc/headcrab/headbite.wav",
+			uneq="npc/headcrab/pain1.wav"
+		},
+		bon = "ValveBiped.Bip01_Head1",
+		siz = Vector(1, 1, 1),
+		pos = Vector(6, -3, 0),
+		ang = Angle(270, 0, 270),
+		wgt = 5,
+		dur = 20,
+		mskmat="mats_aboot_gmod_sprites/headcrab_vignette.png",
+		ent = "ent_aboot_gmod_ezarmor_headcrab"
+	}
 }
+
 local function LoadAdditionalArmor()
-	if JMod.AdditionalArmorTable and JMod.ArmorTable then
-		table.Merge(JMod.ArmorTable, JMod.AdditionalArmorTable)
-		JMod.GenerateArmorEntities(JMod.AdditionalArmorTable)
+	if JMod.HL2ArmorTable and JMod.ArmorTable then
+		table.Merge(JMod.ArmorTable, JMod.HL2ArmorTable)
+		JMod.GenerateArmorEntities(JMod.HL2ArmorTable)
 	end
 end
 
 LoadAdditionalArmor()
 local tag = "aboot_jumpmod"
 local tag_counter = tag .. "_counter"
+
+hook.Add("StartCommand", "JMOD_HL2_ZOMBIE_MOVE", function(ply,cmd)
+	local Time = CurTime()
+	if ply.EZarmor and ply.EZarmor.effects and ply.EZarmor.effects.zombie then
+		ply.EZzombieTime = ply.EZzombieTime or 0
+		cmd:ClearMovement()
+		local RandDir = (cmd:GetViewAngles():Forward() + VectorRand(-0.1, 0.1)):Angle()
+		cmd:SetViewAngles(Angle(0, RandDir.y, 0))
+		cmd:SetForwardMove(50)
+		cmd:SetButtons(IN_ATTACK)
+		if ply.EZzombieTime < Time then
+			ply.EZzombieTime = Time + math.Rand(3, 10)
+			ply:EmitSound("npc/zombie/zombie_alert"..tostring(math.random(1, 3))..".wav")
+			ply:ConCommand("act zombie")
+		end
+	end
+end)
 
 hook.Add("Move", "JMOD_HL2_ARMOR_MOVE", function(ply, mv, cmd)
     if mv:KeyDown(IN_SPEED)then 

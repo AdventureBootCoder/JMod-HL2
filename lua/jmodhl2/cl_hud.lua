@@ -9,7 +9,7 @@ local y_offset = CreateClientConVar(tag .. "_hud_y", SCR_H * OFFSET_H)
 local BAR_WIDTH, BAR_HEIGHT, MARGIN = 0.0075, 0.065, 0.002
 local BLACK, BAR_COL_FULL, BAR_COL_EMPTY = Color(0, 0, 0, 80), Color(255, 236, 12, 240), Color(255, 0, 0, 105)
 
-hook.Remove("HUDPaint", "JMOD_HL2_HUDPAINT")
+--hook.Remove("HUDPaint", "JMOD_HL2_HUDPAINT")
 hook.Add("HUDPaint", "JMOD_HL2_HUDPAINT", function()
 	if not shouldshow:GetBool() then return end
 	local Ply = LocalPlayer()
