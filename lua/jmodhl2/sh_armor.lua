@@ -5,6 +5,7 @@ list.Set( "PlayerOptionsModel", "ABoot HEV Suit",
 player_manager.AddValidHands( "ABoot HEV Suit", 
 "models/ragenigga/viewmodels/c_arms_classic.mdl", 0, "00000000" )
 
+JMod = JMod or {}
 JMod.AdditionalArmorTable = JMod.AdditionalArmorTable or {}
 
 local HEVArmorProtectionProfile={
@@ -169,7 +170,6 @@ JModHL2.ArmorTable = {
 }
 
 local function HL2LoadAdditionalArmor()
-	JMod.AdditionalArmorTable = JMod.AdditionalArmorTable or {}
 	if JModHL2.ArmorTable then
 		table.Merge(JMod.AdditionalArmorTable, JModHL2.ArmorTable)
 	end
