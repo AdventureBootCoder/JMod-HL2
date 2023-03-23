@@ -5,7 +5,7 @@ list.Set( "PlayerOptionsModel", "ABoot HEV Suit",
 player_manager.AddValidHands( "ABoot HEV Suit", 
 "models/ragenigga/viewmodels/c_arms_classic.mdl", 0, "00000000" )
 
-JMod.ArmorTable = JMod.ArmorTable or {}
+JModHL2.ArmorTable = JModHL2.ArmorTable or {}
 
 local HEVArmorProtectionProfile={
 	[DMG_BUCKSHOT]= .33,
