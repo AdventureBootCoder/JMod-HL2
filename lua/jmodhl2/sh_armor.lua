@@ -197,7 +197,6 @@ hook.Add("StartCommand", "JMOD_HL2_ZOMBIE_MOVE", function(ply,cmd)
 	end
 end)
 
-local CHARGE_POWER = 500
 hook.Add("Move", "JMOD_HL2_ARMOR_MOVE", function(ply, mv)
 	if ply.IsProne and ply:IsProne() or ply:GetMoveType() ~= MOVETYPE_WALK then return end
 	local Time = CurTime()
@@ -211,42 +210,8 @@ hook.Add("Move", "JMOD_HL2_ARMOR_MOVE", function(ply, mv)
 				mv:SetMaxClientSpeed(origClientSpeed * ply.EZarmor.effects.speedBoost)
 			end
 		end
-		--[[if not ply:OnGround() and ply.EZarmor.effects.jumpmod and (ply.NextFallSaveTime or 0) <= Time then
-			if SERVER and IsFirstTimePredicted() then
-				local Vel = ply:GetVelocity()
-				local DownSped = -Vel.z
-				if DownSped >= 500 then
-					local Charges = ply:GetNW2Float(tag_counter, 0)
-					local PlyPos = ply:GetPos()
-					local Tr = util.TraceLine({
-						start = PlyPos, 
-						endpos = PlyPos + Vector(0, 0, -100), 
-						mask = MASK_SOLID,
-						filter = ply
-					})
-					--jprint(DownSped / CHARGE_POWER)
-					if Tr.Hit then
-						ply.NextFallSaveTime = Time + 1
-						local UsedCharges = math.Clamp((DownSped / CHARGE_POWER) + .25, 0, 3)
-						local UpThrust = Vector(0, 0, (UsedCharges * CHARGE_POWER) ^ 1.5)
-						--jprint(Charges, UsedCharges, Charges - UsedCharges)
-						--jprint((DownSped / CHARGE_POWER), DownSped - (UsedCharges * CHARGE_POWER))
-						--jprint(Vel.z)
-						ply:SetVelocity(UpThrust)
-						ply:SetNW2Float(tag_counter, Charges - UsedCharges)
-						if DownSped > 1000 and UsedCharges >= 1 then
-							ply:EmitSound(JModHL2.EZ_JUMPSNDS.LONGFALL, 75, 100, 0.7)
-						elseif UsedCharges > 0.1 then
-							ply:EmitSound(JModHL2.EZ_JUMPSNDS.FALL, 70, 100, 0.7)
-						end
-					end
-				end
-			end
-		end]]--
 	end
 end)
-
---hook.Add("PlayerPostThink", "JMod_HL2_FALL_PROTECTION", function(ply) end)
 
 local function DoJump(ply)
 	local Charges = ply:GetNW2Float(tag_counter, 0)
@@ -254,14 +219,15 @@ local function DoJump(ply)
 	if Charges < 1 then return end
 	if not ply:GetNW2Bool("EZjumpmod_canuse", false) then return end
 
-	local Vel = ply:GetVelocity()
-	local Aim = ply:EyeAngles():Up()
+	--local Vel = ply:GetVelocity()
+	local Aim = ply:EyeAngles()
+	--Aim.p = math.Clamp(Aim.p, 0, 90)
 
 	--[[local NewVel = Vector(Aim.x * 500, Aim.y * 500, 0)
 	NewVel.x = math.Clamp(NewVel.x, -500, 500) * .5
 	NewVel.y = math.Clamp(NewVel.y, -500, 500) * .5
 	NewVel.z = math.Clamp(Vel.z, 100, 100) * 2.5]]--
-	NewVel = Aim * 500
+	NewVel = Aim:Up() * 400
 
 	ply:SetVelocity(NewVel)
 	if not IsFirstTimePredicted() then return end
