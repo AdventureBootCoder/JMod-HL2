@@ -39,9 +39,9 @@ hook.Add("HUDPaint", "JMOD_HL2_HUDPAINT", function()
 		surface.SetDrawColor(bar1 < 1 and BAR_COL_EMPTY or BAR_COL_FULL)
 		surface.DrawRect(x + (SCR_W * (BAR_WIDTH + MARGIN) * 2), y - (SCR_H * (bar1 * BAR_HEIGHT)), SCR_W * BAR_WIDTH, SCR_H * (bar1 * BAR_HEIGHT))
 		if Ply:GetNW2Bool("EZjumpmod_canuse", false) and charge >= 1 then
-			draw.DrawText("READY", "HudDefault", x + (SCR_W * (BAR_WIDTH + MARGIN) * 3), y - (SCR_H * BAR_HEIGHT) + 50, BAR_COL_FULL, TEXT_ALIGN_LEFT)
+			draw.DrawText("READY", "HudDefault", x + (SCR_W * (BAR_WIDTH + MARGIN) * 3.2), y - (SCR_H * BAR_HEIGHT) + 50, BAR_COL_FULL, TEXT_ALIGN_LEFT)
 		else
-			draw.DrawText("WAIT", "HudDefault", x + (SCR_W * (BAR_WIDTH + MARGIN) * 3), y - (SCR_H * BAR_HEIGHT) + 50, BAR_COL_EMPTY, TEXT_ALIGN_LEFT)
+			draw.DrawText("WAIT", "HudDefault", x + (SCR_W * (BAR_WIDTH + MARGIN) * 3.2), y - (SCR_H * BAR_HEIGHT) + 50, BAR_COL_EMPTY, TEXT_ALIGN_LEFT)
 		end
 	end
 end)

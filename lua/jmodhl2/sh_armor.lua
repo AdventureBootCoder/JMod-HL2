@@ -5,7 +5,7 @@ list.Set( "PlayerOptionsModel", "ABoot HEV Suit",
 player_manager.AddValidHands( "ABoot HEV Suit", 
 "models/ragenigga/viewmodels/c_arms_classic.mdl", 0, "00000000" )
 
-JMod.AdditionalArmorTable = JMod.AdditionalArmorTable or {}
+JMod.ArmorTable = JMod.ArmorTable or {}
 
 local HEVArmorProtectionProfile={
 	[DMG_BUCKSHOT]= .33,
@@ -42,7 +42,6 @@ JMod.HL2ArmorTable = {
 		PrintName = "EZ HEV Suit",
 		Category = "JMod - EZ HL:2",
 		mdl = "models/blackmesa/props_generic/bm_hevcrate01.mdl",
-		--mat="models/props_generic/bm_hevcrate01_skin0.vmt",
 		lbl = "MK.II HEV SUIT",
 		clr = {  r = 189, g = 100, b = 24 },
 		clrForced = false,
@@ -176,7 +175,8 @@ local function LoadAdditionalArmor()
 	end
 end
 
-LoadAdditionalArmor()
+hook.Add("Initialize", "JModHL2_LoadAdditionalArmor", LoadAdditionalArmor)
+
 local tag = "aboot_jumpmod"
 local tag_counter = tag .. "_counter"
 
@@ -197,18 +197,56 @@ hook.Add("StartCommand", "JMOD_HL2_ZOMBIE_MOVE", function(ply,cmd)
 	end
 end)
 
-hook.Add("Move", "JMOD_HL2_ARMOR_MOVE", function(ply, mv, cmd)
-    if mv:KeyDown(IN_SPEED)then 
-		if ply.IsProne and ply:IsProne() then return end
+local CHARGE_POWER = 500
+hook.Add("Move", "JMOD_HL2_ARMOR_MOVE", function(ply, mv)
+	if ply.IsProne and ply:IsProne() or ply:GetMoveType() ~= MOVETYPE_WALK then return end
+	local Time = CurTime()
 
-		if ply.EZarmor and ply.EZarmor.effects and ply.EZarmor.effects.speedBoost then
-			local origSpeed = mv:GetMaxSpeed()
-			local origClientSpeed = mv:GetMaxClientSpeed()
-			mv:SetMaxSpeed(origSpeed * ply.EZarmor.effects.speedBoost)
-			mv:SetMaxClientSpeed(origClientSpeed * ply.EZarmor.effects.speedBoost)
+	if ply.EZarmor and ply.EZarmor.effects then
+		if mv:KeyDown(IN_SPEED)then
+			if ply.EZarmor.effects.speedBoost then
+				local origSpeed = mv:GetMaxSpeed()
+				local origClientSpeed = mv:GetMaxClientSpeed()
+				mv:SetMaxSpeed(origSpeed * ply.EZarmor.effects.speedBoost)
+				mv:SetMaxClientSpeed(origClientSpeed * ply.EZarmor.effects.speedBoost)
+			end
 		end
+		--[[if not ply:OnGround() and ply.EZarmor.effects.jumpmod and (ply.NextFallSaveTime or 0) <= Time then
+			if SERVER and IsFirstTimePredicted() then
+				local Vel = ply:GetVelocity()
+				local DownSped = -Vel.z
+				if DownSped >= 500 then
+					local Charges = ply:GetNW2Float(tag_counter, 0)
+					local PlyPos = ply:GetPos()
+					local Tr = util.TraceLine({
+						start = PlyPos, 
+						endpos = PlyPos + Vector(0, 0, -100), 
+						mask = MASK_SOLID,
+						filter = ply
+					})
+					--jprint(DownSped / CHARGE_POWER)
+					if Tr.Hit then
+						ply.NextFallSaveTime = Time + 1
+						local UsedCharges = math.Clamp((DownSped / CHARGE_POWER) + .25, 0, 3)
+						local UpThrust = Vector(0, 0, (UsedCharges * CHARGE_POWER) ^ 1.5)
+						--jprint(Charges, UsedCharges, Charges - UsedCharges)
+						--jprint((DownSped / CHARGE_POWER), DownSped - (UsedCharges * CHARGE_POWER))
+						--jprint(Vel.z)
+						ply:SetVelocity(UpThrust)
+						ply:SetNW2Float(tag_counter, Charges - UsedCharges)
+						if DownSped > 1000 and UsedCharges >= 1 then
+							ply:EmitSound(JModHL2.EZ_JUMPSNDS.LONGFALL, 75, 100, 0.7)
+						elseif UsedCharges > 0.1 then
+							ply:EmitSound(JModHL2.EZ_JUMPSNDS.FALL, 70, 100, 0.7)
+						end
+					end
+				end
+			end
+		end]]--
 	end
 end)
+
+--hook.Add("PlayerPostThink", "JMod_HL2_FALL_PROTECTION", function(ply) end)
 
 local function DoJump(ply)
 	local Charges = ply:GetNW2Float(tag_counter, 0)
@@ -217,14 +255,15 @@ local function DoJump(ply)
 	if not ply:GetNW2Bool("EZjumpmod_canuse", false) then return end
 
 	local Vel = ply:GetVelocity()
-	local Aim = ply:GetForward()
+	local Aim = ply:EyeAngles():Up()
 
-	local NewVel = Vector(Aim.x * 500, Aim.y * 500, 0)
+	--[[local NewVel = Vector(Aim.x * 500, Aim.y * 500, 0)
 	NewVel.x = math.Clamp(NewVel.x, -500, 500) * .5
 	NewVel.y = math.Clamp(NewVel.y, -500, 500) * .5
-	NewVel.z = math.Clamp(Vel.z, 100, 100) * 2.5
+	NewVel.z = math.Clamp(Vel.z, 100, 100) * 2.5]]--
+	NewVel = Aim * 500
 
-	ply:SetVelocity(NewVel * 1)
+	ply:SetVelocity(NewVel)
 	if not IsFirstTimePredicted() then return end
 
 	if SERVER then
@@ -278,27 +317,28 @@ hook.Add("OnPlayerHitGround", "JMOD_HL2_HITGROUND", function(ply, water, float, 
 	ply:SetNW2Bool("EZjumpmod_canuse", true)
 	timer.Stop(ply:Nick().."jumpmod_timer")
 	ply.played_sound = false
-	if SERVER and IsFirstTimePredicted() then
+	--[[if SERVER and IsFirstTimePredicted() then
 		if speed > 1000 then
 			ply:EmitSound(JModHL2.EZ_JUMPSNDS.LONGFALL, 75, 100, 0.7)
 		elseif speed > 525 then
 			ply:EmitSound(JModHL2.EZ_JUMPSNDS.FALL, 70, 100, 0.7)
 		end
-	end
+	end]]--
 end)
 
---hook.Remove("GetFallDamage", "JMOD_HL2_FALLDAMAGE")
-hook.Add("GetFallDamage", "JMOD_HL2_FALLDAMAGE", function(ply, sped)
+hook.Remove("GetFallDamage", "JMOD_HL2_FALLDAMAGE")
+--[[hook.Add("GetFallDamage", "JMOD_HL2_FALLDAMAGE", function(ply, sped)
 	if not(ply.EZarmor and ply.EZarmor.effects and ply.EZarmor.effects.jumpmod) then return end
-	local Charges = ply:GetNW2Float(tag_counter, 0)
-	local RemaingCharges = math.Round(Charges - (sped / 100), 2)
-	local UsedCharges = Charges - RemaingCharges
-	ply:SetNW2Float(tag_counter, RemaingCharges)
-	if ply:GetNW2Float(tag_counter, 0) > 0 then
+	local SpedDamage = sped ^ 2 / 8000
+	local Charges, ChargePower = ply:GetNW2Float(tag_counter, 0), 30
+	local RemainingCharges = math.Clamp(math.Round(Charges - (SpedDamage / ChargePower), 2), 0, 3)
+	local UsedCharges = Charges - RemainingCharges
+	ply:SetNW2Float(tag_counter, RemainingCharges)
+	if RemainingCharges > 0.0 then
 		return 0
 	elseif JMod.Config.QoL.RealisticFallDamage then
-		return math.Round((sped ^ 2 / 8000) / (UsedCharges * 5))
+		return math.Round((SpedDamage) / (UsedCharges * ChargePower))
 	else
-		return math.Round(10 / (UsedCharges * 5))
+		return math.Round(10 / (UsedCharges * 10))
 	end
-end)
+end)]]--
