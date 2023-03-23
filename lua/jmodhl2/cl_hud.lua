@@ -43,5 +43,8 @@ hook.Add("HUDPaint", "JMOD_HL2_HUDPAINT", function()
 		else
 			draw.DrawText("WAIT", "HudDefault", x + (SCR_W * (BAR_WIDTH + MARGIN) * 3.2), y - (SCR_H * BAR_HEIGHT) + 50, BAR_COL_EMPTY, TEXT_ALIGN_LEFT)
 		end
+		local Tr = util.QuickTrace(Ply:GetPos(), Vector(0, 0, -9e9), Ply)
+		local Dist = math.Round(Ply:GetPos():Distance(Tr.HitPos) / 10) * 10
+		draw.DrawText("ALT: "..tostring(Dist), "HudDefault", x + (SCR_W * (BAR_WIDTH + MARGIN) * 3.2), y - (SCR_H * BAR_HEIGHT) + 25, BAR_COL_FULL, TEXT_ALIGN_LEFT)
 	end
 end)

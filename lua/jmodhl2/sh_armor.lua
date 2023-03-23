@@ -37,7 +37,7 @@ local NonArmorProtectionProfile = {
 	[DMG_ACID] = .05
 }
 
-JMod.HL2ArmorTable = {
+JModHL2.ArmorTable = {
 	["ABoot HEV Suit"]={
 		PrintName = "EZ HEV Suit",
 		Category = "JMod - EZ HL:2",
@@ -168,14 +168,14 @@ JMod.HL2ArmorTable = {
 	}
 }
 
-local function LoadAdditionalArmor()
-	if JMod.HL2ArmorTable and JMod.ArmorTable then
-		table.Merge(JMod.ArmorTable, JMod.HL2ArmorTable)
-		JMod.GenerateArmorEntities(JMod.HL2ArmorTable)
+local function HL2LoadAdditionalArmor()
+	JMod.AdditionalArmorTable = JMod.AdditionalArmorTable or {}
+	if JModHL2.ArmorTable then
+		table.Merge(JMod.AdditionalArmorTable, JModHL2.ArmorTable)
 	end
 end
 
-hook.Add("Initialize", "JModHL2_LoadAdditionalArmor", LoadAdditionalArmor)
+HL2LoadAdditionalArmor()
 
 local tag = "aboot_jumpmod"
 local tag_counter = tag .. "_counter"
