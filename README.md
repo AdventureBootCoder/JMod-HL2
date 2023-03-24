@@ -1,4 +1,4 @@
 # JMod-HL2
-A HL:2 compatibility addon for JMod
+This mod aims to recreate, and create new, Half Life 2 entities to work with JMod.
 
-JMod: https://github.com/Jackarunda/gmod
+JMod (Required for this to work): https://github.com/Jackarunda/gmod
