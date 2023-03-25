@@ -21,12 +21,12 @@ if SERVER then
 		if IsValid(self.TeleMarker) then 
 			self.TeleMarker:SetActivated(true)
 		end
-		timer.Simple(3, function()
+		timer.Simple(2, function()
 			if IsValid(self) then
 				self:Detonate()
 			end
 		end)
-		timer.Simple(2.5, function()
+		timer.Simple(1.5, function()
 			if not(IsValid(self)) then return end
 			self:EmitSound("snd_jack_wormhole.wav", 105, 100, 1)
 			local PortalOpen = EffectData()
@@ -90,15 +90,16 @@ if SERVER then
 			if not IsValid(self.TeleMarker) then return end 
 			for _, v in pairs(ents.FindInSphere(self.TeleMarker:GetPos(), self.TeleRange)) do
 				if self.TeleMarker:ShouldTeleport(v) then
+					local BBMin, BBMax = v:GetCollisionBounds()
+					if v:IsPlayer() and v:Alive() then
+						BBMin, BBMax = v:GetHull()
+					end
+					local FailPercent = 0
 					for i = 1, 100 do
-						local BBMin, BBMax = v:GetCollisionBounds()
-						if v:IsPlayer() and v:Alive() then
-							BBMin, BBMax = v:GetHull()
-						end
 						--print(v, BBMin, BBMax)
 						--local RelativeVec = self.TeleMarker:GetPos() - v:GetPos()
 						local RandomVec = VectorRand(10, self.TeleRange)
-						RandomVec[3] = RandomVec[3] * 0.25 -- We don't need it to go up or down very much.
+						RandomVec[3] = RandomVec[3] * 0.5 -- We don't need it to go up or down very much.
 						local EndVec = SelfPos + RandomVec
 						local StartVec = SelfPos + Vector(0, 0, 1 + BBMin[3])
 
@@ -111,17 +112,16 @@ if SERVER then
 							filter = self
 						})
 						--Note to self, make striders break on cetain explosions
-						--print(v, self:WorldToLocal(RelativeVec), BBcheck.Hit)
 						if not BBcheck.StartSolid then
 							v:SetPos(BBcheck.HitPos)
 							v:GetPhysicsObject():Wake()
 							v:SetVelocity(self:GetPhysicsObject():GetVelocity())
-							--[[if v:IsPlayer() then
+							if v:IsPlayer() then
 								local HeldEnt = v:GetEntityInUse()
 								if IsValid(HeldEnt) and IsValid(HeldEnt:GetPhysicsObject()) then
 									HeldEnt:SetPos(v:GetPos() + Vector(10, 10, 30))
 								end
-							end]]--
+							end
 							--[[timer.Simple(math.Rand(0.1, 0.5), function()
 								if IsValid(v) and v:GetPhysicsObject():IsPenetrating() then
 									local DisDmg = DamageInfo()
@@ -133,8 +133,11 @@ if SERVER then
 								end
 							end)]]--
 							break
+						else
+							FailPercent = FailPercent + 1
 						end
 					end
+					print(v, FailPercent / 100)
 				end
 			end
 			self.TeleMarker:SetActivated(false)

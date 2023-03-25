@@ -66,7 +66,7 @@ if SERVER then
 
 				self:EmitSound("weapons/physcannon/physcannon_charge.wav", 90, 60)
 
-				timer.Simple(2.5, function()
+				timer.Simple(1.5, function()
 					if not(IsValid(self)) then return end
 					self:EmitSound("snd_jack_wormhole.wav", 105, 100, 1)
 					local PortalOpen = EffectData()
@@ -124,7 +124,7 @@ elseif CLIENT then
 			
 			local Delta = FrameTime()
 			self.Rotation = self.Rotation + Delta * 100
-			self.Scl = self.Scl + Delta
+			self.Scl = self.Scl + Delta * 2
 		end
 	end
 
@@ -149,8 +149,8 @@ elseif CLIENT then
 			end
 
 			local Delta = FrameTime()
-			self.ColorMods["$pp_colour_brightness"] = self.ColorMods["$pp_colour_brightness"] + 0.3 * Delta
-			self.ColorMods["$pp_colour_contrast"] = self.ColorMods["$pp_colour_contrast"] + 0.02 * Delta
+			self.ColorMods["$pp_colour_brightness"] = self.ColorMods["$pp_colour_brightness"] + 0.5 * Delta
+			self.ColorMods["$pp_colour_contrast"] = self.ColorMods["$pp_colour_contrast"] + 0.04 * Delta
 			--self.ColorMods["$pp_colour_colour"] = self.ColorMods["$pp_colour_colour"] - 1 * Delta
 		end
 		if Active ~= self.LastState then
