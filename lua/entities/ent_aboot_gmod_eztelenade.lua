@@ -101,7 +101,7 @@ if SERVER then
 						local RandomVec = VectorRand(10, self.TeleRange)
 						RandomVec[3] = RandomVec[3] * 0.5 -- We don't need it to go up or down very much.
 						local EndVec = SelfPos + RandomVec
-						local StartVec = SelfPos + Vector(0, 0, 1 + BBMin[3])
+						local StartVec = SelfPos + Vector(math.random(BBMin[1], BBMax[1]), math.random(BBMin[2], BBMax[2]), 1 + BBMin[3])
 
 						local BBcheck = util.TraceHull({
 							start = StartVec,
@@ -111,7 +111,6 @@ if SERVER then
 							mask = MASK_SOLID,
 							filter = self
 						})
-						--Note to self, make striders break on cetain explosions
 						if not BBcheck.StartSolid then
 							v:SetPos(BBcheck.HitPos)
 							v:GetPhysicsObject():Wake()
