@@ -1,8 +1,8 @@
-﻿-- Jackarunda 2021
+﻿-- AdventureBoots 2023
 AddCSLuaFile()
 ENT.Type = "anim"
 ENT.PrintName = "EZ Experimental Container"
-ENT.Author = "Jackarunda, AdventureBoots"
+ENT.Author = "AdventureBoots"
 ENT.Category = "JMod - EZ HL:2"
 ENT.NoSitAllowed = true
 ENT.Spawnable = false

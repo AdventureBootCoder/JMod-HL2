@@ -177,7 +177,7 @@ if SERVER then
 		if self:GetResource() <= 0 then return end
 		local Wep = ply:GetActiveWeapon()
 
-		if Wep then
+		if IsValid(Wep) then
 			local PrimType, SecType, PrimSize, SecSize = (ammotype and game.GetAmmoID(ammoType)) or Wep:GetPrimaryAmmoType(), Wep:GetSecondaryAmmoType(), Wep:GetMaxClip1(), Wep:GetMaxClip2()
 			local PrimMax, SecMax, PrimName, SecName = game.GetAmmoMax(PrimType), game.GetAmmoMax(SecType), game.GetAmmoName(PrimType), game.GetAmmoName(SecType)
 			
