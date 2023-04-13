@@ -141,7 +141,7 @@ if(SERVER)then
 	
 	function ENT:TurnOff()
 		self:SetState(STATE_OFF)
-		self:ProduceResource(self:GetProgress())
+		self:ProduceResource()
 		self:EmitSound("ambient/machines/thumper_shutdown1.wav", 100)
 
 		if self.SoundLoop then
@@ -168,7 +168,7 @@ if(SERVER)then
 			self:TryPlace()
 		elseif State == STATE_RUNNING then
 			if alt then
-				self:ProduceResource(self:GetProgress())
+				self:ProduceResource()
 
 				return
 			end
@@ -242,14 +242,14 @@ if(SERVER)then
 					if self:GetProgress() >= 100 then
 						-- Spawn barrel
 						local amtToPump = math.min(self:GetProgress(), 100)
-						self:ProduceResource(amtToPump)
+						self:ProduceResource()
 					end
 				else
 					self:SetProgress(self:GetProgress() + pumpRate)
 
 					if self:GetProgress() >= 100 then
 						local amtToPump = math.min(JMod.NaturalResourceTable[self.DepositKey].amt, 100)
-						self:ProduceResource(amtToPump)
+						self:ProduceResource()
 						JMod.DepleteNaturalResource(self.DepositKey, amtToPump)
 					end
 				end
