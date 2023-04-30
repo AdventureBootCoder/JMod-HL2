@@ -100,7 +100,6 @@ if(SERVER)then
 			if ply:GetSuitPower() >= 1 then
 				ply:SetNW2Float(tag_counter, val)
 			end
-			--jprint(ply:GetNW2Float())
 		end
 	end)
 

@@ -216,7 +216,7 @@ hook.Add("Move", "JMOD_HL2_ARMOR_MOVE", function(ply, mv)
 			end
 			if not ply.ABootRegularJump and mv:KeyDown(IN_JUMP) and SERVER and IsFirstTimePredicted() then
 				local Charges = ply:GetNW2Float(tag_counter, 0)
-				if not ply:OnGround() and ply:GetNW2Bool("EZjumpmod_canuse", false) and Charges >= 1 then
+				if not ply:OnGround() and ply:GetNW2Bool("EZjumpmod_canuse", true) and Charges >= 1 then
 					local Aim = ply:EyeAngles()
 					local OldVel, NewVel = mv:GetVelocity(), Aim:Up() * 450
 					mv:SetVelocity(OldVel + NewVel)

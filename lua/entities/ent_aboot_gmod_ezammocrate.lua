@@ -186,7 +186,7 @@ if SERVER then
 			--[[ PRIMARY --]]
 			if PrimName then 
 				PrimMax = PrimMax * JMod.Config.Weapons.AmmoCarryLimitMult
-				local IsPrimMunitions = table.HasValue(JMod.Config.AmmoTypesThatAreMunitions, PrimName)
+				local IsPrimMunitions = table.HasValue(JMod.Config.Weapons.AmmoTypesThatAreMunitions, PrimName)
 				if (IsPrimMunitions == IsMunitionBox) and not(IsAmmoOnTable(PrimName, JMod.Config.Weapons.WeaponAmmoBlacklist)) then
 					if PrimType and (PrimType ~= -1) then
 						if PrimSize == -1 then
