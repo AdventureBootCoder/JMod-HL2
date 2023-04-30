@@ -102,7 +102,7 @@ if SERVER then
 		local State = self:GetState()
 		if State < 0 then return end
 		self.AutoArm = false
-		local Alt = activator:KeyDown(JMod.Config.AltFunctionKey)
+		local Alt = activator:KeyDown(JMod.Config.General.AltFunctionKey)
 
 		if State == STATE_OFF then
 			if Alt then
@@ -144,7 +144,7 @@ if SERVER then
 
 	function ENT:Launch(targetPos)
 		self:SetState(STATE_LAUNCHED)
-		timer.Simple(0.2 * JMod.Config.MineDelay, function()
+		timer.Simple(0.2 * JMod.Config.Explosives.Mine.Delay, function()
 			if IsValid(self) then
 				self:EmitSound("NPC_CombineMine.Hop")
 				local SelfPos = self:GetPos()
@@ -204,7 +204,7 @@ if SERVER then
 		util.ScreenShake(SelfPos, 99999, 99999, 1, 500)
 		self:EmitSound("snd_jack_fragsplodeclose.wav", 90, 100)
 		JMod.Sploom(JMod.GetEZowner(self), SelfPos, 150, 125)
-		JMod.FragSplosion(self, SelfPos, 500, 20 * JMod.Config.MinePower, 500, JMod.GetEZowner(self), Up, 1.3, 15)
+		JMod.FragSplosion(self, SelfPos, 500, 20 * JMod.Config.Explosives.Mine.Power, 500, JMod.GetEZowner(self), Up, 1.3, 15)
 		SafeRemoveEntity(self)
 	end
 
@@ -392,7 +392,7 @@ if SERVER then
 		if ent.EZhopperMine then
 			if ent:GetState() == STATE_HELD then
 				ent:SetState(STATE_OFF)
-				if ply:KeyDown(JMod.Config.AltFunctionKey) then
+				if ply:KeyDown(JMod.Config.General.AltFunctionKey) then
 					ent:Arm(ply)
 				end
 			end

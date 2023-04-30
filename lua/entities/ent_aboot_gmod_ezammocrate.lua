@@ -185,9 +185,9 @@ if SERVER then
 
 			--[[ PRIMARY --]]
 			if PrimName then 
-				PrimMax = PrimMax * JMod.Config.AmmoCarryLimitMult
+				PrimMax = PrimMax * JMod.Config.Weapons.AmmoCarryLimitMult
 				local IsPrimMunitions = table.HasValue(JMod.Config.AmmoTypesThatAreMunitions, PrimName)
-				if (IsPrimMunitions == IsMunitionBox) and not(IsAmmoOnTable(PrimName, JMod.Config.WeaponAmmoBlacklist)) then
+				if (IsPrimMunitions == IsMunitionBox) and not(IsAmmoOnTable(PrimName, JMod.Config.Weapons.WeaponAmmoBlacklist)) then
 					if PrimType and (PrimType ~= -1) then
 						if PrimSize == -1 then
 							PrimSize = -PrimSize
@@ -217,9 +217,9 @@ if SERVER then
 			if self:GetResource() <= 0 then return end
 			--[[ SECONDARY --]]
 			if SecName then 
-				SecMax = SecMax * JMod.Config.AmmoCarryLimitMult
-				local IsSecMunitions = table.HasValue(JMod.Config.AmmoTypesThatAreMunitions, SecName)
-				if (IsSecMunitions == IsMunitionBox) and not(IsAmmoOnTable(SecName, JMod.Config.WeaponAmmoBlacklist)) then
+				SecMax = SecMax * JMod.Config.Weapons.AmmoCarryLimitMult
+				local IsSecMunitions = table.HasValue(JMod.Config.Weapons.AmmoTypesThatAreMunitions, SecName)
+				if (IsSecMunitions == IsMunitionBox) and not(IsAmmoOnTable(SecName, JMod.Config.Weapons.WeaponAmmoBlacklist)) then
 					if SecType and (SecType ~= -1) then
 						if SecSize == -1 then
 							SecSize = -SecSize
@@ -252,7 +252,7 @@ if SERVER then
 		JMod.Hint(activator, "crate")
 		local Resource, Time = self:GetResource(), CurTime()
 		if Resource <= 0 then return end
-		local Alt = activator:KeyDown(JMod.Config.AltFunctionKey)
+		local Alt = activator:KeyDown(JMod.Config.General.AltFunctionKey)
 
 		if self.LastOpenTime < Time then
 			self:Open(true)

@@ -33,7 +33,7 @@ if(SERVER)then
 		local ent = ents.Create(self.ClassName)
 		ent:SetAngles(Ang)
 		ent:SetPos(SpawnPos)
-		if JMod.Config.SpawnMachinesFull then
+		if JMod.Config.Machines.SpawnMachinesFull then
 			ent.SpawnFull = true
 		end
 		ent:Spawn()
@@ -89,7 +89,7 @@ if(SERVER)then
 
 					if self.User.EZbleeding > 0 then
 						self.User:PrintMessage(HUD_PRINTCENTER, "stopping bleeding")
-						self.User.EZbleeding = math.Clamp(self.User.EZbleeding - 2 * JMod.Config.MedKitHealMult, 0, 9e9)
+						self.User.EZbleeding = math.Clamp(self.User.EZbleeding - 2 * JMod.Config.Tools.Medkit.HealMult, 0, 9e9)
 						self:ConsumeSupplies(.5)
 					else
 						self.User:SetHealth(self.User:Health() + 1)

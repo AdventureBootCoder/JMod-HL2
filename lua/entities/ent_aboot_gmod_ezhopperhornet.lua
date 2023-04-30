@@ -103,7 +103,7 @@ if SERVER then
 		local State = self:GetState()
 		if State < 0 then return end
 		self.AutoArm = false
-		local Alt = activator:KeyDown(JMod.Config.AltFunctionKey)
+		local Alt = activator:KeyDown(JMod.Config.General.AltFunctionKey)
 
 		if State == STATE_OFF then
 			if Alt then
@@ -165,14 +165,14 @@ if SERVER then
 			util.ScreenShake(SelfPos, 99999, 99999, .1, 1000)
 			
 			self:EmitSound("snd_jack_fragsplodeclose.wav", 90, 100)
-			JMod.RicPenBullet(self, SelfPos, Dir, (1000 or ((Targ:IsVehicle() or Targ:InVehicle()) and 5000)) * JMod.Config.MinePower, true, true)
+			JMod.RicPenBullet(self, SelfPos, Dir, (1000 or ((Targ:IsVehicle() or Targ:InVehicle()) and 5000)) * JMod.Config.Explosives.Mine.Power, true, true)
 			SafeRemoveEntity(self)
 			self.Exploded = true
 		elseif findTarget then
 			self:Disarm()
 			self.AutoArm = true
 		else
-			JMod.RicPenBullet(self, SelfPos, -self:GetUp(), 1000 * JMod.Config.MinePower, true, true)
+			JMod.RicPenBullet(self, SelfPos, -self:GetUp(), 1000 * JMod.Config.Explosives.Mine.Power, true, true)
 			SafeRemoveEntity(self)
 			self.Exploded = true
 		end
@@ -241,7 +241,7 @@ if SERVER then
 
 	function ENT:Launch(targetPos)
 		self:SetState(STATE_LAUNCHED)
-		timer.Simple(0.2 * JMod.Config.MineDelay, function()
+		timer.Simple(0.2 * JMod.Config.Explosives.Mine.Delay, function()
 			if IsValid(self) then
 				self:EmitSound("NPC_CombineMine.Hop")
 				local SelfPos = self:GetPos()
