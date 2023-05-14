@@ -15,9 +15,9 @@ ENT.EZconsumes = {
 --
 ENT.Model = "models/props_combine/combinethumper001a.mdl"
 ENT.Mass = 6000
-ENT.SpawnHeight = 10
+ENT.SpawnHeight = 0
 ENT.StaticPerfSpecs = {
-	MaxDurability = 600,
+	MaxDurability = 350,
 	MaxElectricity = 800
 }
 ENT.DynamicPerfSpecs = {
@@ -51,66 +51,30 @@ if(SERVER)then
 		end)
 	end
 
-	function ENT:UpdateDepositKey()
-		local SelfPos = self:GetPos()
-		-- first, figure out which deposits we are inside of, if any
-		local DepositsInRange = {}
-
-		for k, v in pairs(JMod.NaturalResourceTable)do
-			-- Make sure the resource is on the whitelist
-			local Dist = SelfPos:Distance(v.pos)
-
-			-- store they desposit's key if we're inside of it
-			if (Dist <= v.siz) and (not(table.HasValue(self.BlacklistedResources, v.typ))) then 
-				if (v.rate) or (v.amt > 0) then
-					table.insert(DepositsInRange, k)
-				end
-			end
-		end
-
-		-- now, among all the deposits we are inside of, let's find the closest one
-		local ClosestDeposit, ClosestRange = nil, 9e9
-
-		if #DepositsInRange > 0 then
-			for k, v in pairs(DepositsInRange)do
-				local DepositInfo = JMod.NaturalResourceTable[v]
-				local Dist = SelfPos:Distance(DepositInfo.pos)
-
-				if(Dist < ClosestRange)then
-					ClosestDeposit = v
-					ClosestRange = Dist
-				end
-			end
-		end
-		if(ClosestDeposit)then 
-			self.DepositKey = ClosestDeposit
-			self:SetResourceType(JMod.NaturalResourceTable[self.DepositKey].typ)
-			--print("Our deposit is "..self.DepositKey) --DEBUG
-		else 
-			self.DepositKey = 0 
-			--print("No valid deposit") --DEBUG
-		end
-	end
-
 	function ENT:TryPlace()
-		local Tr = util.QuickTrace(self:GetPos() + Vector(0, 0, 30), Vector(0, 0, -50), self)
+		local Tr = util.QuickTrace(self:GetPos() + Vector(0, 0, 100), Vector(0, 0, -500), self)
 		if (Tr.Hit) and (Tr.HitWorld) then
-			local Roll = Tr.HitNormal:Angle().z
-			local Yaw = Tr.HitNormal:Angle().y
-			self:SetAngles(Angle(0, Yaw - 90, 0))
-			self:SetPos(Tr.HitPos + Tr.HitNormal * 0.1 * -Roll * 20)
-			--
 			local GroundIsSolid = true
 			for i = 1, 50 do
 				local Contents = util.PointContents(Tr.HitPos - Vector(0, 0, 10 * i))
-				if(bit.band(util.PointContents(self:GetPos()), CONTENTS_SOLID) == CONTENTS_SOLID)then GroundIsSolid=false break end
+				if(bit.band(util.PointContents(self:GetPos()), CONTENTS_SOLID) == CONTENTS_SOLID)then GroundIsSolid = false break end
 			end
+
 			self:UpdateDepositKey()
-			if not self.DepositKey then
+
+			if not(self.DepositKey)then
 				JMod.Hint(self.EZowner, "oil derrick")
 			elseif(GroundIsSolid)then
-				if not(IsValid(self.Weld))then self.Weld = constraint.Weld(self, Tr.Entity, 0, 0, 50000, false, false) end
-				if(IsValid(self.Weld) and self.DepositKey)then
+				local SelfAng = self:GetAngles()
+				local Roll = Tr.HitNormal:Angle().z
+				local Yaw = Tr.HitNormal:Angle().y
+				self:SetAngles(Angle(0, Yaw - 90, 0))
+				self:SetPos(Tr.HitPos + Tr.HitNormal * self.SpawnHeight)
+				---
+				self:GetPhysicsObject():EnableMotion(false)
+				self.EZinstalled = true
+				---
+				if self.DepositKey then
 					self:TurnOn(self.EZowner)
 				else
 					if self:GetState() > STATE_OFF then
@@ -124,29 +88,36 @@ if(SERVER)then
 
 	function ENT:TurnOn(activator)
 		if self:GetState() > STATE_OFF then return end
-		if(self:GetElectricity() > 0)then
-			self:EmitSound("ambient/machines/thumper_startup1.wav", 100)
-			self:SetProgress(0)
-			timer.Simple(2.8, function()
-				if IsValid(self) and self:GetState() == STATE_OFF then
+		local SelfPos, Forward, Right = self:GetPos(), self:GetForward(), self:GetRight()
+
+		if self.EZinstalled then
+			if (self:GetElectricity() > 0) and (self.DepositKey) then
+				self:EmitSound("ambient/machines/thumper_startup1.wav", 100)
+				timer.Simple(2.8, function()
+					if not(IsValid(self)) or not(self.DepositKey) then return end
 					self:SetState(STATE_RUNNING)
 					self.SoundLoop = CreateSound(self, "ambient/machines/thumper_amb.wav")
+					self.SoundLoop:SetSoundLevel(65)
 					self.SoundLoop:Play()
-				end
-			end)
+					self:SetProgress(0)
+				end)
+			else
+				JMod.Hint(activator, "nopower")
+			end
 		else
-			JMod.Hint(activator,"nopower")
+			self:TryPlace()
 		end
 	end
-	
+
 	function ENT:TurnOff()
 		self:SetState(STATE_OFF)
 		self:ProduceResource()
-		self:EmitSound("ambient/machines/thumper_shutdown1.wav", 100)
 
 		if self.SoundLoop then
 			self.SoundLoop:Stop()
 		end
+
+		self:EmitSound("snds_jack_gmod/pumpjack_stop.wav")
 	end
 
 	function ENT:Use(activator)
@@ -154,19 +125,14 @@ if(SERVER)then
 		local OldOwner = self.EZowner
 		local alt = activator:KeyDown(JMod.Config.General.AltFunctionKey)
 		JMod.SetEZowner(self, activator)
-		--[[if(IsValid(self.EZowner))then
-			if(OldOwner ~= self.EZowner)then -- if owner changed then reset team color
-				JMod.Colorify(self)
-			end
-		end]]--
 
 		if State == STATE_BROKEN then
 			JMod.Hint(activator, "destroyed", self)
 
 			return
-		elseif State == STATE_OFF then
-			self:TryPlace()
-		elseif State == STATE_RUNNING then
+		elseif(State==STATE_OFF)then
+			self:TurnOn(activator)
+		elseif(State==STATE_RUNNING)then
 			if alt then
 				self:ProduceResource()
 
@@ -182,6 +148,7 @@ if(SERVER)then
 	
 	function ENT:Think()
 		local State, Time = self:GetState(), CurTime()
+		local Phys = self:GetPhysicsObject()
 
 		if State == STATE_BROKEN then
 			if self.SoundLoop then self.SoundLoop:Stop() end
@@ -197,11 +164,16 @@ if(SERVER)then
 
 			return
 		elseif State == STATE_RUNNING then
-			if not IsValid(self.Weld) then
-				self.DepositKey = 0
-				self.Weld = nil
+			if self.EZinstalled then
+				if Phys:IsMotionEnabled() or self:IsPlayerHolding() then
+					self.EZinstalled = false
+					self:TurnOff()
+
+					return
+				end
+			else
 				self:TurnOff()
-				--print("[HL:2 - JMOD] Invalid weld")
+
 				return
 			end
 
