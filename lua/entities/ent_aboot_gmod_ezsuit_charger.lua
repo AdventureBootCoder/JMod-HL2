@@ -26,7 +26,7 @@ if(SERVER)then
 		local ent = ents.Create(self.ClassName)
 		ent:SetAngles(Ang)
 		ent:SetPos(SpawnPos)
-		if JMod.Config.SpawnMachinesFull then
+		if JMod.Config.Machines.SpawnMachinesFull then
 			ent.SpawnFull = true
 		end
 		ent:Spawn()
@@ -40,6 +40,11 @@ if(SERVER)then
 		self:SetUseType(ONOFF_USE)
 		self.User = nil
 		self.ChargeSound = CreateSound(self,"items/suitcharge1.wav")
+		if self.SpawnFull then
+			self:SetElectricity(self.MaxElectricity)
+		else
+			self:SetElectricity(0)
+		end
 	end
 
 	function ENT:Use(activator,activatorAgain,onOff)

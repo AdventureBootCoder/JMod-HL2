@@ -1,8 +1,8 @@
 "vertexlitgeneric"
 {
 	// Original shader: VertexLitTexture
-	"$basetexture" "models\aboot\ragenigga\c_hands\v_hand_sheet"
-	"$bumpmap" "models\aboot\ragenigga\c_hands\v_hand_sheet_normal"
+	"$basetexture" "models\ragenigga\c_hands\v_hand_sheet"
+	"$bumpmap" "models\ragenigga\c_hands\v_hand_sheet_normal"
 	//"$envmap" "env_cubemap"
 	//"$envmaptint" "[ .64 .64 .64 ]"
 	//"$normalmapalphaenvmapmask" 1

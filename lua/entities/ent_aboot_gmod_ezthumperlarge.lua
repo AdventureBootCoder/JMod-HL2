@@ -16,13 +16,15 @@ ENT.EZconsumes = {
 ENT.Model = "models/props_combine/combinethumper001a.mdl"
 ENT.Mass = 6000
 ENT.SpawnHeight = 0
+ENT.EZupgradable = true
 ENT.StaticPerfSpecs = {
 	MaxDurability = 350,
 	MaxElectricity = 800
 }
 ENT.DynamicPerfSpecs = {
-	Armor = 2
+	Armor = 2.5
 }
+ENT.BackupRecipe = {[JMod.EZ_RESOURCE_TYPES.BASICPARTS] = 100}
 --
 --ENT.WhitelistedResources = {}
 ENT.BlacklistedResources = {"geothermal", "geo"}

@@ -18,11 +18,12 @@ ENT.Mass = 4000
 ENT.SpawnHeight = 0
 ENT.StaticPerfSpecs = {
 	MaxDurability = 300,
-	MaxElectricity = 400
+	MaxElectricity = 400,
 }
 ENT.DynamicPerfSpecs = {
-	Armor = 1.75
+	Armor = 2
 }
+ENT.BackupRecipe = {[JMod.EZ_RESOURCE_TYPES.BASICPARTS] = 100}
 --
 --ENT.WhitelistedResources = {}
 ENT.BlacklistedResources = {"geothermal", "geo", "water", "oil"}
