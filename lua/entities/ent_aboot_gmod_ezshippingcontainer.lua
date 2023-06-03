@@ -17,7 +17,26 @@ function ENT:SetupDataTables()
 	self:NetworkVar("Int", 0, "Resource")
 end
 
+function ENT:GetEZsupplies(typ)
+	local Supplies = self.Contents
+	if typ then
+		if Supplies[typ] and Supplies[typ] then
+			return Supplies[typ]
+		else
+			return nil
+		end
+	else
+		return Supplies
+	end
+end
+
+function ENT:SetEZsupplies(typ, amt, setter)
+	--if not SERVER then print("[JMOD] - You can't set EZ supplies on client") return end
+	if not self.Contents[typ] then return end
+	self:SetResource(math.Clamp(amt, 0, self.MaxResource))
+end
 ---
+
 if SERVER then
 	function ENT:SpawnFunction(ply, tr)
 		local SpawnPos = tr.HitPos + tr.HitNormal * 40
@@ -117,11 +136,14 @@ if SERVER then
 		if self.NextUse > Time then return end
 		self.NextUse = Time + 1
 		JMod.Hint(activator, "crate")
-		--if self:GetResource() <= 0 then return end
+
 		local TrimmedTable = {}
 		for k, v in pairs(self.Contents) do
 			if v > 0 then
 				TrimmedTable[k] = v
+			else
+				k = nil
+				v = nil
 			end
 		end
 		if table.IsEmpty(TrimmedTable) then return end

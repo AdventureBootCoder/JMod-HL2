@@ -80,8 +80,9 @@ if SERVER then
 			end
 
 			if (data.Speed > 500) and (self:GetState() == STATE_ARMED) then
+				if IsValid(data.HitEntity) and data.HitEntity:IsPlayer() then self:Detonate() end
 				if self:GetState() == STATE_COOKING then return end
-				self:SetState(STATE_COOKING)
+					self:SetState(STATE_COOKING)
 
 				return
 			end
@@ -235,7 +236,7 @@ if SERVER then
 		if State == STATE_COOKING then
 			self.CookingTimer = self.CookingTimer + .1
 			self:SetSkin((self:GetSkin() == 1 and 0) or (self:GetSkin() == 0 and 1))
-			jprint(self.CookingTimer)
+			--jprint(self.CookingTimer)
 			if self.CookingTimer >= 6 then
 				self:Detonate()
 			end

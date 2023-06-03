@@ -63,11 +63,9 @@ if(SERVER)then
 				JMod.Hint(self.EZowner, "ground drill")
 			elseif(GroundIsSolid)then
 				local SelfAng = self:GetAngles()
-				local Pitch = math.abs(Tr.HitNormal:Angle().y) > 5 and Tr.HitNormal:Angle().y or 0
-				local Yaw = math.abs(Tr.HitNormal:Angle().y) > 5 and Tr.HitNormal:Angle().y or SelfAng.y
-				local Roll = math.abs(Tr.HitNormal:Angle().r) > 5 and Tr.HitNormal:Angle().z or 0
-				--self:SetAngles(Angle(0, Yaw - 90, 0))
-				self:SetAngles(Angle(Pitch, Yaw, Roll))
+				local Roll = Tr.HitNormal:Angle().z
+				local Yaw = Tr.HitNormal:Angle().y
+				self:SetAngles(Angle(0, Yaw - 90, 0))
 				self:SetPos(Tr.HitPos + Tr.HitNormal * self.SpawnHeight)
 				---
 				self:GetPhysicsObject():EnableMotion(false)

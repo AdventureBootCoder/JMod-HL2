@@ -121,6 +121,7 @@ if SERVER then
 									HeldEnt:SetPos(v:GetPos() + Vector(10, 10, 30))
 								end
 							end
+							-- This function is for killing players and things that get stuck in walls.
 							--[[timer.Simple(math.Rand(0.1, 0.5), function()
 								if IsValid(v) and v:GetPhysicsObject():IsPenetrating() then
 									local DisDmg = DamageInfo()
@@ -136,7 +137,7 @@ if SERVER then
 							FailPercent = FailPercent + 1
 						end
 					end
-					print(v, FailPercent / 100)
+					--print(v, FailPercent / 100) -- For testing hit-miss ratio
 				end
 			end
 			self.TeleMarker:SetActivated(false)
