@@ -1,0 +1,22 @@
+"VertexLitGeneric"
+{
+	"$baseTexture"			"models/aboot/blackmesa/props_generic/bm_hevcrate01_skin0"
+	"$bumpmap"				"models/aboot/blackmesa/props_generic/bm_hevcrate01_skin0_normal"
+	 
+//	"$selfillum" "1"
+//	"$selfillumtint"		"[0.02 0.02 0.02]"
+//	"$selfillummask"		"models/props_generic/bm_supplycrate01_skin_0_2_si"
+	"$blendtintbybasealpha" "1"
+ 	"$blendtintcoloroverbase" "0"
+
+	"$phong"					"1"
+	"$phongexponent"			"25"
+	"$phongboost"				"2"
+	"$phongfresnelranges"		"[0.15 0.8 2.5]"
+
+	"$surfaceprop"				"wood"
+
+	"%keywords" "bms,crate"
+	"$model" 1
+
+}

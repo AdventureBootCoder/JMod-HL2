@@ -3,7 +3,7 @@ player_manager.AddValidModel( "ABoot HEV Suit",
 list.Set( "PlayerOptionsModel", "ABoot HEV Suit", 
 "models/aboot/player/hev_suit.mdl" );
 player_manager.AddValidHands( "ABoot HEV Suit", 
-"models/ragenigga/viewmodels/c_arms_classic.mdl", 0, "00000000" )
+"models/aboot/ragenigga/viewmodels/c_arms_classic.mdl", 0, "00000000" )
 
 JMod = JMod or {}
 JMod.AdditionalArmorTable = JMod.AdditionalArmorTable or {}
@@ -42,7 +42,7 @@ JModHL2.ArmorTable = {
 	["ABoot HEV Suit"]={
 		PrintName = "EZ HEV Suit",
 		Category = "JMod - EZ HL:2",
-		mdl = "models/blackmesa/props_generic/bm_hevcrate01.mdl",
+		mdl = "models/aboot/blackmesa/props_generic/bm_hevcrate01.mdl",
 		lbl = "MK.II HEV SUIT",
 		clr = {  r = 189, g = 100, b = 24 },
 		clrForced = false,
@@ -93,7 +93,7 @@ JModHL2.ArmorTable = {
 	["ABoot Jump Module"]={
 		PrintName = "EZ Jump Module",
 		Category = "JMod - EZ HL:2",
-		mdl = "models/blackmesa/jumpmod/w_longjump.mdl",
+		mdl = "models/aboot/blackmesa/hev_suit/w_longjump.mdl",
 		clr = { r = 189, g = 100, b = 24 },
 		clrForced = false,
 		slots = {
