@@ -112,6 +112,7 @@ if(SERVER)then
 	end
 
 	function ENT:TurnOff()
+		if (self:GetState() <= 0) then return end
 		self:SetState(STATE_OFF)
 		self:ProduceResource()
 
@@ -152,6 +153,15 @@ if(SERVER)then
 		local State, Time = self:GetState(), CurTime()
 		local Phys = self:GetPhysicsObject()
 
+		if self.EZinstalled then
+			if Phys:IsMotionEnabled() or self:IsPlayerHolding() then
+				self.EZinstalled = false
+				self:TurnOff()
+
+				return
+			end
+		end
+
 		if State == STATE_BROKEN then
 			if self.SoundLoop then self.SoundLoop:Stop() end
 			if self.LastState ~= State then
@@ -166,19 +176,7 @@ if(SERVER)then
 
 			return
 		elseif State == STATE_RUNNING then
-			if self.EZinstalled then
-				if Phys:IsMotionEnabled() or self:IsPlayerHolding() then
-					self.EZinstalled = false
-					self:TurnOff()
-
-					return
-				end
-			else
-				self:TurnOff()
-
-				return
-			end
-
+			if not self.EZinstalled then self:TurnOff() return end
 			if not JMod.NaturalResourceTable[self.DepositKey] then 
 				self:TurnOff()
 				--print("[HL:2 - JMOD] Invalid deposit key")
