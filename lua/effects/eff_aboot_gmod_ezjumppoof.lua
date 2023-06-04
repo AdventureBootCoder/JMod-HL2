@@ -14,7 +14,7 @@ function EFFECT:Init(data)
 			local RollParticle = Emitter:Add(Sprite, Ent:GetPos())
 
 			if RollParticle then
-				RollParticle:SetVelocity(Vel + Norm)
+				RollParticle:SetVelocity(Vel + Norm * 20)
 				RollParticle:SetAirResistance(100)
 				RollParticle:SetDieTime(math.Rand(2, 4))
 				RollParticle:SetStartAlpha(math.random(120, 150))
