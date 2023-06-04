@@ -214,29 +214,57 @@ hook.Add("Move", "JMOD_HL2_ARMOR_MOVE", function(ply, mv)
 			elseif ply.ABootRegularJump and mv:KeyReleased(IN_JUMP) then
 				ply.ABootRegularJump = false
 			end
-			if not ply.ABootRegularJump and mv:KeyDown(IN_JUMP) and SERVER and IsFirstTimePredicted() then
+
+			if not ply.ABootRegularJump and mv:KeyDown(IN_JUMP) and IsFirstTimePredicted() then
 				local Charges = ply:GetNW2Float(tag_counter, 0)
-				if not ply:OnGround() and ply:GetNW2Bool("EZjumpmod_canuse", true) and Charges >= 1 then
+				if not(ply:OnGround()) and ply:GetNW2Bool("EZjumpmod_canuse", true) and (Charges >= 1) then
+					-- Get Eye angles and then get the direction the jump module would actually be aiming
 					local Aim = ply:EyeAngles()
 					local OldVel, NewVel = mv:GetVelocity(), Aim:Up() * 450
+					-- Tell the server that's where we're going
 					mv:SetVelocity(OldVel + NewVel)
+					-- Sound, psshha
 					ply:EmitSound(math.random() > 0.5 and JModHL2.EZ_JUMPSNDS.BOOST1 or JModHL2.EZ_JUMPSNDS.BOOST2, 70, 100, 0.7)
+					-- When we have to deal with garry's prediction, ugh
+					if SERVER then
+						net.Start("ABoot_JumpmodParticles")
+						net.WriteEntity(ply)
+						net.Broadcast()
+					end
+					-- Let them know they're out of juice
 					if Charges <= 1 then
 						ply:SendLua([[
 							surface.PlaySound("]] .. JModHL2.EZ_JUMPSNDS.DENY .. [[")
 						]])
 					end
+					-- Make sure to reduce the charges left
 					Charges = Charges - 1
 					ply:SetNW2Float(tag_counter, Charges)
 					ply:SetNW2Bool("EZjumpmod_canuse", false)
+					-- Timer for regulating useage
 					timer.Create(ply:Nick().."jumpmod_timer", 0.4, 1, function()
 						ply:SetNW2Bool("EZjumpmod_canuse", true)
 					end)
 					timer.Start(ply:Nick().."jumpmod_timer")
+
+					return true
 				end
 			end
 		end
 	end
+end)
+
+net.Receive("ABoot_JumpmodParticles", function()
+	local Ply = net.ReadEntity()
+	-- Effects, poof
+	local EffectSpot = Ply:GetPos()
+	local Poof = EffectData()
+	Poof:SetNormal(Vector(0, 0, -1))
+	Poof:SetScale(1)
+	Poof:SetOrigin(EffectSpot)
+	Poof:SetStart(Vector(0, 0, -50))
+	Poof:SetEntity(Ply)
+	util.Effect("eff_aboot_gmod_ezjumppoof", Poof, true)
 end)
 
 hook.Add("OnPlayerHitGround", "JMOD_HL2_HITGROUND", function(ply, water, float, speed)

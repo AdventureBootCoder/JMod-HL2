@@ -40,6 +40,7 @@ if(SERVER)then
 
 	util.AddNetworkString("ABoot_ContainerMenu")
 	util.AddNetworkString("ABoot_VolumeContainerMenu")
+	util.AddNetworkString("ABoot_JumpmodParticles")
 	local defaultHEVdisable = CreateConVar("aboot_disable_hev", "0", FCVAR_ARCHIVE, "Removes the HEV suit from players on spawn and when it's destroyed. \nNo more running around with an invisible HEV suit")
 
 	local function RemoveHEVsuit(playa) 
@@ -102,6 +103,19 @@ if(SERVER)then
 			end
 		end
 	end)
+
+	concommand.Add("aboot_debug", function(ply, cmd, args) 
+		if not GetConVar("sv_cheats"):GetBool() then return end
+		local EyeTrace = ply:GetEyeTrace()
+		local EffectSpot = EyeTrace.HitPos + Vector(0, 0, 20)
+		local Poof = EffectData()
+		Poof:SetNormal(Vector(0, 0, -1))
+		Poof:SetScale(1)
+		Poof:SetOrigin(EffectSpot)
+		Poof:SetStart(Vector(0, 0, -10))
+		util.Effect("eff_aboot_gmod_ezjumppoof", Poof, true)
+		EmitSound(JModHL2.EZ_JUMPSNDS.BOOST1, EffectSpot, -1)
+	end, nil, "Debug testing command")
 
 elseif CLIENT then 
 
