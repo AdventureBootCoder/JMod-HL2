@@ -9,35 +9,62 @@ function EFFECT:Init(data)
 	local Emitter = ParticleEmitter(Pos)
 	local Sprite = Sprites[math.random(1, #Sprites)]
 
-	for i = 1, 10 * Scl do
-		timer.Simple(i * .02, function()
-			local RollParticle = Emitter:Add(Sprite, Ent:GetPos())
-
+	for i = 1, 20 * Scl do
+		timer.Simple(i * .005, function()
+			local RollParticle = Emitter:Add(Sprite, Pos)
 			if RollParticle then
-				RollParticle:SetVelocity(Vel + Norm * 20)
-				RollParticle:SetAirResistance(100)
-				RollParticle:SetDieTime(math.Rand(2, 4))
-				RollParticle:SetStartAlpha(math.random(120, 150))
+				RollParticle:SetVelocity(Vel + Norm * math.random(100, 7000))
+				RollParticle:SetAirResistance(1000)
+				RollParticle:SetDieTime(math.Rand(.1, 1))
+				RollParticle:SetStartAlpha(math.random(50, 150))
 				RollParticle:SetEndAlpha(0)
-				local Size = math.Rand(10, 20)
+				local Size = math.Rand(3, 30)
 				RollParticle:SetStartSize(Size)
-				RollParticle:SetEndSize(Size * 2)
+				RollParticle:SetEndSize(Size * 3)
 				RollParticle:SetRoll(math.Rand(-3, 3))
 				RollParticle:SetRollDelta(math.Rand(-2, 2))
-				local Vec = VectorRand() * 10 + JMod.Wind * 20
+				local Vec = VectorRand() * 10 + JMod.Wind * 1000
 				RollParticle:SetGravity(Vec)
 				RollParticle:SetLighting(false)
 				local Brightness = math.Rand(.8, 1)
 				RollParticle:SetColor(R * Brightness, G * Brightness, B * Brightness)
-				RollParticle:SetCollide(true)
-				RollParticle:SetBounce(1)
+				RollParticle:SetCollide(false)
+				//RollParticle:SetBounce(0)
 			end
+			if (i == 20) then Emitter:Finish() end
 		end)
 	end
 
-	timer.Simple(10 * Scl * .2, function()
-		Emitter:Finish()
-	end)
+	local Tr = util.QuickTrace(Pos, Vector(0, 0, -400), Ent)
+	if (Tr.Hit) then
+		for i = 1, 60 * Scl do
+			timer.Simple(i * .001, function()
+				local RollParticle = Emitter:Add(Sprite, Tr.HitPos)
+				if RollParticle then
+					local Dir = VectorRand()
+					Dir.z = 0
+					Dir:Normalize()
+					RollParticle:SetVelocity(Dir * math.random(1000, 1500))
+					RollParticle:SetAirResistance(500)
+					RollParticle:SetDieTime(math.Rand(.1, 1))
+					RollParticle:SetStartAlpha(math.random(50, 150))
+					RollParticle:SetEndAlpha(0)
+					local Size = math.Rand(4, 40)
+					RollParticle:SetStartSize(Size)
+					RollParticle:SetEndSize(Size * 3)
+					RollParticle:SetRoll(math.Rand(-3, 3))
+					RollParticle:SetRollDelta(math.Rand(-2, 2))
+					local Vec = VectorRand() * 10 + JMod.Wind * 1000
+					RollParticle:SetGravity(Vec)
+					RollParticle:SetLighting(false)
+					local Brightness = math.Rand(.8, 1)
+					RollParticle:SetColor(R * Brightness, G * Brightness, B * Brightness)
+					RollParticle:SetCollide(false)
+					RollParticle:SetBounce(0)
+				end
+			end)
+		end
+	end
 end
 
 function EFFECT:Think()
