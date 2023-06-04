@@ -151,7 +151,7 @@ if SERVER then
 		end
 
 		local SelfPos, Up = self:LocalToWorld(self:OBBCenter()), Vector(0, 0, 1)
-
+	
 		if IsValid(self:GetTarget()) then
 			local Targ = self:GetTarget()
 			local TargetPos = (IsValid(Targ) and Targ:LocalToWorld(Targ:OBBCenter())) or -Up
@@ -165,6 +165,7 @@ if SERVER then
 			util.ScreenShake(SelfPos, 99999, 99999, .1, 1000)
 			
 			self:EmitSound("snd_jack_fragsplodeclose.wav", 90, 100)
+
 			JMod.RicPenBullet(self, SelfPos, Dir, (1000 or ((Targ:IsVehicle() or Targ:InVehicle()) and 5000)) * JMod.Config.Explosives.Mine.Power, true, true)
 			SafeRemoveEntity(self)
 			self.Exploded = true
@@ -172,7 +173,15 @@ if SERVER then
 			self:Disarm()
 			self.AutoArm = true
 		else
-			JMod.RicPenBullet(self, SelfPos, -self:GetUp(), 1000 * JMod.Config.Explosives.Mine.Power, true, true)
+			local Eff = EffectData()
+			Eff:SetOrigin(SelfPos)
+			Eff:SetScale(0.5)
+			Eff:SetNormal(Dir)
+			util.Effect("eff_jack_gmod_efpburst", Eff, true, true)
+			util.ScreenShake(SelfPos, 99999, 99999, .1, 1000)
+			
+			self:EmitSound("snd_jack_fragsplodeclose.wav", 90, 100)
+			JMod.RicPenBullet(self, SelfPos, Dir, 1000 * JMod.Config.Explosives.Mine.Power, true, true)
 			SafeRemoveEntity(self)
 			self.Exploded = true
 		end
@@ -218,6 +227,7 @@ if SERVER then
 		self.WarningSnd:Stop()
 		self:EmitSound("NPC_CombineMine.TurnOff")
 		self:SetState(STATE_OFF)
+		self:SetTarget(nil)
 	end
 
 	function ENT:Jump(extraVelocity)
@@ -273,15 +283,15 @@ if SERVER then
 
 	function ENT:FindTarget(enemyOnly)
 		local SelfPos = self:GetPos()
-		--jprint(tostring(self:GetTarget()) .. " \t " .. tostring(self:GetAlly()))
 		self:SetTarget(nil)
 		for k, targ in pairs(ents.FindInSphere(SelfPos, AttackDist)) do
 			if (targ ~= self) and (targ:IsPlayer() and targ:InVehicle()) or (targ:IsPlayer() or targ:IsNPC() or targ:IsVehicle()) and JMod.ClearLoS(self, targ, true) then
 				
+				if enemyOnly and not JMod.ShouldAttack(self, targ) then continue end
+
 				local targPos = targ:GetPos()
 
 				if not(IsValid(self:GetTarget())) or (SelfPos:Distance(self:GetTarget():GetPos()) > SelfPos:Distance(targPos)) then
-					if enemyOnly and not JMod.ShouldAttack(self, targ) then return end
 					self:SetTarget(targ)
 				end
 			end
@@ -298,7 +308,6 @@ if SERVER then
 
 	function ENT:Think()
 		local SelfPos, State, Time = self:GetPos(), self:GetState(), CurTime()
-		local Target = self:GetTarget()
 
 		if istable(WireLib) then
 			WireLib.TriggerOutput(self, "State", State)
@@ -312,6 +321,7 @@ if SERVER then
 			end
 			
 			self:FindTarget(false)
+			local Target = self:GetTarget()
 			if IsValid(Target) then
 				local TargetPos = Target:GetPos()
 				if SelfPos:Distance(TargetPos) < AttackDist * 0.75 then
@@ -341,7 +351,7 @@ if SERVER then
 				if self:GetPhysicsObject():GetVelocity().z <= 1 and not self:IsPlayerHolding() then
 					self:FindTarget(true)
 					if IsValid(Target) then
-						self:Detonate(false)
+						self:Detonate(true)
 					end
 				end
 			end)
@@ -356,7 +366,7 @@ if SERVER then
 				end
 			end]]--
 
-			self:NextThink(Time)
+			self:NextThink(Time + .1)
 
 			return true
 		elseif self.AutoArm then
