@@ -277,10 +277,10 @@ elseif(CLIENT)then
 				self
 			}, 
 			mask = MASK_OPAQUE
-			}).Hit
+		}).Hit
 	
 		local Closeness = LocalPlayer():GetFOV()*(EyePos():Distance(SelfPos))
-		local DetailDraw = Closeness<36000 -- cutoff point is 400 units when the fov is 90 degrees
+		local DetailDraw = Closeness < 200000
 		if((not(DetailDraw)) and (Obscured))then return end -- if player is far and sentry is obscured, draw nothing
 		if(Obscured)then DetailDraw=false end -- if obscured, at least disable details
 		if(State == STATE_BROKEN)then DetailDraw = false end -- look incomplete to indicate damage, save on gpu comp too
@@ -288,7 +288,7 @@ elseif(CLIENT)then
 			local ScreenAng = SelfAng:GetCopy()
 			ScreenAng:RotateAroundAxis(ScreenAng:Up(), 90)
 			JMod.RenderModel(self.Screen, SelfPos + Up * 30 - Right * 10 + Forward * 10, ScreenAng, Vector(1, 1.5, 1.5), nil, JMod.EZ_GRADE_MATS[self:GetGrade()])
-			if (Closeness < 20000) and (State == STATE_RUNNING) then
+			if (Closeness < 36000) and (State == STATE_RUNNING) then
 				local DisplayAng = SelfAng:GetCopy()
 				DisplayAng:RotateAroundAxis(DisplayAng:Right(), 0)
 				DisplayAng:RotateAroundAxis(DisplayAng:Up(), 180)
@@ -317,5 +317,5 @@ elseif(CLIENT)then
 			end
 		end
 	end
-	language.Add("ent_jack_gmod_ezdrill","EZ Dill")
+	language.Add("ent_aboot_gmod_ezthumper","EZ Thumper")
 end
