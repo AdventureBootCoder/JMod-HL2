@@ -220,7 +220,7 @@ elseif CLIENT then
 	function ENT:Draw()
 		local Ang, Pos = self:GetAngles(), self:GetPos()
 		local Closeness = LocalPlayer():GetFOV() * EyePos():Distance(Pos)
-		local DetailDraw = Closeness < 45000 -- cutoff point is 500 units when the fov is 90 degrees
+		local DetailDraw = Closeness < 75000 -- cutoff point is 500 units when the fov is 90 degrees
 		self:DrawModel()
 
 		if DetailDraw then
