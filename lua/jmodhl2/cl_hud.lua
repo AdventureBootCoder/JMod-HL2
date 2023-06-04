@@ -43,7 +43,7 @@ hook.Add("HUDPaint", "JMOD_HL2_HUDPAINT", function()
 		local Dist = math.Round(Ply:GetPos():Distance(Tr.HitPos) / 10) * 10
 		draw.DrawText("ALT: "..tostring(math.min(Dist, 9999)), "HudDefault", x + (SCR_W * (BAR_WIDTH + MARGIN) * 3.2), y - (SCR_H * BAR_HEIGHT), BAR_COL_FULL, TEXT_ALIGN_LEFT)
 		local Ang = math.Round(Ply:EyeAngles().p)
-		draw.DrawText("ANG: "..tostring(Ang), "HudDefault", x + (SCR_W * (BAR_WIDTH + MARGIN) * 3.2), y - (SCR_H * BAR_HEIGHT) + 25, BAR_COL_FULL, TEXT_ALIGN_LEFT)
+		draw.DrawText("ANG: "..tostring(-Ang), "HudDefault", x + (SCR_W * (BAR_WIDTH + MARGIN) * 3.2), y - (SCR_H * BAR_HEIGHT) + 25, BAR_COL_FULL, TEXT_ALIGN_LEFT)
 		if Ply:GetNW2Bool("EZjumpmod_canuse", false) and charge >= 1 then
 			draw.DrawText("READY", "HudDefault", x + (SCR_W * (BAR_WIDTH + MARGIN) * 3.2), y - (SCR_H * BAR_HEIGHT) + 50, BAR_COL_FULL, TEXT_ALIGN_LEFT)
 		else
