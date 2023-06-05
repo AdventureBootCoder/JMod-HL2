@@ -50,7 +50,8 @@ hook.Add("HUDPaint", "JMOD_HL2_HUDPAINT", function()
 			draw.DrawText("WAIT", "HudDefault", x + (SCR_W * (BAR_WIDTH + MARGIN) * 3.2), y - (SCR_H * BAR_HEIGHT) + 50, BAR_COL_EMPTY, TEXT_ALIGN_LEFT)
 		end
 		-- There's a lot of work done here:
-		--[[for i = -90, 90 do
+		--[[local Aim = Ply:GetAimVector():Angle() 
+		for i = -90, 90 do
 			local distance = math.abs(i - Aim.p)
 			local alphaValue = math.max((distance*-100 + 200), 0)
 			local DrawPosY = ((SCR_H / 2) + i * 18) + (SCR_H / 60) * -Aim.p
