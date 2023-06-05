@@ -254,7 +254,7 @@ if(SERVER)then
 	end
 
 elseif(CLIENT)then
-	function ENT:Initialize()
+	function ENT:CustomInit()
 		--[[local LerpedThump = 0
 		self:AddCallback("BuildBonePositions", function(ent, numbones)
 			local State = ent:GetState()
