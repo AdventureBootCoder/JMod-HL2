@@ -9,9 +9,9 @@ ENT.Spawnable = true
 ENT.AdminSpawnable = true
 ---
 ENT.JModPreferredCarryAngles = Angle(0, 0, 0)
-ENT.DamageThreshold = 1000
+ENT.DamageThreshold = 1500
 ---
-
+ENT.IsJackyEZcrate = true
 ---
 function ENT:SetupDataTables()
 	self:NetworkVar("Int", 0, "Resource")
@@ -36,6 +36,9 @@ function ENT:SetEZsupplies(typ, amt, setter)
 	self:SetResource(math.Clamp(amt, 0, self.MaxResource))
 end
 ---
+function ENT:UpdateSupplies()
+
+end
 
 if SERVER then
 	function ENT:SpawnFunction(ply, tr)
@@ -141,9 +144,6 @@ if SERVER then
 		for k, v in pairs(self.Contents) do
 			if v > 0 then
 				TrimmedTable[k] = v
-			else
-				k = nil
-				v = nil
 			end
 		end
 		if table.IsEmpty(TrimmedTable) then return end
@@ -215,6 +215,11 @@ elseif CLIENT then
 
 	function ENT:Initialize()
 		self.MaxResource = 100 * 400
+		self.Contents = {}
+
+		for k, v in pairs(JMod.EZ_RESOURCE_TYPES) do
+			self.Contents[v] = 0
+		end
 	end
 
 	function ENT:Draw()
@@ -265,6 +270,7 @@ elseif CLIENT then
 	net.Receive("ABoot_ContainerMenu", function() 
 		local Container = net.ReadEntity()
 		local Contents = net.ReadTable()
+		Container.Contents = Contents
 
 		JMod.SelectionMenuIcons = JMod.SelectionMenuIcons or {}
 		-- first, populate icons
