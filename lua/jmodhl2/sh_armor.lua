@@ -87,7 +87,7 @@ JModHL2.ArmorTable = {
 		mskmat="mats_aboot_gmod_sprites/helmet_vignette1.png",
 		sndlop="snds_jack_gmod/mask_breathe.wav",
 		wgt = 40,
-		dur = 625,
+		dur = 400,
 		ent = "ent_aboot_gmod_ezarmor_hev"
 	},
 	["ABoot Jump Module"]={
