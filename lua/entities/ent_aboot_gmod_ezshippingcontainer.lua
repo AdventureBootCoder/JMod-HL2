@@ -31,14 +31,19 @@ function ENT:GetEZsupplies(typ)
 end
 
 function ENT:SetEZsupplies(typ, amt, setter)
-	--if not SERVER then print("[JMOD] - You can't set EZ supplies on client") return end
-	if not self.Contents[typ] then return end
+	if not self.Contents[typ] then /*error(tostring(typ)..", "..tostring(self.Contents[typ])..", "..tostring(amt))*/ return end
+	self.Contents[typ] = amt
 	self:SetResource(math.Clamp(amt, 0, self.MaxResource))
+	if SERVER then
+		net.Start("ABoot_ContainerMenu")
+			net.WriteBool(false)
+			net.WriteEntity(self)
+			net.WriteString(typ)
+			net.WriteInt(amt, 32)
+		net.Broadcast()
+	end
 end
 ---
-function ENT:UpdateSupplies()
-
-end
 
 if SERVER then
 	function ENT:SpawnFunction(ply, tr)
@@ -148,6 +153,7 @@ if SERVER then
 		end
 		if table.IsEmpty(TrimmedTable) then return end
 		net.Start("ABoot_ContainerMenu")
+			net.WriteBool(true)
 			net.WriteEntity(self)
 			net.WriteTable(TrimmedTable)
 		net.Send(activator)
@@ -190,9 +196,9 @@ if SERVER then
 	function ENT:OnRemove()
 	end
 
-	function ENT:TryLoadResource(typ, amt)
+	function ENT:TryLoadResource(typ, amt, overrideTimer)
 		local Time = CurTime()
-		if self.NextLoad > Time then self.NextLoad = math.min(self.NextLoad, Time + .5) return 0 end
+		if (self.NextLoad > Time) and not(overrideTimer) then self.NextLoad = math.min(self.NextLoad, Time + .1) return 0 end
 		if amt < 1 then return 0 end
 
 		-- Consider the loaded type
@@ -205,6 +211,13 @@ if SERVER then
 
 		self:CalcWeight()
 		self.NextLoad = Time + .5
+
+		net.Start("ABoot_ContainerMenu")
+			net.WriteBool(false)
+			net.WriteEntity(self)
+			net.WriteString(typ)
+			net.WriteInt(self.Contents[typ], 32)
+		net.Broadcast()
 
 		return Accepted
 	end
@@ -268,7 +281,16 @@ elseif CLIENT then
 	end
 
 	net.Receive("ABoot_ContainerMenu", function() 
+		local Menu = net.ReadBool()
 		local Container = net.ReadEntity()
+
+		if not(Menu) then
+			local Typ = net.ReadString()
+			local Amount = net.ReadInt(32)
+			Container:SetEZsupplies(Typ, Amount)
+			
+			return 
+		end
 		local Contents = net.ReadTable()
 		Container.Contents = Contents
 
@@ -412,6 +434,11 @@ elseif CLIENT then
 								net.WriteString(itemName)
 								net.WriteUInt(RequestedAmount, 17)
 							net.SendToServer()
+							local AmountLeft = Container.Contents[itemName]
+							if AmountLeft >= 0 then
+								local Needed = math.min(RequestedAmount, AmountLeft)
+								Container.Contents[itemName] = Container.Contents[itemName] - Needed
+							end
 						end
 					end)
 

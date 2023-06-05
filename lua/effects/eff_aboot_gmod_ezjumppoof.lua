@@ -8,6 +8,7 @@ function EFFECT:Init(data)
 	local R, G, B = 250, 250, 250
 	local Emitter = ParticleEmitter(Pos)
 	local Sprite = Sprites[math.random(1, #Sprites)]
+	local GoodTrace = false
 
 	for i = 1, 20 * Scl do
 		timer.Simple(i * .005, function()
@@ -31,15 +32,16 @@ function EFFECT:Init(data)
 				RollParticle:SetCollide(false)
 				//RollParticle:SetBounce(0)
 			end
-			if (i == 20) then Emitter:Finish() end
+			if (i == 20 * Scl) then Emitter:Finish() end
 		end)
 	end
 
 	local Tr = util.QuickTrace(Pos, Vector(0, 0, -400), Ent)
 	if (Tr.Hit) then
+		local PoofEmitter = ParticleEmitter(Tr.HitPos)
 		for i = 1, 60 * Scl do
 			timer.Simple(i * .001, function()
-				local RollParticle = Emitter:Add(Sprite, Tr.HitPos)
+				local RollParticle = PoofEmitter:Add(Sprite, Tr.HitPos)
 				if RollParticle then
 					local Dir = VectorRand()
 					Dir.z = 0
