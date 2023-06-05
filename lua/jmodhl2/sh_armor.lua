@@ -231,6 +231,8 @@ hook.Add("Move", "JMOD_HL2_ARMOR_MOVE", function(ply, mv)
 						net.WriteEntity(ply)
 						net.Broadcast()
 					end
+					-- Viewpunch!
+					ply:ViewPunch(Angle(3, 0, 0))
 					-- Let them know they're out of juice
 					if Charges <= 1 then
 						ply:SendLua([[
