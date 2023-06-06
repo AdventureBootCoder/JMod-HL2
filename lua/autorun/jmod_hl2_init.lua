@@ -80,6 +80,7 @@ if(SERVER)then
 		end
 	end)
 
+	local NextArmorThink = 0
 	--hook.Remove("Think", "JMOD_HL2_THINK")
 	hook.Add("Think", "JMOD_HL2_THINK", function()
 		local Time = CurTime()
@@ -88,17 +89,48 @@ if(SERVER)then
 			if not(ply.EZarmor and ply.EZarmor.effects and ply.EZarmor.effects.jumpmod) then continue end
 
 			local val = math.Clamp(ply:GetNW2Float(tag_counter, 3) + FrameTime() * 0.35, 0, 3)
+			ply.charging = ply.charging or false
+
 			if val < 1 then
 				ply.EZjumpmod_usealert = true
 			elseif val >= 1 and ply.EZjumpmod_usealert then
 				ply.EZjumpmod_usealert = nil
 				ply:SendLua([[surface.PlaySound("]] .. JModHL2.EZ_JUMPSNDS.READY .. [[")]])
 			end
-			if (GetConVar("gmod_suit"):GetBool()) and (ply:GetSuitPower() >= 1.25) and (val < 3) then
-				ply:SetSuitPower(math.Clamp(ply:GetSuitPower() - .25, 0, 100))
-			end
 
-			if ply:GetSuitPower() >= 1 then
+			if (GetConVar("gmod_suit"):GetBool()) and (ply:GetSuitPower() >= 1) and (val < 3) then
+				ply.charging = true
+				if (ply:GetSuitPower() >= 1.25) then
+					ply:SetSuitPower(math.Clamp(ply:GetSuitPower() - .25, 0, 100))
+				else
+					ply.charging = false
+				end
+			elseif (val < 3) then
+				if NextArmorThink < Time then
+					NextArmorThink = Time + 2
+
+					for id, armorData in pairs(ply.EZarmor.items) do
+						local Info = JMod.ArmorTable[armorData.name]
+
+						if Info.eff and Info.eff.jumpmod then
+							armorData.chrg.power = math.Clamp(armorData.chrg.power - (1 * JMod.Config.Armor.ChargeDepletionMult), 0, Info.chrg.power)
+
+							if armorData.chrg.power <= Info.chrg.power * .25 then
+								JMod.EZarmorWarning(ply, "Jump module charge is low ("..tostring(armorData.chrg.power).."/"..tostring(Info.chrg.power)..")")
+							end
+
+							if armorData.chrg.power > 0 then 
+								ply.charging = true
+							else
+								ply.charging = false
+							end
+
+							break
+						end
+					end
+				end
+			end
+			if ply.charging == true then
 				ply:SetNW2Float(tag_counter, val)
 			end
 		end
