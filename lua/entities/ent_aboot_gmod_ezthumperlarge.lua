@@ -51,6 +51,7 @@ if(SERVER)then
 			self:TryPlace()
 			self:SetColor(Color(255, 255, 255))
 		end)
+		self.NextUseTime = 0
 	end
 
 	function ENT:TryPlace()
@@ -120,10 +121,13 @@ if(SERVER)then
 			self.SoundLoop:Stop()
 		end
 
-		self:EmitSound("snds_jack_gmod/pumpjack_stop.wav")
+		self:EmitSound("ambient/machines/thumper_shutdown1.wav")
 	end
 
 	function ENT:Use(activator)
+		local Time = CurTime()
+		if self.NextUseTime > Time then return end
+		self.NextUseTime = Time + 2
 		local State = self:GetState()
 		local OldOwner = self.EZowner
 		local alt = activator:KeyDown(JMod.Config.General.AltFunctionKey)

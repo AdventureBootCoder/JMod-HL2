@@ -44,12 +44,14 @@ if SERVER then
 		self:DrawShadow(true)
 		self:SetUseType(SIMPLE_USE)
 		self:SetSkin(1)
-
+		
 		---
+		local PhysObj = self:GetPhysicsObject()
 		timer.Simple(.01, function()
 			--self:GetPhysicsObject():SetMass(150)
-			self:GetPhysicsObject():Wake()
-			self:GetPhysicsObject():EnableDrag(false)
+			PhysObj:Wake()
+			PhysObj:EnableDrag(false)
+			PhysObj:SetBuoyancyRatio(1)
 		end)
 
 		---
@@ -81,8 +83,7 @@ if SERVER then
 
 			if (data.Speed > 500) and (self:GetState() == STATE_ARMED) then
 				if IsValid(data.HitEntity) and data.HitEntity:IsPlayer() then self:Detonate() end
-				if self:GetState() == STATE_COOKING then return end
-					self:SetState(STATE_COOKING)
+				self:StartCooking()
 
 				return
 			end
@@ -153,6 +154,15 @@ if SERVER then
 		end
 	end
 
+	function ENT:StartCooking() 
+		if self:GetState() == STATE_COOKING then return end
+		self:SetState(STATE_COOKING)
+
+		self.BeepSound = CreateSound(self, "npc/attack_helicopter/aheli_mine_seek_loop1.wav")
+		self.BeepSound:Play()
+		self.BeepSound:ChangeVolume(1)
+	end
+
 	function ENT:Detonate()
 		if self.Exploded then return end
 		self.Exploded = true
@@ -184,10 +194,10 @@ if SERVER then
 		end
 
 		---
-		util.BlastDamage(game.GetWorld(), Att, SelfPos + Vector(0, 0, 300), 700, 140)
+		util.BlastDamage(game.GetWorld(), Att, SelfPos + Vector(0, 0, 300), 600, 120)
 
 		timer.Simple(.25, function()
-			util.BlastDamage(game.GetWorld(), Att, SelfPos, 1600, 120)
+			util.BlastDamage(game.GetWorld(), Att, SelfPos, 1000, 100)
 		end)
 
 		for k, ent in pairs(ents.FindInSphere(SelfPos, 250)) do
@@ -218,6 +228,9 @@ if SERVER then
 	end
 
 	function ENT:OnRemove()
+		if self.BeepSound then
+			self.BeepSound:Stop()
+		end 
 	end
 
 	--

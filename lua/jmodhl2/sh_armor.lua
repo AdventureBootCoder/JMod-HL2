@@ -261,7 +261,7 @@ net.Receive("ABoot_JumpmodParticles", function()
 	-- Effects, poof
 	local EffectSpot = Ply:GetPos()
 	local Poof = EffectData()
-	Poof:SetNormal(Vector(0, 0, -1))
+	Poof:SetNormal(-Ply:GetAimVector():Angle():Up())
 	Poof:SetScale(1)
 	Poof:SetOrigin(EffectSpot)
 	Poof:SetStart(Vector(0, 0, -45))

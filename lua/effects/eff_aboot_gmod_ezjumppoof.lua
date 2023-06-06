@@ -36,7 +36,7 @@ function EFFECT:Init(data)
 		end)
 	end
 
-	local Tr = util.QuickTrace(Pos, Vector(0, 0, -400), Ent)
+	local Tr = util.QuickTrace(Pos, Norm * 400, Ent)
 	if (Tr.Hit) then
 		local PoofEmitter = ParticleEmitter(Tr.HitPos)
 		for i = 1, 60 * Scl do
