@@ -16,6 +16,9 @@ ENT.EZconsumes = {
 ENT.Model = "models/props_combine/combinethumper002.mdl"
 ENT.Mass = 4000
 ENT.SpawnHeight = 0
+--
+ENT.EZcolorable = false
+ENT.EZupgradable = true
 ENT.StaticPerfSpecs = {
 	MaxDurability = 300,
 	MaxElectricity = 400,
@@ -41,7 +44,6 @@ if(SERVER)then
 		self.DepositKey = 0
 		self.LastState = 0
 		self:NextThink(1)
-		self.EZupgradable = true
 		--self:SetMaterial("models/aboot/aboot_combinethumper002_mat.vmt")
 		timer.Simple(0, function() 
 			self:TryPlace()
@@ -252,6 +254,10 @@ if(SERVER)then
 		local spawnVec = self:WorldToLocal(Vector(SelfPos) + Up * 135 + Right * 80)
 		JMod.MachineSpawnResource(self, self:GetResourceType(), amt, spawnVec, Angle(0, 0, 0), Forward*100, true, 200)
 		self:SetProgress(self:GetProgress() - amt)
+	end
+
+	function ENT:PostEntityPaste(ply, ent, createdEntities)
+		ent.EZcolorable
 	end
 
 elseif(CLIENT)then
