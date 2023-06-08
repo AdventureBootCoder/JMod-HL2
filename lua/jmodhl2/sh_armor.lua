@@ -180,7 +180,7 @@ HL2LoadAdditionalArmor()
 local tag_counter = "aboot_jumpmod_counter"
 
 hook.Add("StartCommand", "JMOD_HL2_ZOMBIE_MOVE", function(ply,cmd)
-	if ply.EZarmor and ply.EZarmor.effects and ply.EZarmor.effects.zombie then
+	if ply:Alive() and (ply.EZarmor and ply.EZarmor.effects and ply.EZarmor.effects.zombie) then
 		local Time = CurTime()
 		local RandDir = (cmd:GetViewAngles():Forward() + VectorRand(-0.1, 0.1)):Angle()
 		cmd:ClearMovement()

@@ -56,22 +56,24 @@ if(SERVER)then
 	end
 
 	function ENT:Use(activator,activatorAgain,onOff)
-		local Dude=activator or activatorAgain
-		local Time=CurTime()
-		local State=self:GetState()
-		if(State<0)then
+		local Dude = mactivator or activatorAgain
+		local Time = CurTime()
+		local State = self:GetState()
+		if State < 0 then
 			return
-		elseif(State==STATE_OFF)then
+		elseif (State == STATE_OFF) then
 			if(tobool(onOff))then -- we got pressed
-				--if((self:GetElectricity()<=0))then JMod.Hint(activator, "nopower") end
-				if((Dude:Health()<100)and(self:GetSupplies()>0))then
+				if (Dude:Health() < 100) and (self:GetSupplies() > 0) then
 					self:TurnOn(Dude)
+				elseif self:GetSupplies() <= 0 then
+					JMod.Hint(activator, "afh supply")
+					self:EmitSound("items/medshotno1.wav")
 				else
 					self:EmitSound("items/medshotno1.wav")
 				end
 			end
-		elseif(State==STATE_CHARGIN)then
-			if not(tobool(onOff))then -- we were released
+		elseif (State == STATE_CHARGIN) then
+			if not(tobool(onOff)) then -- we were released
 				self:TurnOff(true)
 			end
 		end

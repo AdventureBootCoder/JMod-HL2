@@ -1020,21 +1020,7 @@ if(SERVER)then
 	end
 elseif(CLIENT)then
 	function ENT:CustomInit()
-		self.BaseGear=JMod.MakeModel(self,"models/props_phx/gears/spur36.mdl",nil,.25)
-		self.VertGear=JMod.MakeModel(self,"models/props_phx/gears/spur36.mdl",nil,.15)
-		self.MiniBaseGear=JMod.MakeModel(self,"models/props_phx/gears/spur12.mdl",nil,.25)
-		self.MiniVertGear=JMod.MakeModel(self,"models/props_phx/gears/spur12.mdl",nil,.15)
 		self.MachineGun=JMod.MakeModel(self,"models/jmod/ez/sentrygun.mdl")
-		self.MainPost=JMod.MakeModel(self,"models/mechanics/solid_steel/box_beam_12.mdl",nil,.2)
-		self.ElevationMotor=JMod.MakeModel(self,"models/xqm/hydcontrolbox.mdl",nil,.35)
-		self.TriggerMotor=JMod.MakeModel(self,"models/xqm/hydcontrolbox.mdl",nil,.3)
-		self.Shield=JMod.MakeModel(self,"models/hunter/tubes/circle2x2b.mdl","phoenix_storms/gear",.3)
-		self.Light=JMod.MakeModel(self,"models/props_wasteland/light_spotlight02_lamp.mdl",nil,.3)
-		self.Lens=JMod.MakeModel(self,"models/hunter/misc/sphere025x025.mdl","debug/env_cubemap_model",.3)
-		self.OmniLens=JMod.MakeModel(self,"models/hunter/misc/sphere025x025.mdl","debug/env_cubemap_model",.3)
-		self.Camera=JMod.MakeModel(self,"models/mechanics/robotics/b2.mdl","phoenix_storms/metal",.4)
-		self.LeftHandle=JMod.MakeModel(self,"models/props_wasteland/panel_leverhandle001a.mdl","phoenix_storms/metal")
-		self.RightHandle=JMod.MakeModel(self,"models/props_wasteland/panel_leverhandle001a.mdl","phoenix_storms/metal")
 		---
 		self.CurAimPitch = 0
 		self.CurAimYaw = 0
