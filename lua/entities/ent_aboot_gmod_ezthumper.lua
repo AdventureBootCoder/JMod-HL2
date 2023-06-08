@@ -256,10 +256,6 @@ if(SERVER)then
 		self:SetProgress(self:GetProgress() - amt)
 	end
 
-	function ENT:PostEntityPaste(ply, ent, createdEntities)
-		ent.EZcolorable
-	end
-
 elseif(CLIENT)then
 	function ENT:CustomInit()
 		--[[local LerpedThump = 0

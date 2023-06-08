@@ -56,6 +56,7 @@ if(SERVER)then
 		if defaultHEVdisable:GetBool() then
 			RemoveHEVsuit(playa)
 		end
+		ply:SetNW2Float(tag_counter, 0)
 	end)
 
 	hook.Add("PlayerDeath", tag, function(ply)
@@ -84,16 +85,17 @@ if(SERVER)then
 	--hook.Remove("Think", "JMOD_HL2_THINK")
 	hook.Add("Think", "JMOD_HL2_THINK", function()
 		local Time = CurTime()
-
+		
 		for k, ply in ipairs(player.GetAll()) do
 			if not(ply.EZarmor and ply.EZarmor.effects and ply.EZarmor.effects.jumpmod) then continue end
-
+			
 			local val = math.Clamp(ply:GetNW2Float(tag_counter, 3) + FrameTime() * 0.35, 0, 3)
-			ply.charging = ply.charging or false
+			ply.charging = ply.charging or true
 
 			if val < 1 then
 				ply.EZjumpmod_usealert = true
 			elseif val >= 1 and ply.EZjumpmod_usealert then
+				ply:SetNW2Bool("EZjumpmod_canuse", true)
 				ply.EZjumpmod_usealert = nil
 				ply:SendLua([[surface.PlaySound("]] .. JModHL2.EZ_JUMPSNDS.READY .. [[")]])
 			end
@@ -129,6 +131,8 @@ if(SERVER)then
 						end
 					end
 				end
+			else
+				
 			end
 			if ply.charging == true then
 				ply:SetNW2Float(tag_counter, val)
