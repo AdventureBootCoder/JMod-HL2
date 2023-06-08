@@ -56,11 +56,11 @@ if(SERVER)then
 		if defaultHEVdisable:GetBool() then
 			RemoveHEVsuit(playa)
 		end
-		ply:SetNW2Float(tag_counter, 0)
+		playa:SetNW2Float(tag_counter, 0)
 	end)
 
-	hook.Add("PlayerDeath", tag, function(ply)
-		ply:SetNW2Float(tag_counter, 0)
+	hook.Add("PlayerDeath", tag, function(playa)
+		playa:SetNW2Float(tag_counter, 0)
 	end)
 
 	hook.Add("JModHookEZArmorSync", "ABootHL2ArmorCheck", function(playa)
