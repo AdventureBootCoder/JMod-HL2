@@ -2,9 +2,9 @@
 AddCSLuaFile()
 ENT.Type="anim"
 ENT.Base="ent_jack_gmod_ezmachine_base"
-ENT.PrintName="EZ Sentry"
-ENT.Author="Jackarunda"
-ENT.Category="JMod - EZ Machines"
+ENT.PrintName="EZ Combine Turret"
+ENT.Author="AdventureBoots, Jackarunda"
+ENT.Category="JMod - EZ HL:2"
 ENT.Information="glhfggwpezpznore"
 ENT.NoSitAllowed=true
 ENT.Spawnable=false
@@ -20,7 +20,7 @@ ENT.EZscannerDanger=true
 ENT.JModPreferredCarryAngles=Angle(0,0,0)
 ENT.EZupgradable=true
 ENT.Model="models/combine_turrets/floor_turret.mdl"
-//ENT.Mat="models/mat_jack_gmod_ezsentry"
+ENT.Mat="models/mat_jack_gmod_ezsentry"
 ENT.Mass=250
 -- config --
 ENT.AmmoTypes = {
@@ -242,11 +242,12 @@ if(SERVER)then
 	function ENT:CreateNPCTarget()
 		if not IsValid(self.NPCTarget) then
 			self.NPCTarget = ents.Create("npc_bullseye")
-			self.NPCTarget:SetPos(self:GetPos() + self:GetUp() * 50)
+			self.NPCTarget:SetPos(self:GetPos() + self:GetUp() * 60 + self:GetForward() * 15)
 			self.NPCTarget:SetParent(self)
 			self.NPCTarget:Spawn()
 			self.NPCTarget:Activate()
 			self.NPCTarget:SetNotSolid(true)
+			self.NPCTarget:SetHealth(9e9)
 			--self.NPCTarget.NoCollideAll=true
 			--self.NPCTarget:SetCustomCollisionCheck(true)
 		end
@@ -687,12 +688,13 @@ if(SERVER)then
 		if not point then return end
 		local Ammo = self:GetAmmo()
 		if Ammo <= 0 then return end
+		local Maxy = self:GetBoneMatrix(2)
 		local SelfPos, Up, Right, Forward, ProjType = self:GetPos(), self:GetUp(), self:GetRight(), self:GetForward(), self:GetAmmoType()
-		local AimAng = self:GetAngles()
+		local AimAng = Maxy:GetAngles()
 		AimAng:RotateAroundAxis(Right, self:GetAimPitch())
 		AimAng:RotateAroundAxis(Up, self:GetAimYaw())
 		local AimForward = AimAng:Forward()
-		local ShootPos = SelfPos + Up * 38 + AimForward * self.BarrelLength
+		local ShootPos = Maxy:GetTranslation() + AimAng:Up() * 5 + AimForward * (self.BarrelLength - 5)
 		local AmmoConsume, ElecConsume = 1, .02
 		local Heat = self.Damage * self.ShotCount / 30
 		self:AddVisualRecoil(Heat * 2)
@@ -1004,6 +1006,7 @@ if(SERVER)then
 			end
 
 			self:SetAimPitch(pitch)
+			self:ManipulateBoneAngles(2,Angle(0,0,-pitch))
 		end
 
 		if yaw ~= nil then
@@ -1016,6 +1019,7 @@ if(SERVER)then
 			end
 
 			self:SetAimYaw(yaw)
+			self:ManipulateBoneAngles(1,Angle(yaw,0,0))
 		end
 	end
 elseif(CLIENT)then
@@ -1036,6 +1040,14 @@ elseif(CLIENT)then
 	local GlowSprite = Material("sprites/mat_jack_basicglow")
 
 	local GradeColors = {Vector(.3, .3, .3), Vector(.2, .2, .2), Vector(.2, .2, .2), Vector(.2, .2, .2), Vector(.2, .2, .2)}
+
+	local AmmoBGs = {
+		["Bullet"] = 0,
+		["API Bullet"] = 0,
+		["Buckshot"] = 1,
+		["HE Grenade"] = 2,
+		["Pulse Laser"] = 3
+	}
 
 	function ENT:Draw()
 		local SelfPos, SelfAng, AimPitch, AimYaw, State, Grade = self:GetPos(), self:GetAngles(), self:GetAimPitch(), self:GetAimYaw(), self:GetState(), self:GetGrade()
@@ -1078,35 +1090,57 @@ elseif(CLIENT)then
 
 		---
 		self:DrawModel()
+		---
+		if AmmoType ~= self.LastAmmoType then
+			self.LastAmmoType = AmmoType
+			self.MachineGun:SetBodygroup(0, AmmoBGs[AmmoType])
+		end
+		---
+		local GunMaxy = self:GetBoneMatrix(2)
+		local AimAngle = GunMaxy:GetAngles():GetCopy()
+		AimAngle:RotateAroundAxis(AimAngle:Forward(), -90)
+		AimAngle:RotateAroundAxis(AimAngle:Up(), -90)
+		local AimUp, AimRight, AimForward = AimAngle:Up(), AimAngle:Right(), AimAngle:Forward()
+		local GunPos = GunMaxy:GetTranslation()
+
+		JMod.RenderModel(self.MachineGun, GunPos - AimForward * (6 + self.VisualRecoil) - AimRight * 1.5, AimAngle, Vector(0.75, 0.75, 0.75))
+		self.VisualRecoil = math.Clamp(self.VisualRecoil - FT * 4, 0, 5)
 
 		if DetailDraw then
 			---
 			if (Closeness < 20000) and (State > 0) then
-				local DisplayAng = SelfAng:GetCopy()
-				DisplayAng:RotateAroundAxis(DisplayAng:Right(), 70)
-				DisplayAng:RotateAroundAxis(DisplayAng:Up(), -90)
+				local LeftRightMaxy = self:GetBoneMatrix(1)
+				local DisplayAng = LeftRightMaxy:GetAngles():GetCopy()
+				local DisplayPos = LeftRightMaxy:GetTranslation()
+				DisplayAng:RotateAroundAxis(DisplayAng:Right(), 85)
 				local Opacity = math.random(50, 150)
-				cam.Start3D2D(SelfPos + Up * 28 - Right * 7.5 - Forward * 8, DisplayAng, .075)
-				surface.SetDrawColor(10, 10, 10, Opacity + 20)
-				surface.DrawRect(-100, -140, 128, 128)
-				JMod.StandardRankDisplay(Grade, -35, -75, 118, Opacity + 20)
-				draw.SimpleTextOutlined("POWER", "JMod-Display", 250, 0, Color(255, 255, 255, Opacity), TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP, 3, Color(0, 0, 0, Opacity))
-				local ElecFrac = self:GetElectricity() / self.MaxElectricity
-				local R, G, B = JMod.GoodBadColor(ElecFrac)
-				draw.SimpleTextOutlined(tostring(math.Round(ElecFrac * 100)) .. "%", "JMod-Display", 250, 30, Color(R, G, B, Opacity), TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP, 3, Color(0, 0, 0, Opacity))
+				cam.Start3D2D(DisplayPos + DisplayAng:Up() * 3 + DisplayAng:Forward() * 7 + DisplayAng:Right() * -7, DisplayAng, .075)
+					surface.SetDrawColor(10, 10, 10, Opacity + 20)
+					surface.DrawRect(-100, -140, 128, 128)
+					JMod.StandardRankDisplay(Grade, -35, -75, 118, Opacity + 20)
 
-				if AmmoType ~= "Pulse Laser" then
-					local Ammo = self:GetAmmo()
-					local AmmoFrac = Ammo / self.MaxAmmo
-					local R, G, B = JMod.GoodBadColor(AmmoFrac)
-					draw.SimpleTextOutlined("AMMO", "JMod-Display", -50, 0, Color(255, 255, 255, Opacity), TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP, 3, Color(0, 0, 0, Opacity))
-					draw.SimpleTextOutlined(tostring(Ammo), "JMod-Display", -50, 30, Color(R, G, B, Opacity), TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP, 3, Color(0, 0, 0, Opacity))
-				end
+					if AmmoType ~= "Pulse Laser" then
+						local Ammo = self:GetAmmo()
+						local AmmoFrac = Ammo / self.MaxAmmo
+						local R, G, B = JMod.GoodBadColor(AmmoFrac)
+						draw.SimpleTextOutlined("AMMO", "JMod-Display", -50, 0, Color(255, 255, 255, Opacity), TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP, 3, Color(0, 0, 0, Opacity))
+						draw.SimpleTextOutlined(tostring(Ammo), "JMod-Display", -50, 30, Color(R, G, B, Opacity), TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP, 3, Color(0, 0, 0, Opacity))
+					end
 
-				local CoolFrac = self:GetCoolant() / 100
-				draw.SimpleTextOutlined("COOLANT", "JMod-Display", 90, 0, Color(255, 255, 255, Opacity), TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP, 3, Color(0, 0, 0, Opacity))
-				local R, G, B = JMod.GoodBadColor(CoolFrac)
-				draw.SimpleTextOutlined(tostring(math.Round(CoolFrac * 100)) .. "%", "JMod-Display", 90, 30, Color(R, G, B, Opacity), TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP, 3, Color(0, 0, 0, Opacity))
+				cam.End3D2D()
+				---
+				DisplayAng:RotateAroundAxis(DisplayAng:Right(), 185)
+				---
+				cam.Start3D2D(DisplayPos + DisplayAng:Up() * 3 + DisplayAng:Forward() * -5 + DisplayAng:Right() * -12, DisplayAng, .075)
+					draw.SimpleTextOutlined("POWER", "JMod-Display", 0, 0, Color(255, 255, 255, Opacity), TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP, 3, Color(0, 0, 0, Opacity))
+					local ElecFrac = self:GetElectricity() / self.MaxElectricity
+					local R, G, B = JMod.GoodBadColor(ElecFrac)
+					draw.SimpleTextOutlined(tostring(math.Round(ElecFrac * 100)) .. "%", "JMod-Display", 0, 30, Color(R, G, B, Opacity), TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP, 3, Color(0, 0, 0, Opacity))
+
+					local CoolFrac = self:GetCoolant() / 100
+					draw.SimpleTextOutlined("COOLANT", "JMod-Display", 0, 60, Color(255, 255, 255, Opacity), TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP, 3, Color(0, 0, 0, Opacity))
+					local R, G, B = JMod.GoodBadColor(CoolFrac)
+					draw.SimpleTextOutlined(tostring(math.Round(CoolFrac * 100)) .. "%", "JMod-Display", 0, 90, Color(R, G, B, Opacity), TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP, 3, Color(0, 0, 0, Opacity))
 				cam.End3D2D()
 			end
 		end
@@ -1130,7 +1164,7 @@ elseif(CLIENT)then
 
 		if LightColor then
 			render.SetMaterial(GlowSprite)
-			render.DrawSprite(BasePos + AimUp * 10 + AimForward * 9 - AimRight * 3.5, 7, 7, LightColor)
+			render.DrawSprite(self:GetAttachment(4).Pos, 7, 7, LightColor)
 		end
 	end
 
