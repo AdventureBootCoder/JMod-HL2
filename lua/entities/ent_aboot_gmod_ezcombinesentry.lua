@@ -257,7 +257,7 @@ if(SERVER)then
 	function ENT:CreateNPCTarget()
 		if not IsValid(self.NPCTarget) then
 			self.NPCTarget = ents.Create("npc_bullseye")
-			self.NPCTarget:SetPos(self:GetPos() + self:GetUp() * 60)
+			self.NPCTarget:SetPos(self:GetPos() + self:GetUp() * 60 + self:GetForward() * 15)
 			self.NPCTarget:SetParent(self)
 			self.NPCTarget:Spawn()
 			self.NPCTarget:Activate()
@@ -1174,7 +1174,7 @@ elseif(CLIENT)then
 		self:ManipulateBoneAngles(4, Angle(self.CurPlateAng, 0, 0))
 		self:ManipulateBonePosition(3, Vector(0, 0, self.CurGunOut))
 		---
-		self:ManipulateBoneAngles(2, Angle(0, 0, self.CurAimPitch))
+		self:ManipulateBoneAngles(2, Angle(0, 0, -self.CurAimPitch))
 		self:ManipulateBoneAngles(1, Angle(self.CurAimYaw, 0, 0))
 		---
 
