@@ -1092,6 +1092,8 @@ elseif(CLIENT)then
 		["Pulse Laser"] = 3
 	}
 
+	local FirstFrame = true
+
 	function ENT:Draw()
 		local SelfPos, SelfAng, AimPitch, AimYaw, State, Grade = self:GetPos(), self:GetAngles(), self:GetAimPitch(), self:GetAimYaw(), self:GetState(), self:GetGrade()
 		local Up, Right, Forward, FT, AmmoType = SelfAng:Up(), SelfAng:Right(), SelfAng:Forward(), FrameTime(), self:GetAmmoType()
@@ -1178,6 +1180,10 @@ elseif(CLIENT)then
 		self:ManipulateBoneAngles(1, Angle(self.CurAimYaw, 0, 0))
 		---
 
+		if FirstFrame == true then
+			FirstFrame = false
+			return
+		end
 		if DetailDraw then
 			---
 			if (Closeness < 20000) and (State > 0) then
