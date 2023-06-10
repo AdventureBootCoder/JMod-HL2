@@ -7,7 +7,7 @@ ENT.Author="AdventureBoots, Jackarunda"
 ENT.Category="JMod - EZ HL:2"
 ENT.Information="glhfggwpezpznore"
 ENT.NoSitAllowed=true
-ENT.Spawnable=false
+ENT.Spawnable=true
 ENT.AdminSpawnable=true
 ENT.SpawnHeight=15
 ENT.EZconsumes={
@@ -20,8 +20,9 @@ ENT.EZscannerDanger=true
 ENT.JModPreferredCarryAngles=Angle(0,0,0)
 ENT.EZupgradable=true
 ENT.Model="models/combine_turrets/floor_turret.mdl"
-ENT.Mat="models/mat_jack_gmod_ezsentry"
-ENT.Mass=250
+--ENT.Mat="models/mat_jack_gmod_ezsentry"
+ENT.Mass=nil
+ENT.EZcolorable = false
 -- config --
 ENT.AmmoTypes = {
 	["Bullet"] = {TargetingRadius = 1.1}, -- Simple pew pew
@@ -185,7 +186,7 @@ function ENT:InitPerfSpecs(removeAmmo)
 end
 
 ----
-local STATE_BROKEN,STATE_OFF,STATE_WATCHING,STATE_SEARCHING,STATE_ENGAGING,STATE_WHINING,STATE_OVERHEATED=-1,0,1,2,3,4,5
+local STATE_BROKEN,STATE_OFF,STATE_WATCHING,STATE_SEARCHING,STATE_ENGAGING,STATE_WHINING,STATE_OVERHEATED,STATE_FALLEN=-1,0,1,2,3,4,5,6
 function ENT:CustomSetupDataTables()
 	self:NetworkVar("Int",2,"Ammo")
 	self:NetworkVar("Float",1,"AimPitch")
@@ -209,7 +210,6 @@ if(SERVER)then
 		---
 		self:Point(0, 0)
 		self.SearchStageTime = self.SearchTime / 2
-		--self:SetAmmo(self.MaxAmmo)
 		self.NextWhine=0
 		self.Heat=0
 		self:ResetMemory()
@@ -222,12 +222,6 @@ if(SERVER)then
 			self:SetAmmo(0)
 			self:SetCoolant(0)
 		end
-		self.TestBlock = ents.Create("prop_physics")
-		self.TestBlock:SetModel("models/hunter/blocks/cube025x025x025.mdl")
-		self.TestBlock:SetPos(self:GetPos())
-		self.TestBlock:SetParent(self)
-		self.TestBlock:Spawn()
-		self.TestBlock:Activate()
 	end
 
 	function ENT:ResetMemory()
@@ -239,6 +233,11 @@ if(SERVER)then
 		self.NextTargetReSearch = 0
 		self.NextFixTime = 0
 		self.NextUseTime = 0
+		self.NextPingTime = 0
+		self.NextEndPanicTime = 0
+		if self.AlertSound then
+			self.AlertSound:Stop()
+		end
 
 		self.SearchData = {
 			LastKnownTarg = nil,
@@ -247,7 +246,6 @@ if(SERVER)then
 			NextDeEsc = 0, -- next de-escalation to the watching state
 			NextSearchChange = 0, -- time to move on to the next phase of searching
 			State = 0 -- 0=not searching, 1=aiming at last known point, 2=aiming at predicted point
-			
 		}
 	end
 	
@@ -339,10 +337,10 @@ if(SERVER)then
 		end
 	end
 
-	function ENT:TurnOff()
+	function ENT:TurnOff(autoReactivate)
 		if (self:GetState() <= 0) then return end
 		self:SetState(STATE_OFF)
-		self:EmitSound("snds_jack_gmod/ezsentry_shutdown.wav", 65, 100)
+		self:EmitSound("npc/turret_floor/die.wav", 65, 100)
 		self:ResetMemory()
 		self:RemoveNPCTarget()
 	end
@@ -354,8 +352,7 @@ if(SERVER)then
 	function ENT:TurnOn(activator)
 		if self:GetState() > STATE_OFF then return end
 		local OldOwner = self.EZowner
-		JMod.SetEZowner(self, activator, true)
-
+		JMod.SetEZowner(self, activator, false)
 		self:SetState(STATE_WATCHING)
 		self:EmitSound("snds_jack_gmod/ezsentry_startup.wav", 65, 100)
 		self:ResetMemory()
@@ -470,7 +467,7 @@ if(SERVER)then
 		self.NextTargetReSearch = CurTime() + self.TargetLockTime
 		self.SearchData.State = 0
 		self:SetState(STATE_ENGAGING)
-		self:EmitSound("snds_jack_gmod/ezsentry_engage.wav", 65, 100)
+		self:EmitSound("npc/turret_floor/active.wav", 100, 100)
 		JMod.Hint(self.EZowner, "sentry upgrade")
 	end
 
@@ -480,15 +477,22 @@ if(SERVER)then
 		self.SearchData.NextSearchChange = Time + self.SearchStageTime
 		self.SearchData.NextDeEsc = Time + self.SearchTime
 		self:SetState(STATE_SEARCHING)
-		self:EmitSound("snds_jack_gmod/ezsentry_disengage.wav", 65, 100)
+		self:EmitSound("npc/turret_floor/ping.wav", 65, 100)
 	end
 
 	function ENT:StandDown()
 		self.Target = nil
 		self.SearchData.State = 0
 		self:SetState(STATE_WATCHING)
-		self:EmitSound("snds_jack_gmod/ezsentry_standdown.wav", 65, 100)
+		self:EmitSound("npc/turret_floor/retract.wav", 65, 100)
 		JMod.Hint(self.EZowner, "sentry modify")
+	end
+
+	function ENT:Panic()
+		--self.PanicSound = CreateSound(self, "npc/turret_floor/alarm.wav")
+		--self.PanicSound:Play()
+		self:SetState(STATE_FALLEN)
+		self.NextEndPanicTime = Time + 3
 	end
 
 	function ENT:Think()
@@ -499,6 +503,8 @@ if(SERVER)then
 			self.NextRealThink = Time + .25 / self.ThinkSpeed
 			self.Firing = false
 			local State = self:GetState()
+			local SelfAng = self:GetAngles()
+			local Tipped = ((SelfAng.p > 60 or SelfAng.p < -60) or (SelfAng.r > 60 or SelfAng.r < -60))
 
 			if State > 0 then
 				if self.Heat > 90 then
@@ -516,6 +522,23 @@ if(SERVER)then
 						end
 					elseif State == STATE_WHINING then
 						self:SetState(STATE_WATCHING)
+					end
+				end
+				if State ~= STATE_FALLEN and Tipped then
+					self:SetState(STATE_FALLEN)
+					self:ReturnToForward()
+					self.AlertSound = CreateSound(self, "npc/turret_floor/alert.wav")
+					self.AlertSound:Play()
+					self.NextWhine = Time + math.Rand(1.5, 2)
+					timer.Simple(1, function() 
+						if IsValid(self) and self.AlertSound then
+							self.AlertSound:Stop()
+						end
+					end)
+				elseif State == STATE_FALLEN and not(Tipped) then 
+					self:SetState(STATE_WATCHING)
+					if self.AlertSound then
+						self.AlertSound:Stop()
 					end
 				end
 			end
@@ -556,6 +579,11 @@ if(SERVER)then
 							if (math.abs(NeedTurnPitch) > 0) or (math.abs(NeedTurnYaw) > 0) then
 								self:Turn(NeedTurnPitch, NeedTurnYaw)
 							end
+						end
+
+						if self.NextPingTime < Time then
+							self.NextPingTime = Time + 0.75
+							self:EmitSound("npc/turret_floor/ping.wav", 80, 100)
 						end
 
 						if self.SearchData.NextSearchChange < Time then
@@ -614,6 +642,8 @@ if(SERVER)then
 				end
 			elseif State == STATE_WHINING then
 				self:Whine(true)
+			elseif State == STATE_FALLEN then
+				self:Whine(true)
 			end
 
 			if ((Electricity < self.MaxElectricity * .1) or (Ammo < self.MaxAmmo * .1)) and (State > 0) then
@@ -628,11 +658,11 @@ if(SERVER)then
 			---
 			if self.Heat > 55 then
 				local SelfPos, Up, Right, Forward = self:GetPos(), self:GetUp(), self:GetRight(), self:GetForward()
-				local AimAng = self:GetAngles()
+				local AimAng = SelfAng
 				AimAng:RotateAroundAxis(Right, self:GetAimPitch())
 				AimAng:RotateAroundAxis(Up, self:GetAimYaw())
 				local AimForward = AimAng:Forward()
-				local ShootPos = SelfPos + Up * 38 + AimForward * self.BarrelLength
+				local ShootPos = SelfPos + Up * 56 + AimForward * self.BarrelLength
 				---
 				local Exude = EffectData()
 				Exude:SetOrigin(ShootPos)
@@ -667,16 +697,10 @@ if(SERVER)then
 		local Ammo = self:GetAmmo()
 		if Ammo <= 0 then return end
 		local SelfPos, Up, Right, Forward, ProjType = self:GetPos(), self:GetUp(), self:GetRight(), self:GetForward(), self:GetAmmoType()
-		/*local GunMaxy = self:GetBoneMatrix(2)
-		local AimAng = GunMaxy:GetAngles()
-		AimAng:RotateAroundAxis(AimAng:Right(), 90)
-		local AimForward = AimAng:Forward()
-		local ShootPos = GunMaxy:GetTranslation() + AimForward * (self.BarrelLength - 15) + AimAng:Up() * -2 + AimAng:Right() * -5*/
 		local AimAng = self:GetAngles()
 		AimAng:RotateAroundAxis(AimAng:Up(), self:GetAimYaw())
 		local AimForward = AimAng:Forward()
-		local ShootPos = SelfPos + AimForward * (self.BarrelLength - 15) + Up * 60
-		self.TestBlock:SetPos(ShootPos)
+		local ShootPos = SelfPos + AimForward * (self.BarrelLength - 12) + AimAng:Up() * 56
 		local AmmoConsume, ElecConsume = 1, .02
 		local Heat = self.Damage * self.ShotCount / 30
 		self:AddVisualRecoil(Heat * 2)
@@ -741,7 +765,6 @@ if(SERVER)then
 			local Force = Dmg / 5
 			local ShootDir = (point - ShootPos):GetNormalized()
 
-			--ParticleEffect("MuzzleFlash", ShootPos, AimAng, self)
 			util.Effect("MuzzleFlash", Eff)
 
 			sound.Play("weapons/ar2/fire"..tostring(math.random(1, 3))..".wav", SelfPos + Up, 100, math.random(80, 100))
@@ -983,7 +1006,7 @@ if(SERVER)then
 		local X, Y = self:GetAimYaw(), self:GetAimPitch()
 		self:Point(Y + math.Rand(-1, 1) * self.TurnSpeed / 8, X + math.Rand(-1, 1) * self.TurnSpeed / 4)
 		self:ConsumeElectricity()
-		-- todo: sound
+		-- todo, find a use for this
 	end
 
 	function ENT:ReturnToForward()
@@ -994,7 +1017,7 @@ if(SERVER)then
 		self:Point(Y + TurnAmtPitch, X - TurnAmtYaw)
 
 		if (math.abs(TurnAmtPitch) > .5) or (math.abs(TurnAmtYaw) > .5) then
-			sound.Play("snds_jack_gmod/ezsentry_turn.wav", self:GetPos(), 60, math.random(95, 105))
+			sound.Play("snds_jack_gmod/ezsentry_turn.wav", self:GetPos(), 60, math.random(65, 80))
 		end
 
 		self:ConsumeElectricity()
@@ -1007,7 +1030,7 @@ if(SERVER)then
 		self:Point(Y + TurnAmtPitch, X - TurnAmtYaw)
 
 		if (math.abs(TurnAmtPitch) > .5) or (math.abs(TurnAmtYaw) > .5) then
-			sound.Play("snds_jack_gmod/ezsentry_turn.wav", self:GetPos(), 60, math.random(95, 105))
+			sound.Play("snds_jack_gmod/ezsentry_turn.wav", self:GetPos(), 60, math.random(65, 80))
 		end
 
 		self:ConsumeElectricity()
@@ -1024,7 +1047,6 @@ if(SERVER)then
 			end
 
 			self:SetAimPitch(pitch)
-			self:ManipulateBoneAngles(2,Angle(0,0,-pitch), true)
 		end
 
 		if yaw ~= nil then
@@ -1037,7 +1059,6 @@ if(SERVER)then
 			end
 
 			self:SetAimYaw(yaw)
-			self:ManipulateBoneAngles(1,Angle(yaw,0,0), true)
 		end
 	end
 elseif(CLIENT)then
@@ -1121,6 +1142,8 @@ elseif(CLIENT)then
 				self.RenderGun = false
 
 				return
+			else
+				self.RenderGun = true
 			end
 		end
 		---
@@ -1150,6 +1173,9 @@ elseif(CLIENT)then
 		self.CurGunOut = Lerp(FT * 3, self.CurGunOut, GunOut)
 		self:ManipulateBoneAngles(4, Angle(self.CurPlateAng, 0, 0))
 		self:ManipulateBonePosition(3, Vector(0, 0, self.CurGunOut))
+		---
+		self:ManipulateBoneAngles(2, Angle(0, 0, self.CurAimPitch))
+		self:ManipulateBoneAngles(1, Angle(self.CurAimYaw, 0, 0))
 		---
 
 		if DetailDraw then
@@ -1200,7 +1226,7 @@ elseif(CLIENT)then
 			LightColor = Color(255, 255, 0)
 		elseif State == STATE_ENGAGING then
 			LightColor = Color(255, 0, 0)
-		elseif State == STATE_WHINING then
+		elseif State == STATE_WHINING or State == STATE_FALLEN then
 			local Mul = math.sin(CurTime() * 5) / 2 + .5
 			LightColor = Color(255 * Mul, 255 * Mul, 0)
 		elseif State == STATE_OVERHEATED then
