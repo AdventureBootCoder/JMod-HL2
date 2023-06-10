@@ -73,7 +73,8 @@ JModHL2.ArmorTable = {
 			[DMG_POISON]=.99
 		},
 		chrg={
-			chemicals = 50
+			chemicals = 50,
+			power = 30
 		},
 		snds={
 			eq="hl1/fvox/bell.wav",
@@ -81,7 +82,14 @@ JModHL2.ArmorTable = {
 		},
 		eff={
 			HEVsuit = true,
-			speedBoost = 1.2
+			speedBoost = 1.2,
+			nightVision = true
+		},
+		blackvisionwhendead = true,
+		tgl = {
+			blackvisionwhendead = false,
+			mskmat = "mats_aboot_gmod_sprites/helmet_vignette1.png",
+			eff = {nightVision = false}
 		},
 		plymdl="models/aboot/player/hev_suit.mdl", -- https://steamcommunity.com/sharedfiles/filedetails/?id=1341386337&searchtext=hev+suit
 		mskmat="mats_aboot_gmod_sprites/helmet_vignette1.png",

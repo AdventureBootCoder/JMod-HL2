@@ -24,8 +24,19 @@ ENT.Mat="models/mat_jack_gmod_ezsentry"
 ENT.Mass=250
 -- config --
 ENT.AmmoTypes = {
-	["Bullet"] = {}, -- Simple pew pew
-	-- default stats --
+	["Bullet"] = {TargetingRadius = 1.1}, -- Simple pew pew
+	["Pulse Rifle"] = {
+		FireRate = 1.2,
+		Damage = .35,
+		Accuracy = .8,
+		BarrelLength = .9,
+		MaxAmmo = 1.5,
+		TargetingRadius = 1,
+		-- make it faster
+		SearchSpeed = 1.5,
+		TargetLockTime = .5,
+		TurnSpeed = 1.5
+	},
 	["Buckshot"] = {
 		FireRate = .4,
 		Damage = .35,
@@ -86,10 +97,10 @@ ENT.StaticPerfSpecs = {
 	MaxCoolant = 100
 }
 ENT.DynamicPerfSpecs={
-	MaxAmmo=300,
+	MaxAmmo=200,
 	TurnSpeed=60,
-	TargetingRadius=15,
-	Armor=1,
+	TargetingRadius=20,
+	Armor=2,
 	FireRate=6,
 	Damage=15,
 	Accuracy=1,
@@ -191,7 +202,7 @@ if(SERVER)then
 		end
 
 		---
-		self:SetAmmoType("Bullet")
+		self:SetAmmoType("Pulse Rifle")
 		JMod.Colorify(self)
 		self:SetPerfMult(JMod.Config.Machines.Sentry.PerformanceMult)
 		self:InitPerfSpecs()
@@ -211,6 +222,12 @@ if(SERVER)then
 			self:SetAmmo(0)
 			self:SetCoolant(0)
 		end
+		self.TestBlock = ents.Create("prop_physics")
+		self.TestBlock:SetModel("models/hunter/blocks/cube025x025x025.mdl")
+		self.TestBlock:SetPos(self:GetPos())
+		self.TestBlock:SetParent(self)
+		self.TestBlock:Spawn()
+		self.TestBlock:Activate()
 	end
 
 	function ENT:ResetMemory()
@@ -242,7 +259,7 @@ if(SERVER)then
 	function ENT:CreateNPCTarget()
 		if not IsValid(self.NPCTarget) then
 			self.NPCTarget = ents.Create("npc_bullseye")
-			self.NPCTarget:SetPos(self:GetPos() + self:GetUp() * 60 + self:GetForward() * 15)
+			self.NPCTarget:SetPos(self:GetPos() + self:GetUp() * 60)
 			self.NPCTarget:SetParent(self)
 			self.NPCTarget:Spawn()
 			self.NPCTarget:Activate()
@@ -289,44 +306,9 @@ if(SERVER)then
 			self:TurnOff()
 		end
 	end
+
 	function ENT:CustomDetermineDmgMult(dmginfo)
-		local Mult=1
-		local IncomingVec=dmginfo:GetDamageForce():GetNormalized()
-		local Up,Right,Forward=self:GetUp(),self:GetRight(),self:GetForward()
-		local AimAng=self:GetAngles()
-		AimAng:RotateAroundAxis(Right,self:GetAimPitch())
-		AimAng:RotateAroundAxis(Up,self:GetAimYaw())
-		local AimVec=AimAng:Forward()
-		local AttackAngle=-math.deg(math.asin(AimVec:Dot(IncomingVec)))
-		if(AttackAngle>=60)then
-			Mult=Mult*.2
-			if(math.random(1,2)==1)then
-				local SelfPos=self:GetPos()
-				sound.Play("snds_jack_gmod/ricochet_"..math.random(1,2)..".wav",SelfPos+VectorRand(),70,math.random(80,120))
-				local effectdata=EffectData()
-				effectdata:SetOrigin(SelfPos+Up*30+AimVec*20)
-				effectdata:SetNormal(VectorRand())
-				effectdata:SetMagnitude(2) --amount and shoot hardness
-				effectdata:SetScale(1) --length of strands
-				effectdata:SetRadius(2) --thickness of strands
-				util.Effect("Sparks",effectdata,true,true)
-				if(dmginfo:IsDamageType(DMG_BULLET)or(dmginfo:IsDamageType(DMG_BUCKSHOT)))then
-					local RicDir=VectorRand()
-					RicDir.z=RicDir.z/2
-					RicDir:Normalize()
-					self:FireBullets({
-						Src=SelfPos,
-						Dir=RicDir,
-						Tracer=1,
-						Num=1,
-						Spread=Vector(0,0,0),
-						Damage=10,
-						Force=50,
-						Attacker=dmginfo:GetAttacker() or self
-					})
-				end
-			end
-		end
+		local Mult = 1
 		return Mult
 	end
 
@@ -372,14 +354,7 @@ if(SERVER)then
 	function ENT:TurnOn(activator)
 		if self:GetState() > STATE_OFF then return end
 		local OldOwner = self.EZowner
-		JMod.SetEZowner(self, activator)
-
-		if IsValid(self.EZowner) then
-			-- if owner changed then reset team color
-			if OldOwner ~= self.EZowner then
-				JMod.Colorify(self)
-			end
-		end
+		JMod.SetEZowner(self, activator, true)
 
 		self:SetState(STATE_WATCHING)
 		self:EmitSound("snds_jack_gmod/ezsentry_startup.wav", 65, 100)
@@ -425,9 +400,12 @@ if(SERVER)then
 
 	function ENT:CanSee(ent)
 		if not IsValid(ent) then return false end
-		local TargPos, SelfPos = self:DetermineTargetAimPoint(ent), self:GetPos() + self:GetUp() * 35
+		local TargPos, SelfPos = self:DetermineTargetAimPoint(ent), self:GetPos() + self:GetUp() * 60
 		local Dist = TargPos:Distance(SelfPos)
 		if Dist > self.TargetingRadius then return false end
+
+		local TargetAngle = self:WorldToLocal(TargPos):Angle().y
+		if not((TargetAngle < 40) or (TargetAngle > 320)) then return false end
 
 		local Tr = util.TraceLine({
 			start = SelfPos,
@@ -688,13 +666,17 @@ if(SERVER)then
 		if not point then return end
 		local Ammo = self:GetAmmo()
 		if Ammo <= 0 then return end
-		local Maxy = self:GetBoneMatrix(2)
 		local SelfPos, Up, Right, Forward, ProjType = self:GetPos(), self:GetUp(), self:GetRight(), self:GetForward(), self:GetAmmoType()
-		local AimAng = Maxy:GetAngles()
-		AimAng:RotateAroundAxis(Right, self:GetAimPitch())
-		AimAng:RotateAroundAxis(Up, self:GetAimYaw())
+		/*local GunMaxy = self:GetBoneMatrix(2)
+		local AimAng = GunMaxy:GetAngles()
+		AimAng:RotateAroundAxis(AimAng:Right(), 90)
 		local AimForward = AimAng:Forward()
-		local ShootPos = Maxy:GetTranslation() + AimAng:Up() * 5 + AimForward * (self.BarrelLength - 5)
+		local ShootPos = GunMaxy:GetTranslation() + AimForward * (self.BarrelLength - 15) + AimAng:Up() * -2 + AimAng:Right() * -5*/
+		local AimAng = self:GetAngles()
+		AimAng:RotateAroundAxis(AimAng:Up(), self:GetAimYaw())
+		local AimForward = AimAng:Forward()
+		local ShootPos = SelfPos + AimForward * (self.BarrelLength - 15) + Up * 60
+		self.TestBlock:SetPos(ShootPos)
 		local AmmoConsume, ElecConsume = 1, .02
 		local Heat = self.Damage * self.ShotCount / 30
 		self:AddVisualRecoil(Heat * 2)
@@ -739,6 +721,42 @@ if(SERVER)then
 				Num = self.ShotCount,
 				Tracer = 5,
 				TracerName = "eff_jack_gmod_smallarmstracer",
+				Dir = ShootDir,
+				Spread = Vector(0, 0, 0),
+				Src = ShootPos,
+				IgnoreEntity = nil
+			}
+
+			self:FireBullets(Ballut)
+		elseif ProjType == "Pulse Rifle" then
+			local ShellAng = AimAng:GetCopy()
+			ShellAng:RotateAroundAxis(ShellAng:Up(), -90)
+			local Eff = EffectData()
+			Eff:SetOrigin(SelfPos + Up * 36 + AimForward * 5)
+			Eff:SetAngles(ShellAng)
+			Eff:SetFlags(5)
+			Eff:SetEntity(self)
+			---
+			local Dmg, Inacc = self.Damage, .06 / self.Accuracy
+			local Force = Dmg / 5
+			local ShootDir = (point - ShootPos):GetNormalized()
+
+			--ParticleEffect("MuzzleFlash", ShootPos, AimAng, self)
+			util.Effect("MuzzleFlash", Eff)
+
+			sound.Play("weapons/ar2/fire"..tostring(math.random(1, 3))..".wav", SelfPos + Up, 100, math.random(80, 100))
+			ShootDir = (ShootDir + VectorRand() * math.Rand(.05, 1) * Inacc):GetNormalized()
+
+			local Ballut = {
+				Attacker = self.EZowner or self,
+				Callback = nil,
+				Damage = Dmg,
+				Force = Force,
+				Distance = nil,
+				HullSize = nil,
+				Num = self.ShotCount,
+				Tracer = 5,
+				TracerName = "AR2Tracer",
 				Dir = ShootDir,
 				Spread = Vector(0, 0, 0),
 				Src = ShootPos,
@@ -997,8 +1015,8 @@ if(SERVER)then
 
 	function ENT:Point(pitch, yaw)
 		if pitch ~= nil then
-			if pitch > 90 then
-				pitch = 90
+			if pitch > 45 then
+				pitch = 45
 			end
 
 			if pitch < -45 then
@@ -1006,20 +1024,20 @@ if(SERVER)then
 			end
 
 			self:SetAimPitch(pitch)
-			self:ManipulateBoneAngles(2,Angle(0,0,-pitch))
+			self:ManipulateBoneAngles(2,Angle(0,0,-pitch), true)
 		end
 
 		if yaw ~= nil then
-			if yaw > 180 then
-				yaw = yaw - 360
+			if yaw > 40 then
+				yaw = 40
 			end
 
-			if yaw < -180 then
-				yaw = yaw + 360
+			if yaw < -40 then
+				yaw = -40
 			end
 
 			self:SetAimYaw(yaw)
-			self:ManipulateBoneAngles(1,Angle(yaw,0,0))
+			self:ManipulateBoneAngles(1,Angle(yaw,0,0), true)
 		end
 	end
 elseif(CLIENT)then
@@ -1028,9 +1046,12 @@ elseif(CLIENT)then
 		---
 		self.CurAimPitch = 0
 		self.CurAimYaw = 0
+		self.CurPlateAng = 0
+		self.CurGunOut = 0
 		self.VisualRecoil = 0
 		---
 		self.LastAmmoType = ""
+		self.RenderGun = true
 	end
 
 	function ENT:AddVisualRecoil(amt)
@@ -1043,6 +1064,7 @@ elseif(CLIENT)then
 
 	local AmmoBGs = {
 		["Bullet"] = 0,
+		["Pulse Rifle"] = 0,
 		["API Bullet"] = 0,
 		["Buckshot"] = 1,
 		["HE Grenade"] = 2,
@@ -1052,6 +1074,7 @@ elseif(CLIENT)then
 	function ENT:Draw()
 		local SelfPos, SelfAng, AimPitch, AimYaw, State, Grade = self:GetPos(), self:GetAngles(), self:GetAimPitch(), self:GetAimYaw(), self:GetState(), self:GetGrade()
 		local Up, Right, Forward, FT, AmmoType = SelfAng:Up(), SelfAng:Right(), SelfAng:Forward(), FrameTime(), self:GetAmmoType()
+		local PlateAng, GunOut = 0, 0
 		self.CurAimPitch = Lerp(FT * 3, self.CurAimPitch, AimPitch)
 		self.CurAimYaw = Lerp(FT * 3, self.CurAimYaw, AimYaw)
 
@@ -1094,17 +1117,40 @@ elseif(CLIENT)then
 		if AmmoType ~= self.LastAmmoType then
 			self.LastAmmoType = AmmoType
 			self.MachineGun:SetBodygroup(0, AmmoBGs[AmmoType])
+			if AmmoType == "Pulse Rifle" then
+				self.RenderGun = false
+
+				return
+			end
 		end
 		---
-		local GunMaxy = self:GetBoneMatrix(2)
-		local AimAngle = GunMaxy:GetAngles():GetCopy()
-		AimAngle:RotateAroundAxis(AimAngle:Forward(), -90)
-		AimAngle:RotateAroundAxis(AimAngle:Up(), -90)
-		local AimUp, AimRight, AimForward = AimAngle:Up(), AimAngle:Right(), AimAngle:Forward()
-		local GunPos = GunMaxy:GetTranslation()
+		if self.RenderGun then
+			local GunMaxy = self:GetBoneMatrix(2)
+			local AimAngle = GunMaxy:GetAngles():GetCopy()
+			AimAngle:RotateAroundAxis(AimAngle:Forward(), -90)
+			AimAngle:RotateAroundAxis(AimAngle:Up(), -90)
+			local AimUp, AimRight, AimForward = AimAngle:Up(), AimAngle:Right(), AimAngle:Forward()
+			local GunPos = GunMaxy:GetTranslation()
 
-		JMod.RenderModel(self.MachineGun, GunPos - AimForward * (6 + self.VisualRecoil) - AimRight * 1.5, AimAngle, Vector(0.75, 0.75, 0.75))
+			JMod.RenderModel(self.MachineGun, GunPos - AimForward * (6 + self.VisualRecoil) - AimRight * 1.5, AimAngle, Vector(0.75, 0.75, 0.75))
+			CurPlateAng = 0
+			CurGunOut = 0
+		else
+			if (State == STATE_ENGAGING) or (State == STATE_SEARCHING) then
+				PlateAng = 20
+				GunOut = 8
+			else
+				PlateAng = 0
+				GunOut = 0
+			end
+		end
 		self.VisualRecoil = math.Clamp(self.VisualRecoil - FT * 4, 0, 5)
+		---
+		self.CurPlateAng = Lerp(FT * 3, self.CurPlateAng, PlateAng)
+		self.CurGunOut = Lerp(FT * 3, self.CurGunOut, GunOut)
+		self:ManipulateBoneAngles(4, Angle(self.CurPlateAng, 0, 0))
+		self:ManipulateBonePosition(3, Vector(0, 0, self.CurGunOut))
+		---
 
 		if DetailDraw then
 			---
