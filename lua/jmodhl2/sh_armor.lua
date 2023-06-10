@@ -83,13 +83,13 @@ JModHL2.ArmorTable = {
 		eff={
 			HEVsuit = true,
 			speedBoost = 1.2,
-			nightVision = true
+			nightVision = false
 		},
-		blackvisionwhendead = true,
+		blackvisionwhendead = false,
 		tgl = {
-			blackvisionwhendead = false,
+			blackvisionwhendead = true,
 			mskmat = "mats_aboot_gmod_sprites/helmet_vignette1.png",
-			eff = {nightVision = false}
+			eff = {nightVision = true}
 		},
 		plymdl="models/aboot/player/hev_suit.mdl", -- https://steamcommunity.com/sharedfiles/filedetails/?id=1341386337&searchtext=hev+suit
 		mskmat="mats_aboot_gmod_sprites/helmet_vignette1.png",
