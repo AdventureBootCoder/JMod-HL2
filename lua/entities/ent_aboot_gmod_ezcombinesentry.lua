@@ -1240,7 +1240,7 @@ elseif(CLIENT)then
 			LightColor = Color(255 * Mul, 255 * Mul, 0)
 		end
 
-		if LightColor then
+		if LightColor and self:GetAttachment(4) ~= nil then
 			render.SetMaterial(GlowSprite)
 			render.DrawSprite(self:GetAttachment(4).Pos, 7, 7, LightColor)
 		end

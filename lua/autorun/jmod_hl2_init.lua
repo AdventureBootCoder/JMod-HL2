@@ -3,8 +3,8 @@ JModHL2 = JModHL2 or {}
 -- we have to load locales before any other files
 -- because files that add concommands have help text
 -- and we want the help text to be localized
-include("jmodhl2/sh_locales.lua")
-AddCSLuaFile("jmodhl2/sh_locales.lua")
+--include("jmodhl2/sh_locales.lua")
+--AddCSLuaFile("jmodhl2/sh_locales.lua")
 
 for i, f in pairs(file.Find("jmodhl2/*.lua", "LUA")) do
 	if string.Left(f, 3) == "sv_" then
@@ -146,15 +146,11 @@ if(SERVER)then
 
 	concommand.Add("aboot_debug", function(ply, cmd, args) 
 		if not GetConVar("sv_cheats"):GetBool() then return end
-		local EyeTrace = ply:GetEyeTrace()
-		local EffectSpot = EyeTrace.HitPos + Vector(0, 0, 20)
-		local Poof = EffectData()
-		Poof:SetNormal(Vector(0, 0, -1))
-		Poof:SetScale(1)
-		Poof:SetOrigin(EffectSpot)
-		Poof:SetStart(Vector(0, 0, -10))
-		util.Effect("eff_aboot_gmod_ezjumppoof", Poof, true)
-		EmitSound(JModHL2.EZ_JUMPSNDS.BOOST1, EffectSpot, -1)
+		local Obj = ply:GetEyeTrace().Entity
+		if IsValid(Obj) then
+			Obj:SetColor(Color(255, 255, 255, 150))
+			Obj:SetRenderMode(RENDERMODE_TRANSCOLOR)
+		end
 	end, nil, "Debug testing command")
 
 elseif CLIENT then 

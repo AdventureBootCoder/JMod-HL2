@@ -1,4 +1,4 @@
-﻿-- Jackarunda 2021
+﻿-- AdventureBoots 2022
 AddCSLuaFile()
 ENT.Type = "anim"
 ENT.Author = "Jackarunda, AdventureBoots"
@@ -163,6 +163,25 @@ elseif CLIENT then
 		return true
 	end
 
+	function ENT:SummonIchthy(ply)
+		local IchyOrigin = ply:EyeAngles():Forward()
+		IchyOrigin.z = 0
+		if util.QuickTrace(ply:EyePos(), IchyOrigin * 480).Hit then return end
+		timer.Simple(0.5, function()
+			if IsValid(self) and IsValid(ply) and ply:Alive() and (ply:WaterLevel() >= 3) and not(ply.Scared) then
+				local Ichy = EffectData()
+				Ichy:SetAngles(Angle(0, ply:GetAngles().y + 180, 0))
+				local IchyOrigin = ply:EyeAngles():Forward()
+				IchyOrigin.z = 0
+				Ichy:SetOrigin(ply:EyePos() + IchyOrigin * 480)
+				Ichy:SetEntity(ply)
+				util.Effect("eff_aboot_gmod_ichthy", Ichy)
+				ply.Scared = true
+				EmitSound("npc/ichthyosaur/attack_growl1.wav", ply:EyePos() + IchyOrigin * 480, -1)
+			end
+		end)
+	end
+
 	hook.Remove("RenderScreenspaceEffects", "ABoot_TeleportEffect")
 	hook.Add("RenderScreenspaceEffects", "ABoot_TeleportEffect", function()
 		local Ply = LocalPlayer()
@@ -172,6 +191,11 @@ elseif CLIENT then
 			if (v:GetActivated() and v:GetPos():Distance(Ply:GetPos()) < v.TeleRange) and v:ShouldTeleport(Ply) then
 				Teleporting = true
 				Teleporter = v
+				if (v.TimeSinceActivated > (CurTime() - 0.15)) and not(Ply.Scared) and (Ply:WaterLevel() >= 3) then
+					if math.random(0, 1000) > 975 then
+						v:SummonIchthy(Ply)
+					end
+				end
 			end
 		end
 		if Teleporting then
@@ -181,6 +205,8 @@ elseif CLIENT then
 			render.DrawScreenQuad(true)
 			--render.SetMaterial(Overlay)
 			--render.DrawScreenQuad(false)
+		elseif Ply.Scared then
+			Ply.Scared = nil
 		end
 	end)
 
