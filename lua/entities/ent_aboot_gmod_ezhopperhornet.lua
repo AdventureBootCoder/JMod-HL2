@@ -239,12 +239,14 @@ if SERVER then
 			Phys:ApplyForceOffset(Vector(0, 0, 3000) + extraVelocity, self:LocalToWorld(Vector(math.random()*2, math.random()*2, 0)))
 		end
 		timer.Simple(1, function()
-			if IsValid(self) and (self:GetState() == STATE_ARMING) and (self.ArmAttempts < 5) then
-				self.ArmAttempts = self.ArmAttempts + 1
-				self:SetState(STATE_OFF)
-				self:Arm(JMod.GetEZowner(self))
-			else
-				self:SetState(STATE_OFF)
+			if IsValid(self) then 
+				if (self:GetState() == STATE_ARMING) and (self.ArmAttempts < 5) then
+					self.ArmAttempts = self.ArmAttempts + 1
+					self:SetState(STATE_OFF)
+					self:Arm(JMod.GetEZowner(self))
+				else
+					self:SetState(STATE_OFF)
+				end
 			end
 		end)
 	end
@@ -346,11 +348,12 @@ if SERVER then
 			return true
 		elseif State == STATE_LAUNCHED then
 			self.NextDetonateTime = self.NextDetonateTime or Time + 0.3
-			if self.NextDetonateTime > Time then return end
-			if self:GetPhysicsObject():GetVelocity().z <= 1 and not self:IsPlayerHolding() then
-				self:FindTarget(true)
-				if IsValid(Target) then
-					self:Detonate(true)
+			if self.NextDetonateTime < Time then 
+				if self:GetPhysicsObject():GetVelocity().z <= 10 and not self:IsPlayerHolding() then
+					self:FindTarget(true)
+					if IsValid(self:GetTarget()) then
+						self:Detonate()
+					end
 				end
 			end
 

@@ -86,7 +86,7 @@ if(SERVER)then
 
 	local NextMainThink, NextArmorThink = 0, 0
 	hook.Add("Think", "JMOD_HL2_THINK", function()
-		local Time = CurTime()
+		local Time, FT = CurTime(), FrameTime()
 		
 		--jprint("Think", NextMainThink < Time)
 		if NextMainThink > Time then return end
@@ -96,7 +96,7 @@ if(SERVER)then
 
 			if ply.EZarmor and ply.EZarmor.effects then
 				if ply.EZarmor.effects.jumpmod or ply.EZarmor.effects.jetmod then
-					local val = math.Clamp(ply:GetNW2Float(tag_counter, 3) + FrameTime() * 4.5, 0, 3)
+					local val = math.Clamp(ply:GetNW2Float(tag_counter, 3) + FT * 4.5, 0, 3)
 					if ply.charging == nil then
 						ply.charging = true
 					end
@@ -110,9 +110,10 @@ if(SERVER)then
 					end
 
 					if (GetConVar("gmod_suit"):GetBool()) and (ply:GetSuitPower() >= 1) and (val < 3) then
+						
 						ply.charging = true
 						if (ply:GetSuitPower() >= 1.25) then
-							ply:SetSuitPower(math.Clamp(ply:GetSuitPower() - .25, 0, 100))
+							ply:SetSuitPower(math.Clamp(ply:GetSuitPower() - 5.5 * (FT * 60), 0, 100))
 						else
 							ply.charging = false
 						end

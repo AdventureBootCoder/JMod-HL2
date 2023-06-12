@@ -108,6 +108,10 @@ JModHL2.ArmorTable = {
 		slots = {
 			back = 1
 		},
+		tgl = {
+			eff = {jumpmod = false},
+			slots = {back = 0}
+		},
 		def=table.Inherit({
 			[DMG_NERVEGAS]=1,
 			[DMG_RADIATION]=1,
@@ -136,6 +140,48 @@ JModHL2.ArmorTable = {
 		dur = 100,
 		HEVreq = true,
 		ent = "ent_aboot_gmod_ezarmor_jumpmodule"
+	},
+	["ABoot Jet Module"]={
+		PrintName = "EZ Jet Module",
+		Category = "JMod - EZ HL:2",
+		mdl = "models/aboot/combine/hev_suit/combinejetmodule.mdl",
+		clr = { r = 255, g = 255, b = 0 },
+		clrForced = false,
+		slots = {
+			back = 1
+		},
+		tgl = {
+			eff = {jetmod = false},
+			slots = {back = 0}
+		},
+		def=table.Inherit({
+			[DMG_NERVEGAS]=1,
+			[DMG_RADIATION]=1,
+			[DMG_ACID]=1,
+			[DMG_POISON]=1,
+		},HEVArmorProtectionProfile),
+		resist={
+			[DMG_ACID]=.75,
+			[DMG_POISON]=.90
+		},
+		chrg={
+			power = 50
+		},
+		snds={
+			eq="aboot_jumpmod/bootup_sequence/bootup_jetconnects.wav",
+			uneq="aboot_jumpmod/bootup_sequence/bootup_moduleacq.wav"
+		},
+		eff={
+			jetmod = true
+		},
+		bon = "ValveBiped.Bip01_Spine2",
+		siz = Vector(.7, .7, .7),
+		pos = Vector(7, 2, 0),
+		ang = Angle(0, 180, 90),
+		wgt = 20,
+		dur = 100,
+		HEVreq = true,
+		ent = "ent_aboot_gmod_ezarmor_combinepack"
 	},
 	["Aboot Headcrab"] = {
 		PrintName = "Headcrab Armor",
@@ -175,44 +221,6 @@ JModHL2.ArmorTable = {
 		dur = 20,
 		mskmat="mats_aboot_gmod_sprites/headcrab_vignette.png",
 		ent = "ent_aboot_gmod_ezarmor_headcrab"
-	},
-	["ABoot Jet Module"]={
-		PrintName = "EZ Jet Module",
-		Category = "JMod - EZ HL:2",
-		mdl = "models/aboot/combine/hev_suit/combinejetmodule.mdl",
-		clr = { r = 255, g = 255, b = 0 },
-		clrForced = false,
-		slots = {
-			back = 1
-		},
-		def=table.Inherit({
-			[DMG_NERVEGAS]=1,
-			[DMG_RADIATION]=1,
-			[DMG_ACID]=1,
-			[DMG_POISON]=1,
-		},HEVArmorProtectionProfile),
-		resist={
-			[DMG_ACID]=.75,
-			[DMG_POISON]=.90
-		},
-		chrg={
-			power = 50
-		},
-		snds={
-			eq="aboot_jumpmod/bootup_sequence/bootup_jetconnects.wav",
-			uneq="aboot_jumpmod/bootup_sequence/bootup_moduleacq.wav"
-		},
-		eff={
-			jetmod = true
-		},
-		bon = "ValveBiped.Bip01_Spine2",
-		siz = Vector(.7, .7, .7),
-		pos = Vector(6, 6, 0),
-		ang = Angle(0, 0, 90),
-		wgt = 20,
-		dur = 100,
-		HEVreq = true,
-		ent = "ent_aboot_gmod_ezarmor_combinepack"
 	}
 }
 
@@ -247,6 +255,7 @@ hook.Add("StartCommand", "JMOD_HL2_ZOMBIE_MOVE", function(ply,cmd)
 	end
 end)
 
+local RegularJump = true
 hook.Add("Move", "JMOD_HL2_ARMOR_MOVE", function(ply, mv)
 	if ply.IsProne and ply:IsProne() or ply:GetMoveType() ~= MOVETYPE_WALK then return end
 	local Time = CurTime()
@@ -261,17 +270,17 @@ hook.Add("Move", "JMOD_HL2_ARMOR_MOVE", function(ply, mv)
 			end
 		end
 
-		local RegularJump = false
 		if mv:KeyPressed(IN_JUMP) and ply:OnGround() then
 			RegularJump = true
 		elseif RegularJump and mv:KeyReleased(IN_JUMP) then
 			RegularJump = false
 		end
+		--jprint(RegularJump)
 
 		local Charges = ply:GetNW2Float(tag_counter, 0)
 
 		if ply.EZarmor.effects.jumpmod then
-			if not RegularJump and mv:KeyDown(IN_JUMP) and IsFirstTimePredicted() then
+			if not(RegularJump) and mv:KeyDown(IN_JUMP) and IsFirstTimePredicted() then
 				local Charges = ply:GetNW2Float(tag_counter, 0)
 				if not(ply:OnGround()) and ply:GetNW2Bool("EZjumpmod_canuse", true) and (Charges >= 1) then
 					-- Get Eye angles and then get the direction the jump module would actually be aiming
@@ -283,18 +292,9 @@ hook.Add("Move", "JMOD_HL2_ARMOR_MOVE", function(ply, mv)
 					ply:EmitSound(math.random() > 0.5 and JModHL2.EZ_JUMPSNDS.BOOST1 or JModHL2.EZ_JUMPSNDS.BOOST2, 70, 100, 0.7)
 					-- When we have to deal with garry's prediction, ugh
 					if SERVER then
-						--[[net.Start("ABoot_JumpmodParticles")
+						net.Start("ABoot_JumpmodParticles")
 						net.WriteEntity(ply)
-						net.Broadcast()]]--
-						-- Effects, poof
-						local EffectSpot = Ply:GetPos()
-						local Poof = EffectData()
-						Poof:SetNormal(-Ply:GetAimVector():Angle():Up())
-						Poof:SetScale(1)
-						Poof:SetOrigin(EffectSpot)
-						Poof:SetStart(Vector(0, 0, -45))
-						Poof:SetEntity(Ply)
-						util.Effect("eff_aboot_gmod_ezjumppoof", Poof, true)
+						net.Broadcast()
 					end
 					-- Let them know they're out of juice
 					if CLIENT and Charges <= 1 then
@@ -316,35 +316,46 @@ hook.Add("Move", "JMOD_HL2_ARMOR_MOVE", function(ply, mv)
 				end
 			end
 		elseif ply.EZarmor.effects.jetmod then
-			if not RegularJump and mv:KeyDown(IN_JUMP) then
+			if not(RegularJump) and mv:KeyDown(IN_JUMP) then
 				if not(ply:OnGround()) and ply:GetNW2Bool("EZjetmod_canuse", true) and Charges > 0.2 then
 					-- Get Eye angles and then get the direction the jump module would actually be aiming
 					local Aim = ply:EyeAngles()
-					local OldVel, NewVel = mv:GetVelocity(), Aim:Up() * 20
+					local OldVel = mv:GetVelocity()
+					local NewVel = Vector(0, 0, 10)
+					if mv:KeyDown(IN_FORWARD) then
+						NewVel = NewVel + (Aim:Forward() * 10)
+					end
+					if mv:KeyDown(IN_BACK) then
+						NewVel = NewVel - (Aim:Forward() * 10)
+					end
+					if mv:KeyDown(IN_MOVELEFT) then
+						NewVel = NewVel - (Aim:Right() * 10)
+					end
+					if mv:KeyDown(IN_MOVERIGHT) then
+						NewVel = NewVel + (Aim:Forward() * 10)
+					end
 					-- Tell the server that's where we're going
 					mv:SetVelocity(OldVel + NewVel)
 					-- Sound, psshha
-					ply:EmitSound(math.random() > 0.5 and JModHL2.EZ_JUMPSNDS.BOOST1 or JModHL2.EZ_JUMPSNDS.BOOST2, 70, 100, 0.7)
-					-- Effects, poof
+					if not ply.EZThrusterSound then
+						ply.EZThrusterSound = CreateSound(ply, "thrusters/rocket00.wav")
+					end
+					ply.EZThrusterSound:Play()
 					if SERVER then
-						local EffectSpot = ply:GetPos()
-						local Poof = EffectData()
-						Poof:SetNormal(-ply:GetAimVector():Angle():Up())
-						Poof:SetScale(1)
-						Poof:SetOrigin(EffectSpot)
-						Poof:SetStart(Vector(0, 0, -45))
-						Poof:SetEntity(ply)
-						util.Effect("eff_aboot_gmod_ezjumppoof", Poof, true)
+						-- Effects, poof
 					end
 					-- Let them know they're out of juice
 					if CLIENT and Charges <= 0.1 then
 						EmitSound(JModHL2.EZ_JUMPSNDS.DENY, ply:GetPos(), ply:EntIndex(), CHAN_ITEM)
 					end
 					-- Make sure to reduce the charges left
-					Charges = Charges - 0.05
+					Charges = Charges - 0.01
 					ply:SetNW2Float(tag_counter, Charges)
 				end
 			end
+		end
+		if not mv:KeyDown(IN_JUMP) then
+			ply.EZThrusterSound:Stop()
 		end
 	end
 end)
