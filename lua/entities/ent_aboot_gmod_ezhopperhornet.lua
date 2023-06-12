@@ -345,26 +345,14 @@ if SERVER then
 
 			return true
 		elseif State == STATE_LAUNCHED then
-			--jprint(self:GetPhysicsObject():GetVelocity().z)
-			timer.Simple(.3, function()
-				if not IsValid(self) then return end
-				if self:GetPhysicsObject():GetVelocity().z <= 1 and not self:IsPlayerHolding() then
-					self:FindTarget(true)
-					if IsValid(Target) then
-						self:Detonate(true)
-					end
+			self.NextDetonateTime = self.NextDetonateTime or Time + 0.3
+			if self.NextDetonateTime > Time then return end
+			if self:GetPhysicsObject():GetVelocity().z <= 1 and not self:IsPlayerHolding() then
+				self:FindTarget(true)
+				if IsValid(Target) then
+					self:Detonate(true)
 				end
-			end)
-			--[[if not IsValid(self:GetTarget()) then 
-				for k, targ in pairs(ents.FindInSphere(SelfPos, AttackDist)) do
-					if (targ ~= self) and JMod.ShouldAttack(self, targ) and JMod.ClearLoS(self, targ, true) then
-						self:SetTarget(targ)
-						break
-					else 
-						self:Disarm()
-					end
-				end
-			end]]--
+			end
 
 			self:NextThink(Time + .1)
 
