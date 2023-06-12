@@ -8,16 +8,22 @@ local x_offset = CreateClientConVar(tag .. "_hud_x", SCR_W * OFFSET_W)
 local y_offset = CreateClientConVar(tag .. "_hud_y", SCR_H * OFFSET_H)
 local BAR_WIDTH, BAR_HEIGHT, MARGIN = 0.0075, 0.065, 0.002
 local BLACK, BAR_COL_FULL, BAR_COL_EMPTY = Color(0, 0, 0, 80), Color(255, 236, 12, 240), Color(255, 0, 0, 105)
+local charge = 0
 
 hook.Add("HUDPaint", "JMOD_HL2_HUDPAINT", function()
 	if not shouldshow:GetBool() then return end
 	local Ply = LocalPlayer()
 	if Ply:Alive() and Ply.EZarmor and Ply.EZarmor.effects and Ply.EZarmor.effects.jumpmod then
-
+		--
 		local x = x_offset:GetInt()
 		local y = y_offset:GetInt()
+		--
+		local PlyCharge = Ply:GetNW2Float(tag_counter, 0)
 
-		local charge = Ply:GetNW2Float(tag_counter, 0)
+		charge = Lerp(FrameTime() * 4.5, charge, PlyCharge + 0.01)
+		if PlyCharge - charge < 0 then
+			charge = PlyCharge
+		end
 		local bar1 = math.min(charge, 1)
 		local bar2 = math.min(charge - bar1, 1)
 		local bar3 = math.max(math.min(charge - bar1 * 2, 1), 0)

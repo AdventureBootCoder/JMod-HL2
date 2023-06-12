@@ -74,7 +74,7 @@ JModHL2.ArmorTable = {
 		},
 		chrg={
 			chemicals = 50,
-			power = 30
+			power = 50
 		},
 		snds={
 			eq="hl1/fvox/bell.wav",
@@ -89,7 +89,8 @@ JModHL2.ArmorTable = {
 		tgl = {
 			blackvisionwhendead = true,
 			mskmat = "mats_aboot_gmod_sprites/helmet_vignette1.png",
-			eff = {nightVision = true}
+			eff = {nightVision = true},
+			slots = {}
 		},
 		plymdl="models/aboot/player/hev_suit.mdl", -- https://steamcommunity.com/sharedfiles/filedetails/?id=1341386337&searchtext=hev+suit
 		mskmat="mats_aboot_gmod_sprites/helmet_vignette1.png",
@@ -118,7 +119,7 @@ JModHL2.ArmorTable = {
 			[DMG_POISON]=.90
 		},
 		chrg={
-			power = 30
+			power = 50
 		},
 		snds={
 			eq="aboot_jumpmod/bootup_sequence/bootup_jetconnects.wav",
@@ -244,14 +245,12 @@ hook.Add("Move", "JMOD_HL2_ARMOR_MOVE", function(ply, mv)
 						net.WriteEntity(ply)
 						net.Broadcast()
 					end
+					-- Let them know they're out of juice
+					if CLIENT and Charges <= 1 then
+						EmitSound(JModHL2.EZ_JUMPSNDS.DENY, ply:GetPos(), ply:EntIndex(), CHAN_ITEM)
+					end
 					-- Viewpunch!
 					ply:ViewPunch(Angle(3, 0, 0))
-					-- Let them know they're out of juice
-					if Charges <= 1 then
-						ply:SendLua([[
-							surface.PlaySound("]] .. JModHL2.EZ_JUMPSNDS.DENY .. [[")
-						]])
-					end
 					-- Make sure to reduce the charges left
 					Charges = Charges - 1
 					ply:SetNW2Float(tag_counter, Charges)
