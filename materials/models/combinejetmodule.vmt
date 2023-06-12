@@ -1,0 +1,7 @@
+VertexLitGeneric
+{
+	$basetexture	"models/combinejetmodule.vtf"
+	$surfaceprop	"metal"
+	$blendtintbybasealpha 1
+	$blendtintcoloroverbase 0
+}
