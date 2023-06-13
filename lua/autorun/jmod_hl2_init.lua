@@ -124,16 +124,17 @@ if(SERVER)then
 								local Info = JMod.ArmorTable[armorData.name]
 
 								if Info.eff and (Info.eff.jumpmod or Info.eff.jetmod) then
-									if armorData.chrg.power <= Info.chrg.power * .25 then
-										JMod.EZarmorWarning(ply, "Jump module charge is low ("..tostring(armorData.chrg.power).."/"..tostring(Info.chrg.power)..")")
-									end
-
+									
 									if armorData.chrg.power < 1.1 * JMod.Config.Armor.ChargeDepletionMult then
 										JMod.EZarmorWarning(ply, "Jump module is out of charge")
 										ply.charging = false
 									else
 										armorData.chrg.power = math.Clamp(armorData.chrg.power - (1 * JMod.Config.Armor.ChargeDepletionMult), 0, Info.chrg.power)
 										ply.charging = true
+									end
+
+									if armorData.chrg.power <= Info.chrg.power * .25 then
+										JMod.EZarmorWarning(ply, "Jump module charge is low ("..tostring(armorData.chrg.power).."/"..tostring(Info.chrg.power)..")")
 									end
 									
 									break
@@ -227,8 +228,6 @@ elseif CLIENT then
 		end
 	end)
 
-	--hook.Remove("PlayerButtonDown", "ABootHotBarWeaponSelect")
-
 	hook.Add("PlayerButtonDown", "ABootHotBarWeaponSelect", function(playa, button)
 		if not(simpleWeaponSelect:GetBool()) then return end
 		local slot = button - 2
@@ -245,27 +244,6 @@ elseif CLIENT then
 
 			if (v ~= CurWep) and (v:GetSlot() == slot) then
 				input.SelectWeapon(v)
-			end
-		end
-	end)
-
-	local GlowSprite = Material("mat_jack_gmod_glowsprite")
-
-	hook.Add("PostDrawTranslucentRenderables", "JMODHL2_POSTDRAWTRNASLUCENT", function(bDrawD, bDrawingSky, isDraw3dSky) 
-		for _, ply in ipairs(player.GetAll()) do
-			if not IsValid(ply) and ply:Alive() then return end
-			if ply.EZarmor and ply.EZarmor.effects and ply.EZarmor.effects.jetmod and ply.EZjetting then
-				local Matty = ply:GetBoneMatrix(ply:LookupBone("ValveBiped.Bip01_Spine2"))
-				local Pos, Ang = Matty:GetTranslation(), Matty:GetAngles()
-				local Dir, Up, Right = -Ang:Forward(), Ang:Up(), Ang:Right()
-
-				render.SetMaterial(GlowSprite)
-
-				for i = 1, 10 do
-					local Inv = 10 - i
-					render.DrawSprite(Pos - Up * 8 + Right * 5 + Dir * (i * 3 + math.random(5, 10)), 2 * Inv, 2 * Inv, Color(255, 255 - i * 20, 255 - i * 10, 255))
-					render.DrawSprite(Pos + Up * 8 + Right * 5 + Dir * (i * 3 + math.random(5, 10)), 2 * Inv, 2 * Inv, Color(255, 255 - i * 20, 255 - i * 10, 255))
-				end
 			end
 		end
 	end)

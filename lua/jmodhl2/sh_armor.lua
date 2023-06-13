@@ -145,7 +145,7 @@ JModHL2.ArmorTable = {
 		PrintName = "EZ Jet Module",
 		Category = "JMod - EZ HL:2",
 		mdl = "models/aboot/combine/hev_suit/combinejetmodule.mdl",
-		clr = { r = 255, g = 255, b = 0 },
+		clr = { r = 0, g = 255, b = 255 },
 		clrForced = false,
 		slots = {
 			back = 1
@@ -341,9 +341,9 @@ hook.Add("Move", "JMOD_HL2_ARMOR_MOVE", function(ply, mv)
 					elseif mv:KeyDown(IN_MOVERIGHT) then
 						NewVel = NewVel + Vector(NewRight.x, NewRight.y, 0)
 					end
-					NewVel = NewVel:GetNormalized() * 10
+					NewVel = NewVel:GetNormalized() * 12
 					if util.QuickTrace(ply:GetPos(), Vector(0, 0, -120), {ply}).Hit then
-						NewVel = NewVel + Vector(0, 0, 5)
+						NewVel = NewVel + Vector(0, 0, 3)
 					end
 					-- Tell the server that's where we're going
 					mv:SetVelocity(OldVel + NewVel)
@@ -403,3 +403,27 @@ hook.Add("OnPlayerHitGround", "JMOD_HL2_HITGROUND", function(ply, water, float, 
 	timer.Stop(ply:Nick().."jumpmod_timer")
 	ply.played_sound = false
 end)
+
+if CLIENT then
+
+	local GlowSprite = Material("mat_jack_gmod_glowsprite")
+
+	hook.Add("PostDrawTranslucentRenderables", "JMODHL2_POSTDRAWTRNASLUCENT", function(bDrawD, bDrawingSky, isDraw3dSky) 
+		for _, ply in ipairs(player.GetAll()) do
+			if not(IsValid(ply) and ply:Alive()) then return end
+			if ply.EZarmor and ply.EZarmor.effects and ply.EZarmor.effects.jetmod and ply.EZjetting then
+				local Matty = ply:GetBoneMatrix(ply:LookupBone("ValveBiped.Bip01_Spine2"))
+				local Pos, Ang = Matty:GetTranslation(), Matty:GetAngles()
+				local Dir, Up, Right = -Ang:Forward(), Ang:Up(), Ang:Right()
+
+				render.SetMaterial(GlowSprite)
+
+				for i = 1, 10 do
+					local Inv = 10 - i
+					render.DrawSprite(Pos - Up * 8 + Right * 5 + Dir * (i * 3 + math.random(5, 10)), 2 * Inv, 2 * Inv, Color(255, 255 - i * 20, 255 - i * 10, 255))
+					render.DrawSprite(Pos + Up * 8 + Right * 5 + Dir * (i * 3 + math.random(5, 10)), 2 * Inv, 2 * Inv, Color(255, 255 - i * 20, 255 - i * 10, 255))
+				end
+			end
+		end
+	end)
+end
