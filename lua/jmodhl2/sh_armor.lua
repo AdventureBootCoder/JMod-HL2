@@ -255,9 +255,16 @@ hook.Add("StartCommand", "JMOD_HL2_ZOMBIE_MOVE", function(ply,cmd)
 	end
 end)
 
-local RegularJump = true
+local RegularJump, NextEffectTime = true, 0
 hook.Add("Move", "JMOD_HL2_ARMOR_MOVE", function(ply, mv)
-	if ply.IsProne and ply:IsProne() or ply:GetMoveType() ~= MOVETYPE_WALK then return end
+	if ply.IsProne and ply:IsProne() or ply:GetMoveType() ~= MOVETYPE_WALK then
+		ply.EZjetting = false
+		if ply.EZThrusterSound then
+			ply.EZThrusterSound:Stop()
+		end
+		
+		return 
+	end
 	local Time = CurTime()
 
 	if ply.EZarmor and ply.EZarmor.effects then
@@ -319,43 +326,52 @@ hook.Add("Move", "JMOD_HL2_ARMOR_MOVE", function(ply, mv)
 			if not(RegularJump) and mv:KeyDown(IN_JUMP) then
 				if not(ply:OnGround()) and ply:GetNW2Bool("EZjetmod_canuse", true) and Charges > 0.2 then
 					-- Get Eye angles and then get the direction the jump module would actually be aiming
-					local Aim = ply:EyeAngles()
+					local Drain = 0.02
+					local Dir = ply:GetAngles()
 					local OldVel = mv:GetVelocity()
-					local NewVel = Vector(0, 0, 10)
+					local NewVel = Vector(0, 0, 0.6)
+					local NewForward, NewRight = Dir:Forward(), Dir:Right()
 					if mv:KeyDown(IN_FORWARD) then
-						NewVel = NewVel + (Aim:Forward() * 10)
-					end
-					if mv:KeyDown(IN_BACK) then
-						NewVel = NewVel - (Aim:Forward() * 10)
+						NewVel = NewVel + Vector(NewForward.x, NewForward.y, 0)
+					elseif mv:KeyDown(IN_BACK) then
+						NewVel = NewVel - Vector(NewForward.x, NewForward.y, 0)
 					end
 					if mv:KeyDown(IN_MOVELEFT) then
-						NewVel = NewVel - (Aim:Right() * 10)
+						NewVel = NewVel - Vector(NewRight.x, NewRight.y, 0)
+					elseif mv:KeyDown(IN_MOVERIGHT) then
+						NewVel = NewVel + Vector(NewRight.x, NewRight.y, 0)
 					end
-					if mv:KeyDown(IN_MOVERIGHT) then
-						NewVel = NewVel + (Aim:Forward() * 10)
-					end
+					NewVel = NewVel:GetNormalized() * 12
 					-- Tell the server that's where we're going
 					mv:SetVelocity(OldVel + NewVel)
+					ply.EZjetting = true
 					-- Sound, psshha
 					if not ply.EZThrusterSound then
 						ply.EZThrusterSound = CreateSound(ply, "thrusters/rocket00.wav")
 					end
 					ply.EZThrusterSound:Play()
 					if SERVER then
-						-- Effects, poof
+						if NextEffectTime < Time then
+							NextEffectTime = Time + 0.2
+							-- Effects, poof
+							net.Start("ABoot_JumpmodParticles")
+							net.WriteEntity(ply)
+							net.Broadcast()
+						end
 					end
 					-- Let them know they're out of juice
 					if CLIENT and Charges <= 0.1 then
 						EmitSound(JModHL2.EZ_JUMPSNDS.DENY, ply:GetPos(), ply:EntIndex(), CHAN_ITEM)
 					end
 					-- Make sure to reduce the charges left
-					Charges = Charges - 0.01
+					Charges = Charges - Drain
 					ply:SetNW2Float(tag_counter, Charges)
 				end
 			end
 		end
 		if not mv:KeyDown(IN_JUMP) then
 			ply.EZThrusterSound:Stop()
+			ply.EZjetting = false
 		end
 	end
 end)

@@ -77,11 +77,13 @@ hook.Add("HUDPaint", "JMOD_HL2_HUDPAINT", function()
 			end
 			-- Container
 			draw.RoundedBox(10, x - 8, y - (SCR_H * 0.075), SCR_W * 0.09, SCR_H * 0.080, BLACK)
-			surface.SetDrawColor(JET_COL_EMPTY)
-			surface.DrawOutlinedRect(x, y - (SCR_H * BAR_HEIGHT), SCR_W * BAR_WIDTH, SCR_H *  BAR_HEIGHT)
-			-- Bars
 			surface.SetDrawColor(charge < 1 and JET_COL_EMPTY or JET_COL_FULL)
-			surface.DrawRect(x, y - (SCR_H * (charge * BAR_HEIGHT / 3)), SCR_W * BAR_WIDTH, SCR_H * (charge * BAR_HEIGHT / 3))
+			surface.DrawOutlinedRect(x, y - (SCR_H * BAR_HEIGHT), SCR_W * BAR_WIDTH * 3, SCR_H *  BAR_HEIGHT)
+			-- Bars
+			for i = 0, math.Round(charge * 2) do
+				surface.SetDrawColor(charge < 1 and JET_COL_EMPTY or JET_COL_FULL)
+				surface.DrawRect(x, y - (i * 10) - 10, SCR_W * BAR_WIDTH * 3, 8)
+			end
 			-- Extra stats
 			local Tr = util.QuickTrace(Ply:GetPos(), Vector(0, 0, -9e9), Ply)
 			local Dist = math.Round(Ply:GetPos():Distance(Tr.HitPos) / 10) * 10
