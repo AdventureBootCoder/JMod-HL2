@@ -181,7 +181,7 @@ JModHL2.ArmorTable = {
 		wgt = 20,
 		dur = 100,
 		HEVreq = true,
-		ent = "ent_aboot_gmod_ezarmor_combinepack"
+		ent = "ent_aboot_gmod_ezarmor_jetmodule"
 	},
 	["Aboot Headcrab"] = {
 		PrintName = "Headcrab Armor",
@@ -329,7 +329,7 @@ hook.Add("Move", "JMOD_HL2_ARMOR_MOVE", function(ply, mv)
 					local Drain = 0.02
 					local Dir = ply:GetAngles()
 					local OldVel = mv:GetVelocity()
-					local NewVel = Vector(0, 0, 0.6)
+					local NewVel = Vector(0, 0, 1)
 					local NewForward, NewRight = Dir:Forward(), Dir:Right()
 					if mv:KeyDown(IN_FORWARD) then
 						NewVel = NewVel + Vector(NewForward.x, NewForward.y, 0)
@@ -341,7 +341,10 @@ hook.Add("Move", "JMOD_HL2_ARMOR_MOVE", function(ply, mv)
 					elseif mv:KeyDown(IN_MOVERIGHT) then
 						NewVel = NewVel + Vector(NewRight.x, NewRight.y, 0)
 					end
-					NewVel = NewVel:GetNormalized() * 12
+					NewVel = NewVel:GetNormalized() * 10
+					if util.QuickTrace(ply:GetPos(), Vector(0, 0, -120), {ply}).Hit then
+						NewVel = NewVel + Vector(0, 0, 5)
+					end
 					-- Tell the server that's where we're going
 					mv:SetVelocity(OldVel + NewVel)
 					ply.EZjetting = true
@@ -369,8 +372,10 @@ hook.Add("Move", "JMOD_HL2_ARMOR_MOVE", function(ply, mv)
 				end
 			end
 		end
-		if not mv:KeyDown(IN_JUMP) then
-			ply.EZThrusterSound:Stop()
+		if not(mv:KeyDown(IN_JUMP)) or ply:OnGround() then
+			if ply.EZThrusterSound then
+				ply.EZThrusterSound:Stop()
+			end
 			ply.EZjetting = false
 		end
 	end
