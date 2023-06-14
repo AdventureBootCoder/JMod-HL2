@@ -1,9 +1,9 @@
-player_manager.AddValidModel( "ABoot HEV Suit", 
-"models/aboot/player/hev_suit.mdl" );
-list.Set( "PlayerOptionsModel", "ABoot HEV Suit", 
-"models/aboot/player/hev_suit.mdl" );
-player_manager.AddValidHands( "ABoot HEV Suit", 
-"models/aboot/ragenigga/viewmodels/c_arms_classic.mdl", 0, "00000000" )
+player_manager.AddValidModel( "ABoot HEV Suit", "models/aboot/player/hev_suit.mdl" );
+list.Set( "PlayerOptionsModel", "ABoot HEV Suit", "models/aboot/player/hev_suit.mdl" );
+player_manager.AddValidHands( "ABoot HEV Suit", "models/aboot/ragenigga/viewmodels/c_arms_classic.mdl", 0, "00000000" )
+list.Set( "PlayerOptionsModel", "Combine Super Soldier", "models/1000shells/combine_super_solder.mdl" )
+player_manager.AddValidModel( "Combine Super Soldier", "models/1000shells/combine_super_solder.mdl" )
+player_manager.AddValidHands("Combine Super Soldier", "models/1000shells/combine_super_solder_h.mdl", 0, "00000000")
 
 JMod = JMod or {}
 JMod.AdditionalArmorTable = JMod.AdditionalArmorTable or {}
