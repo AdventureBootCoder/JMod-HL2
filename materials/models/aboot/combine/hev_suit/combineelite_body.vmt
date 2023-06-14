@@ -16,6 +16,8 @@
 	"$rimlight" "1"												// To enable rim lighting (requires phong)
 	"$rimlightexponent" "20"										// Exponent for phong component of rim lighting	
 	"$rimlightboost" ".5"										// Boost for ambient cube component of rim lighting
-
+	
+	"$blendtintbybasealpha" "1"
+ 	"$blendtintcoloroverbase" "0"
 }
 // Stolen from Missing Information
