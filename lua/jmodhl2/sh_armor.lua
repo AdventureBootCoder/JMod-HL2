@@ -99,6 +99,66 @@ JModHL2.ArmorTable = {
 		dur = 400,
 		ent = "ent_aboot_gmod_ezarmor_hev"
 	},
+	["ABoot Combine Suit"]={
+		PrintName = "EZ Combine Suit",
+		Category = "JMod - EZ HL:2",
+		mdl = "models/props_junk/cardboard_box002a.mdl",
+		lbl = "ELITE UNIFORM",
+		clr = {  r = 0, g = 255, b = 255 },
+		clrForced = false,
+		slots={
+			eyes = 1,
+			mouthnose = 1,
+			head = 1,
+			chest = 1,
+			abdomen = 1,
+			pelvis = 1,
+			leftthigh = 1,
+			leftcalf = 1,
+			rightthigh = 1,
+			rightcalf = 1,
+			rightshoulder = 1,
+			rightforearm = 1,
+			leftshoulder = 1,
+			leftforearm = 1
+		},
+		def=table.Inherit({
+			[DMG_NERVEGAS]=1,
+			[DMG_RADIATION]=1,
+			[DMG_ACID]=1,
+			[DMG_POISON]=1,
+		},HEVArmorProtectionProfile),
+		resist={
+			[DMG_ACID]=.90,
+			[DMG_POISON]=.99
+		},
+		chrg={
+			chemicals = 50,
+			power = 50
+		},
+		snds={
+			eq="hl1/fvox/bell.wav",
+			uneq="hl1/fvox/deactivated.wav"
+		},
+		eff={
+			HEVsuit = true,
+			speedBoost = 1,
+			thermalVision = false
+		},
+		blackvisionwhendead = false,
+		tgl = {
+			blackvisionwhendead = true,
+			mskmat = "mats_aboot_gmod_sprites/helmet_vignette2.png",
+			eff = {thermalVision = true},
+			slots = {}
+		},
+		plymdl = "models/1000shells/combine_super_solder.mdl",
+		mskmat = "mats_aboot_gmod_sprites/helmet_vignette2.png",
+		sndlop = "snds_jack_gmod/mask_breathe.wav",
+		wgt = 40,
+		dur = 400,
+		ent = "ent_aboot_gmod_ezarmor_combinesuit"
+	},
 	["ABoot Jump Module"]={
 		PrintName = "EZ Jump Module",
 		Category = "JMod - EZ HL:2",
@@ -410,7 +470,7 @@ if CLIENT then
 
 	hook.Add("PostDrawTranslucentRenderables", "JMODHL2_POSTDRAWTRNASLUCENT", function(bDrawD, bDrawingSky, isDraw3dSky) 
 		for _, ply in ipairs(player.GetAll()) do
-			if not(IsValid(ply) and ply:Alive()) then return end
+			if not(IsValid(ply) and ply:Alive()) or not(ply:ShouldDrawLocalPlayer()) then return end
 			if ply.EZarmor and ply.EZarmor.effects and ply.EZarmor.effects.jetmod and ply.EZjetting then
 				local Matty = ply:GetBoneMatrix(ply:LookupBone("ValveBiped.Bip01_Spine2"))
 				local Pos, Ang = Matty:GetTranslation(), Matty:GetAngles()

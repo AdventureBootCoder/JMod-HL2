@@ -1,0 +1,8 @@
+"VertexlitGeneric"
+{
+	"$basetexture" "models/ccustom_soldier/combine_gear"
+	"$bumpmap" "models/ccustom_soldier/belt_gear_n"
+
+	"$blendtintbybasealpha" "1"
+ 	"$blendtintcoloroverbase" "0"
+}

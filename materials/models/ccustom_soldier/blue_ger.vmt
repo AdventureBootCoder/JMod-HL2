@@ -1,0 +1,15 @@
+"VertexlitGeneric"
+{
+	"$basetexture" "models/ccustom_soldier/blue_ger"
+	"$bumpmap" "models/ccustom_soldier/Belt_gear_n"
+	"$halflambert" 1
+
+	"$phong" "1"
+	"$phongexponent" "20"
+	"$phongboost" ".3"	
+	"$phongfresnelranges"	"[2 5 10]"
+
+	"$blendtintbybasealpha" "1"
+ 	"$blendtintcoloroverbase" "0"
+}
+// Stolen from Missing Information
