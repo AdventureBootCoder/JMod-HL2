@@ -1,0 +1,15 @@
+"VertexlitGeneric"
+{
+	"$basetexture" "models/aboot/combine/hev_suit/Belt_gear"
+	"$bumpmap" "models/aboot/combine/hev_suit/Belt_gear_n"
+	"$halflambert" 1
+
+	"$phong" "1"
+	"$phongexponent" "20"
+	"$phongboost" ".3"	
+	"$phongfresnelranges"	"[2 5 10]"
+
+	"$blendtintbybasealpha" "1"
+ 	"$blendtintcoloroverbase" "0"
+}
+// Stolen from Missing Information

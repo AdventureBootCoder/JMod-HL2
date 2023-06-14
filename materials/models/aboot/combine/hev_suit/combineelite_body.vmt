@@ -1,0 +1,21 @@
+"VertexlitGeneric"
+{
+	"$basetexture" "models/aboot/combine/hev_suit/Combineelite_body"
+	"$bumpmap" "models/aboot/combine/hev_suit/Combineelite_body_n"
+
+
+	"$phongalbedotint" "1"	
+	"$phong" "1"
+	"$phongexponent" "20"
+	"$phongboost" ".3"	
+	"$phongfresnelranges"	"[.3 1 8]"
+	"$halflambert" "1"
+        	"$phongexponenttexture" "models/ccustom_soldier/Combineelite_body_exp"
+
+	// Rim lighting parameters
+	"$rimlight" "1"												// To enable rim lighting (requires phong)
+	"$rimlightexponent" "20"										// Exponent for phong component of rim lighting	
+	"$rimlightboost" ".5"										// Boost for ambient cube component of rim lighting
+
+}
+// Stolen from Missing Information
