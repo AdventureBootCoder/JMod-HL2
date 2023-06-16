@@ -6,14 +6,14 @@ ENT.PrintName = "EZ Combine Radio"
 ENT.Author = "AdventureBoots"
 ENT.Category = "JMod - EZ HL:2"
 ENT.Information = "glhfggwpezpznore"
-ENT.Spawnable = false
+ENT.Spawnable = true
 ENT.AdminSpawnable = true
 ENT.NoSitAllowed = true
 ENT.Model = "models/props_combine/breenconsole.mdl"
---ENT.Mat = "models/mat_jack_gmod_ezradio"
+ENT.Mat = ""
 ENT.Mass = 150
 ----
-ENT.JModPreferredCarryAngles = Angle(0,0,0)
+ENT.JModPreferredCarryAngles = Angle(0,-90,0)
 ENT.SpawnHeight = 20
 ENT.EZradio = true
 ----
@@ -25,11 +25,27 @@ ENT.StaticPerfSpecs = {
 local STATE_BROKEN,STATE_OFF,STATE_CONNECTING=-1,0,1
 if(SERVER)then
 	--- I'm basically inheriting everything here
+	function ENT:TryFindSky()
+		local SelfPos = self:LocalToWorld(Vector(0, 0, 50))
 
+		for i = 1, 3 do
+			local Dir = self:LocalToWorldAngles(Angle(-85 + i * 5, 0, 0)):Forward()
+
+			local HitSky = util.TraceLine({
+				start = SelfPos,
+				endpos = SelfPos + Dir * 9e9,
+				filter = {self},
+				mask = MASK_OPAQUE
+			}).HitSky
+
+			if HitSky then return true end
+		end
+
+		return false
+	end
 elseif(CLIENT)then
 	function ENT:CustomInit()
 		self.Dish = JMod.MakeModel(self,"models/props_rooftop/satellitedish02.mdl")
-		self.Panel = JMod.MakeModel(self,"models/props_lab/reciever01a.mdl",nil,.8)
 		self.Headset = JMod.MakeModel(self,"models/lt_c/sci_fi/headset_2.mdl")
 		self.MaxElectricity = 100
 		local Files, Folders = file.Find("sound/npc/combine_soldier/vo/*.wav","GAME")
@@ -51,7 +67,7 @@ elseif(CLIENT)then
 		local SelfPos, SelfAng, State = self:GetPos(), self:GetAngles(), self:GetState()
 		local Up, Right, Forward, FT = SelfAng:Up(), SelfAng:Right(), SelfAng:Forward(), FrameTime()
 		---
-		local BasePos = SelfPos + Up * 32
+		local BasePos = SelfPos + Up * 50
 
 		local Obscured = util.TraceLine({
 			start = EyePos(),
@@ -79,25 +95,24 @@ elseif(CLIENT)then
 		---
 		local DishAng = SelfAng:GetCopy()
 		DishAng:RotateAroundAxis(Right, 20)
-		JMod.RenderModel(self.Dish, BasePos + Up * 8 + Forward * 8, DishAng, nil, Vector(.7, .7, .7))
+		DishAng:RotateAroundAxis(Up, 90)
+		--JMod.RenderModel(self.Dish, BasePos + Up * 8 + Forward * 8, DishAng, nil, Vector(.7, .7, .7))
 
 		---
 		if DetailDraw then
-			local PanelAng = SelfAng:GetCopy()
-			PanelAng:RotateAroundAxis(Right, 90)
-			JMod.RenderModel(self.Panel, BasePos - Up * 15 - Forward * 6, PanelAng, nil, Vector(.7, .7, .7))
-			---
 			local HeadsetAng = SelfAng:GetCopy()
-			HeadsetAng:RotateAroundAxis(Right, -110)
-			JMod.RenderModel(self.Headset, BasePos - Up * 4, HeadsetAng, nil, ColorToVector(self:GetColor()))
+			HeadsetAng:RotateAroundAxis(Right, -130)
+			HeadsetAng:RotateAroundAxis(Up, 90)
+			HeadsetAng:RotateAroundAxis(HeadsetAng:Forward(), 30)
+			JMod.RenderModel(self.Headset, BasePos - Up * 7 - Forward * 15, HeadsetAng, nil, ColorToVector(self:GetColor()))
 			---
 
 			if (Closeness < 20000) and (State > 0) then
 				local DisplayAng = SelfAng:GetCopy()
-				DisplayAng:RotateAroundAxis(DisplayAng:Right(), 80)
-				DisplayAng:RotateAroundAxis(DisplayAng:Up(), -90)
+				DisplayAng:RotateAroundAxis(DisplayAng:Up(), 0)
+				DisplayAng:RotateAroundAxis(DisplayAng:Forward(), 45)
 				local Opacity = math.random(50, 150)
-				cam.Start3D2D(SelfPos + Up * 38 - Forward * 5, DisplayAng, .075)
+				cam.Start3D2D(SelfPos + Up * 45 + Right * 5, DisplayAng, .075)
 
 				if State > 1 then
 					draw.SimpleTextOutlined("Connected to:", "JMod-Display", 0, 0, Color(255, 255, 255, Opacity), TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP, 2, Color(0, 0, 0, Opacity))

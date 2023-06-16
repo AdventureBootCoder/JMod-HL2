@@ -45,6 +45,7 @@ if SERVER then
 		self.FreezeTime = 0
 		self.Restlessness = 1
 		--self:SetVisualState(STATE_GNORMAL)
+		self.CachePos = self:GetPos()
 	end
 
 	function ENT:PhysicsCollide(data, physobj)
@@ -66,8 +67,8 @@ if SERVER then
 
 	---
 	function ENT:GetObjective()
-		-- todo: more things than just killing
-		return "kill"
+
+		return "steal"
 	end
 
 	function ENT:GetTarget(objective)
@@ -84,6 +85,25 @@ if SERVER then
 						Target = v
 						Closest = Dist
 					end
+				end
+			end
+		elseif objective == "steal" then
+			local Closest, SelfPos = 9e9, self:GetPos()
+
+			local Resources = {}
+			for _, v in ipairs(ents.GetAll()) do
+				if v.IsJackyEZresource and (v:GetPos():Distance(self.CachePos) > 200) then
+					table.insert(Resources, v)
+				end
+			end
+			if table.IsEmpty(Resources) then return Target end
+
+			for k, v in pairs(Resources) do
+				local Dist = SelfPos:Distance(v:GetPos())
+
+				if Dist < Closest then
+					Target = v
+					Closest = Dist
 				end
 			end
 		end
@@ -103,8 +123,9 @@ if SERVER then
 		return true -- todo
 	end
 
-	function ENT:TryMoveTowardPoint(pos)
-		local SelfPos = self:GetPos()
+	function ENT:TryMoveTowardPoint(pos, ent)
+		if not ent then ent = self end
+		local SelfPos = ent:GetPos()
 		local Dir = (pos - SelfPos):GetNormalized()
 		local NewPos = SelfPos + Dir * 100
 		local NewGroundPos = self:FindGroundAt(NewPos)
@@ -112,7 +133,7 @@ if SERVER then
 		if NewGroundPos then
 			if not self:IsLocationBeingWatched(NewGroundPos) then
 				if self:IsLocationClear(NewGroundPos) then
-					self:SnapTo(NewGroundPos)
+					self:SnapTo(NewGroundPos, ent and ent)
 
 					return true
 				end
@@ -141,16 +162,17 @@ if SERVER then
 		return false
 	end
 
-	function ENT:SnapTo(pos)
+	function ENT:SnapTo(pos, ent)
+		if not ent then ent = self end
 		local Yaw = (pos - self:GetPos()):GetNormalized():Angle().y
-		self:SetPos(pos + Vector(0, 0, 5))
-		self:SetAngles(Angle(0, Yaw, 0))
-		self:GetPhysicsObject():Sleep()
-		self:EmitSound("player/footsteps/sand"..tostring(math.random(1, 4))..".wav", 75, 100, 1)
+		ent:SetPos(pos + Vector(0, 0, 5))
+		ent:SetAngles(Angle(0, Yaw, 0))
+		ent:GetPhysicsObject():Sleep()
+		ent:EmitSound("player/footsteps/sand"..tostring(math.random(1, 4))..".wav", 75, 100, 1)
 	end
 
 	function ENT:IsLocationBeingWatched(pos)
-		--if(true)then return false end
+		if(true)then return false end
 		local PotentialObservers = table.Merge(ents.FindByClass("gmod_cameraprop"), player.GetAll())
 
 		for k, obs in pairs(PotentialObservers) do
@@ -188,6 +210,13 @@ if SERVER then
 	function ENT:GetDesiredPosition(objective, target)
 		if objective == "kill" then
 			if target then return self:FindGroundAt(target:GetShootPos() - target:GetAimVector() * 100) end
+		elseif objective == "steal" then
+			if target then
+				local RandomDir = VectorRand()
+				RandomDir.z = 0
+				local Trace = util.QuickTrace(target:LocalToWorld(target:OBBCenter()), RandomDir * 20, target)
+				return self:FindGroundAt(Trace.HitPos)
+			end
 		end
 
 		return nil
@@ -221,6 +250,18 @@ if SERVER then
 					mask = MASK_SHOT
 				}).Hit
 			end
+		elseif objective == "steal" then
+			local TargPos = target:GetPos()
+			local Dist = TargPos:Distance(SelfPos)
+
+			if Dist <= 100 then
+				return not util.TraceLine({
+					start = SelfPos,
+					endpos = TargPos,
+					filter = {self, target},
+					mask = MASK_SHOT
+				}).Hit
+			end
 		end
 
 		return false
@@ -243,18 +284,6 @@ if SERVER then
 			elseif self:CanCompleteObjective(Objective, Target) then
 				if Objective == "kill" then
 					if Target then
-						--[[
-						self:FireBullets({
-							Src=SelfPos,
-							Dir=((Target:GetShootPos()-Vector(0,0,20))-SelfPos):GetNormalized(),
-							Tracer=1,
-							Num=1,
-							Spread=Vector(0,0,0),
-							Damage=1,
-							Force=5000,
-							Attacker=self:FindPatsy(Target)
-						})
-						--]]
 						local Attacker = self:FindPatsy(Target)
 
 						if Attacker ~= Target then
@@ -263,6 +292,11 @@ if SERVER then
 
 						local Vec = ((Target:GetShootPos() - Vector(0, 0, 10)) - SelfPos):GetNormalized()
 						self:GetPhysicsObject():ApplyForceCenter(Vec * 100000)
+					end
+				elseif Objective == "steal" then
+					if Target then
+						self:TryMoveTowardPoint(self.CachePos, Target)
+						self:TryMoveTowardPoint(self.CachePos)
 					end
 				end
 			else
