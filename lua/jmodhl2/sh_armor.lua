@@ -384,7 +384,7 @@ hook.Add("Move", "JMOD_HL2_ARMOR_MOVE", function(ply, mv)
 			end
 		elseif ply.EZarmor.effects.jetmod then
 			if not(RegularJump) and mv:KeyDown(IN_JUMP) then
-				if not(ply:OnGround()) and ply:GetNW2Bool("EZjetmod_canuse", true) and Charges > 0.2 then
+				if not(ply:OnGround()) and ply:GetNW2Bool("EZjetmod_canuse", true) and Charges > 0.1 then
 					-- Get Eye angles and then get the direction the jump module would actually be aiming
 					local Drain = 0.02
 					local Dir = ply:GetAngles()
@@ -413,6 +413,7 @@ hook.Add("Move", "JMOD_HL2_ARMOR_MOVE", function(ply, mv)
 						ply.EZThrusterSound = CreateSound(ply, "thrusters/rocket00.wav")
 					end
 					ply.EZThrusterSound:Play()
+					ply.EZThrusterSound:ChangePitch(80 + (Charges * 15)^1.2)
 					if SERVER then
 						if NextEffectTime < Time then
 							NextEffectTime = Time + 0.2
@@ -422,14 +423,14 @@ hook.Add("Move", "JMOD_HL2_ARMOR_MOVE", function(ply, mv)
 							net.Broadcast()
 						end
 					end
-					-- Let them know they're out of juice
-					if CLIENT and Charges <= 0.1 then
-						EmitSound(JModHL2.EZ_JUMPSNDS.DENY, ply:GetPos(), ply:EntIndex(), CHAN_ITEM)
-					end
 					-- Make sure to reduce the charges left
 					Charges = Charges - Drain
 					ply:SetNW2Float(tag_counter, Charges)
 				end
+			end
+			-- Let them know they're out of juice
+			if CLIENT and mv:KeyPressed(IN_JUMP) and Charges <= 0.1 then
+				EmitSound(JModHL2.EZ_JUMPSNDS.DENY, ply:GetPos(), ply:EntIndex(), CHAN_ITEM)
 			end
 		end
 		if not(mv:KeyDown(IN_JUMP)) or ply:OnGround() then
