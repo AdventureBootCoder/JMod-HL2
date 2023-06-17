@@ -1,6 +1,6 @@
 SWEP.Base = "wep_jack_gmod_gunbase"
 SWEP.Spawnable = true -- this obviously has to be set to true
-SWEP.Category = "ArcCW - Half-Life" -- edit this if you like
+SWEP.Category = "JMod: Half-Life - ArcCW" -- edit this if you like
 SWEP.AdminOnly = false
 SWEP.PrintName = ".357 Magnum"
 SWEP.Slot = 1
@@ -10,7 +10,7 @@ SWEP.ViewModelFOV = 60
 SWEP.MirrorVMWM = true
 SWEP.WorldModelOffset = {
     pos = Vector(6, 2, -3),
-    ang = Angle(-10, 180, 180)
+    ang = Angle(0, 180, 180)
 }
 SWEP.BodyHolsterSlot = "thighs"
 SWEP.BodyHolsterAng = Angle(0, 180, 75)
@@ -24,11 +24,7 @@ SWEP.DefaultBodygroups = "00000000000"
 SWEP.Damage = 80
 SWEP.DamageMin = 60
 
-SWEP.Range = 60 -- in METRES
-SWEP.RangeMin = 30
-SWEP.Penetration = 12
-SWEP.DamageType = DMG_BULLET
-SWEP.ShootEntity = nil -- entity to fire, if any
+JMod.ApplyAmmoSpecs(SWEP, "Magnum Pistol Round", 1.2)
 SWEP.MuzzleVelocity = 1050 -- projectile or phys bullet muzzle velocity
 -- IN M/S
 SWEP.ChamberSize = 0 -- how many rounds can be chambered.
@@ -66,9 +62,6 @@ SWEP.HipDispersion = 200 -- inaccuracy added by hip firing.
 SWEP.MoveDispersion = 50
 SWEP.SightsDispersion = 0
 
-SWEP.Primary.Ammo = "Magnum Pistol Round" -- what ammo type the gun uses
-SWEP.MagID = "Magnum Pistol Round" -- the magazine pool this gun draws from
-
 SWEP.ShootVol = 150 -- volume of shoot sound
 SWEP.ShootPitch = 100 -- pitch of shoot sound
 
@@ -103,8 +96,8 @@ SWEP.Tracer = "arccw_tracer" -- override tracer (hitscan) effect
 SWEP.HullSize = 0 -- HullSize used by FireBullets
 
 SWEP.BodyDamageMults = {
-    [HITGROUP_HEAD] = 1.34,
- }
+	[HITGROUP_HEAD] = 1.34,
+}
 
 SWEP.Force = 40
 
@@ -157,8 +150,8 @@ SWEP.Attachments = {
 		Offset = {
 			vpos = Vector(2.8, -6, 0), -- offset that the attachment will be relative to the bone
 			vang = Angle(0, 90, 90),
-			wpos = Vector(10, 1.75, -5.5),
-			wang = Angle(-10, -2, 183)
+			wpos = Vector(10, 1.75, -4.6),
+			wang = Angle(0, -2, 183)
 		},
 		--[[SlideAmount={ -- how far this attachment can slide in both directions.
 			-- overrides Offset.
@@ -171,7 +164,7 @@ SWEP.Attachments = {
 		CorrectiveAng = Angle(180, 0, 0),
 		CorrectivePos = Vector(0, 0, 0)
 	},
-	{
+	--[[{
 		PrintName = "Muzzle", -- print name
 		DefaultAttName = "Default",
 		Slot = "muzzle", -- what kind of attachments can fit here, can be string or table
@@ -182,15 +175,7 @@ SWEP.Attachments = {
 			wpos = Vector(10, 1.75, -5.5),
 			wang = Angle(-10, -2, 183)
 		},
-		--[[SlideAmount={ -- how far this attachment can slide in both directions.
-			-- overrides Offset.
-			vmin=Vector(0.8, -5.715, -4),
-			vmax=Vector(0.8, -5.715, -0.5),
-			wmin=Vector(5.36, 0.739, -5.401),
-			wmax=Vector(5.36, 0.739, -5.401),
-		},]]--
-		--InstalledEles = {"noch"},
-	}
+	}]]--
 }
 
 SWEP.Animations = {

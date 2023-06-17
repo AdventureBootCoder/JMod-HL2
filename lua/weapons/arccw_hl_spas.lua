@@ -1,14 +1,11 @@
 SWEP.Base = "wep_jack_gmod_gunbase"
 SWEP.Spawnable = true -- this obviously has to be set to true
-SWEP.Category = "ArcCW - Half-Life" -- edit this if you like
+SWEP.Category = "JMod: Half-Life - ArcCW" -- edit this if you like
 SWEP.AdminOnly = false
-
 SWEP.PrintName = "Shotgun"
-
 SWEP.Slot = 3
 
 SWEP.Force = 12
-
 SWEP.UseHands = true
 
 SWEP.ViewModel = "models/weapons/c_customspas12.mdl"
@@ -19,26 +16,20 @@ SWEP.WorldModelOffset = {
 	pos = Vector(16, 0, -3.5),
 	ang = Angle(-10, 180, 180)
 }
-
-SWEP.BodyDamageMults = {
-	[HITGROUP_HEAD] = 1,
-}
+SWEP.BodyHolsterSlot = "back"
+SWEP.BodyHolsterAng = Angle(0, -10, 10)
+SWEP.BodyHolsterAngL = Angle(-10, -10, -100)
+SWEP.BodyHolsterPos = Vector(3, -10, -5)
+SWEP.BodyHolsterPosL = Vector(5, -2, 5)
 
 SWEP.CustomToggleCustomizeHUD = false
  
 SWEP.ShotgunSpreadDispersion = true
 SWEP.NoRandSpread = false
+SWEP.DoorBreachPower = 1.5
 
 SWEP.DefaultBodygroups = "00000000000"
-
-SWEP.Damage = 12
-SWEP.DamageMin = 6
-
-SWEP.Range = 50 -- in METRES
-SWEP.RangeMin = 10
-SWEP.Penetration = 1
-SWEP.DamageType = DMG_BUCKSHOT
-SWEP.ShootEntity = nil -- entity to fire, if any
+JMod.ApplyAmmoSpecs(SWEP, "Shotgun Round", 1.2)
 SWEP.MuzzleVelocity = 1050 -- projectile or phys bullet muzzle velocity
 -- IN M/S
 SWEP.ChamberSize = 0 -- how many rounds can be chambered.
@@ -47,7 +38,6 @@ SWEP.ExtendedClipSize = 8
 SWEP.ReducedClipSize = 4
 
 SWEP.PhysBulletMuzzleVelocity = 700
-
 
 SWEP.Recoil = 1.4
 SWEP.RecoilSide = 0.4
@@ -79,9 +69,6 @@ SWEP.HipDispersion = 300 -- inaccuracy added by hip firing.
 SWEP.MoveDispersion = 100
 SWEP.SightsDispersion = 100
 
-SWEP.Primary.Ammo = "Buckshot" -- what ammo type the gun uses
-SWEP.MagID = "shotgun" -- the magazine pool this gun draws from
-
 SWEP.ShootVol = 90 -- volume of shoot sound
 SWEP.ShootPitch = 100 -- pitch of shoot sound
 
@@ -99,17 +86,12 @@ SWEP.ShellMaterial = nil
 SWEP.MuzzleFlashColor = Color(255, 150, 0)
 SWEP.GMMuzzleEffect = false
 
-
 SWEP.MuzzleEffectAttachment = 1 -- which attachment to put the muzzle on
 SWEP.CaseEffectAttachment = 2 -- which attachment to put the case effect on
 
 SWEP.SpeedMult = 0.9
 SWEP.SightedSpeedMult = 0.7
 SWEP.SightTime = 0.33
-
-SWEP.FreeAimAngle = nil -- defaults to HipDispersion / 80. overwrite here
-SWEP.NeverFreeAim = nil
-SWEP.AlwaysFreeAim = nil
 
 SWEP.TracerNum = 2 -- tracer every X
 SWEP.TracerFinalMag = 0 -- the last X bullets in a magazine are all tracers
@@ -156,7 +138,25 @@ SWEP.AttachmentElements = {
 SWEP.ExtraSightDist = 10
 
 SWEP.Attachments = {
-
+	{
+		PrintName = "Tactical", -- print name
+		DefaultAttName = "No Attachment",
+		Slot = "tactical", -- what kind of attachments can fit here, can be string or table
+		Bone = "root", -- relevant bone any attachments will be mostly referring to
+		Offset = {
+			vpos = Vector(0, 0, 0), -- offset that the attachment will be relative to the bone
+			vang = Angle(0, 0, 0),
+			wpos = Vector(0, 0, 0),
+			wang = Angle(0, 0, 0)
+		},
+		--[[SlideAmount={ -- how far this attachment can slide in both directions.
+			-- overrides Offset.
+			vmin=Vector(0.8, -5.715, -4),
+			vmax=Vector(0.8, -5.715, -0.5),
+			wmin=Vector(5.36, 0.739, -5.401),
+			wmax=Vector(5.36, 0.739, -5.401),
+		}]]--
+	}
 }
 
 SWEP.Animations = {
