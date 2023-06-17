@@ -88,10 +88,6 @@ SWEP.SpeedMult = 0.9
 SWEP.SightedSpeedMult = 0.5
 SWEP.SightTime = 0.33
 
-SWEP.FreeAimAngle = nil -- defaults to HipDispersion / 80. overwrite here
-SWEP.NeverFreeAim = nil
-SWEP.AlwaysFreeAim = nil
-
 SWEP.TracerNum = 1 -- tracer every X
 SWEP.TracerFinalMag = 0 -- the last X bullets in a magazine are all tracers
 SWEP.Tracer = "arccw_tracer" -- override tracer (hitscan) effect
@@ -109,8 +105,8 @@ SWEP.IronSightStruct = {
 }
 
 SWEP.HoldtypeHolstered = "passive"
-SWEP.HoldtypeActive = "rpg"
-SWEP.HoldtypeSights = "rpg"
+SWEP.HoldtypeActive = "shotgun"
+SWEP.HoldtypeSights = "ar2"
 
 SWEP.AnimShoot = ACT_HL2MP_GESTURE_RANGE_ATTACK_SHOTGUN
 

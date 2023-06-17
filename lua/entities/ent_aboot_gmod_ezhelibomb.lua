@@ -75,17 +75,23 @@ if SERVER then
 
 	function ENT:PhysicsCollide(data, physobj)
 		if not IsValid(self) then return end
+		local State = self:GetState()
 
 		if data.DeltaTime > 0.2 then
 			if data.Speed > 50 then
 				self:EmitSound("Canister.ImpactHard")
 			end
 
-			if (data.Speed > 500) and (self:GetState() == STATE_ARMED) then
-				if IsValid(data.HitEntity) and data.HitEntity:IsPlayer() then self:Detonate() end
+			if (data.Speed > 450) and (State == STATE_ARMED) then
 				self:StartCooking()
 
 				return
+			end
+
+			if State == STATE_COOKING then
+				if JMod.ShouldAttack(self, data.HitEntity) then
+					self:Detonate()
+				end
 			end
 
 			if data.Speed > 2000 then
