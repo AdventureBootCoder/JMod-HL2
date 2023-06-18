@@ -44,7 +44,6 @@ if SERVER then
 
 		self.FreezeTime = 0
 		self.Restlessness = 1
-		--self:SetVisualState(STATE_GNORMAL)
 		self.CachePos = self:GetPos()
 	end
 
@@ -92,7 +91,8 @@ if SERVER then
 
 			local Resources = {}
 			for _, v in ipairs(ents.GetAll()) do
-				if v.IsJackyEZresource and (v:GetPos():Distance(self.CachePos) > 200) then
+
+				if v.IsJackyEZresource and not(v:IsPlayerHolding()) and (v:GetPos():Distance(self.CachePos) > 200) then
 					table.insert(Resources, v)
 				end
 			end
@@ -101,7 +101,7 @@ if SERVER then
 			for k, v in pairs(Resources) do
 				local Dist = SelfPos:Distance(v:GetPos())
 
-				if Dist < Closest then
+				if (Dist < 2000) and (Dist < Closest) then
 					Target = v
 					Closest = Dist
 				end
@@ -133,7 +133,8 @@ if SERVER then
 		if NewGroundPos then
 			if not self:IsLocationBeingWatched(NewGroundPos) then
 				if self:IsLocationClear(NewGroundPos) then
-					self:SnapTo(NewGroundPos, ent and ent)
+					--self:SnapTo(NewGroundPos, ent and ent)
+					self:JumpTo(NewGroundPos, ent and ent)
 
 					return true
 				end
@@ -152,7 +153,8 @@ if SERVER then
 		if NewGroundPos then
 			if not self:IsLocationBeingWatched(NewGroundPos) then
 				if self:IsLocationClear(NewGroundPos) then
-					self:SnapTo(NewGroundPos)
+					--self:SnapTo(NewGroundPos)
+					self:JumpTo(NewGroundPos)
 
 					return true
 				end
@@ -169,6 +171,32 @@ if SERVER then
 		ent:SetAngles(Angle(0, Yaw, 0))
 		ent:GetPhysicsObject():Sleep()
 		ent:EmitSound("player/footsteps/sand"..tostring(math.random(1, 4))..".wav", 75, 100, 1)
+	end
+
+	function ENT:JumpTo(targetPos, ent)
+		if not ent then ent = self end
+		local SelfPos = self:GetPos()
+		local ToVec = targetPos - SelfPos
+		ToVec.z = 0
+		local ToDir = ToVec:GetNormalized()
+		local ToAng = ToDir:Angle()
+		local Dist = SelfPos:Distance(targetPos)
+		local LaunchAngle = 60
+		ToAng:RotateAroundAxis(ToAng:Right(), LaunchAngle)
+		ToDir = ToAng:Forward() 
+		-----
+		local Speed = math.sqrt((600 * Dist) / math.sin(2 * math.rad(LaunchAngle))) * self.Restlessness -- Fancy math
+		-----
+		constraint.RemoveAll(ent)
+
+		local Phys = ent:GetPhysicsObject()
+		timer.Simple(0, function()
+			if IsValid(Phys) then
+				Phys:EnableMotion(true)
+				Phys:SetDragCoefficient(0)
+				Phys:AddVelocity((ToDir * Speed) + VectorRand(-1, 1))
+			end
+		end)
 	end
 
 	function ENT:IsLocationBeingWatched(pos)
@@ -254,7 +282,7 @@ if SERVER then
 			local TargPos = target:GetPos()
 			local Dist = TargPos:Distance(SelfPos)
 
-			if Dist <= 100 then
+			if Dist <= 50 then
 				return not util.TraceLine({
 					start = SelfPos,
 					endpos = TargPos,
@@ -321,5 +349,5 @@ elseif CLIENT then
 		self:DrawModel()
 	end
 
-	language.Add("ent_aboot_gmod_ezanomaly_aboot", "T H E   B O O T")
+	language.Add("ent_aboot_gmod_ezanomaly_aboot", "A   B O O T")
 end
