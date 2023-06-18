@@ -182,6 +182,10 @@ if SERVER then
 			Eff = "500lb_air"
 		end
 
+		if self:WaterLevel() >= 3 then
+			Eff = "WaterSurfaceExplosion"
+		end
+
 		for i = 1, 3 do
 			sound.Play("ambient/explosions/explode_" .. math.random(1, 9) .. ".wav", SelfPos + VectorRand() * 1000, 160, math.random(80, 110))
 		end
@@ -220,7 +224,7 @@ if SERVER then
 		timer.Simple(.2, function()
 			local Tr = util.QuickTrace(SelfPos + Vector(0, 0, 100), Vector(0, 0, -400))
 
-			if Tr.Hit then
+			if Tr.Hit and not(Eff == "WaterSurfaceExplosion") then
 				util.Decal("BigScorch", Tr.HitPos + Tr.HitNormal, Tr.HitPos - Tr.HitNormal)
 			end
 		end)
@@ -229,7 +233,16 @@ if SERVER then
 		self:Remove()
 
 		timer.Simple(.1, function()
-			ParticleEffect(Eff, SelfPos, Angle(0, 0, 0))
+			if Eff == "WaterSurfaceExplosion" then
+				local Splach = EffectData()
+				Splach:SetOrigin(SelfPos)
+				Splach:SetNormal(Vector(0, 0, 1))
+				Splach:SetScale(100)
+				util.Effect("WaterSplash", Splach)
+				util.Effect("WaterSurfaceExplosion", Splach)
+			else
+				ParticleEffect(Eff, SelfPos, Angle(0, 0, 0))
+			end
 		end)
 	end
 

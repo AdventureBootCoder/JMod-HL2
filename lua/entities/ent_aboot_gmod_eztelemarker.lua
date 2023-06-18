@@ -89,7 +89,7 @@ if SERVER then
 
 elseif CLIENT then
 	function ENT:Initialize()
-		self.TimeSinceActivated = CurTime()
+		self.TimeActivated = CurTime()
 		self.Scl = 0.1
 		self.Rotation = 1
 		self.TeleRange = 200
@@ -155,7 +155,7 @@ elseif CLIENT then
 		end
 		if Active ~= self.LastState then
 			if Active == true then
-				self.TimeSinceActivated = CurTime()
+				self.TimeActivated = CurTime()
 			end
 			self.LastState = Active
 		end
@@ -164,22 +164,19 @@ elseif CLIENT then
 	end
 
 	function ENT:SummonIchthy(ply)
+		if ply.Scared or not(IsValid(ply)) or not(ply:Alive()) or (ply:WaterLevel() < 3) then return end
 		local IchyOrigin = ply:EyeAngles():Forward()
 		IchyOrigin.z = 0
 		if util.QuickTrace(ply:EyePos(), IchyOrigin * 480).Hit then return end
-		timer.Simple(0.5, function()
-			if IsValid(self) and IsValid(ply) and ply:Alive() and (ply:WaterLevel() >= 3) and not(ply.Scared) then
-				local Ichy = EffectData()
-				Ichy:SetAngles(Angle(0, ply:GetAngles().y + 180, 0))
-				local IchyOrigin = ply:EyeAngles():Forward()
-				IchyOrigin.z = 0
-				Ichy:SetOrigin(ply:EyePos() + IchyOrigin * 480)
-				Ichy:SetEntity(ply)
-				util.Effect("eff_aboot_gmod_ichthy", Ichy)
-				ply.Scared = true
-				EmitSound("npc/ichthyosaur/attack_growl1.wav", ply:EyePos() + IchyOrigin * 480, -1)
-			end
-		end)
+		local Ichy = EffectData()
+		Ichy:SetAngles(Angle(0, ply:GetAngles().y + 180, 0))
+		local IchyOrigin = ply:EyeAngles():Forward()
+		IchyOrigin.z = 0
+		Ichy:SetOrigin(ply:EyePos() + IchyOrigin * 480)
+		Ichy:SetEntity(ply)
+		util.Effect("eff_aboot_gmod_ichthy", Ichy)
+		ply.Scared = true
+		EmitSound("npc/ichthyosaur/attack_growl1.wav", ply:EyePos() + IchyOrigin * 480, -1)
 	end
 
 	hook.Remove("RenderScreenspaceEffects", "ABoot_TeleportEffect")
@@ -191,9 +188,11 @@ elseif CLIENT then
 			if (v:GetActivated() and v:GetPos():Distance(Ply:GetPos()) < v.TeleRange) and v:ShouldTeleport(Ply) then
 				Teleporting = true
 				Teleporter = v
-				if (v.TimeSinceActivated > (CurTime() - 0.15)) and not(Ply.Scared) and (Ply:WaterLevel() >= 3) then
-					if math.random(0, 1000) > 975 then
-						v:SummonIchthy(Ply)
+				if (v.TimeActivated >= (CurTime() - 0.2)) and not(Ply.Scared) and (Ply:WaterLevel() >= 3) then
+					if math.random(0, 1000) >= 950 then
+						timer.Simple(0.5, function()
+							v:SummonIchthy(Ply)
+						end)
 					end
 				end
 			end

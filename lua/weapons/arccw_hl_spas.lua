@@ -1,5 +1,5 @@
 SWEP.Base = "wep_jack_gmod_gunbase"
-SWEP.Spawnable = true -- this obviously has to be set to true
+SWEP.Spawnable = false
 SWEP.Category = "JMod: Half-Life - ArcCW" -- edit this if you like
 SWEP.AdminOnly = false
 SWEP.PrintName = "Shotgun"
@@ -141,7 +141,7 @@ SWEP.Attachments = {
 	{
 		PrintName = "Tactical", -- print name
 		DefaultAttName = "No Attachment",
-		Slot = "tactical", -- what kind of attachments can fit here, can be string or table
+		Slot = {"laser", "flashlight", "rail"}, -- what kind of attachments can fit here, can be string or table
 		Bone = "root", -- relevant bone any attachments will be mostly referring to
 		Offset = {
 			vpos = Vector(0, 0, 0), -- offset that the attachment will be relative to the bone

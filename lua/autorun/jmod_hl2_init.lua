@@ -47,6 +47,7 @@ if(SERVER)then
 	util.AddNetworkString("ABoot_VolumeContainerMenu")
 	util.AddNetworkString("ABoot_JumpmodParticles")
 	local defaultHEVdisable = CreateConVar("aboot_disable_hev", "0", FCVAR_ARCHIVE, "Removes the HEV suit from players on spawn and when it's destroyed. \nNo more running around with an invisible HEV suit")
+	local noPowerDraw = CreateConVar("aboot_infinite_power", "0", FCVAR_ARCHIVE, "Disables jomp/jrt modules drawing internal power, effectivly making their charge infinite")
 
 	local function RemoveHEVsuit(playa) 
 		playa:SetArmor(0)
@@ -108,7 +109,7 @@ if(SERVER)then
 						ply:SendLua([[surface.PlaySound("]] .. JModHL2.EZ_JUMPSNDS.READY .. [[")]])
 					end
 
-					if (GetConVar("gmod_suit"):GetBool()) and (ply:GetSuitPower() >= 1) and (val < 3) then
+					if (GetConVar("gmod_suit"):GetBool()) and (ply:GetSuitPower() >= 1) and (val < 3) and not(noPowerDraw:GetBool()) then
 						
 						ply.charging = true
 						if (ply:GetSuitPower() >= 1.25) then
@@ -123,7 +124,7 @@ if(SERVER)then
 							for id, armorData in pairs(ply.EZarmor.items) do
 								local Info = JMod.ArmorTable[armorData.name]
 
-								if Info.eff and (Info.eff.jumpmod or Info.eff.jetmod) then
+								if Info.eff and (Info.eff.jumpmod or Info.eff.jetmod) and not(noPowerDraw:GetBool()) then
 									
 									if armorData.chrg.power < 1.1 * JMod.Config.Armor.ChargeDepletionMult then
 										JMod.EZarmorWarning(ply, "Jump module is out of charge")

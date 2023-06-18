@@ -1,6 +1,6 @@
 SWEP.Base = "wep_jack_gmod_gunbase"
-SWEP.Spawnable = true -- this obviously has to be set to true
-SWEP.Category = "ArcCW - Half-Life" -- edit this if you like
+SWEP.Spawnable = false
+SWEP.Category = "JMod: Half-Life - ArcCW" -- edit this if you like
 SWEP.AdminOnly = false
 SWEP.PrintName = "Annabelle"
 SWEP.Slot = 3
