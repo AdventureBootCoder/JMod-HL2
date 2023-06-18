@@ -50,6 +50,7 @@ if(SERVER)then
 			self:SetColor(Color(255, 255, 255))
 		end)
 		self.NextUseTime = 0
+		self.NextSoundTime = 0
 	end
 
 	function ENT:TryPlace()
@@ -64,8 +65,10 @@ if(SERVER)then
 			self:UpdateDepositKey()
 
 			if not(self.DepositKey)then
-				JMod.Hint(self.EZowner, "ground drill")
-			elseif(GroundIsSolid)then
+				JMod.Hint(self.EZowner, "thumper")
+			end
+			
+			if(GroundIsSolid)then
 				local SelfAng = self:GetAngles()
 				local Roll = Tr.HitNormal:Angle().z
 				local Yaw = Tr.HitNormal:Angle().y
@@ -75,14 +78,12 @@ if(SERVER)then
 				self:GetPhysicsObject():EnableMotion(false)
 				self.EZinstalled = true
 				---
-				if self.DepositKey then
-					self:TurnOn(self.EZowner)
-				else
-					if self:GetState() > STATE_OFF then
-						self:TurnOff()
-					end
-					JMod.Hint(self.EZowner, "machine mounting problem")
+				self:TurnOn(self.EZowner)
+			else
+				if self:GetState() > STATE_OFF then
+					self:TurnOff()
 				end
+				JMod.Hint(self.EZowner, "machine mounting problem")
 			end
 		end
 	end
@@ -92,10 +93,10 @@ if(SERVER)then
 		local SelfPos, Forward, Right = self:GetPos(), self:GetForward(), self:GetRight()
 
 		if self.EZinstalled then
-			if (self:GetElectricity() > 0) and (self.DepositKey) then
+			if (self:GetElectricity() > 0) then
 				self:EmitSound("ambient/machines/thumper_startup1.wav", 100)
 				timer.Simple(2.8, function()
-					if not(IsValid(self)) or not(self.DepositKey) then return end
+					if not(IsValid(self)) or not(self.EZinstalled) then return end
 					self:SetState(STATE_RUNNING)
 					self.SoundLoop = CreateSound(self, "ambient/machines/thumper_amb.wav")
 					self.SoundLoop:SetSoundLevel(65)
@@ -135,15 +136,14 @@ if(SERVER)then
 			JMod.Hint(activator, "destroyed", self)
 
 			return
-		elseif(State==STATE_OFF)then
+		elseif State == STATE_OFF then
 			self:TurnOn(activator)
-		elseif(State==STATE_RUNNING)then
+		elseif State == STATE_RUNNING then
 			if alt then
 				self:ProduceResource()
-
-				return
+			else
+				self:TurnOff()
 			end
-			self:TurnOff()
 		end
 	end
 	
@@ -181,9 +181,7 @@ if(SERVER)then
 			if not self.EZinstalled then self:TurnOff() return end
 
 			if not JMod.NaturalResourceTable[self.DepositKey] then 
-				self:TurnOff()
-				--print("[HL:2 - JMOD] Invalid deposit key")
-				return
+				self:SetResourceType("N/A")
 			end
 
 			self:ConsumeElectricity(.02)
@@ -202,36 +200,40 @@ if(SERVER)then
 				self:EmitSound("ambient/machines/thumper_dust.wav")
 				self:ResetSequenceInfo()
 
-				-- This is just the rate at which we pump
-				local pumpRate = JMod.EZ_GRADE_BUFFS[self:GetGrade()]^2
-				
-				-- Here's where we do the rescource deduction, and barrel production
-				-- If it's a flow (i.e. water)
-				if JMod.NaturalResourceTable[self.DepositKey].rate then
-					-- We get the rate
-					local flowRate = JMod.NaturalResourceTable[self.DepositKey].rate
-					-- and set the progress to what it was last tick + our ability * the flowrate
-					self:SetProgress(self:GetProgress() + pumpRate * flowRate)
+				if self:GetResourceType() ~= "N/A" then
+					-- This is just the rate at which we pump
+					local pumpRate = JMod.EZ_GRADE_BUFFS[self:GetGrade()]^2
+					
+					-- Here's where we do the rescource deduction, and barrel production
+					-- If it's a flow (i.e. water)
+					if JMod.NaturalResourceTable[self.DepositKey].rate then
+						-- We get the rate
+						local flowRate = JMod.NaturalResourceTable[self.DepositKey].rate
+						-- and set the progress to what it was last tick + our ability * the flowrate
+						self:SetProgress(self:GetProgress() + pumpRate * flowRate)
 
-					-- If the progress exceeds 100
-					if self:GetProgress() >= 100 then
-						-- Spawn barrel
-						local amtToPump = math.min(self:GetProgress(), 100)
-						self:ProduceResource()
-					end
-				else
-					self:SetProgress(self:GetProgress() + pumpRate)
+						-- If the progress exceeds 100
+						if self:GetProgress() >= 100 then
+							-- Spawn barrel
+							local amtToPump = math.min(self:GetProgress(), 100)
+							self:ProduceResource()
+						end
+					else
+						self:SetProgress(self:GetProgress() + pumpRate)
 
-					if self:GetProgress() >= 100 then
-						local amtToPump = math.min(JMod.NaturalResourceTable[self.DepositKey].amt, 100)
-						self:ProduceResource()
-						JMod.DepleteNaturalResource(self.DepositKey, amtToPump)
+						if self:GetProgress() >= 100 then
+							local amtToPump = math.min(JMod.NaturalResourceTable[self.DepositKey].amt, 100)
+							self:ProduceResource()
+							JMod.DepleteNaturalResource(self.DepositKey, amtToPump)
+						end
 					end
 				end
 			end
 
-			JMod.EmitAIsound(self:GetPos(), 1000, .5, 256)
-
+			if self.NextSoundTime <= Time then
+				self.NextSoundTime = Time + 3
+				JMod.EmitAIsound(self:GetPos(), 1000, 3, 256)
+			end
 		else
 			if self.LastState ~= State then
 				self:ResetSequence("idle")
@@ -301,24 +303,24 @@ elseif(CLIENT)then
 				DisplayAng:RotateAroundAxis(DisplayAng:Forward(), 90)
 				local Opacity = math.random(50,150)
 				cam.Start3D2D(SelfPos + Up * 40 - Right * 23 + Forward * 35, DisplayAng, .1)
-                    surface.SetDrawColor(10, 10, 10, Opacity + 50)
-                    surface.DrawRect(184, -200, 128, 128)
-                    JMod.StandardRankDisplay(Grade, 248, -140, 118, Opacity + 50)
-                    draw.SimpleTextOutlined("EXTRACTING", "JMod-Display", 250, -60, Color(255, 255, 255, Opacity), TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP, 3, Color(0, 0, 0, Opacity))
-                    local ExtractCol = Color(100, 255, 100, Opacity)
-                    draw.SimpleTextOutlined(string.upper(Typ) or "N/A", "JMod-Display", 250, -30, ExtractCol, TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP, 3, Color(0, 0, 0, Opacity))
-                    draw.SimpleTextOutlined("POWER", "JMod-Display", 250, 0, Color(255, 255, 255, Opacity), TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP, 3, Color(0, 0, 0, Opacity))
-                    local ElecFrac=self:GetElectricity()/400
-                    local R,G,B=JMod.GoodBadColor(ElecFrac)
-                    draw.SimpleTextOutlined(tostring(math.Round(ElecFrac * 100)).."%", "JMod-Display", 250, 30, Color(R, G, B, Opacity), TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP, 3, Color(0, 0, 0, Opacity))
-                    draw.SimpleTextOutlined("PROGRESS", "JMod-Display", 250, 60, Color(255, 255, 255, Opacity), TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP, 3, Color(0, 0, 0, Opacity))
-                    local ProgressFrac = self:GetProgress() / 100
+					surface.SetDrawColor(10, 10, 10, Opacity + 50)
+					surface.DrawRect(184, -200, 128, 128)
+					JMod.StandardRankDisplay(Grade, 248, -140, 118, Opacity + 50)
+					draw.SimpleTextOutlined("EXTRACTING", "JMod-Display", 250, -60, Color(255, 255, 255, Opacity), TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP, 3, Color(0, 0, 0, Opacity))
+					local ExtractCol = Color(100, 255, 100, Opacity)
+					draw.SimpleTextOutlined(string.upper(Typ), "JMod-Display", 250, -30, ExtractCol, TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP, 3, Color(0, 0, 0, Opacity))
+					draw.SimpleTextOutlined("POWER", "JMod-Display", 250, 0, Color(255, 255, 255, Opacity), TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP, 3, Color(0, 0, 0, Opacity))
+					local ElecFrac=self:GetElectricity()/400
+					local R,G,B=JMod.GoodBadColor(ElecFrac)
+					draw.SimpleTextOutlined(tostring(math.Round(ElecFrac * 100)).."%", "JMod-Display", 250, 30, Color(R, G, B, Opacity), TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP, 3, Color(0, 0, 0, Opacity))
+					draw.SimpleTextOutlined("PROGRESS", "JMod-Display", 250, 60, Color(255, 255, 255, Opacity), TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP, 3, Color(0, 0, 0, Opacity))
+					local ProgressFrac = self:GetProgress() / 100
 					local PR, PG, PB = JMod.GoodBadColor(ElecFrac)
-                    draw.SimpleTextOutlined(tostring(math.Round(ProgressFrac * 100)).."%", "JMod-Display", 250, 90, Color(PR, PG, PB, Opacity), TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP, 3, Color(0, 0, 0, Opacity))
-                    --local CoolFrac=self:GetCoolant()/100
-                    --draw.SimpleTextOutlined("COOLANT","JMod-Display",90,0,Color(255,255,255,Opacity),TEXT_ALIGN_CENTER,TEXT_ALIGN_TOP,3,Color(0,0,0,Opacity))
-                    --local R,G,B=JMod.GoodBadColor(CoolFrac)
-                    --draw.SimpleTextOutlined(tostring(math.Round(CoolFrac*100)).."%","JMod-Display",90,30,Color(R,G,B,Opacity),TEXT_ALIGN_CENTER,TEXT_ALIGN_TOP,3,Color(0,0,0,Opacity))
+					draw.SimpleTextOutlined(tostring(math.Round(ProgressFrac * 100)).."%", "JMod-Display", 250, 90, Color(PR, PG, PB, Opacity), TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP, 3, Color(0, 0, 0, Opacity))
+					--local CoolFrac=self:GetCoolant()/100
+					--draw.SimpleTextOutlined("COOLANT","JMod-Display",90,0,Color(255,255,255,Opacity),TEXT_ALIGN_CENTER,TEXT_ALIGN_TOP,3,Color(0,0,0,Opacity))
+					--local R,G,B=JMod.GoodBadColor(CoolFrac)
+					--draw.SimpleTextOutlined(tostring(math.Round(CoolFrac*100)).."%","JMod-Display",90,30,Color(R,G,B,Opacity),TEXT_ALIGN_CENTER,TEXT_ALIGN_TOP,3,Color(0,0,0,Opacity))
 				cam.End3D2D()
 			end
 		end
