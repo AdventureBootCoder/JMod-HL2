@@ -11,7 +11,7 @@ att.Desc_Cons = {
 }
 
 att.Laser = false
-att.LaserStrength = 0.5
+att.LaserStrength = 1
 att.LaserBone = "laser"
 att.LaserColor = Color(255, 0, 0)
 

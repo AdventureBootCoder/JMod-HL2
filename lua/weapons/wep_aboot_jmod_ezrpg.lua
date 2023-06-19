@@ -136,8 +136,8 @@ SWEP.Attachments = {
 		Slot = "missile_guidence", -- what kind of attachments can fit here, can be string or table
 		Bone = "rpg_base", -- relevant bone any attachments will be mostly referring to
 		Offset = {
-			vpos = Vector(0, 0, 0), -- offset that the attachment will be relative to the bone
-			vang = Angle(0, 0, 0),
+			vpos = Vector(-1, 1, 4), -- offset that the attachment will be relative to the bone
+			vang = Angle(0, 0, 190),
 			wpos = Vector(0, 0, 0),
 			wang = Angle(0, 0, 0)
 		}

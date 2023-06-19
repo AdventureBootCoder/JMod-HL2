@@ -148,7 +148,7 @@ if SERVER then
 				local NewDir = (OwnerTr.HitPos - self:GetPos()):GetNormalized() * 1000
 				self.CurVel = self.CurVel + NewDir / ThinkRate
 			else
-				self.CurVel = self.CurVel + physenv.GetGravity() / ThinkRate 
+				self.CurVel = self.CurVel + physenv.GetGravity() / ThinkRate * .2
 			end
 			--jprint(self.CurVel:Length())
 
