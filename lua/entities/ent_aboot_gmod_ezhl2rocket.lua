@@ -28,7 +28,18 @@ if SERVER then
 		self:SetNotSolid(true)
 		self.NextDet = 0
 		self.FuelLeft = 100
-		self.DieTime = CurTime() + 30
+		timer.Simple(0, function()
+			if not(IsValid(self)) then return end
+			if self.Guided then
+				self.DieTime = CurTime() + 30
+			else
+				self.DieTime = CurTime() + 5
+			end
+		end)
+		self.SoundLoop = CreateSound(self, "weapons/rpg/rocket1.wav")
+		self.SoundLoop:Play()
+		self.SoundLoop:ChangeVolume(1)
+		self.SoundLoop:SetSoundLevel(120)
 		self.NextThrust = 0
 		self:Think()
 	end
@@ -38,12 +49,12 @@ if SERVER then
 		if self.Exploded then return end
 		self.Exploded = true
 		local SelfPos, Att, Dir = (tr and tr.HitPos + tr.HitNormal * 5) or self:GetPos() + Vector(0, 0, 30), self.EZowner or self, -self:GetRight()
-		JMod.Sploom(Att, SelfPos, 200)
+		JMod.Sploom(Att, SelfPos, 100)
 		---
 		util.ScreenShake(SelfPos, 1000, 3, 2, 700)
 		self:EmitSound("snd_jack_fragsplodeclose.wav", 90, 100)
 		---
-		util.BlastDamage(game.GetWorld(), Att, SelfPos + Vector(0, 0, 50), self.BlastRadius or 200, self.Damage or 200)
+		util.BlastDamage(game.GetWorld(), Att, SelfPos + Vector(0, 0, 50), self.BlastRadius or 150, self.Damage or 200)
 
 		for k, ent in pairs(ents.FindInSphere(SelfPos, 200)) do
 			if ent:GetClass() == "npc_helicopter" then
@@ -78,6 +89,9 @@ if SERVER then
 	end
 
 	function ENT:OnRemove()
+		if self.SoundLoop then
+			self.SoundLoop:Stop()
+		end
 	end
 
 	--
@@ -127,15 +141,27 @@ if SERVER then
 			self:Detonate(Tr)
 		else
 			self:SetPos(Pos + self.CurVel / ThinkRate)
-			local NewDir = (OwnerTr.HitPos - self:GetPos()):GetNormalized() * 100
-			--jprint(NewDir)
-			self.CurVel = self.CurVel + NewDir
+			local AngleToBe = self.CurVel:GetNormalized():Angle()
+			AngleToBe:RotateAroundAxis(AngleToBe:Up(), -90)
+			self:SetAngles(AngleToBe)
+			if self.Guided then
+				local NewDir = (OwnerTr.HitPos - self:GetPos()):GetNormalized() * 1000
+				self.CurVel = self.CurVel + NewDir / ThinkRate
+			else
+				self.CurVel = self.CurVel + physenv.GetGravity() / ThinkRate 
+			end
+			--jprint(self.CurVel:Length())
 
 			---
 			if (self.FuelLeft > 0) and (self.NextThrust < Time) then
 				self.NextThrust = Time + .02
-				self.CurVel = self.CurVel + self.CurVel:GetNormalized() * 50
-				--self.FuelLeft = self.FuelLeft - 1
+				if self.Guided then
+					self.CurVel = self.CurVel --+ self.CurVel:GetNormalized() * 50
+					--self.FuelLeft = self.FuelLeft - 1
+				else
+					self.CurVel = self.CurVel + self.CurVel:GetNormalized() * 200
+					self.FuelLeft = self.FuelLeft - 5
+				end
 				---
 				local Eff = EffectData()
 				Eff:SetOrigin(self:GetPos())
@@ -146,7 +172,7 @@ if SERVER then
 		end
 
 		if IsValid(self) then
-			if self.DieTime < Time then
+			if (self.DieTime or Time) < Time then
 				self:Detonate()
 
 				return

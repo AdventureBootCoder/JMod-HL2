@@ -1,5 +1,5 @@
 SWEP.Base = "wep_jack_gmod_gunbase"
-SWEP.Spawnable = false
+SWEP.Spawnable = true
 SWEP.Category = "JMod: Half-Life - ArcCW" -- edit this if you like
 SWEP.AdminOnly = false
 SWEP.PrintName = "RPG"
@@ -7,7 +7,7 @@ SWEP.Slot = 4
 
 SWEP.UseHands = true
 
-SWEP.ViewModel = "models/weapons/tfa_mmod/c_rpg.mdl"
+SWEP.ViewModel = "models/weapons/aboot/c_rpg.mdl"
 SWEP.WorldModel = "models/weapons/w_rocket_launcher.mdl"
 SWEP.ViewModelFOV = 60
 SWEP.MirrorVMWM = true
@@ -15,12 +15,12 @@ SWEP.WorldModelOffset = {
     pos = Vector(16, 2, -3),
     ang = Angle(-15, 180, 180)
 }
-
 SWEP.DefaultBodygroups = "00000000000"
-
+---
+SWEP.CustomToggleCustomizeHUD = false
+---
 --SWEP.Damage = 150
 --SWEP.DamageType = DMG_BLAST
-
 JMod.ApplyAmmoSpecs(SWEP, "Mini Rocket")
 SWEP.ManualAction = false
 SWEP.AutoReload = false
@@ -28,7 +28,7 @@ SWEP.ShootEntity = "ent_aboot_gmod_ezhl2rocket"
 SWEP.ShootEntityAngle = Angle(0, -90, 0)
 SWEP.ShootEntityOffset = Vector(10, 0, -4)
 SWEP.ShootEntityAngleCorrection = Angle(0, -90, 0)
-SWEP.MuzzleVelocity = 100 -- projectile or phys bullet muzzle velocity
+SWEP.MuzzleVelocity = 1200 -- projectile or phys bullet muzzle velocity
 -- IN M/S
 SWEP.ChamberSize = 0 -- how many rounds can be chambered.
 SWEP.Primary.ClipSize = 1 -- DefaultClip is automatically set.
@@ -36,8 +36,8 @@ SWEP.ExtendedClipSize = 1
 SWEP.ReducedClipSize = 1
 
 
-SWEP.Recoil = 2
-SWEP.RecoilSide = 0.2
+SWEP.Recoil = 1
+SWEP.RecoilSide = 0
 SWEP.RecoilRise = 0.5
 SWEP.MaxRecoilBlowback = -1
 SWEP.VisualRecoilMult = 5
@@ -61,7 +61,7 @@ SWEP.NPCWeaponType = "weapon_rpg"
 SWEP.NPCWeight = 100
 
 SWEP.AccuracyMOA = 0 -- accuracy in Minutes of Angle. There are 60 MOA in a degree.
-SWEP.HipDispersion = 300 -- inaccuracy added by hip firing.
+SWEP.HipDispersion = 100 -- inaccuracy added by hip firing.
 SWEP.MoveDispersion = 100
 SWEP.SightsDispersion = 0
 SWEP.JumpDispersion = 1000 -- dispersion penalty when in the air
@@ -130,7 +130,18 @@ SWEP.AttachmentElements = {
 SWEP.ExtraSightDist = 10
 
 SWEP.Attachments = {
-
+	{
+		PrintName = "Guidence System",
+		DefaultAttName = "None",
+		Slot = "missile_guidence", -- what kind of attachments can fit here, can be string or table
+		Bone = "rpg_base", -- relevant bone any attachments will be mostly referring to
+		Offset = {
+			vpos = Vector(0, 0, 0), -- offset that the attachment will be relative to the bone
+			vang = Angle(0, 0, 0),
+			wpos = Vector(0, 0, 0),
+			wang = Angle(0, 0, 0)
+		}
+	}
 }
 
 SWEP.Animations = {
