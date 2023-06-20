@@ -17,9 +17,9 @@ SWEP.WorldModelOffset = {
 }
 SWEP.BodyHolsterSlot = "back"
 SWEP.BodyHolsterAng = Angle(-10, 190, 180)
-SWEP.BodyHolsterAngL = Angle(0, 0, 0)
+SWEP.BodyHolsterAngL = Angle(-20, 190, 0)
 SWEP.BodyHolsterPos = Vector(5, 8, -5)
-SWEP.BodyHolsterPosL = Vector(5, -10, 4)
+SWEP.BodyHolsterPosL = Vector(5, 8, 5)
 
 SWEP.DefaultBodygroups = "00000000000"
 ---

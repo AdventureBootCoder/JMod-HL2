@@ -2,14 +2,10 @@ SWEP.Base = "wep_jack_gmod_gunbase"
 SWEP.Spawnable = true -- this obviously has to be set to true
 SWEP.Category = "JMod: Half-Life - ArcCW" -- edit this if you like
 SWEP.AdminOnly = false
-
 SWEP.PrintName = "AR3"
-
 SWEP.Slot = 4
 
-SWEP.UseHands = true
-
-SWEP.ViewModel = "models/weapons/c_iiopnar3.mdl"
+SWEP.ViewModel = "models/weapons/aboot/c_iiopnar3.mdl"
 SWEP.WorldModel = "models/weapons/aboot/tfa_mmod/w_ar3.mdl"
 SWEP.ViewModelFOV = 60
 SWEP.MirrorVMWM = true
