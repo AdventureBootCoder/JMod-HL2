@@ -144,13 +144,13 @@ if SERVER then
 			local AngleToBe = self.CurVel:GetNormalized():Angle()
 			AngleToBe:RotateAroundAxis(AngleToBe:Up(), -90)
 			self:SetAngles(AngleToBe)
+			local RandomDir = VectorRand() * 2000
 			if self.Guided then
 				local NewDir = (OwnerTr.HitPos - self:GetPos()):GetNormalized() * 1200
 				self.CurVel = self.CurVel + NewDir / ThinkRate
 			else
-				self.CurVel = self.CurVel + physenv.GetGravity() / ThinkRate * .2
+				self.CurVel = self.CurVel + (physenv.GetGravity() + RandomDir) / ThinkRate * .2
 			end
-			--jprint(self.CurVel:Length())
 
 			---
 			if (self.FuelLeft > 0) and (self.NextThrust < Time) then
@@ -167,7 +167,7 @@ if SERVER then
 				Eff:SetOrigin(self:GetPos())
 				Eff:SetNormal(-self.CurVel:GetNormalized())
 				Eff:SetScale(1)
-				util.Effect("eff_jack_gmod_rockettrail", Eff, true, true)
+				util.Effect("eff_jack_gmod_thrustsmoke", Eff, true, true)
 			end
 		end
 

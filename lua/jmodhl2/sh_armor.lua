@@ -190,6 +190,7 @@ JModHL2.ArmorTable = {
 			uneq="aboot_jumpmod/bootup_sequence/bootup_moduleacq.wav"
 		},
 		eff={
+			HEVreq = true,
 			jumpmod = true
 		},
 		bon = "ValveBiped.Bip01_Spine2",
@@ -198,7 +199,6 @@ JModHL2.ArmorTable = {
 		ang = Angle(0, 0, 90),
 		wgt = 20,
 		dur = 100,
-		HEVreq = true,
 		ent = "ent_aboot_gmod_ezarmor_jumpmodule"
 	},
 	["ABoot Jet Module"]={
@@ -232,6 +232,7 @@ JModHL2.ArmorTable = {
 			uneq="aboot_jumpmod/bootup_sequence/bootup_moduleacq.wav"
 		},
 		eff={
+			HEVreq = true,
 			jetmod = true
 		},
 		bon = "ValveBiped.Bip01_Spine2",
@@ -240,7 +241,6 @@ JModHL2.ArmorTable = {
 		ang = Angle(0, 180, 90),
 		wgt = 20,
 		dur = 100,
-		HEVreq = true,
 		ent = "ent_aboot_gmod_ezarmor_jetmodule"
 	},
 	["Aboot Headcrab"] = {

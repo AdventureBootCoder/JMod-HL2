@@ -68,16 +68,17 @@ if(SERVER)then
 	end)
 
 	hook.Add("JModHookEZArmorSync", "ABootHL2ArmorCheck", function(playa)
-		if playa.EZarmor.effects and playa.EZarmor.effects.HEVsuit then
+		local PlyEff = playa.EZarmor.effects
+		if PlyEff and PlyEff.HEVsuit then
 			if not(playa:IsSuitEquipped()) then
 				playa:EquipSuit()
 			end
 		elseif defaultHEVdisable:GetBool() and playa:IsSuitEquipped() then
 			RemoveHEVsuit(playa)
 		end
-		for id, items in pairs(playa.EZarmor.items) do
-			if JMod.ArmorTable[items.name].HEVreq then
-				if not (playa.EZarmor.effects and playa.EZarmor.effects.HEVsuit) then
+		if PlyEff and PlyEff.HEVreq and not(PlyEff.HEVsuit) then
+			for id, items in pairs(playa.EZarmor.items) do
+				if JMod.ArmorTable[items.name].eff.HEVreq then
 					playa:PrintMessage(HUD_PRINTCENTER, "This armor requires an HEV suit")
 					JMod.RemoveArmorByID(playa, id)
 				end

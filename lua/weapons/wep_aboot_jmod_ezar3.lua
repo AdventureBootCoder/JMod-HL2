@@ -1,6 +1,6 @@
 SWEP.Base = "wep_jack_gmod_gunbase"
 SWEP.Spawnable = true -- this obviously has to be set to true
-SWEP.Category = "ArcCW - Half-Life" -- edit this if you like
+SWEP.Category = "JMod: Half-Life - ArcCW" -- edit this if you like
 SWEP.AdminOnly = false
 
 SWEP.PrintName = "AR3"
@@ -109,7 +109,7 @@ SWEP.AlwaysFreeAim = nil
 
 SWEP.TracerNum = 1 -- tracer every X
 SWEP.TracerFinalMag = 0 -- the last X bullets in a magazine are all tracers
-SWEP.Tracer = "AR2Tracer" -- override tracer (hitscan) effect
+SWEP.Tracer = "tfa_mmod_tracer_ar3" -- override tracer (hitscan) effect
 SWEP.TracerCol = Color(0, 0, 255)
 SWEP.HullSize = 0 -- HullSize used by FireBullets
 
