@@ -6,7 +6,7 @@ SWEP.PrintName = "Shotgun"
 SWEP.Slot = 3
 
 SWEP.ViewModel = "models/weapons/aboot/c_customspas12.mdl"
-SWEP.WorldModel = "models/weapons/w_IIopnshotgun.mdl"
+SWEP.WorldModel = "models/weapons/aboot/w_IIopnshotgun.mdl"
 SWEP.ViewModelFOV = 60
 SWEP.MirrorVMWM = true
 SWEP.WorldModelOffset = {

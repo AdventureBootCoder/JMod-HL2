@@ -5,8 +5,8 @@ SWEP.AdminOnly = false
 SWEP.PrintName = ".357 Magnum"
 SWEP.Slot = 1
 
-SWEP.ViewModel = "models/weapons/tfa_mmod/c_357.mdl"
-SWEP.WorldModel = "models/weapons/tfa_mmod/w_357.mdl"
+SWEP.ViewModel = "models/weapons/aboot/c_357.mdl"
+SWEP.WorldModel = "models/weapons/aboot/w_357.mdl"
 SWEP.ViewModelFOV = 60
 SWEP.MirrorVMWM = true
 SWEP.WorldModelOffset = {
