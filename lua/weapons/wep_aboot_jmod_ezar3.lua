@@ -10,7 +10,7 @@ SWEP.Slot = 4
 SWEP.UseHands = true
 
 SWEP.ViewModel = "models/weapons/c_iiopnar3.mdl"
-SWEP.WorldModel = "models/weapons/tfa_mmod/w_ar3.mdl"
+SWEP.WorldModel = "models/weapons/aboot/tfa_mmod/w_ar3.mdl"
 SWEP.ViewModelFOV = 60
 SWEP.MirrorVMWM = true
 SWEP.WorldModelOffset = {
