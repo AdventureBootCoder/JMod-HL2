@@ -1,9 +1,10 @@
 SWEP.Base = "wep_jack_gmod_gunbase"
-SWEP.Spawnable = false
+SWEP.Spawnable = true
 SWEP.Category = "JMod: Half-Life - ArcCW" -- edit this if you like
 SWEP.AdminOnly = false
 SWEP.PrintName = ".357 Magnum"
 SWEP.Slot = 1
+
 SWEP.ViewModel = "models/weapons/tfa_mmod/c_357.mdl"
 SWEP.WorldModel = "models/weapons/tfa_mmod/w_357.mdl"
 SWEP.ViewModelFOV = 60
@@ -21,8 +22,6 @@ SWEP.BodyHolsterPosL = Vector(0, 0, 0)
 SWEP.CustomToggleCustomizeHUD = false
 ---
 SWEP.DefaultBodygroups = "00000000000"
-SWEP.Damage = 80
-SWEP.DamageMin = 60
 
 JMod.ApplyAmmoSpecs(SWEP, "Magnum Pistol Round", 1.2)
 SWEP.MuzzleVelocity = 1050 -- projectile or phys bullet muzzle velocity

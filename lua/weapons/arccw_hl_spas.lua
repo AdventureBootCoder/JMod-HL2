@@ -1,14 +1,11 @@
 SWEP.Base = "wep_jack_gmod_gunbase"
-SWEP.Spawnable = false
+SWEP.Spawnable = true
 SWEP.Category = "JMod: Half-Life - ArcCW" -- edit this if you like
 SWEP.AdminOnly = false
 SWEP.PrintName = "Shotgun"
 SWEP.Slot = 3
 
-SWEP.Force = 12
-SWEP.UseHands = true
-
-SWEP.ViewModel = "models/weapons/c_customspas12.mdl"
+SWEP.ViewModel = "models/weapons/aboot/c_customspas12.mdl"
 SWEP.WorldModel = "models/weapons/w_IIopnshotgun.mdl"
 SWEP.ViewModelFOV = 60
 SWEP.MirrorVMWM = true
@@ -29,7 +26,9 @@ SWEP.NoRandSpread = false
 SWEP.DoorBreachPower = 1.5
 
 SWEP.DefaultBodygroups = "00000000000"
+
 JMod.ApplyAmmoSpecs(SWEP, "Shotgun Round", 1.2)
+SWEP.Force = 12
 SWEP.MuzzleVelocity = 1050 -- projectile or phys bullet muzzle velocity
 -- IN M/S
 SWEP.ChamberSize = 0 -- how many rounds can be chambered.

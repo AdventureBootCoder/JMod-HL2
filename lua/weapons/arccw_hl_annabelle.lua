@@ -1,11 +1,10 @@
 SWEP.Base = "wep_jack_gmod_gunbase"
-SWEP.Spawnable = false
+SWEP.Spawnable = true
 SWEP.Category = "JMod: Half-Life - ArcCW" -- edit this if you like
 SWEP.AdminOnly = false
 SWEP.PrintName = "Annabelle"
 SWEP.Slot = 3
 
-SWEP.UseHands = true
 SWEP.ViewModel = "models/weapons/annabelle/c_annabelle.mdl"
 SWEP.WorldModel = "models/weapons/annabelle/w_annabelle.mdl"
 SWEP.ViewModelFOV = 70
