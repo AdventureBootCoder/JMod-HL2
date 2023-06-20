@@ -1,8 +1,8 @@
 "vertexlitgeneric"
 {
-	"$baseTexture" "Models/Weapons/tfa_mmod/V_Rocket_launcher/rpg_green_sheet"
-	$bumpmap "Models/Weapons/tfa_mmod/V_Rocket_launcher/rpg_green_sheet_nrm"
-	//"$phongexponenttexture" "Models/Weapons/tfa_mmod/V_Rocket_launcher/rpg_green_sheet_s"
+	"$baseTexture" "Models/Weapons/aboot/V_Rocket_launcher/rpg_green_sheet"
+	$bumpmap "Models/Weapons/aboot/V_Rocket_launcher/rpg_green_sheet_nrm"
+	//"$phongexponenttexture" "Models/Weapons/aboot/V_Rocket_launcher/rpg_green_sheet_s"
 	
 		"$envmap" "env_cubemap"
 	"$phong"				"1"
