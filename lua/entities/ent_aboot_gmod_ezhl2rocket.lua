@@ -10,7 +10,7 @@ ENT.AdminSpawnable = false
 ENT.CollisionGroup = COLLISION_GROUP_NONE
 ENT.NoPhys = true
 ENT.IsEZrocket = true
-local ThinkRate = 22 --Hz
+local ThinkRate = 33 --Hz
 
 ---
 if SERVER then
@@ -145,7 +145,7 @@ if SERVER then
 			AngleToBe:RotateAroundAxis(AngleToBe:Up(), -90)
 			self:SetAngles(AngleToBe)
 			if self.Guided then
-				local NewDir = (OwnerTr.HitPos - self:GetPos()):GetNormalized() * 1000
+				local NewDir = (OwnerTr.HitPos - self:GetPos()):GetNormalized() * 1200
 				self.CurVel = self.CurVel + NewDir / ThinkRate
 			else
 				self.CurVel = self.CurVel + physenv.GetGravity() / ThinkRate * .2
@@ -166,7 +166,7 @@ if SERVER then
 				local Eff = EffectData()
 				Eff:SetOrigin(self:GetPos())
 				Eff:SetNormal(-self.CurVel:GetNormalized())
-				Eff:SetScale(.2)
+				Eff:SetScale(1)
 				util.Effect("eff_jack_gmod_rockettrail", Eff, true, true)
 			end
 		end

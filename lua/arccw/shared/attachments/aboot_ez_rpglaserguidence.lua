@@ -10,7 +10,7 @@ att.Desc_Cons = {
 	"Visible laser"
 }
 
-att.Laser = false
+att.Laser = true
 att.LaserStrength = 1
 att.LaserBone = "laser"
 att.LaserColor = Color(255, 0, 0)

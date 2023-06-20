@@ -15,6 +15,12 @@ SWEP.WorldModelOffset = {
     pos = Vector(16, 2, -3),
     ang = Angle(-15, 180, 180)
 }
+SWEP.BodyHolsterSlot = "back"
+SWEP.BodyHolsterAng = Angle(-10, 190, 180)
+SWEP.BodyHolsterAngL = Angle(0, 0, 0)
+SWEP.BodyHolsterPos = Vector(5, 8, -5)
+SWEP.BodyHolsterPosL = Vector(5, -10, 4)
+
 SWEP.DefaultBodygroups = "00000000000"
 ---
 SWEP.CustomToggleCustomizeHUD = false
@@ -61,8 +67,8 @@ SWEP.NPCWeaponType = "weapon_rpg"
 SWEP.NPCWeight = 100
 
 SWEP.AccuracyMOA = 0 -- accuracy in Minutes of Angle. There are 60 MOA in a degree.
-SWEP.HipDispersion = 100 -- inaccuracy added by hip firing.
-SWEP.MoveDispersion = 100
+SWEP.HipDispersion = 500 -- inaccuracy added by hip firing.
+SWEP.MoveDispersion = 500
 SWEP.SightsDispersion = 0
 SWEP.JumpDispersion = 1000 -- dispersion penalty when in the air
 
@@ -136,10 +142,10 @@ SWEP.Attachments = {
 		Slot = "missile_guidence", -- what kind of attachments can fit here, can be string or table
 		Bone = "rpg_base", -- relevant bone any attachments will be mostly referring to
 		Offset = {
-			vpos = Vector(-1, 1, 4), -- offset that the attachment will be relative to the bone
-			vang = Angle(0, 0, 190),
-			wpos = Vector(0, 0, 0),
-			wang = Angle(0, 0, 0)
+			vpos = Vector(0, .7, 3.8), -- offset that the attachment will be relative to the bone
+			vang = Angle(180, 0, -10),
+			wpos = Vector(8, 6, -6.2),
+			wang = Angle(-15, 0, -90)
 		}
 	}
 }
