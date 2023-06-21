@@ -6,8 +6,8 @@ SWEP.PrintName = "AR2"
 SWEP.Slot = 2
 SWEP.UseHands = true
 
-SWEP.ViewModel = "models/weapons/c_iiopnirifle.mdl"--"models/weapons/tfa_mmod/c_irifle.mdl"
-SWEP.WorldModel = "models/weapons/w_iiopnirifle.mdl"
+SWEP.ViewModel = "models/weapons/aboot/ar2/c_iiopnirifle.mdl"
+SWEP.WorldModel = "models/weapons/aboot/ar2/w_iiopnirifle.mdl"
 SWEP.ViewModelFOV = 70
 SWEP.MirrorVMWM = true
 SWEP.WorldModelOffset = {

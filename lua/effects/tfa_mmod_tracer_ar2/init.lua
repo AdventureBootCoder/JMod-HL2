@@ -16,7 +16,7 @@ function EFFECT:Init(data)
 
 	if IsValid(self.WeaponEnt.Owner) then
 		if self.WeaponEnt.Owner == LocalPlayer() then
-			if not ply:ShouldDrawLocalPlayer() then
+			if not self.WeaponEnt.Owner:ShouldDrawLocalPlayer() then
 				ang = self.WeaponEnt.Owner:EyeAngles()
 				ang:Normalize()
 				--ang.p = math.max(math.min(ang.p,55),-55)

@@ -64,8 +64,8 @@ SWEP.SightsDispersion = 0
 SWEP.ShootVol = 150 -- volume of shoot sound
 SWEP.ShootPitch = 100 -- pitch of shoot sound
 
-SWEP.ShootSound = "JMOD_HL2.357.1"
-SWEP.DistantShootSound = "JMOD_HL2.357.NPC"
+SWEP.ShootSound = "TFA_MMOD.357.1"
+SWEP.DistantShootSound = "TFA_MMOD.357.NPC"
 
 SWEP.MuzzleEffect = "muzzleflash_minimi"
 SWEP.ShellModel = "models/shells/shell_57.mdl"
@@ -215,7 +215,7 @@ SWEP.Animations = {
 }
 
 sound.Add({
-	name = 			"JMOD_HL2.357.1",
+	name = 			"TFA_MMOD.357.1",
 	channel = 		CHAN_WEAPON,
 	level = SNDLVL_GUNFIRE,
 	volume = 		1.0,
@@ -224,7 +224,7 @@ sound.Add({
 })
 
 sound.Add({
-	name = 			"JMOD_HL2.357.NPC",
+	name = 			"TFA_MMOD.357.NPC",
 	channel = 		CHAN_ITEM,
 	level = 140,
 	volume = 		0.25,
@@ -233,63 +233,63 @@ sound.Add({
 })
 
 sound.Add({
-	name = 			"JMOD_HL2.357.Draw",
+	name = 			"TFA_MMOD.357.Draw",
 	channel = 		CHAN_ITEM,
 	volume = 		1.0,
 	sound = 			"weapons/tfa_mmod/357/357_deploy.wav"
 })
 
 sound.Add({
-	name = 			"JMOD_HL2.357.Fidget_Spinner",
+	name = 			"TFA_MMOD.357.Fidget_Spinner",
 	channel = 		CHAN_ITEM,
 	volume = 		1.0,
 	sound = 			"weapons/tfa_mmod/357/357_spin2.wav"
 })
 
 sound.Add({
-	name = 			"JMOD_HL2.357.OpenLoader",
+	name = 			"TFA_MMOD.357.OpenLoader",
 	channel = 		CHAN_ITEM,
 	volume = 		1.0,
 	sound = 			"weapons/tfa_mmod/357/357_reload1.wav"
 })
 
 sound.Add({
-	name = 			"JMOD_HL2.357.Spin",
+	name = 			"TFA_MMOD.357.Spin",
 	channel = 		CHAN_ITEM,
 	volume = 		1.0,
 	sound = 			"weapons/tfa_mmod/357/357_spin1.wav"
 })
 
 sound.Add({
-	name = 			"JMOD_HL2.357.RemoveLoader",
+	name = 			"TFA_MMOD.357.RemoveLoader",
 	channel = 		CHAN_ITEM,
 	volume = 		1.0,
 	sound = 			"weapons/tfa_mmod/357/357_reload2.wav"
 })
 
 sound.Add({
-	name = 			"JMOD_HL2.357.ReplaceLoader",
+	name = 			"TFA_MMOD.357.ReplaceLoader",
 	channel = 		CHAN_ITEM,
 	volume = 		1.0,
 	sound = 			"weapons/tfa_mmod/357/357_reload3.wav"
 })
 
 sound.Add({
-	name = 			"JMOD_HL2.357.CloseLoader",
+	name = 			"TFA_MMOD.357.CloseLoader",
 	channel = 		CHAN_ITEM,
 	volume = 		1.0,
 	sound = 			"weapons/tfa_mmod/357/357_reload4.wav"
 })
 
 sound.Add({
-	name = 			"JMOD_HL2.357.Hammer_Pull",
+	name = 			"TFA_MMOD.357.Hammer_Pull",
 	channel = 		CHAN_ITEM,
 	volume = 		1.0,
 	sound = 			"weapons/tfa_mmod/357/357_hammerpull.wav"
 })
 
 sound.Add({
-	name = 			"JMOD_HL2.357.Hammer_Release",
+	name = 			"TFA_MMOD.357.Hammer_Release",
 	channel = 		CHAN_ITEM,
 	volume = 		1.0,
 	sound = 			"weapons/tfa_mmod/357/357_hammerrelease.wav"

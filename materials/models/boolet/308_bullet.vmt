@@ -1,0 +1,24 @@
+VertexLitGeneric
+{
+	"$basetexture"				"Models/boolet/308_bullet"
+	"$phongexponenttexture"		"models/weapons/v_hand/exp"
+	"$color2"					"[0.25 0.25 0.25]"
+
+	$detail						"detail\metal_detail_01"
+    $detailscale                3
+   	$detailblendfactor 			2
+   	$detailblendmode			0
+
+	$envmap						env_cubemap
+	$envmaptint					"[ .8 .4 .2 ]"
+//	$envmaptint					"[ .4 .25 .1 ]"
+//	$normalmapalphaenvmapmask	1
+
+	$phong						1
+	$phongexponent				50
+	$phongboost					100
+	$phongfresnelranges			"[0.25 0.5 1]"
+	"$phongalbedotint"			"1"
+	"$phongalbedoboost"			"48"
+	"$basemapalphaphongmask"	"1"
+}
