@@ -15,7 +15,7 @@ function EFFECT:Init(data)
 	self.Position = self:GetTracerShootPos(data:GetStart(), self.WeaponEnt, self.Attachment)
 
 	if IsValid(self.WeaponEnt.Owner) then
-		if self.WeaponEnt.Owner == LocalPlayer() then
+		if self.WeaponEnt.Owner:ShouldDrawLocalPlayer() then
 			if not self.WeaponEnt.Owner:GetViewEntity() then
 				ang = self.WeaponEnt.Owner:EyeAngles()
 				ang:Normalize()
