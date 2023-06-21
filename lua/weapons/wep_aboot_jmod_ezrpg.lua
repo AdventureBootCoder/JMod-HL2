@@ -5,8 +5,6 @@ SWEP.AdminOnly = false
 SWEP.PrintName = "RPG"
 SWEP.Slot = 4
 
-SWEP.UseHands = true
-
 SWEP.ViewModel = "models/weapons/aboot/c_rpg.mdl"
 SWEP.WorldModel = "models/weapons/w_rocket_launcher.mdl"
 SWEP.ViewModelFOV = 60
