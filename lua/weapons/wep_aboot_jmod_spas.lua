@@ -2,7 +2,7 @@ SWEP.Base = "wep_jack_gmod_gunbase"
 SWEP.Spawnable = true
 SWEP.Category = "JMod: Half-Life - ArcCW" -- edit this if you like
 SWEP.AdminOnly = false
-SWEP.PrintName = "Shotgun"
+SWEP.PrintName = "SPAS-13"
 SWEP.Slot = 3
 
 SWEP.ViewModel = "models/weapons/aboot/c_customspas12.mdl"

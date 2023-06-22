@@ -2,7 +2,7 @@ SWEP.Base = "wep_jack_gmod_gunbase"
 SWEP.Spawnable = true
 SWEP.Category = "JMod: Half-Life - ArcCW" -- edit this if you like
 SWEP.AdminOnly = false
-SWEP.PrintName = "RPG"
+SWEP.PrintName = "RPG Launcher"
 SWEP.Slot = 4
 
 SWEP.ViewModel = "models/weapons/aboot/c_rpg.mdl"
