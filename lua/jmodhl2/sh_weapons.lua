@@ -25,18 +25,24 @@ JModHL2.WeaponTable = {
 		ent = "ent_aboot_jmod_ezweapon_ar3",
 		Category = "JMod - EZ HL:2"
 	},
+	["RPG Launcher"] = {
+		mdl = "models/weapons/w_rocket_launcher.mdl",
+		swep = "wep_aboot_jmod_rpg",
+		ent = "ent_aboot_jmod_ezweapon_rpg",
+		Category = "JMod - EZ HL:2"
+	},
 	["SPAS-13"] = {
 		mdl = "models/weapons/aboot/w_IIopnshotgun.mdl",
 		swep = "wep_aboot_jmod_spas",
 		ent = "ent_aboot_jmod_ezweapon_spas",
 		Category = "JMod - EZ HL:2"
 	},
-	["RPG Launcher"] = {
-		mdl = "models/weapons/w_rocket_launcher.mdl",
-		swep = "wep_aboot_jmod_rpg",
-		ent = "ent_aboot_jmod_ezweapon_rpg",
+	["SMG1"] = {
+		mdl = "models/weapons/aboot/tfa_mmod/w_smg1.mdl",
+		swep = "wep_aboot_jmod_smg1",
+		ent = "ent_aboot_jmod_ezweapon_smg1",
 		Category = "JMod - EZ HL:2"
-	}
+	},
 }
 
 -- keepcorpses caauses floating arrow bug
@@ -56,6 +62,23 @@ JModHL2.AmmoTable = {
 		effrange = 110,
 		terminaldmg = 10,
 		penetration = 45
+	},
+	["20mm Grenade"] = {
+		resourcetype = "munitions",
+		carrylimit = 12,
+		basedmg = 80,
+		effrange = 80,
+		terminaldmg = 50,
+		penetration = 1
+	},
+	["RPG Rocket"] = {
+		resourcetype = "munitions",
+		sizemult = 40,
+		carrylimit = 4,
+		ent = "ent_aboot_gmod_ezhl2rocket",
+		nicename = "EZ RPG Rocket",
+		basedmg = 350,
+		blastrad = 200
 	}
 }
 

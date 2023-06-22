@@ -1,6 +1,6 @@
-SWEP.Base = "arccw_base"
+SWEP.Base = "wep_jack_gmod_gunbase"
 SWEP.Spawnable = true -- this obviously has to be set to true
-SWEP.Category = "ArcCW - Half-Life" -- edit this if you like
+SWEP.Category = "JMod: Half-Life - ArcCW" -- edit this if you like
 SWEP.AdminOnly = false
 
 SWEP.PrintName = "SMG1"
@@ -9,16 +9,17 @@ SWEP.Slot = 2
 
 SWEP.UseHands = true
 
-SWEP.ViewModel = "models/weapons/tfa_mmod/c_smg1.mdl"
-SWEP.WorldModel = "models/weapons/tfa_mmod/w_smg1.mdl"
+SWEP.ViewModel = "models/weapons/aboot/tfa_mmod/c_smg1.mdl"
+SWEP.WorldModel = "models/weapons/aboot/tfa_mmod/w_smg1.mdl"
 SWEP.ViewModelFOV = 70
 SWEP.MirrorVMWM = true
 SWEP.WorldModelOffset = {
     pos = Vector(10, 0, -4),
     ang = Angle(-3, 0, 180)
 }
-
 SWEP.DefaultBodygroups = "00000000000"
+
+SWEP.CustomToggleCustomizeHUD = false
 
 SWEP.Damage = 11
 SWEP.DamageMin = 4
@@ -60,7 +61,7 @@ SWEP.Firemodes = {
 }
 
 SWEP.NPCWeaponType = "weapon_smg1"
-SWEP.NPCWeight = 100
+SWEP.NPCWeight = 80
 
 SWEP.AccuracyMOA = 5 -- accuracy in Minutes of Angle. There are 60 MOA in a degree.
 SWEP.HipDispersion = 500 -- inaccuracy added by hip firing.

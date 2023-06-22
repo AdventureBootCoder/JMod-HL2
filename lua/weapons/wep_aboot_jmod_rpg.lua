@@ -23,9 +23,8 @@ SWEP.DefaultBodygroups = "00000000000"
 ---
 SWEP.CustomToggleCustomizeHUD = false
 ---
---SWEP.Damage = 150
---SWEP.DamageType = DMG_BLAST
-JMod.ApplyAmmoSpecs(SWEP, "Mini Rocket")
+
+JMod.ApplyAmmoSpecs(SWEP, "RPG Rocket")
 SWEP.ManualAction = false
 SWEP.AutoReload = false
 SWEP.ShootEntity = "ent_aboot_gmod_ezhl2rocket"
