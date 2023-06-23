@@ -24,7 +24,7 @@ SWEP.DefaultBodygroups = "00000000000"
 SWEP.CustomToggleCustomizeHUD = false
 ---
 
-JMod.ApplyAmmoSpecs(SWEP, "RPG Rocket")
+JModHL2.ApplyAmmoSpecs(SWEP, "RPG Rocket")
 SWEP.ManualAction = false
 SWEP.AutoReload = false
 SWEP.ShootEntity = "ent_aboot_gmod_ezhl2rocket"
@@ -68,9 +68,6 @@ SWEP.HipDispersion = 500 -- inaccuracy added by hip firing.
 SWEP.MoveDispersion = 500
 SWEP.SightsDispersion = 0
 SWEP.JumpDispersion = 1000 -- dispersion penalty when in the air
-
-SWEP.Primary.Ammo = "RPG_Round" -- what ammo type the gun uses
-SWEP.MagID = "rpg" -- the magazine pool this gun draws from
 
 SWEP.ShootVol = 90 -- volume of shoot sound
 SWEP.ShootPitch = 100 -- pitch of shoot sound

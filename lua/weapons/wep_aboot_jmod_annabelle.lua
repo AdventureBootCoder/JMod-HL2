@@ -179,10 +179,7 @@ sound.Add({
 	sound = {
 		"weapon/annabelle/annabelle_fire_player_01.wav",
 		"weapon/annabelle/annabelle_fire_player_02.wav",
-		"weapon/annabelle/annabelle_fire_player_03.wav",
-		"weapon/annabelle/annabelle_fire_player_04.wav",
-		"weapon/annabelle/annabelle_fire_player_05.wav",
-		"weapon/annabelle/annabelle_fire_player_06.wav"
+		"weapon/annabelle/annabelle_fire_player_03.wav"
 	}
 })
 
@@ -195,10 +192,7 @@ sound.Add({
 	sound = {
 		")weapon/annabelle/annabelle_fire_player_01.wav",
 		")weapon/annabelle/annabelle_fire_player_02.wav",
-		")weapon/annabelle/annabelle_fire_player_03.wav",
-		")weapon/annabelle/annabelle_fire_player_04.wav",
-		")weapon/annabelle/annabelle_fire_player_05.wav",
-		")weapon/annabelle/annabelle_fire_player_06.wav"
+		")weapon/annabelle/annabelle_fire_player_03.wav"
 	}
 })
 
@@ -235,10 +229,7 @@ sound.Add({
 	sound = {
 		"weapon/annabelle/handling/annabelle_bullet_futz_01.wav",
 		"weapon/annabelle/handling/annabelle_bullet_futz_02.wav",
-		"weapon/annabelle/handling/annabelle_bullet_futz_03.wav",
-		"weapon/annabelle/handling/annabelle_bullet_futz_04.wav",
-		"weapon/annabelle/handling/annabelle_bullet_futz_05.wav",
-		"weapon/annabelle/handling/annabelle_bullet_futz_06.wav"
+		"weapon/annabelle/handling/annabelle_bullet_futz_03.wav"
 	}
 })
 sound.Add({
@@ -250,9 +241,6 @@ sound.Add({
 	sound = {
 		"weapon/annabelle/handling/annabelle_bullet_load_01.wav",
 		"weapon/annabelle/handling/annabelle_bullet_load_02.wav",
-		"weapon/annabelle/handling/annabelle_bullet_load_03.wav",
-		"weapon/annabelle/handling/annabelle_bullet_load_04.wav",
-		"weapon/annabelle/handling/annabelle_bullet_load_05.wav",
-		"weapon/annabelle/handling/annabelle_bullet_load_06.wav"
+		"weapon/annabelle/handling/annabelle_bullet_load_03.wav"
 	}
 })

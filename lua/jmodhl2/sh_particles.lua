@@ -27,5 +27,5 @@ local function AddCustomAmmo()
 end
 
 timer.Simple(1, function()
-	pcall(AddCustomAmmo) -- make sure they added
+	pcall(AddCustomAmmo) -- make sure they're added
 end)

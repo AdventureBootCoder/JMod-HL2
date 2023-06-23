@@ -152,5 +152,11 @@ function JModHL2.GenerateWeaponEntities(tbl)
 	end
 end
 
+function JModHL2.ApplyAmmoSpecs(wep, typ, mult)
+	timer.Simple(1, function()
+		JMod.ApplyAmmoSpecs(wep, typ, mult) 
+	end)
+end
+
 JModHL2.LoadAmmoTable(JModHL2.AmmoTable)
 JModHL2.GenerateWeaponEntities(JModHL2.WeaponTable)
