@@ -54,14 +54,17 @@ JModHL2.AmmoTable = {
 		basedmg = 40,
 		effrange = 90,
 		terminaldmg = 5,
-		penetration = 35
+		penetration = 35,
+		tracer = "tfa_mmod_tracer_ar2"
 	},
 	["Heavy Pulse Ammo"] = {
+		resourcetype = false,
 		carrylimit = 100,
 		basedmg = 45,
 		effrange = 110,
 		terminaldmg = 10,
-		penetration = 45
+		penetration = 45,
+		tracer = "tfa_mmod_tracer_ar3"
 	},
 	["20mm Grenade"] = {
 		resourcetype = "munitions",

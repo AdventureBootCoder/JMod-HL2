@@ -36,20 +36,23 @@ att.UBGL_Capacity = 1
 --att.ActivateElements = {"reducedmag"}
 
 local function Ammo(wep)
-    return wep.Owner:GetAmmoCount("AR2AltFire")
+	return wep.Owner:GetAmmoCount("AR2AltFire")
 end
 
 local FireCombineBall = function(ply, num)
 	if not SERVER then return end
+	ply:RemoveAmmo(1, "AR2AltFire")
 	local cballspawner = ents.Create("point_combine_ball_launcher")
 	cballspawner:SetAngles(ply:GetAimVector():Angle())
-	cballspawner:SetPos(ply:GetShootPos() + ply:GetAimVector() * 20)
+	cballspawner:SetPos(ply:GetShootPos() + ply:GetAimVector() * 30)
 	cballspawner:SetKeyValue("minspeed", 1000)
 	cballspawner:SetKeyValue("maxspeed", 1000 )
 	cballspawner:SetKeyValue("ballradius", "1")
 	cballspawner:SetKeyValue("ballcount", tostring(num))
-	cballspawner:SetKeyValue("maxballbounces", "10")
+	cballspawner:SetKeyValue("maxballbounces", "4")
+	cballspawner:SetKeyValue("balltype", "2")
 	cballspawner:SetKeyValue("launchconenoise", 0)
+	cballspawner:SetKeyValue("parentname", ply:Name())
 	cballspawner:Spawn()
 	cballspawner:Activate()
 	cballspawner:Fire("LaunchBall")
@@ -62,15 +65,14 @@ att.UBGL_Fire = function(wep, ubgl)
         return wep:EmitSound("weapons/arccw/dryfire.wav", 100)
     end
 	
-    wep.Owner:RemoveAmmo(1, "AR2AltFire")
-	
     wep:PlayAnimation("charge")
 	wep:EmitSound("Project_MMOD_AR2.Charge")
-	timer.Simple(1, function()
+	timer.Simple(.8, function()
 		if IsValid(wep) and IsValid(wep.Owner) and wep.Owner:Alive() then
 			FireCombineBall(wep.Owner, 1)
 			wep:EmitSound("Project_MMOD_AR2.SecondaryFire")
 			wep:PlayAnimation("alt_fire")
+			hook.Remove("KeyRelease", wep.Owner:Nick() .. "Ar2AltFireRelease")
 		end
 	end)
 
@@ -90,10 +92,9 @@ att.UBGL_Fire = function(wep, ubgl)
 
     local load = math.Clamp(clip, 0, reserve)
 
-    wep.Owner:SetAmmo(reserve - load, "AR2AltFire")
+    wep.Owner:SetAmmo(reserve - load, "MP5_Grenade")
 	
     wep:SetClip2(load)
-
 end
 
 att.UBGL_Reload = function(wep, ubgl)
@@ -112,7 +113,7 @@ att.UBGL_Reload = function(wep, ubgl)
 
     local load = math.Clamp(clip, 0, reserve)
 
-    wep.Owner:SetAmmo(reserve - load, "AR2AltFire")
+    wep.Owner:SetAmmo(reserve - load, "MP5_Grenade")
 	
     wep:SetClip2(load)
 end

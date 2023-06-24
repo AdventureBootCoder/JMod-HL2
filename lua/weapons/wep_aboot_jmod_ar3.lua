@@ -62,8 +62,7 @@ SWEP.MoveDispersion = 100
 SWEP.SightsDispersion = 200
 SWEP.ShotgunSpreadDispersion = false
 
-SWEP.Primary.Ammo = "ar2" -- what ammo type the gun uses
-SWEP.MagID = "ar2" -- the magazine pool this gun draws from
+SWEP.MagID = "ar3"
 
 SWEP.ShootVol = 90 -- volume of shoot sound
 SWEP.ShootPitch = 80 -- pitch of shoot sound
@@ -110,7 +109,6 @@ SWEP.HeatLockout = false -- overheating means you cannot fire until heat has bee
 SWEP.HeatDelayTime = 0.2
 SWEP.HeatFix = true -- when the "fix" animation is played, all heat is restored.
 SWEP.HeatOverflow = nil -- if true, heat is allowed to exceed capacity (this only applies when the default overheat handling is overridden)
-
 
 
 SWEP.IronSightStruct = {
@@ -185,6 +183,20 @@ SWEP.Animations = {
         
     },
 }
+
+local function Ammo(wep)
+    return wep.Owner:GetAmmoCount("Heavy Pulse Ammo")
+end
+
+SWEP.Hook_Think = function(self)
+	if not SERVER then return end
+	local Time = CurTime()
+	self.NextRechargeTime = self.NextRechargeTime or 0
+	if (self.NextRechargeTime < Time) and (Time > self:GetNextPrimaryFire() + 2) and (Ammo(self) < 100) then
+		self.NextRechargeTime = Time + .1
+		self.Owner:GiveAmmo(1, "Heavy Pulse Ammo", true)
+	end
+end
 
 sound.Add( {
     name = "TFA_MMOD.AR3.1",

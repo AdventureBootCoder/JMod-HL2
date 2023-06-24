@@ -41,7 +41,6 @@ end
 att.UBGL_Fire = function(wep, ubgl)
     if wep:Clip2() <= 0 then
 	
-	
         return wep:EmitSound("weapons/arccw/dryfire.wav", 100)
     end
 	
@@ -49,8 +48,8 @@ att.UBGL_Fire = function(wep, ubgl)
 	
     wep:PlayAnimation("gl_fire")
 	wep:EmitSound("TFA_MMOD.SMG1.2")
-    --wep:FireRocket("arccw_hl2_riflegrenade", 2000)
-	wep:FireRocket("smg_grenade", 2000)
+    wep:FireRocket("arccw_hl2_riflegrenade", 2000)
+	--wep:FireRocket("smg_grenade", 2000)
 
     wep:SetClip2(wep:Clip2() - 1)
 
@@ -69,7 +68,7 @@ att.UBGL_Fire = function(wep, ubgl)
 
     local load = math.Clamp(clip, 0, reserve)
 
-    wep.Owner:SetAmmo(reserve - load, "MP5_Grenade")
+    wep.Owner:SetAmmo(reserve - load, "20mm Grenade")
 	
     wep:SetClip2(load)
 
@@ -91,7 +90,7 @@ att.UBGL_Reload = function(wep, ubgl)
 
     local load = math.Clamp(clip, 0, reserve)
 
-    wep.Owner:SetAmmo(reserve - load, "MP5_Grenade")
+    wep.Owner:SetAmmo(reserve - load, "20mm Grenade")
 	
     wep:SetClip2(load)
 end

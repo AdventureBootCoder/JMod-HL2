@@ -2,12 +2,8 @@ SWEP.Base = "wep_jack_gmod_gunbase"
 SWEP.Spawnable = false
 SWEP.Category = "JMod: Half-Life - ArcCW" -- edit this if you like
 SWEP.AdminOnly = false
-
 SWEP.PrintName = "SMG1"
-
 SWEP.Slot = 2
-
-SWEP.UseHands = true
 
 SWEP.ViewModel = "models/weapons/aboot/tfa_mmod/c_smg1.mdl"
 SWEP.WorldModel = "models/weapons/aboot/tfa_mmod/w_smg1.mdl"
