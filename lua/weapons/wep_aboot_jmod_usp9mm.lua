@@ -1,16 +1,12 @@
-SWEP.Base = "arccw_base"
-SWEP.Spawnable = true -- this obviously has to be set to true
-SWEP.Category = "ArcCW - Half-Life" -- edit this if you like
+SWEP.Base = "wep_jack_gmod_gunbase"
+SWEP.Spawnable = false
+SWEP.Category = "JMod: Half-Life - ArcCW"
 SWEP.AdminOnly = false
-
 SWEP.PrintName = "9mm Pistol"
-
 SWEP.Slot = 1
 
-SWEP.UseHands = true
-
-SWEP.ViewModel = "models/weapons/c_IIopnPistol.mdl"
-SWEP.WorldModel = "models/weapons/w_IIopnPistol.mdl"
+SWEP.ViewModel = "models/weapons/aboot/c_iiopnpistol.mdl"
+SWEP.WorldModel = "models/weapons/aboot/w_iiopnpistol.mdl"
 SWEP.ViewModelFOV = 60
 SWEP.MirrorVMWM = true
 SWEP.WorldModelOffset = {
@@ -20,23 +16,17 @@ SWEP.WorldModelOffset = {
 
 SWEP.DefaultBodygroups = "00000000000"
 
-SWEP.Damage = 16
-SWEP.DamageMin = 8
 
-SWEP.Range = 50 -- in METRES
-SWEP.RangeMin = 25
-
-SWEP.Penetration = 4
-SWEP.DamageType = DMG_BULLET
-SWEP.ShootEntity = nil -- entity to fire, if any
+JModHL2.ApplyAmmoSpecs(SWEP, "Pistol Round", 1)
 SWEP.MuzzleVelocity = 1050 -- projectile or phys bullet muzzle velocity
 -- IN M/S
 SWEP.ChamberSize = 0 -- how many rounds can be chambered.
-SWEP.Primary.ClipSize = 18 -- DefaultClip is automatically set.
-SWEP.ExtendedClipSize = 22
+SWEP.Primary.ClipSize = 15 -- DefaultClip is automatically set.
+SWEP.ExtendedClipSize = 20
 SWEP.ReducedClipSize = 12
 
 SWEP.PhysBulletMuzzleVelocity = 700
+SWEP.CanFireUnderwater = true
 
 
 SWEP.Recoil = 0.1
@@ -62,10 +52,6 @@ SWEP.Firemodes = {
 
 SWEP.Force = 8
 
-SWEP.BodyDamageMults = {
-    [HITGROUP_HEAD] = 1.2,
- }
- 
 SWEP.NPCWeaponType = "weapon_pistol"
 SWEP.NPCWeight = 100
 
@@ -74,7 +60,6 @@ SWEP.HipDispersion = 150 -- inaccuracy added by hip firing.
 SWEP.MoveDispersion = 100
 SWEP.SightsDispersion = 0
 
-SWEP.Primary.Ammo = "pistol" -- what ammo type the gun uses
 SWEP.MagID = "pistol" -- the magazine pool this gun draws from
 
 SWEP.ShootVol = 80 -- volume of shoot sound
@@ -113,7 +98,7 @@ SWEP.HullSize = 0 -- HullSize used by FireBullets
 
 
 SWEP.IronSightStruct = {
-    Pos = Vector(-4.34, -2, 1.6),
+    Pos = Vector(-4.3, -2, 1.6),
     Ang = Angle(0, 0.0875, 0),
     Magnification = 1.1,
     SwitchToSound = "", -- sound that plays when switching to this sight

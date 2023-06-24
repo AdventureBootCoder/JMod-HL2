@@ -192,9 +192,9 @@ SWEP.Hook_Think = function(self)
 	if not SERVER then return end
 	local Time = CurTime()
 	self.NextRechargeTime = self.NextRechargeTime or 0
-	if (self.NextRechargeTime < Time) and (Time > self:GetNextPrimaryFire() + 2) and (Ammo(self) < 100) then
+	if (self.NextRechargeTime < Time) and (Time > self:GetNextPrimaryFire() + 1) and (Ammo(self) < 100) then
 		self.NextRechargeTime = Time + .1
-		self.Owner:GiveAmmo(1, "Heavy Pulse Ammo", true)
+		self.Owner:GiveAmmo(math.min(100 - Ammo(self), 2), "Heavy Pulse Ammo", true)
 	end
 end
 

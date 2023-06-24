@@ -19,6 +19,12 @@ JModHL2.WeaponTable = {
 		ent = "ent_aboot_jmod_ezweapon_python",
 		Category = "JMod - EZ HL:2"
 	},
+	["9mm Pistol"] = {
+		mdl = "models/weapons/aboot/w_iiopnpistol.mdl",
+		swep = "wep_aboot_jmod_usp9mm",
+		ent = "ent_aboot_jmod_ezweapon_usp",
+		Category = "JMod - EZ HL:2"
+	},
 	["Pulse LMG"] = {
 		mdl = "models/weapons/aboot/tfa_mmod/w_ar3.mdl",
 		swep = "wep_aboot_jmod_ar3",
@@ -64,7 +70,8 @@ JModHL2.AmmoTable = {
 		effrange = 110,
 		terminaldmg = 10,
 		penetration = 45,
-		tracer = "tfa_mmod_tracer_ar3"
+		tracer = "tfa_mmod_tracer_ar3",
+		dmgtype = DMG_AIRBOAT
 	},
 	["20mm Grenade"] = {
 		resourcetype = "munitions",
@@ -81,7 +88,8 @@ JModHL2.AmmoTable = {
 		ent = "ent_aboot_gmod_ezhl2rocket",
 		nicename = "EZ RPG Rocket",
 		basedmg = 350,
-		blastrad = 200
+		blastrad = 200,
+		dmgtype = DMG_BLAST
 	}
 }
 
