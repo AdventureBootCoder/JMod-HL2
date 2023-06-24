@@ -27,7 +27,7 @@ SWEP.DoorBreachPower = 1.5
 
 SWEP.DefaultBodygroups = "00000000000"
 
-JMod.ApplyAmmoSpecs(SWEP, "Shotgun Round", 1.2)
+JModHL2.ApplyAmmoSpecs(SWEP, "Shotgun Round", 1.2)
 SWEP.Force = 12
 SWEP.MuzzleVelocity = 1050 -- projectile or phys bullet muzzle velocity
 -- IN M/S

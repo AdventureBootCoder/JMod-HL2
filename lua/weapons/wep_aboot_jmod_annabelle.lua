@@ -21,7 +21,7 @@ SWEP.BodyHolsterPosL = Vector(5, -10, 4)
 
 SWEP.DefaultBodygroups = "00000000000"
 
-JMod.ApplyAmmoSpecs(SWEP, "Magnum Pistol Round", 1.5)
+JModHL2.ApplyAmmoSpecs(SWEP, "Magnum Pistol Round", 1.5)
 SWEP.Force = 25
 SWEP.MuzzleVelocity = 1050 -- projectile or phys bullet muzzle velocity
 -- IN M/S

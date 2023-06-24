@@ -4,7 +4,6 @@ SWEP.Category = "JMod: Half-Life - ArcCW"
 SWEP.AdminOnly = false
 SWEP.PrintName = "Pulse Rifle"
 SWEP.Slot = 2
-SWEP.UseHands = true
 
 SWEP.ViewModel = "models/weapons/aboot/ar2/c_iiopnirifle.mdl"
 SWEP.WorldModel = "models/weapons/aboot/ar2/w_iiopnirifle.mdl"
@@ -24,7 +23,7 @@ SWEP.BodyHolsterPosL = Vector(5, -10, 4)
 
 SWEP.CustomToggleCustomizeHUD = false
 
-JMod.ApplyAmmoSpecs(SWEP, "Light Pulse Ammo", 1)
+JModHL2.ApplyAmmoSpecs(SWEP, "Light Pulse Ammo", 1)
 -- IN M/S
 SWEP.ChamberSize = 0 -- how many rounds can be chambered.
 SWEP.Primary.ClipSize = 30 -- DefaultClip is automatically set.
