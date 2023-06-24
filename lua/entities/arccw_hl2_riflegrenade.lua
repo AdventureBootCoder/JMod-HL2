@@ -117,9 +117,6 @@ function ENT:Detonate()
 
             self:EmitSound("BaseExplosionEffect.Sound")
             ParticleEffect("hl2mmod_explosion_grenade", self:GetPos(), Angle(-90, 0, 0))
-            --self:EmitSound("phx/kaboom.wav", 125, 100, 1, CHAN_AUTO)
-
-            -- Where is the sound zenith ? ???
         end
 
         util.ScreenShake(self:GetPos(), 25, 4, 0.75, self.GrenadeRadius * 4)

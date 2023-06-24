@@ -45,20 +45,17 @@ att.UBGL_Fire = function(wep, ubgl)
         return wep:EmitSound("weapons/arccw/dryfire.wav", 100)
     end
 	
-
-
     wep.Owner:RemoveAmmo(1, "smg1_grenade")
 	
     wep:PlayAnimation("gl_fire")
 	wep:EmitSound("TFA_MMOD.SMG1.2")
-    wep:FireRocket("arccw_hl2_riflegrenade", 2000)
+    --wep:FireRocket("arccw_hl2_riflegrenade", 2000)
+	wep:FireRocket("smg_grenade", 2000)
 
     wep:SetClip2(wep:Clip2() - 1)
 
-
     wep:DoEffects()
 	
-
     if wep:Clip2() >= 1 then return end
 
     if Ammo(wep) <= 0 then return end

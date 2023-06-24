@@ -72,6 +72,7 @@ SWEP.Primary.Ammo = "smg1" -- what ammo type the gun uses
 SWEP.Secondary.Ammo			= "SMG1_Grenade"
 SWEP.Secondary.Sound		= Sound( "Weapon_SMG1.Double" )
 SWEP.MagID = "smg1" -- the magazine pool this gun draws from
+SWEP.Secondary.DefaultClip = 1
 
 SWEP.ShootVol = 80 -- volume of shoot sound
 SWEP.ShootPitch = 100 -- pitch of shoot sound
@@ -163,7 +164,7 @@ SWEP.Attachments = {
         Installed = "ubgl_hl2_gl",
     },
 }
-SWEP.Secondary.DefaultClip = 1
+
 SWEP.Animations = {
     ["idle"] = {
         Source = "idle01",
@@ -197,21 +198,21 @@ SWEP.Animations = {
         TPAnim = ACT_HL2MP_GESTURE_RANGE_ATTACK_REVOLVER,
         TPAnimStartTime = 0,
     },
-    ["enter_ubgl"] = {
-        Source = "lowtoidle",
+	["enter_ubgl"] = {
+		Source = "lowtoidle",
 		Mult = 0.5,
 		RestoreAmmo = -1,
-        SoundTable = {
-            {s = "weapons/arccw/ubgl_select.wav",  t = 0, c = ci},
-        },
-    },
-    ["exit_ubgl"] = {
-        Source = "lowtoidle",
+		SoundTable = {
+			{s = "weapons/arccw/ubgl_select.wav",  t = 0, c = ci},
+		},
+	},
+	["exit_ubgl"] = {
+		Source = "lowtoidle",
 		Mult = 0.5,
-        SoundTable = {
-            {s = "weapons/arccw/ubgl_exit.wav",  t = 0, c = ci},
-        },
-    },
+		SoundTable = {
+			{s = "weapons/arccw/ubgl_exit.wav",  t = 0, c = ci},
+		},
+	},
     ["reload"] = {
         Source = "reload",
         TPAnim = ACT_HL2MP_GESTURE_RELOAD_AR2,

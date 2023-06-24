@@ -140,8 +140,8 @@ SWEP.Attachments = {
 	{
 		PrintName = "Tactical", -- print name
 		DefaultAttName = "No Attachment",
-		Slot = {"laser", "flashlight", "rail"}, -- what kind of attachments can fit here, can be string or table
-		Bone = "root", -- relevant bone any attachments will be mostly referring to
+		Slot = {"tac"},
+		Bone = "Base",
 		Offset = {
 			vpos = Vector(0, 0, 0), -- offset that the attachment will be relative to the bone
 			vang = Angle(0, 0, 0),

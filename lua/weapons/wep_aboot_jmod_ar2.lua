@@ -22,17 +22,16 @@ SWEP.BodyHolsterAngL = Angle(-10, 10, 180)
 SWEP.BodyHolsterPos = Vector(5, -10, -4)
 SWEP.BodyHolsterPosL = Vector(5, -10, 4)
 
-//SWEP.CustomToggleCustomizeHUD = false
+SWEP.CustomToggleCustomizeHUD = false
 
 JMod.ApplyAmmoSpecs(SWEP, "Light Pulse Ammo", 1)
 -- IN M/S
 SWEP.ChamberSize = 0 -- how many rounds can be chambered.
-SWEP.Primary.ClipSize = 360 -- DefaultClip is automatically set.
-SWEP.ExtendedClipSize = 720
-SWEP.ReducedClipSize = 180
+SWEP.Primary.ClipSize = 30 -- DefaultClip is automatically set.
+SWEP.ExtendedClipSize = 60
+SWEP.ReducedClipSize = 20
 
 SWEP.PhysBulletMuzzleVelocity = 700
-
 
 SWEP.Recoil = 0.2
 SWEP.RecoilSide = 0.4
@@ -56,11 +55,6 @@ SWEP.Firemodes = {
 }
 
 SWEP.Force = 15
-
-SWEP.BodyDamageMults = {
-    [HITGROUP_HEAD] = 1.5,
- }
- 
 SWEP.NPCWeaponType = "weapon_ar2"
 SWEP.NPCWeight = 100
 
@@ -70,7 +64,10 @@ SWEP.MoveDispersion = 50
 SWEP.SightsDispersion = 100
 
 SWEP.Primary.Ammo = "ar2" -- what ammo type the gun uses
+SWEP.Secondary.Ammo			= "AR2AltFire"
+SWEP.Secondary.Sound		= Sound( "Project_MMOD_AR2.SecondaryFire" )
 SWEP.MagID = "ar2" -- the magazine pool this gun draws from
+SWEP.Secondary.DefaultClip = 1
 
 SWEP.ShootVol = 80 -- volume of shoot sound
 SWEP.ShootPitch = 100 -- pitch of shoot sound
@@ -145,9 +142,16 @@ SWEP.AttachmentElements = {
 SWEP.ExtraSightDist = 10
 
 SWEP.Attachments = {
-
+	{
+		PrintName = "CB Launcher",
+		Slot = {"hl2_cbl"},
+		DefaultAttName = "DISABLED",
+		Installed = "ubgl_hl2_ar2cbl",
+	}
 }
 
+SWEP.SelectUBGLSound =  "weapons/arccw/ubgl_select.wav"
+SWEP.ExitUBGLSound = "weapons/arccw/ubgl_exit.wav"
 SWEP.MirrorVMWM = false -- Copy the viewmodel, along with all its attachments, to the worldmodel. Super convenient!
 SWEP.MirrorWorldModel = true -- Use this to set the mirrored viewmodel to a different model, without any floating speedloaders or cartridges you may have. Needs MirrorVMWM
 
@@ -169,8 +173,32 @@ SWEP.Animations = {
         Source = {"fire1","fire2","fire3"},
 		ShellEjectAt = 0,
     },
+	["charge"] = {
+        Source = {"shake"},
+    },
+	["fire_alt"] = {
+        Source = {"fire_alt"},
+    },
+	["enter_ubgl"] = {
+		Source = "lowtoidle",
+		Mult = 0.5,
+		RestoreAmmo = -1,
+		SoundTable = {
+			{s = "weapons/arccw/ubgl_select.wav",  t = 0, c = ci}
+		},
+	},
+	["exit_ubgl"] = {
+		Source = "lowtoidle",
+		Mult = 0.5,
+		SoundTable = {
+			{s = "weapons/arccw/ubgl_exit.wav",  t = 0, c = ci}
+		},
+	},
+	["reload_ubgl"] = {
+        Source = {"lowtoidle"}
+    },
     ["enter_inspect"] = {
-        Source = "idle"--{"fidget","fidget2"},
+        Source = {"fidget","fidget2"}
     },
     ["reload"] = {
         Source = "reload",
