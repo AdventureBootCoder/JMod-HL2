@@ -1,4 +1,6 @@
 JMod = JMod or {}
+JMod.AdditionalAmmoTable = JMod.AdditionalAmmoTable or {}
+JMod.AdditionalWeaponTable = JMod.AdditionalWeaponTable or {}
 
 JModHL2.WeaponTable = {
 	["Pulse Rifle"] = {
@@ -93,81 +95,11 @@ JModHL2.AmmoTable = {
 	}
 }
 
-function JModHL2.LoadAmmoTable(tbl)
-	timer.Simple(1, function()
-		if JMod.AmmoTable then
-			table.Merge(JMod.AmmoTable, tbl)
-		end
-	end)
-		
-	for k, v in pairs(tbl) do
-		v.carrylimit = v.carrylimit or -2
-		game.AddAmmoType({
-			name = k,
-			maxcarry = v.carrylimit,
-			npcdmg = v.basedmg,
-			plydmg = v.basedmg,
-			dmgtype = v.dmgtype or DMG_BULLET
-		})
-		if SERVER then
-			timer.Simple(1, function()
-				if (v.resourcetype) and (v.resourcetype == "munitions") then
-					if not(table.HasValue(JMod.Config.Weapons.AmmoTypesThatAreMunitions, k)) then
-						table.insert(JMod.Config.Weapons.AmmoTypesThatAreMunitions, k)
-					end
-				elseif not(v.resourcetype) then
-					if not(table.HasValue(JMod.Config.Weapons.WeaponAmmoBlacklist, k)) then
-						table.insert(JMod.Config.Weapons.WeaponAmmoBlacklist, k)
-					end
-				end
-			end)
-		end
-
-		if CLIENT then
-			language.Add(k .. "_ammo", k)
-
-			if v.ent then
-				language.Add(v.ent, v.nicename)
-			end
-		end
-	end
-end
-
--- Dynamically create weapon Ents
-function JModHL2.GenerateWeaponEntities(tbl)
-	timer.Simple(1, function()
-		if JMod.WeaponTable then
-			table.Merge(JMod.WeaponTable, tbl)
-		end
-	end)
-	for name, info in pairs(tbl) do
-		if info.noent then continue end
-
-		local WeaponEnt = {}
-		WeaponEnt.Base = "ent_jack_gmod_ezweapon"
-		WeaponEnt.PrintName = info.PrintName or name
-		if info.Spawnable == nil then
-			WeaponEnt.Spawnable = true
-		else
-			WeaponEnt.Spawnable = info.Spawnable
-		end
-		WeaponEnt.AdminOnly = info.AdminOnly or false
-		WeaponEnt.Category = info.Category or "JMod - EZ HL:2"
-		WeaponEnt.WeaponName = name
-		WeaponEnt.ModelScale = info.gayPhysics and nil or info.size -- or math.max(info.siz.x, info.siz.y, info.siz.z)
-		scripted_ents.Register(WeaponEnt, info.ent)
-
-		if CLIENT then
-			language.Add(info.ent, name)
-		end
-	end
-end
+table.Merge(JMod.AdditionalWeaponTable, JModHL2.WeaponTable)
+table.Merge(JMod.AdditionalAmmoTable, JModHL2.AmmoTable)
 
 function JModHL2.ApplyAmmoSpecs(wep, typ, mult)
 	timer.Simple(1, function()
 		JMod.ApplyAmmoSpecs(wep, typ, mult) 
 	end)
 end
-
-JModHL2.LoadAmmoTable(JModHL2.AmmoTable)
-JModHL2.GenerateWeaponEntities(JModHL2.WeaponTable)
