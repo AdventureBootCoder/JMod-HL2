@@ -143,10 +143,10 @@ SWEP.Attachments = {
 		Slot = {"tac"},
 		Bone = "Base",
 		Offset = {
-			vpos = Vector(0, 0, 0), -- offset that the attachment will be relative to the bone
-			vang = Angle(0, 0, 0),
-			wpos = Vector(0, 0, 0),
-			wang = Angle(0, 0, 0)
+			vpos = Vector(-20, 0, 0), -- offset that the attachment will be relative to the bone
+			vang = Angle(180, 0, 180),
+			wpos = Vector(28, .5, -6),
+			wang = Angle(-5, 0, -92)
 		},
 		--[[SlideAmount={ -- how far this attachment can slide in both directions.
 			-- overrides Offset.

@@ -1,5 +1,5 @@
 SWEP.Base = "wep_jack_gmod_gunbase"
-SWEP.Spawnable = true
+SWEP.Spawnable = false
 SWEP.Category = "JMod: Half-Life - ArcCW"
 SWEP.AdminOnly = false
 SWEP.PrintName = "Pulse Rifle"
