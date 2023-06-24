@@ -6,12 +6,13 @@ ENT.PrintName = "EZ Combine Radio"
 ENT.Author = "AdventureBoots"
 ENT.Category = "JMod - EZ HL:2"
 ENT.Information = "glhfggwpezpznore"
-ENT.Spawnable = true
+ENT.Spawnable = false
 ENT.AdminSpawnable = true
 ENT.NoSitAllowed = true
 ENT.Model = "models/props_combine/breenconsole.mdl"
-ENT.Mat = ""
+ENT.Mat = "models/aboot/combine/combine_radio001"
 ENT.Mass = 150
+ENT.EZcolorable = false
 ----
 ENT.JModPreferredCarryAngles = Angle(0,-90,0)
 ENT.SpawnHeight = 20

@@ -16,17 +16,15 @@ SWEP.WorldModelOffset = {
 }
 SWEP.DefaultBodygroups = "00000000000"
 
-SWEP.CustomToggleCustomizeHUD = false
+SWEP.BodyHolsterSlot = "back"
+SWEP.BodyHolsterAng = Angle(10, 10, 0)
+SWEP.BodyHolsterAngL = Angle(-10, 10, 180)
+SWEP.BodyHolsterPos = Vector(5, -10, -4)
+SWEP.BodyHolsterPosL = Vector(5, -10, 4)
 
-SWEP.Damage = 15
-SWEP.DamageMin = 10
+//SWEP.CustomToggleCustomizeHUD = false
 
-SWEP.Range = 80 -- in METRES
-SWEP.RangeMin = 40
-SWEP.Penetration = 8
-SWEP.DamageType = DMG_BULLET
-SWEP.ShootEntity = nil -- entity to fire, if any
-SWEP.MuzzleVelocity = 1050 -- projectile or phys bullet muzzle velocity
+JMod.ApplyAmmoSpecs(SWEP, "Light Pulse Ammo", 1)
 -- IN M/S
 SWEP.ChamberSize = 0 -- how many rounds can be chambered.
 SWEP.Primary.ClipSize = 360 -- DefaultClip is automatically set.

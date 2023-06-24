@@ -13,26 +13,17 @@ SWEP.WorldModelOffset = {
     pos = Vector(23, 4, -1),
     ang = Angle(-10, 180, 180)
 }
-
 SWEP.MirrorVMWM = false -- Copy the viewmodel, along with all its attachments, to the worldmodel. Super convenient!
 SWEP.MirrorWorldModel = true -- Use this to set the mirrored viewmodel to a different model, without any floating speedloaders or cartridges you may have. Needs MirrorVMWM
-
-SWEP.Force = 15
 SWEP.DefaultBodygroups = "00000000000"
 
-SWEP.BodyDamageMults = {
-    [HITGROUP_HEAD] = 1.1,
- }
- 
-SWEP.Damage = 13
-SWEP.DamageMin = 8
+SWEP.BodyHolsterSlot = "back"
+SWEP.BodyHolsterAng = Angle(10, 10, 0)
+SWEP.BodyHolsterAngL = Angle(-10, 10, 180)
+SWEP.BodyHolsterPos = Vector(5, -10, -4)
+SWEP.BodyHolsterPosL = Vector(5, -10, 4)
 
-SWEP.Range = 60 -- in METRES
-SWEP.RangeMin = 30
-SWEP.Penetration = 8
-SWEP.DamageType = DMG_BULLET
-SWEP.ShootEntity = nil -- entity to fire, if any
-SWEP.MuzzleVelocity = 1050 -- projectile or phys bullet muzzle velocity
+JMod.ApplyAmmoSpecs(SWEP, "Heavy Pulse Ammo", 1)
 -- IN M/S
 SWEP.ChamberSize = 0 -- how many rounds can be chambered.
 SWEP.Primary.ClipSize = 100 -- DefaultClip is automatically set.
@@ -68,7 +59,7 @@ SWEP.NPCWeight = 100
 SWEP.AccuracyMOA = 10 -- accuracy in Minutes of Angle. There are 60 MOA in a degree.
 SWEP.HipDispersion = 700 -- inaccuracy added by hip firing.
 SWEP.MoveDispersion = 100
-SWEP.SightsDispersion = 300
+SWEP.SightsDispersion = 200
 SWEP.ShotgunSpreadDispersion = false
 
 SWEP.Primary.Ammo = "ar2" -- what ammo type the gun uses

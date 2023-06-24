@@ -13,19 +13,5 @@ local function AddParticles()
 	game.AddParticles("particles/hl2mmod_weaponeffects.pcf")
 
 	PrecacheParticleSystem("hl2mmod_explosion_grenade")
-	PrecacheParticleSystem("hl2mmod_explosion_rpg")
-	PrecacheParticleSystem("hl2mmod_explosion_grenade_noaftersmoke")
-
 end
 pcall(AddParticles)
-
-local function AddCustomAmmo()
-	game.AddAmmoType({
-		name = "Regenerating-AR3",
-		maxcarry = 100
-	})
-end
-
-timer.Simple(1, function()
-	pcall(AddCustomAmmo) -- make sure they're added
-end)
