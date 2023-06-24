@@ -33,7 +33,7 @@ att.UBGL_Ammo = "AR2AltFire"
 att.UBGL_RPM = 30
 att.UBGL_Recoil = 1
 att.UBGL_Capacity = 1
-att.ActivateElements = {"reducedmag"}
+--att.ActivateElements = {"reducedmag"}
 
 local function Ammo(wep)
     return wep.Owner:GetAmmoCount("AR2AltFire")
