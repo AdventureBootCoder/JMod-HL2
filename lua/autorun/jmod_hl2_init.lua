@@ -68,16 +68,17 @@ if(SERVER)then
 	end)
 
 	hook.Add("JModHookEZArmorSync", "ABootHL2ArmorCheck", function(playa)
-		if playa.EZarmor.effects and playa.EZarmor.effects.HEVsuit then
+		local PlyEff = playa.EZarmor.effects
+		if PlyEff and PlyEff.HEVsuit then
 			if not(playa:IsSuitEquipped()) then
 				playa:EquipSuit()
 			end
 		elseif defaultHEVdisable:GetBool() and playa:IsSuitEquipped() then
 			RemoveHEVsuit(playa)
 		end
-		for id, items in pairs(playa.EZarmor.items) do
-			if JMod.ArmorTable[items.name].HEVreq then
-				if not (playa.EZarmor.effects and playa.EZarmor.effects.HEVsuit) then
+		if PlyEff and PlyEff.HEVreq and not(PlyEff.HEVsuit) then
+			for id, items in pairs(playa.EZarmor.items) do
+				if JMod.ArmorTable[items.name].eff.HEVreq then
 					playa:PrintMessage(HUD_PRINTCENTER, "This armor requires an HEV suit")
 					JMod.RemoveArmorByID(playa, id)
 				end
@@ -153,11 +154,20 @@ if(SERVER)then
 
 	concommand.Add("aboot_debug", function(ply, cmd, args) 
 		if not GetConVar("sv_cheats"):GetBool() then return end
-		local Obj = ply:GetEyeTrace().Entity
-		if IsValid(Obj) then
-			Obj:SetColor(Color(255, 255, 255, 150))
-			Obj:SetRenderMode(RENDERMODE_TRANSCOLOR)
-		end
+		ply:EmitSound("Weapon_PhysCannon.Launch", CHAN_WEAPON)
+		local cballspawner = ents.Create("point_combine_ball_launcher")
+		cballspawner:SetAngles(ply:GetAngles())
+		cballspawner:SetPos(ply:GetShootPos() + ply:GetAimVector() * 14)
+		cballspawner:SetKeyValue("minspeed", 1000)
+		cballspawner:SetKeyValue("maxspeed", 1000 )
+		cballspawner:SetKeyValue("ballradius", "1")
+		cballspawner:SetKeyValue("ballcount", "10")
+		cballspawner:SetKeyValue("maxballbounces", "18")
+		cballspawner:SetKeyValue("launchconenoise", 1.2)
+		cballspawner:Spawn()
+		cballspawner:Activate()
+		cballspawner:Fire("LaunchBall")
+		cballspawner:Fire("kill","",1)
 	end, nil, "Debug testing command")
 
 elseif CLIENT then 

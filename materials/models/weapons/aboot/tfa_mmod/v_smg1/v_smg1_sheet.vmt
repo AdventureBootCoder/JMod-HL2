@@ -1,0 +1,20 @@
+"vertexlitgeneric"
+{
+	"$selfillum" "1"
+	"$basetexture" "Models/Weapons/aboot/tfa_mmod/V_smg1/v_smg1_sheet_diff"
+	"$bumpmap" "models/weapons/aboot/tfa_mmod/v_smg1/v_smg1_sheet_normal"
+	"$selfillummask" "models/weapons/aboot/tfa_mmod/v_smg1/v_smg1_sheet_mask"
+	"$envmap" "env_cubemap"
+	"$normalmapalphaenvmapmask" 1
+	"$envmaptint" "[.1 .1 .1]"
+	"$envmapcontrast" .7
+	"$phong" 1
+	"$phongboost" 6
+	"$phongexponenttexture" "models/weapons/aboot/tfa_mmod/v_smg1/v_smg1_sheet_phong"
+	"$phongfresnelranges" "[.2 1 0]"
+	"$phongalbedotint" 1
+	"$rimlight"			"1"
+    "$rimlightexponent"			"100"
+    "$rimlightboost"			".5"
+    "$rimmask"			"1"
+}

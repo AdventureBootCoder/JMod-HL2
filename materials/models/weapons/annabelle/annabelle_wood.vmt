@@ -1,0 +1,26 @@
+VertexLitGeneric
+{
+	"$basetexture"				"models/weapons/Annabelle/Annabelle_d"
+	"$bumpmap"					"models/weapons/Annabelle/Annabelle_n"
+	"$phongexponenttexture"		"models/weapons/Annabelle/Annabelle_e"
+	"$color2"					"[0.85 0.85 0.8]"
+	
+	$detail						"detail\metal_detail_01"
+    $detailscale                3
+   	$detailblendfactor 			.7
+   	$detailblendmode			0
+
+	$envmap						env_cubemap
+	$envmaptint					"[ .01 .01 .01 ]"
+	$normalmapalphaenvmapmask	"1"	
+	
+	$phong						1
+	$phongexponent				10
+	$phongboost					.6
+	$phongfresnelranges			"[0.25 0.5 1]"
+
+	"$rimlight"					"1"
+	"$rimlightexponent"			"80"	
+	"$rimlightboost"			".3"
+	"$rimmask"					"1"
+}

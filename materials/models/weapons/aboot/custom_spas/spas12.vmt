@@ -1,0 +1,31 @@
+"VertexLitGeneric"
+{
+	"$baseTexture" 				"models\weapons\aboot\custom_spas\spas12_d"
+	"$bumpmap" 					"models\weapons\aboot\custom_spas\spas12_n"
+	"$phongexponenttexture"     "models\weapons\aboot\custom_spas\spas12_e"
+	
+	"$phong" "1"
+	"$phongboost" "4"
+	"$PhongFresnelRanges" "[ 0.7 0.9 1 ]"
+	
+	
+
+    "$rimlight" "1" // slight Lighting Exposer from environment
+	"$rimlightexponent" "69" // Defines the broader and tightness of highlight, The smaller number is higher $rimlightboost effect, The highest number lower $rimlightboost effect
+	"$rimlightboost" "1" // play around the values high between low
+	"$rimmask" "1" // Important if you add alpha channel from $phongexponenttexture 
+	
+	"$envmap"					"env_cubemap"
+	"$normalmapalphaenvmapmask"	"1"
+	"$envmaptint"				"[0.3 0.3 0.3]"
+	
+		"Proxies"
+	{
+		"MwEnvMapTint"
+		{
+			"min" "0"
+			"max" "0.6"
+		}
+	}
+	
+}

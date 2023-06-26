@@ -1,0 +1,5 @@
+"VertexLitGeneric"
+{
+	"$basetexture" "Models/Weapons/aboot/TFA_MMOD/v_crossbow/lensdirt"
+	"$no_draw" 1
+}

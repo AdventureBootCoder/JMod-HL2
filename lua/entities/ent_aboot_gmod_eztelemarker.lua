@@ -189,11 +189,11 @@ elseif CLIENT then
 				Teleporting = true
 				Teleporter = v
 				if (v.TimeActivated >= (CurTime() - 0.2)) and not(Ply.Scared) and (Ply:WaterLevel() >= 3) then
-					if math.random(0, 1000) >= 950 then
+					--if math.random(0, 1000) >= 950 then
 						timer.Simple(0.5, function()
 							v:SummonIchthy(Ply)
 						end)
-					end
+					--end
 				end
 			end
 		end

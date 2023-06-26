@@ -1,0 +1,21 @@
+"VertexLitGeneric"
+{
+	"$baseTexture" "Models/Weapons/aboot/TFA_MMOD/W_smg1/w_smg2"
+	"$bumpmap" "Models/Weapons/aboot/TFA_MMOD/W_smg1/w_smg2_nrm"
+	//"$envmap" "env_cubemap"
+	//"$envmapmask" "Models/Weapons/aboot/TFA_MMOD/w_smg1/w_smg2specularmask"
+	//"$envmaptint" "[ .3 .3 .3 ]"	
+	$nocull "1"
+	"$envmap" "env_cubemap"
+	"$normalmapalphaenvmapmask" 1
+	"$envmaptint" "[.1 .1 .1]"
+	"$envmapcontrast" .7
+	"$phong" 1
+	"$phongboost" 6
+	"$phongfresnelranges" "[.2 1 0]"
+	"$phongalbedotint" 1
+	"$rimlight"			"1"
+    "$rimlightexponent"			"100"
+    "$rimlightboost"			".5"
+    "$rimmask"			"1"
+}

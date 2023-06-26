@@ -1,0 +1,18 @@
+VertexLitGeneric
+{
+	"$basetexture"				"models/Weapons/aboot/TFA_MMOD/V_smg1/MP7_d"
+	"$bumpmap"					"models/Weapons/aboot/TFA_MMOD/V_smg1/MP7_n"
+	"$phongexponenttexture"		"models/Weapons/aboot/TFA_MMOD/V_smg1/MP7_e"
+	"$color2"					"[0.3 0.3 0.3]"
+	"$translucent"				"1"
+	
+	$envmap						env_cubemap
+	$envmaptint					"[ .13 .13 .13 ]"
+
+	$phong						1
+	$phongexponent				40
+	$phongboost					35
+	$phongfresnelranges			"[0.25 0.5 1]"
+	"$phongalbedotint" 			"1"
+	"$phongalbedoboost" 		"48"
+}

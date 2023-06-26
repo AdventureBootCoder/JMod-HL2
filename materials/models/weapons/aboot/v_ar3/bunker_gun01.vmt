@@ -1,0 +1,44 @@
+
+"vertexlitgeneric"
+{
+	"$basetexture" "models\weapons\aboot\v_ar3\bunker_gun01"
+	"$bumpmap" "models\weapons\aboot\v_ar3\bunker_gun01_nrm"
+	"$phongexponenttexture" "models\weapons\aboot\v_ar3\bunker_gun01_phong"
+	"$selfillummask" "models\weapons\aboot\v_ar3\bunker_gun01_mask"
+	
+	"$surfaceprop" "metal"
+	"$selfillum"			"1"
+
+	"$phong"     "1"
+	"$phongexponent"  "10"
+	"$phongboost"   "4"
+//	"$phongfresnelranges"   "[0.22 0.856 20]"
+	"$phongfresnelranges"		"[1 .7 .3]"
+//	"$phongwarptexture"  "models/Weapons/V_IRifle/v_irifle_iridescence"
+
+	"$envmap" "env_cubemap"
+	"$normalmapalphaenvmapmask"	"1"
+	"$envmaptint"	"[0.245 0.245 0.245]"
+	"$envmapfresnel"	"1"
+	
+
+	"$halflambert"			"1"
+
+	"Proxies"
+	{
+		"Sine"
+		{
+			"resultVar" "$selfIllumTint"
+			"sinemin" 0.2
+			"sinemax" 1.30
+			"sineperiod" 3.00
+		}
+		"Sine"
+		{
+			"resultVar" "$phongboost"
+			"sinemin" 0.6
+			"sinemax" 1.0
+			"sineperiod" 3.00
+		}
+	}
+}
