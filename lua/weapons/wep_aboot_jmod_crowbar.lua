@@ -111,7 +111,7 @@ SWEP.Hook_PostBash = function(wep, data)
 			wep.TaskEntity = Ent
 			wep.CurTask = Task
 		elseif IsValid(Ent:GetPhysicsObject()) then
-			local Message = JMod.ToolboxDeconstruct(Ent, Pos, wep.Owner, Task)
+			local Message = JMod.EZprogressTask(Ent, Pos, wep.Owner, Task)
 
 			if Message then
 				wep.Owner:PrintMessage(HUD_PRINTCENTER, Message)
