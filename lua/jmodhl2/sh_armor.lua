@@ -286,6 +286,16 @@ JModHL2.ArmorTable = {
 
 local function HL2LoadAdditionalArmor()
 	if JModHL2.ArmorTable then
+		JModHL2.ArmorTable["Admin Jump Module"] = table.Copy(JModHL2.ArmorTable["ABoot Jump Module"])
+		JModHL2.ArmorTable["Admin Jump Module"].PrintName = "Admin Jump Module"
+		JModHL2.ArmorTable["Admin Jump Module"].AdminOnly = true
+		JModHL2.ArmorTable["Admin Jump Module"].eff = { HEVreq = false, jumpmod = true }
+		JModHL2.ArmorTable["Admin Jump Module"].ent = "ent_aboot_gmod_ezarmor_jumpmodule_admin"
+		JModHL2.ArmorTable["Admin Jet Module"] = table.Copy(JModHL2.ArmorTable["ABoot Jet Module"])
+		JModHL2.ArmorTable["Admin Jet Module"].PrintName = "Admin Jet Module"
+		JModHL2.ArmorTable["Admin Jet Module"].AdminOnly = true
+		JModHL2.ArmorTable["Admin Jet Module"].eff = { HEVreq = false, jetmod = true }
+		JModHL2.ArmorTable["Admin Jet Module"].ent = "ent_aboot_gmod_ezarmor_jetmodule_admin"
 		table.Merge(JMod.AdditionalArmorTable, JModHL2.ArmorTable)
 	end
 end
