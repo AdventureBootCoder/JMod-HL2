@@ -47,7 +47,8 @@ if(SERVER)then
 	util.AddNetworkString("ABoot_VolumeContainerMenu")
 	util.AddNetworkString("ABoot_JumpmodParticles")
 	local defaultHEVdisable = CreateConVar("aboot_disable_hev", "0", FCVAR_ARCHIVE, "Removes the HEV suit from players on spawn and when it's destroyed. \nNo more running around with an invisible HEV suit")
-	local noPowerDraw = CreateConVar("aboot_infinite_power", "0", FCVAR_ARCHIVE, "Disables jomp/jrt modules drawing internal power, effectivly making their charge infinite")
+	local noPowerDraw = CreateConVar("aboot_infinite_power", "0", FCVAR_ARCHIVE, "Disables jump/jet modules drawing internal power, effectivly making their charge infinite")
+	local EZammoPickup = CreateConVar("aboot_ez_ammopickup", "0", FCVAR_ARCHIVE, "Turns HL2 ammo pickups into EZ ammo pickups for the weapon you are holding")
 
 	local function RemoveHEVsuit(playa) 
 		playa:SetArmor(0)
@@ -150,6 +151,40 @@ if(SERVER)then
 				end
 			end
 		end
+	end)
+
+	local HLtoEZammo = {
+		["item_ammo_357"] = {"Magnum Pistol Round", 12},
+		["item_ammo_357_large"] = {"Magnum Pistol Round", 24},
+		["item_ammo_ar2"] = {"Light Pulse Ammo", 30},
+		["item_ammo_ar2_large"] = {"Light Pulse Ammo", 90},
+		["item_ammo_pistol"] = {"Pistol Round", 20},
+		["item_ammo_pistol_large"] = {"Pistol Round", 30},
+		["item_ammo_smg1"] = {"Pistol Round", 45},
+		["item_ammo_smg1_large"] = {"Pistol Round", 60},
+	}
+
+	hook.Add("PlayerCanPickupItem", "JMod_HL2_EZpickup", function(ply, item)
+		if (EZammoPickup:GetBool() == true) and (HLtoEZammo[item:GetClass()]) then
+			EZammoConversion = HLtoEZammo[item:GetClass()]
+			local AmmoID = game.GetAmmoID(EZammoConversion[1])
+			local MaxAmmo = game.GetAmmoMax(AmmoID) * JMod.Config.Weapons.AmmoCarryLimitMult
+			local AmmoToGive = math.min(EZammoConversion[2], MaxAmmo - ply:GetAmmoCount(EZammoConversion[1]))
+			if AmmoToGive > 0 then
+				ply:GiveAmmo(AmmoToGive, EZammoConversion[1])
+				item:Remove()
+
+				return false
+			end
+		end
+		--[[if (item:GetClass() == "item_healthkit") and (ply:Health() < ply:GetMaxHealth()) then
+			ply.EZhealth = (ply.EZhealth or 0) + 15
+			ply:PrintMessage(HUD_PRINTCENTER, "treatment " .. ply.EZhealth + ply:Health() .. "/" .. ply:GetMaxHealth())
+			sound.Play("snds_jack_gmod/ez_medical/" .. math.random(1, 27) .. ".wav", ply:GetShootPos(), 60, math.random(90, 110))
+			item:Remove()
+
+			return false
+		end]]--
 	end)
 
 	concommand.Add("aboot_debug", function(ply, cmd, args) 
