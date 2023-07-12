@@ -1,4 +1,5 @@
 --HiveHand
+--[[
 sound.Add({
 	name = "weapon_hivehand.Burst",
 	channel = CHAN_BODY,
@@ -71,9 +72,10 @@ sound.Add({
 	soundlevel = SNDLVL_NORM,
 	sound = ")weapons/hivehand/pickup.wav",
 })
-
+]]--
 --TripMine
 
+--[[
 sound.Add({
 	name = "grenade_tripmine.Activate",
 	channel = CHAN_WEAPON,
@@ -105,10 +107,11 @@ sound.Add({
 	soundlevel = SNDLVL_GUNFIRE,
 	sound = ")weapons/tripmine/idle01.wav",
 })
+]]--
 
 
 --Satchel
-
+--[[
 sound.Add({
 	name = "weapon_satchel.Double",
 	channel = CHAN_WEAPON,
@@ -132,9 +135,9 @@ sound.Add({
 	soundlevel = SNDLVL_GUNFIRE,
 	sound = "^weapons/satchel/single_npc.wav",
 })
-
+]]--
 --Frag grenade
-
+--[[
 sound.Add({
 	name = "weapon_frag.Single",
 	channel = CHAN_WEAPON,
@@ -166,9 +169,10 @@ sound.Add({
 	soundlevel = SNDLVL_GUNFIRE,
 	sound = ")weapons/grenade/idle_fidget.wav",
 })
+]]--
 
 --Snark
-
+--[[
 sound.Add({
 	name = "weapon_snark.Single",
 	channel = CHAN_WEAPON,
@@ -229,6 +233,7 @@ sound.Add({
 	soundlevel = SNDLVL_90dB,
 	sound = "npc/snark/hunt"..math.random(1,4)..".wav"
 })
+]]--
 
 --RPG
 
@@ -502,7 +507,7 @@ sound.Add({
 	volume = 0.9,
 	pitch = PITCH_NORM,
 	soundlevel = SNDLVL_GUNFIRE,
-	sound = ")weapons/shotgun/double.wav",
+	sound = ")weapons/shotgun/shotgun_double.wav",
 })
 
 sound.Add({
@@ -526,7 +531,7 @@ sound.Add({
 	channel = CHAN_STATIC,
 	volume = VOL_NORM,
 	soundlevel = SNDLVL_NORM,
-	sound = ")weapons/shotgun/empty.wav",
+	sound = ")weapons/shotgun/shotgun_empty.wav",
 })
 
 sound.Add({
@@ -534,7 +539,7 @@ sound.Add({
 	channel = CHAN_ITEM,
 	volume = VOL_NORM,
 	soundlevel = SNDLVL_NORM,
-	sound = ")weapons/shotgun/reload"..math.random(1, 3)..".wav",
+	sound = ")weapons/shotgun/shotgun_reload"..math.random(1, 3)..".wav",
 })
 
 sound.Add({
@@ -566,7 +571,7 @@ sound.Add({
 	channel = CHAN_ITEM,
 	volume = 0.40,
 	soundlevel = SNDLVL_NORM,
-	sound = ")weapons/shotgun/pump.wav",
+	sound = ")weapons/shotgun/shotgun_pump"..math.random(1, 2)..".wav",
 })
 
 --Crowbar

@@ -315,7 +315,6 @@ if(SERVER)then
 	end
 
 	function ENT:Use(activator)
-		if self.Target and activator == self.Target then return end
 		if activator:IsPlayer() then
 			local State = self:GetState()
 
@@ -325,7 +324,7 @@ if(SERVER)then
 				return
 			end
 
-			if State > 0 then
+			if (State > 0) and not(IsValid(self.Target) and activator == self.Target) then
 				self:TurnOff()
 			else
 				if self:GetElectricity() > 0 then
@@ -769,7 +768,6 @@ if(SERVER)then
 			util.Effect("MuzzleFlash", Eff)
 
 			sound.Play("weapons/ar2/fire1.wav", SelfPos + Up, 100, math.random(80, 100))
-			//sound.Play("npc/turret_floor/shoot"..tostring(math.random(1, 3))..".wav", SelfPos + Up, 100, 100)
 			ShootDir = (ShootDir + VectorRand() * math.Rand(.05, 1) * Inacc):GetNormalized()
 
 			local Ballut = {
