@@ -40,21 +40,26 @@ if SERVER then
 
 	function ENT:Use(activator)
 		if IsValid(activator) and activator:IsPlayer() then
-			activator:Give("weapon_crowbar")
-			activator:SelectWeapon("weapon_crowbar")
+			activator:Give("wep_aboot_jmod_crowbar")
+			activator:SelectWeapon("wep_aboot_jmod_crowbar")
 			local TrPos = util.QuickTrace(activator:GetPos(), Vector(0, 0, 200), {activator, self}).HitPos
 			for i = 0, 20 do
 				timer.Simple(0.1 * i, function()
 					local RandVec = TrPos + VectorRand(-100, 100)
-					local Crab = ents.Create("npc_headcrab")
-					Crab:SetPos(RandVec)
-					Crab:Spawn()
-					Crab:Activate()
-					--[[local Crab = ents.Create("prop_ragdoll")
+					local Crab = ents.Create("prop_ragdoll")
 					Crab:SetModel("models/headcrabclassic.mdl")
 					Crab:SetPos(RandVec)
 					Crab:Spawn()
-					Crab:Activate()]]--
+					Crab:Activate()
+					timer.Simple(1, function() 
+						if IsValid(Crab) then
+							local RealCrab = ents.Create("npc_headcrab")
+							RealCrab:SetPos(Crab:GetPos())
+							RealCrab:Spawn()
+							RealCrab:Activate()
+							Crab:Remove()
+						end
+					end)
 				end)
 			end
 			SafeRemoveEntityDelayed(self, 0)
@@ -66,7 +71,7 @@ if SERVER then
 		local Time = CurTime()
 		if self.NextPurr <= Time then
 			self.NextPurr = Time + 2
-			self:EmitSound("npc/headcrab/idle"..tostring(math.random(1, 2))..".wav")
+			self:EmitSound("npc/headcrab/idle"..tostring(math.random(1, 2))..".wav", 110)
 		end
 	end
 
