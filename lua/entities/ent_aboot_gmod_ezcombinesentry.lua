@@ -316,8 +316,13 @@ if(SERVER)then
 
 	function ENT:Use(activator)
 		if activator:IsPlayer() then
-			local State = self:GetState()
+			local State, Alt = self:GetState(), activator:KeyDown(JMod.Config.General.AltFunctionKey)
 
+			if Alt then
+				activator:PickupObject(self)
+				
+				return
+			end
 			if State == STATE_BROKEN then
 				JMod.Hint(activator, "destroyed")
 
