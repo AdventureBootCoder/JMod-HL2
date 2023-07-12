@@ -204,7 +204,7 @@ if(SERVER)then
 
 		---
 		self:SetAmmoType("Pulse Rifle")
-		JMod.Colorify(self)
+		--JMod.Colorify(self)
 		self:SetPerfMult(JMod.Config.Machines.Sentry.PerformanceMult)
 		self:InitPerfSpecs()
 		---
@@ -315,6 +315,7 @@ if(SERVER)then
 	end
 
 	function ENT:Use(activator)
+		if self.Target and activator == self.Target then return end
 		if activator:IsPlayer() then
 			local State = self:GetState()
 
@@ -767,7 +768,8 @@ if(SERVER)then
 
 			util.Effect("MuzzleFlash", Eff)
 
-			sound.Play("weapons/ar2/fire"..tostring(math.random(1, 3))..".wav", SelfPos + Up, 100, math.random(80, 100))
+			sound.Play("weapons/ar2/fire1.wav", SelfPos + Up, 100, math.random(80, 100))
+			//sound.Play("npc/turret_floor/shoot"..tostring(math.random(1, 3))..".wav", SelfPos + Up, 100, 100)
 			ShootDir = (ShootDir + VectorRand() * math.Rand(.05, 1) * Inacc):GetNormalized()
 
 			local Ballut = {

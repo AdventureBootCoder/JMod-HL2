@@ -424,6 +424,12 @@ hook.Add("Move", "JMOD_HL2_ARMOR_MOVE", function(ply, mv)
 					end
 					ply.EZThrusterSound:Play()
 					ply.EZThrusterSound:ChangePitch(80 + (Charges * 15)^1.2)
+					--[[if not IsValid(ply.ThrustEffect) then
+						ply.ThrustEffect = ents.Create("env_rotorwash_emitter")
+						ply.ThrustEffect:SetPos(ply:GetPos())
+						ply.ThrustEffect:Spawn()
+						ply.ThrustEffect:SetParent(ply)
+					end]]--
 					if SERVER then
 						if NextEffectTime < Time then
 							NextEffectTime = Time + 0.2
@@ -447,6 +453,10 @@ hook.Add("Move", "JMOD_HL2_ARMOR_MOVE", function(ply, mv)
 			if ply.EZThrusterSound then
 				ply.EZThrusterSound:Stop()
 			end
+			--[[if IsValid(ply.ThrustEffect) then
+				ply.ThrustEffect:Remove()
+				ply.ThrustEffect = nil
+			end]]--
 			ply.EZjetting = false
 		end
 	end
