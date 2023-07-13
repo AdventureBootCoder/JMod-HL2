@@ -104,8 +104,81 @@ JModHL2.AmmoTable = {
 table.Merge(JMod.AdditionalWeaponTable, JModHL2.WeaponTable)
 table.Merge(JMod.AdditionalAmmoTable, JModHL2.AmmoTable)
 
+function JModHL2.LoadAdditionalAmmo()
+	if JMod.AdditionalAmmoTable then
+		table.Merge(JMod.AmmoTable, JMod.AdditionalAmmoTable)
+		JMod.LoadAmmoTable(JMod.AdditionalAmmoTable)
+	end
+end
+hook.Add("Initialize", "JMod_LoadAdditionalAmmo", JModHL2.LoadAdditionalAmmo)
+
+function JModHL2.LoadAdditionalWeaponEntities()
+	if JMod.AdditionalWeaponTable then
+		table.Merge(JMod.WeaponTable, JMod.AdditionalWeaponTable)
+		JMod.GenerateWeaponEntities(JMod.AdditionalWeaponTable)
+	end
+end
+hook.Add("Initialize", "JMod_LoadAdditionalWeaponEntities", JModHL2.LoadAdditionalWeaponEntities)
+
+--JModHL2.LoadAdditionalAmmo()
+--JModHL2.LoadAdditionalWeaponEntities()
+
+function JModHL2.GetAmmoSpecs(typ)
+	if not JModHL2.AmmoTable[typ] then return nil end
+	local Result, BaseType = table.FullCopy(JModHL2.AmmoTable[typ]), string.Split(typ, "-")[1]
+
+	return table.Inherit(Result, JModHL2.AmmoTable[BaseType])
+end
+
 function JModHL2.ApplyAmmoSpecs(wep, typ, mult)
-	timer.Simple(1, function()
+	--[[timer.Simple(1, function()
 		JMod.ApplyAmmoSpecs(wep, typ, mult) 
-	end)
+	end)]]--
+	mult = mult or 1
+	wep.Primary.Ammo = typ
+	local Specs = JModHL2.GetAmmoSpecs(typ)
+	if not Specs then 
+		timer.Simple(1, function()
+			JMod.ApplyAmmoSpecs(wep, typ, mult) 
+		end)
+
+		return
+	end
+	wep.Damage = Specs.basedmg * mult
+	wep.Num = Specs.projnum or 1
+
+	if Specs.effrange then
+		wep.Range = Specs.effrange
+	end
+
+	if Specs.terminaldmg then
+		wep.DamageMin = Specs.terminaldmg * mult
+	end
+
+	if Specs.penetration then
+		wep.Penetration = Specs.penetration
+	end
+
+	if Specs.blastrad then
+		wep.BlastRadius = Specs.blastrad
+	end
+
+	if Specs.dmgtype then
+		wep.DamageType = Specs.dmgtype
+	end
+
+	if Specs.expanding then
+		wep.EZexpangingAmmo = Specs.expanding
+	end
+
+	if Specs.armorpiercing then
+		wep.EZarmorpiercingAmmo = Specs.armorpiercing
+	end
+
+	-- todo: implement this when we add these types
+	if Specs.tracer then
+		wep.Tracer = Specs.tracer
+	else
+		wep.Tracer = nil
+	end
 end
