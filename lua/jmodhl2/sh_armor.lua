@@ -331,6 +331,7 @@ hook.Add("Move", "JMOD_HL2_ARMOR_MOVE", function(ply, mv)
 		ply.EZjetting = false
 		if ply.EZThrusterSound then
 			ply.EZThrusterSound:Stop()
+			ply.EZThrusterSound = nil
 		end
 		
 		return 
@@ -420,10 +421,11 @@ hook.Add("Move", "JMOD_HL2_ARMOR_MOVE", function(ply, mv)
 					ply.EZjetting = true
 					-- Sound, psshha
 					if not ply.EZThrusterSound then
-						ply.EZThrusterSound = CreateSound(ply, "thrusters/rocket00.wav")
+						ply.EZThrusterSound = CreateSound(ply, "^thrusters/rocket00.wav")
 					end
 					ply.EZThrusterSound:Play()
-					ply.EZThrusterSound:ChangePitch(80 + (Charges * 15)^1.2)
+					ply.EZThrusterSound:SetSoundLevel(150)
+					ply.EZThrusterSound:ChangePitch(80 + (Charges * 12)^1.2)
 					--[[if not IsValid(ply.ThrustEffect) then
 						ply.ThrustEffect = ents.Create("env_rotorwash_emitter")
 						ply.ThrustEffect:SetPos(ply:GetPos())
