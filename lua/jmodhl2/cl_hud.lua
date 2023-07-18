@@ -4,16 +4,32 @@ local tag_counter = tag .. "_counter"
 local shouldshow = CreateClientConVar(tag .. "_hud", "1")
 local SCR_W, SCR_H = ScrW(), ScrH()
 local OFFSET_W, OFFSET_H= 0.305, 0.975
-local x_offset = CreateClientConVar(tag .. "_hud_x", SCR_W * OFFSET_W)
-local y_offset = CreateClientConVar(tag .. "_hud_y", SCR_H * OFFSET_H)
+local x_offset = CreateClientConVar(tag .. "_hud_x", SCR_W * OFFSET_W, true)
+local y_offset = CreateClientConVar(tag .. "_hud_y", SCR_H * OFFSET_H, true)
+local x_info_offset = CreateClientConVar("aboot_machine_info_hud_x", SCR_W * 0.02, true)
+local y_info_offset = CreateClientConVar("aboot_machine_info_hud_y", SCR_H * 0.5, true)
 local BAR_WIDTH, BAR_HEIGHT, MARGIN = 0.0075, 0.065, 0.002
 local BLACK, BAR_COL_FULL, BAR_COL_EMPTY = Color(0, 0, 0, 80), Color(255, 236, 12, 240), Color(255, 0, 0, 105)
 local JET_COL_FULL, JET_COL_EMPTY = Color(0, 139, 173, 240), Color(200, 0, 0, 105)
 local charge = 0
+local MACHINE_MESSAGE = Color(206, 206, 206, 129)
 
 hook.Add("HUDPaint", "JMOD_HL2_HUDPAINT", function()
-	if not shouldshow:GetBool() then return end
+	
 	local Ply = LocalPlayer()
+	if Ply:Alive() and Ply.EZarmor and Ply.EZarmor.effects then
+		if Ply.EZarmor.effects.HEVsuit then
+			local TrackedEnt = Ply:GetNW2Entity("EZmachineTracking", nil)
+			if IsValid(TrackedEnt) then
+				local InfoX = x_info_offset:GetInt()
+				local InfoY = y_info_offset:GetInt()
+				draw.DrawText("Machine Synced: "..TrackedEnt.PrintName, "HudDefault", InfoX, InfoY, MACHINE_MESSAGE, TEXT_ALIGN_LEFT)
+
+			end
+		end
+	end
+
+	if not shouldshow:GetBool() then return end
 	--
 	local x = x_offset:GetInt()
 	local y = y_offset:GetInt()
@@ -90,6 +106,20 @@ hook.Add("HUDPaint", "JMOD_HL2_HUDPAINT", function()
 			draw.DrawText("ALT: "..tostring(math.min(Dist, 9999)), "HudDefault", x + (SCR_W * (BAR_WIDTH + MARGIN) * 3.2), y - (SCR_H * BAR_HEIGHT), JET_COL_FULL, TEXT_ALIGN_LEFT)
 			local Ang = math.Round(Ply:EyeAngles().p)
 			draw.DrawText("ANG: "..tostring(-Ang), "HudDefault", x + (SCR_W * (BAR_WIDTH + MARGIN) * 3.2), y - (SCR_H * BAR_HEIGHT) + 25, JET_COL_FULL, TEXT_ALIGN_LEFT)
+		end
+	end
+end)
+
+local COLOR_HOSTILE = Color( 255, 0, 0)
+
+hook.Add("PreDrawHalos", "JMod_HL2_HALOS", function()
+	local Ply = LocalPlayer()
+	if Ply:Alive() and Ply.EZarmor and Ply.EZarmor.effects then
+		if Ply.EZarmor.effects.HEVsuit then
+			local TrackedEnt = Ply:GetNW2Entity("EZturretTarget", nil)
+			if IsValid(TrackedEnt) then
+				halo.Add( {TrackedEnt}, COLOR_HOSTILE, 1, 1, 2, true, true, false)
+			end
 		end
 	end
 end)

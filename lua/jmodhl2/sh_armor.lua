@@ -82,8 +82,8 @@ JModHL2.ArmorTable = {
 		},
 		eff={
 			HEVsuit = true,
-			speedBoost = 1.2,
-			nightVision = false
+			speedBoost = 1,
+			--nightVision = false
 		},
 		blackvisionwhendead = false,
 		tgl = {
@@ -339,7 +339,7 @@ hook.Add("Move", "JMOD_HL2_ARMOR_MOVE", function(ply, mv)
 	local Time = CurTime()
 
 	if ply.EZarmor and ply.EZarmor.effects then
-		if mv:KeyDown(IN_SPEED) then
+		if mv:KeyDown(IN_SPEED) and ply:OnGround() then
 			if ply.EZarmor.effects.speedBoost then
 				local origSpeed = mv:GetMaxSpeed()
 				local origClientSpeed = mv:GetMaxClientSpeed()

@@ -46,6 +46,7 @@ if(SERVER)then
 	util.AddNetworkString("ABoot_ContainerMenu")
 	util.AddNetworkString("ABoot_VolumeContainerMenu")
 	util.AddNetworkString("ABoot_JumpmodParticles")
+	util.AddNetworkString("ABoot_GroundScannerSync")
 	local defaultHEVdisable = CreateConVar("aboot_disable_hev", "0", FCVAR_ARCHIVE, "Removes the HEV suit from players on spawn and when it's destroyed. \nNo more running around with an invisible HEV suit")
 	local noPowerDraw = CreateConVar("aboot_infinite_power", "0", FCVAR_ARCHIVE, "Disables jump/jet modules drawing internal power, effectivly making their charge infinite")
 	local EZammoPickup = CreateConVar("aboot_ez_ammopickup", "0", FCVAR_ARCHIVE, "Turns HL2 ammo pickups into EZ ammo pickups for the weapon you are holding")
@@ -95,8 +96,18 @@ if(SERVER)then
 		NextMainThink = Time + 0.2
 
 		for _, ply in ipairs(player.GetAll()) do
-
 			if ply.EZarmor and ply.EZarmor.effects then
+				if ply.EZarmor.effects.HEVsuit then
+					local TrackedMachine = ply:GetNW2Entity("EZmachineTracking", nil)
+					if IsValid(TrackedMachine) then
+						if TrackedMachine.Target and IsValid(TrackedMachine.Target) and (TrackedMachine:GetState() > 0) then
+							ply:SetNW2Entity("EZturretTarget", TrackedMachine.Target)
+						else
+							ply:SetNW2Entity("EZturretTarget", nil)
+						end
+					end
+				end
+
 				if ply.EZarmor.effects.jumpmod or ply.EZarmor.effects.jetmod then
 					local val = math.Clamp(ply:GetNW2Float(tag_counter, 3) + FT * 4.5, 0, 3)
 					if ply.charging == nil then
@@ -111,36 +122,42 @@ if(SERVER)then
 						ply:SendLua([[surface.PlaySound("]] .. JModHL2.EZ_JUMPSNDS.READY .. [[")]])
 					end
 
-					if (GetConVar("gmod_suit"):GetBool()) and (ply:GetSuitPower() >= 1) and (val < 3) and not(noPowerDraw:GetBool()) then
+					local AuxPowered = false
+
+					if (val < 3) and not(noPowerDraw:GetBool()) then
+						if (GetConVar("gmod_suit"):GetBool()) and (ply:GetSuitPower() >= 1) then
 						
-						ply.charging = true
-						if (ply:GetSuitPower() >= 1.25) then
-							ply:SetSuitPower(math.Clamp(ply:GetSuitPower() - 5.5 * (FT * 60), 0, 100))
-						else
-							ply.charging = false
+							ply.charging = true
+							if (ply:GetSuitPower() >= 1.25) then
+								ply:SetSuitPower(math.Clamp(ply:GetSuitPower() - 5.5 * (FT * 60), 0, 100))
+								AuxPowered = true
+							else
+								ply.charging = false
+							end
 						end
-					elseif (val < 3) then
 						if NextArmorThink < Time then
 							NextArmorThink = Time + 2
 
-							for id, armorData in pairs(ply.EZarmor.items) do
-								local Info = JMod.ArmorTable[armorData.name]
+							if not AuxPowered then
+								for id, armorData in pairs(ply.EZarmor.items) do
+									local Info = JMod.ArmorTable[armorData.name]
 
-								if Info.eff and (Info.eff.jumpmod or Info.eff.jetmod) and not(noPowerDraw:GetBool()) then
-									
-									if armorData.chrg.power < 1.1 * JMod.Config.Armor.ChargeDepletionMult then
-										JMod.EZarmorWarning(ply, "Jump module is out of charge")
-										ply.charging = false
-									else
-										armorData.chrg.power = math.Clamp(armorData.chrg.power - (1 * JMod.Config.Armor.ChargeDepletionMult), 0, Info.chrg.power)
-										ply.charging = true
-									end
+									if Info.eff and (Info.eff.jumpmod or Info.eff.jetmod) then
+										
+										if armorData.chrg.power < 1.1 * JMod.Config.Armor.ChargeDepletionMult then
+											JMod.EZarmorWarning(ply, "Jump module is out of charge")
+											ply.charging = false
+										else
+											armorData.chrg.power = math.Clamp(armorData.chrg.power - (1 * JMod.Config.Armor.ChargeDepletionMult), 0, Info.chrg.power)
+											ply.charging = true
+										end
 
-									if armorData.chrg.power <= Info.chrg.power * .25 then
-										JMod.EZarmorWarning(ply, "Jump module charge is low ("..tostring(armorData.chrg.power).."/"..tostring(Info.chrg.power)..")")
+										if armorData.chrg.power <= Info.chrg.power * .25 then
+											JMod.EZarmorWarning(ply, "Jump module charge is low ("..tostring(armorData.chrg.power).."/"..tostring(Info.chrg.power)..")")
+										end
+										
+										break
 									end
-									
-									break
 								end
 							end
 						end
@@ -162,6 +179,8 @@ if(SERVER)then
 		["item_ammo_pistol_large"] = {"Pistol Round", 30},
 		["item_ammo_smg1"] = {"Pistol Round", 45},
 		["item_ammo_smg1_large"] = {"Pistol Round", 60},
+		["item_box_buckshot"] = {"Shotgun Round", 20},
+		["item_rpg_round"] = {"RPG Rocket", 1},
 	}
 
 	hook.Add("PlayerCanPickupItem", "JMod_HL2_EZpickup", function(ply, item)
@@ -185,6 +204,17 @@ if(SERVER)then
 
 			return false
 		end]]--
+	end)
+
+	hook.Add("PlayerUse", "JMod_HL2_MachineTracking", function(ply, ent) 
+		if not(IsValid(ply)) or not(IsValid(ent)) or not(ent.IsJackyEZmachine) then return end
+
+		if ent ~= ply:GetNW2Entity("EZmachineTracking", nil) and (JMod.GetEZowner(ent) == ply) and (ent:GetState() > 0) then
+			ply:SetNW2Entity("EZmachineTracking", ent)
+			jprint("Linking to: " .. tostring(ply:GetNW2Entity("EZmachineTracking", nil)))
+		elseif ent == ply:GetNW2Entity("EZmachineTracking", ent) and (ent:GetState() == 0) then
+			ply:SetNW2Entity("EZmachineTracking", nil)
+		end
 	end)
 
 	concommand.Add("aboot_debug", function(ply, cmd, args) 
