@@ -21,28 +21,28 @@ SWEP.BodyHolsterPosL = Vector(5, -10, 4)
 
 SWEP.DefaultBodygroups = "00000000000"
 
-JModHL2.ApplyAmmoSpecs(SWEP, "Magnum Pistol Round", 1.5)
+JModHL2.ApplyAmmoSpecs(SWEP, "Magnum Rifle Round", 1.2)
 SWEP.Force = 25
 SWEP.MuzzleVelocity = 1050 -- projectile or phys bullet muzzle velocity
 -- IN M/S
-SWEP.ChamberSize = 0 -- how many rounds can be chambered.
-SWEP.Primary.ClipSize = 8 -- DefaultClip is automatically set.
-SWEP.ExtendedClipSize = 10
-SWEP.ReducedClipSize = 6
+SWEP.ChamberSize = 1 -- how many rounds can be chambered.
+SWEP.Primary.ClipSize = 4 -- DefaultClip is automatically set.
+SWEP.ExtendedClipSize = 6
+SWEP.ReducedClipSize = 1
 
 SWEP.PhysBulletMuzzleVelocity = 700
 
-SWEP.Recoil = 0.8
+SWEP.Recoil = 2
 SWEP.RecoilSide = 0.2
-SWEP.RecoilRise = 0.5
+SWEP.RecoilRise = 1
 SWEP.MaxRecoilBlowback = -1
-SWEP.VisualRecoilMult = 2
+SWEP.VisualRecoilMult = 5
 SWEP.RecoilPunch = 2
 SWEP.RecoilPunchBackMax = 2
 SWEP.RecoilPunchBackMaxSights = nil -- may clip with scopes
 SWEP.RecoilVMShake = 2.5 -- random viewmodel offset when shooty
 
-SWEP.Delay = 60 / 80 -- 60 / RPM.
+SWEP.Delay = 60 / 10 -- 60 / RPM.
 SWEP.Num = 1 -- number of shots per trigger pull.
 SWEP.Firemodes = {
     {
@@ -58,8 +58,8 @@ SWEP.NPCWeaponType = "weapon_ar2"
 SWEP.NPCWeight = 100
 
 SWEP.AccuracyMOA = 5 -- accuracy in Minutes of Angle. There are 60 MOA in a degree.
-SWEP.HipDispersion = 150 -- inaccuracy added by hip firing.
-SWEP.MoveDispersion = 100
+SWEP.HipDispersion = 350 -- inaccuracy added by hip firing.
+SWEP.MoveDispersion = 200
 SWEP.SightsDispersion = 0
 
 SWEP.ShootVol = 90 -- volume of shoot sound
@@ -156,7 +156,7 @@ SWEP.Animations = {
     ["cycle"] = {
         Source = {"lever"},
 		ShellEjectAt = 0.1,
-		
+		Mult = 1.2,
     },
     ["sgreload_start"] = {
         Source = "reload1",
@@ -175,7 +175,7 @@ sound.Add({
 	channel = CHAN_WEAPON,
 	volume = 1,
 	level = SNDLVL_GUNFIRE,
-	pitch = {97, 103},
+	pitch = {70, 90},
 	sound = {
 		"weapon/annabelle/annabelle_fire_player_01.wav",
 		"weapon/annabelle/annabelle_fire_player_02.wav",

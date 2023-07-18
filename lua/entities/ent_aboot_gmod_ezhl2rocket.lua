@@ -10,7 +10,7 @@ ENT.AdminSpawnable = false
 ENT.CollisionGroup = COLLISION_GROUP_NONE
 ENT.NoPhys = true
 ENT.IsEZrocket = true
-local ThinkRate = 33 --Hz
+local ThinkRate = 66 --Hz
 
 ---
 if SERVER then
@@ -146,7 +146,7 @@ if SERVER then
 			self:SetAngles(AngleToBe)
 			local RandomDir = VectorRand() * 2000
 			if self.Guided then
-				local NewDir = (OwnerTr.HitPos - self:GetPos()):GetNormalized() * 1200
+				local NewDir = (OwnerTr.HitPos - self:GetPos()):GetNormalized() * 600
 				self.CurVel = self.CurVel + NewDir / ThinkRate
 			else
 				self.CurVel = self.CurVel + (physenv.GetGravity() + RandomDir) / ThinkRate * .2
