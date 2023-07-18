@@ -1055,12 +1055,12 @@ if(SERVER)then
 		end
 
 		if yaw ~= nil then
-			if yaw > 40 then
-				yaw = 40
+			if yaw > 60 then
+				yaw = 60
 			end
 
-			if yaw < -40 then
-				yaw = -40
+			if yaw < -60 then
+				yaw = -60
 			end
 
 			self:SetAimYaw(yaw)
