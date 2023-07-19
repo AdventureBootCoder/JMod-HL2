@@ -46,7 +46,6 @@ if(SERVER)then
 	util.AddNetworkString("ABoot_ContainerMenu")
 	util.AddNetworkString("ABoot_VolumeContainerMenu")
 	util.AddNetworkString("ABoot_JumpmodParticles")
-	util.AddNetworkString("ABoot_GroundScannerSync")
 	local defaultHEVdisable = CreateConVar("aboot_disable_hev", "0", FCVAR_ARCHIVE, "Removes the HEV suit from players on spawn and when it's destroyed. \nNo more running around with an invisible HEV suit")
 	local noPowerDraw = CreateConVar("aboot_infinite_power", "0", FCVAR_ARCHIVE, "Disables jump/jet modules drawing internal power, effectivly making their charge infinite")
 	local EZammoPickup = CreateConVar("aboot_ez_ammopickup", "0", FCVAR_ARCHIVE, "Turns HL2 ammo pickups into EZ ammo pickups for the weapon you are holding")
@@ -208,6 +207,11 @@ if(SERVER)then
 
 	hook.Add("PlayerUse", "JMod_HL2_MachineTracking", function(ply, ent) 
 		if not(IsValid(ply)) or not(IsValid(ent)) or not(ent.IsJackyEZmachine) then return end
+		if not(ply:Alive() and ply.EZarmor and ply.EZarmor.effects and ply.EZarmor.effects.HEVsuit) then 
+			ply:SetNW2Entity("EZmachineTracking", nil) 
+			
+			return 
+		end
 
 		if ent ~= ply:GetNW2Entity("EZmachineTracking", nil) and (JMod.GetEZowner(ent) == ply) and (ent:GetState() > 0) then
 			ply:SetNW2Entity("EZmachineTracking", ent)
