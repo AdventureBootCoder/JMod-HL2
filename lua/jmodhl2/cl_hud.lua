@@ -3,10 +3,10 @@ local tag_counter = tag .. "_counter"
 
 local shouldshow = CreateClientConVar(tag .. "_hud", "1")
 local SCR_W, SCR_H = ScrW(), ScrH()
-local x_offset = CreateClientConVar(tag .. "_hud_x", 0.305, true)
-local y_offset = CreateClientConVar(tag .. "_hud_y", 0.975, true)
-local x_info_offset = CreateClientConVar("aboot_machine_info_hud_x", 0.02, true)
-local y_info_offset = CreateClientConVar("aboot_machine_info_hud_y", 0.5, true)
+local x_offset = CreateClientConVar(tag .. "_hud_x_frac", 0.305, true)
+local y_offset = CreateClientConVar(tag .. "_hud_y_frac", 0.975, true)
+local x_info_offset = CreateClientConVar("aboot_machine_info_hud_x_frac", 0.02, true)
+local y_info_offset = CreateClientConVar("aboot_machine_info_hud_y_frac", 0.8, true)
 local BAR_WIDTH, BAR_HEIGHT, MARGIN = 0.0075, 0.065, 0.002
 local BLACK, BAR_COL_FULL, BAR_COL_EMPTY = Color(0, 0, 0, 80), Color(255, 236, 12, 240), Color(255, 0, 0, 105)
 local JET_COL_FULL, JET_COL_EMPTY = Color(0, 139, 173, 240), Color(200, 0, 0, 105)
@@ -128,10 +128,12 @@ local angle_origin = Angle(0, 0, 0)
 local ExtraHeight = Vector(0, 0, 5)
 
 local function TablesEqual(tbl1, tbl2)
+	local SamePositions = true
 	for k, v in ipairs(tbl1) do
-		if v.pos ~= tbl2[k].pos then return false end
+		if v.pos ~= tbl2[k].pos then SamePositions = false break end
 	end
-	return not table.IsEmpty(tbl1)
+	if table.IsEmpty(tbl1) then SamePositions = false end
+	return SamePositions
 end
 
 hook.Add("PostDrawTranslucentRenderables", "JMod_HL2_TRANSREND", function()
@@ -141,17 +143,21 @@ hook.Add("PostDrawTranslucentRenderables", "JMod_HL2_TRANSREND", function()
 			local TrackedEnt = Ply:GetNW2Entity("EZmachineTracking", nil)
 			if IsValid(TrackedEnt) and TrackedEnt.ScanResults then
 				if not(TablesEqual(LastTable, TrackedEnt.ScanResults)) then
-					print("These tables are not the same")
+					--print("These tables are not the same")
 					LastTable = table.Copy(TrackedEnt.ScanResults)
 					OldPos = TrackedEnt:GetPos()
 					OldAng = TrackedEnt:GetAngles()
+					OldAng:RotateAroundAxis(OldAng:Right(), -90)
+					OldAng:RotateAroundAxis(OldAng:Up(), 90)
 				end
-				local Pos, Ang = OldPos, OldAng
-				Ang:RotateAroundAxis(Ang:Right(), -90)
-				Ang:RotateAroundAxis(Ang:Up(), 90)
+
+				--local Pos, Ang = TrackedEnt:GetPos(), TrackedEnt:GetAngles()
+				--Ang:RotateAroundAxis(Ang:Right(), -90)
+				--Ang:RotateAroundAxis(Ang:Up(), 90)
+
 				for k, v in ipairs(LastTable) do
 					if (v.typ ~= "ANOMALY") and (v.typ ~= "DANGER") and (v.typ ~= "SMILEY") then
-						local NewPos, NewAng = LocalToWorld(Pos, Ang, v.pos, angle_origin)
+						local NewPos, NewAng = LocalToWorld(v.pos, angle_origin, OldPos, OldAng)
 						JMod.HoloGraphicDisplay(nil, NewPos, Angle(0, 0, 0), 1, 30000, function()
 							JMod.StandardResourceDisplay(v.typ, v.amt or v.rate, nil, 0, 0, v.siz * 2, true, nil, nil, v.rate)
 						end)
