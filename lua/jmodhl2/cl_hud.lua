@@ -151,10 +151,6 @@ hook.Add("PostDrawTranslucentRenderables", "JMod_HL2_TRANSREND", function()
 					OldAng:RotateAroundAxis(OldAng:Up(), 90)
 				end
 
-				--local Pos, Ang = TrackedEnt:GetPos(), TrackedEnt:GetAngles()
-				--Ang:RotateAroundAxis(Ang:Right(), -90)
-				--Ang:RotateAroundAxis(Ang:Up(), 90)
-
 				for k, v in ipairs(LastTable) do
 					if (v.typ ~= "ANOMALY") and (v.typ ~= "DANGER") and (v.typ ~= "SMILEY") then
 						local NewPos, NewAng = LocalToWorld(v.pos, angle_origin, OldPos, OldAng)

@@ -237,7 +237,7 @@ sound.Add({
 
 --RPG
 
-sound.Add({
+--[[sound.Add({
 	name = "grenade_tow.TrailLoop",
 	channel = CHAN_WEAPON,
 	pitch = 105,
@@ -496,12 +496,12 @@ sound.Add({
 	pitch = math.random(96, 104),
 	soundlevel = SNDLVL_GUNFIRE,
 	sound = "^weapons/mp5/single_npc.wav",
-})
+})]]--
 
 --Shotgun
 
 
-sound.Add({
+--[[sound.Add({
 	name = "weapon_shotgun.Double2",
 	channel = CHAN_WEAPON,
 	volume = 0.9,
@@ -590,4 +590,4 @@ sound.Add({
 	volume = 0.9,
 	soundlevel = SNDLVL_NORM,
 	sound = ")weapons/crowbar/melee_hit"..math.random(1,3)..".wav",
-})
+})]]--
