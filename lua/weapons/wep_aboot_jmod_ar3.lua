@@ -5,6 +5,7 @@ SWEP.AdminOnly = false
 SWEP.PrintName = "Pulse LMG"
 SWEP.Slot = 4
 
+--SWEP.ViewModel = "models/weapons/aboot/tfa_mmod/c_ar3.mdl"
 SWEP.ViewModel = "models/weapons/aboot/c_iiopnar3.mdl"
 SWEP.WorldModel = "models/weapons/aboot/tfa_mmod/w_ar3.mdl"
 SWEP.ViewModelFOV = 60
@@ -156,6 +157,12 @@ SWEP.Animations = {
     ["idle"] = {
         Source = "idle",
     },
+	["ready"] = {
+        Source = "pickup",
+        LHIK = true,
+        LHIKIn = 0,
+        LHIKOut = 0.5,
+    },
     ["draw"] = {
         Source = "IR_draw",
         LHIK = true,
@@ -180,7 +187,6 @@ SWEP.Animations = {
     ["reload"] = {
         Source = "reload",
 		TPAnim = ACT_HL2MP_GESTURE_RELOAD_DUEL,
-        
     },
 }
 
