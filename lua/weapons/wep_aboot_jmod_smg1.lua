@@ -17,8 +17,8 @@ SWEP.DefaultBodygroups = "00000000000"
 
 SWEP.CustomToggleCustomizeHUD = false
 
-SWEP.Damage = 11
-SWEP.DamageMin = 4
+--SWEP.Damage = 11
+--SWEP.DamageMin = 4
 
 SWEP.Range = 45 -- in METRES
 SWEP.RangeMin = 25
@@ -70,6 +70,8 @@ SWEP.Secondary.Sound		= Sound( "Weapon_SMG1.Double" )
 SWEP.MagID = "smg1" -- the magazine pool this gun draws from
 SWEP.Secondary.DefaultClip = 1
 
+JModHL2.ApplyAmmoSpecs(SWEP, "Pistol Round", 1.1)
+
 SWEP.ShootVol = 80 -- volume of shoot sound
 SWEP.ShootPitch = 100 -- pitch of shoot sound
 
@@ -105,14 +107,6 @@ SWEP.TracerNum = 1 -- tracer every X
 SWEP.TracerFinalMag = 0 -- the last X bullets in a magazine are all tracers
 SWEP.Tracer = "arccw_tracer" -- override tracer (hitscan) effect
 SWEP.HullSize = 0 -- HullSize used by FireBullets
-
-SWEP.BodyDamageMults = {
-    [HITGROUP_HEAD] = 1.2,
-	[HITGROUP_LEFTLEG] = 0.9,
-	[HITGROUP_RIGHTLEG] = 0.9,
-	[HITGROUP_LEFTARM] = 1,
-	[HITGROUP_RIGHTARM] = 1,
- }
 
 SWEP.IronSightStruct = {
     Pos = Vector( -4.7, -4, 2 ),

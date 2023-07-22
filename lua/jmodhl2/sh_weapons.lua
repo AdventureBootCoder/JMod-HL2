@@ -130,6 +130,7 @@ hook.Add("Initialize", "JMod_LoadAdditionalWeaponEntities", JModHL2.LoadAddition
 --JModHL2.LoadAdditionalWeaponEntities()
 
 function JModHL2.GetAmmoSpecs(typ)
+	if JMod.GetAmmoSpecs and JMod.GetAmmoSpecs(typ) then return JMod.GetAmmoSpecs(typ) end
 	if not JModHL2.AmmoTable[typ] then return nil end
 	local Result, BaseType = table.FullCopy(JModHL2.AmmoTable[typ]), string.Split(typ, "-")[1]
 

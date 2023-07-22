@@ -17,8 +17,8 @@ SWEP.ProceduralIronFire = true
 SWEP.DefaultBodygroups = "00000000000"
 SWEP.CustomToggleCustomizeHUD = false
 
-SWEP.Damage = 9
-SWEP.DamageMin = 3
+--SWEP.Damage = 9
+--SWEP.DamageMin = 3
 
 SWEP.Range = 50 -- in METRES
 SWEP.RangeMin = 20
@@ -26,6 +26,9 @@ SWEP.Penetration = 4
 SWEP.DamageType = DMG_BULLET
 SWEP.ShootEntity = nil -- entity to fire, if any
 SWEP.MuzzleVelocity = 1050 -- projectile or phys bullet muzzle velocity
+
+JModHL2.ApplyAmmoSpecs(SWEP, "Pistol Round", 1.2)
+
 -- IN M/S
 SWEP.ChamberSize = 0 -- how many rounds can be chambered.
 SWEP.Primary.ClipSize = 32 -- DefaultClip is automatically set.
@@ -48,6 +51,9 @@ SWEP.RecoilVMShake = 8 -- random viewmodel offset when shooty
 SWEP.Delay = 60 / 900 -- 60 / RPM.
 SWEP.Num = 1 -- number of shots per trigger pull.
 SWEP.Firemodes = {
+	{
+		Mode = 3,
+	},
     {
         Mode = 2,
     },
@@ -185,12 +191,6 @@ sound.Add({
 		"weapon/hmg/hmg_fire_player_04.wav",
 		"weapon/hmg/hmg_fire_player_05.wav",
 		"weapon/hmg/hmg_fire_player_06.wav",
-		"weapon/hmg/hmg_fire_player_07.wav",
-		"weapon/hmg/hmg_fire_player_08.wav",
-		"weapon/hmg/hmg_fire_player_09.wav",
-		"weapon/hmg/hmg_fire_player_10.wav",
-		"weapon/hmg/hmg_fire_player_11.wav",
-		"weapon/hmg/hmg_fire_player_12.wav"
 	}
 })
 
@@ -207,12 +207,6 @@ sound.Add({
 		")weapon/hmg/hmg_fire_player_04.wav",
 		")weapon/hmg/hmg_fire_player_05.wav",
 		")weapon/hmg/hmg_fire_player_06.wav",
-		")weapon/hmg/hmg_fire_player_07.wav",
-		")weapon/hmg/hmg_fire_player_08.wav",
-		")weapon/hmg/hmg_fire_player_09.wav",
-		")weapon/hmg/hmg_fire_player_10.wav",
-		")weapon/hmg/hmg_fire_player_11.wav",
-		")weapon/hmg/hmg_fire_player_12.wav"
 	}
 })
 
