@@ -50,15 +50,19 @@ SWEP.RecoilVMShake = 8 -- random viewmodel offset when shooty
 
 SWEP.Delay = 60 / 900 -- 60 / RPM.
 SWEP.Num = 1 -- number of shots per trigger pull.
+SWEP.FireMode = 2
 SWEP.Firemodes = {
 	{
-		Mode = 3,
+		Mode = -3,
+		PrintName = "BURST"
 	},
     {
         Mode = 2,
+		PrintName = "FULL-AUTO"
     },
     {
         Mode = 1,
+		PrintName = "SEMI-AUTO"
     },
     {
         Mode = 0
@@ -81,8 +85,8 @@ SWEP.MagID = "smg1" -- the magazine pool this gun draws from
 SWEP.ShootVol = 80 -- volume of shoot sound
 SWEP.ShootPitch = 100 -- pitch of shoot sound
 
-SWEP.ShootSound = "Weapon_SMG2.Fire"
-SWEP.DistantShootSound = "Weapon_SMG2.NPC"
+SWEP.ShootSound = "JModHL2_Weapon_SMG2.Fire"
+SWEP.DistantShootSound = "JModHL2_Weapon_SMG2.NPC"
 
 SWEP.MirrorVMWM = false -- Copy the viewmodel, along with all its attachments, to the worldmodel. Super convenient!
 SWEP.MirrorWorldModel = true -- Use this to set the mirrored viewmodel to a different model, without any floating speedloaders or cartridges you may have. Needs MirrorVMWM
@@ -179,7 +183,7 @@ SWEP.Animations = {
 }
 
 sound.Add({
-	name = "Weapon_SMG2.Fire",
+	name = "JModHL2_Weapon_SMG2.Fire",
 	channel = CHAN_WEAPON,
 	volume = 0.8,
 	level = SNDLVL_GUNFIRE,
@@ -195,7 +199,7 @@ sound.Add({
 })
 
 sound.Add({
-	name = "Weapon_SMG2.NPC",
+	name = "JModHL2_Weapon_SMG2.NPC",
 	channel = CHAN_STATIC,
 	volume = 0.1,
 	level = 140,

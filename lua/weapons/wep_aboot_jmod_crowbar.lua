@@ -72,10 +72,10 @@ SWEP.SprintAng = Angle( -11.0898, 9.5787, -10.7118 )
 
 SWEP.BarrelLength = 0
 
-SWEP.MeleeSwingSound = "Weapon_HEV.Crowbar_Swing"
-SWEP.MeleeMissSound = "Weapon_Crowbar.Melee_Miss2"
-SWEP.MeleeHitSound = "Weapon_Crowbar.Melee_Hit2"
-SWEP.MeleeHitNPCSound = "Weapon_Crowbar.Melee_Hit2"
+SWEP.MeleeSwingSound = "JMod_Weapon_HEV.Crowbar_Swing"
+SWEP.MeleeMissSound = "JMod_Weapon_Crowbar.Melee_Miss2"
+SWEP.MeleeHitSound = "JMod_Weapon_Crowbar.Melee_Hit2"
+SWEP.MeleeHitNPCSound = "JMod_Weapon_Crowbar.Melee_Hit2"
 
 SWEP.IronSightStruct = false
 
@@ -266,7 +266,7 @@ function SWEP:MeleeAttack(melee2)
 end
 
 sound.Add({
-	name = "Weapon_Crowbar.Melee_Miss2",
+	name = "JMod_Weapon_Crowbar.Melee_Miss2",
 	channel = CHAN_WEAPON,
 	level = 79,
 	volume = 0.6,
@@ -278,7 +278,7 @@ sound.Add({
 	}
 })
 sound.Add({
-	name = "Weapon_Crowbar.Melee_Hit2",
+	name = "JMod_Weapon_Crowbar.Melee_Hit2",
 	channel = CHAN_STATIC,
 	level = 60,
 	volume = 0.75,
@@ -294,7 +294,7 @@ sound.Add({
 })
 
 sound.Add({
-	name = "Weapon_HEV.Crowbar_Draw",
+	name = "JMod_Weapon_HEV.Crowbar_Draw",
 	channel = CHAN_STATIC,
 	level = 60,
 	volume = 0.75,
@@ -305,7 +305,7 @@ sound.Add({
 	}
 })
 sound.Add({
-	name = "Weapon_HEV.Crowbar_Swing",
+	name = "JMod_Weapon_HEV.Crowbar_Swing",
 	channel = CHAN_WEAPON,
 	level = 79,
 	volume = 0.6,

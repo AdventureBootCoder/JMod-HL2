@@ -222,12 +222,6 @@ sound.Add({
 		"weapon/oicw/oicw_fire_player_04.wav",
 		"weapon/oicw/oicw_fire_player_05.wav",
 		"weapon/oicw/oicw_fire_player_06.wav",
-		"weapon/oicw/oicw_fire_player_07.wav",
-		"weapon/oicw/oicw_fire_player_08.wav",
-		"weapon/oicw/oicw_fire_player_09.wav",
-		"weapon/oicw/oicw_fire_player_10.wav",
-		"weapon/oicw/oicw_fire_player_11.wav",
-		"weapon/oicw/oicw_fire_player_12.wav"
 	}
 })
 sound.Add({
@@ -256,12 +250,6 @@ sound.Add({
 		")weapon/oicw/oicw_fire_player_04.wav",
 		")weapon/oicw/oicw_fire_player_05.wav",
 		")weapon/oicw/oicw_fire_player_06.wav",
-		")weapon/oicw/oicw_fire_player_07.wav",
-		")weapon/oicw/oicw_fire_player_08.wav",
-		")weapon/oicw/oicw_fire_player_09.wav",
-		")weapon/oicw/oicw_fire_player_10.wav",
-		")weapon/oicw/oicw_fire_player_11.wav",
-		")weapon/oicw/oicw_fire_player_12.wav"
 	}
 })
 
