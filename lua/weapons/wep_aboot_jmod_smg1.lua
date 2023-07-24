@@ -60,12 +60,12 @@ SWEP.Firemodes = {
 SWEP.NPCWeaponType = "weapon_smg1"
 SWEP.NPCWeight = 80
 
-SWEP.AccuracyMOA = 5 -- accuracy in Minutes of Angle. There are 60 MOA in a degree.
+SWEP.AccuracyMOA = 6 -- accuracy in Minutes of Angle. There are 60 MOA in a degree.
 SWEP.HipDispersion = 500 -- inaccuracy added by hip firing.
 SWEP.MoveDispersion = 100
 SWEP.SightsDispersion = 100
 
-SWEP.Primary.Ammo = "smg1" -- what ammo type the gun uses
+--SWEP.Primary.Ammo = "smg1" -- what ammo type the gun uses
 SWEP.Secondary.Ammo			= "SMG1_Grenade"
 SWEP.Secondary.Sound		= Sound( "Weapon_SMG1.Double" )
 SWEP.MagID = "smg1" -- the magazine pool this gun draws from
@@ -154,6 +154,10 @@ SWEP.Attachments = {
         DefaultAttName = "DISABLED",
         Installed = "ubgl_hl2_gl",
     },
+	{
+		PrintName = "Perk",
+		Slot = "perk"
+	},
 }
 
 SWEP.Animations = {

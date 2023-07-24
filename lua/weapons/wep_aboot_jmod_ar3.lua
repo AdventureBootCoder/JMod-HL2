@@ -17,6 +17,7 @@ SWEP.WorldModelOffset = {
 SWEP.MirrorVMWM = false -- Copy the viewmodel, along with all its attachments, to the worldmodel. Super convenient!
 SWEP.MirrorWorldModel = true -- Use this to set the mirrored viewmodel to a different model, without any floating speedloaders or cartridges you may have. Needs MirrorVMWM
 SWEP.DefaultBodygroups = "00000000000"
+SWEP.CustomToggleCustomizeHUD = false
 
 SWEP.BodyHolsterSlot = "back"
 SWEP.BodyHolsterAng = Angle(10, 10, 0)
@@ -150,7 +151,21 @@ SWEP.AttachmentElements = {
 SWEP.ExtraSightDist = 10
 
 SWEP.Attachments = {
-
+	{
+        PrintName = "Underbarrel",
+        Slot = {"bipod"},
+        Bone = "Base",
+        Offset = {
+            vpos = Vector(0, 0, -1),
+            vang = Angle(0, 90, 0),
+            wpos = Vector(14.329, 1.5, -3.453),
+            wang = Angle(-6, 0, 180)
+        },
+    },
+	{
+		PrintName = "Perk",
+		Slot = "perk"
+	},
 }
 
 SWEP.Animations = {

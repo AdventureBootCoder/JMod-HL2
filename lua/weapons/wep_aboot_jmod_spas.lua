@@ -28,6 +28,8 @@ SWEP.DoorBreachPower = 1.5
 SWEP.DefaultBodygroups = "00000000000"
 
 JModHL2.ApplyAmmoSpecs(SWEP, "Shotgun Round", 1.2)
+SWEP.IsShotgun = true
+
 SWEP.Force = 12
 SWEP.MuzzleVelocity = 1050 -- projectile or phys bullet muzzle velocity
 -- IN M/S
@@ -155,7 +157,27 @@ SWEP.Attachments = {
 			wmin=Vector(5.36, 0.739, -5.401),
 			wmax=Vector(5.36, 0.739, -5.401),
 		}]]--
-	}
+	},
+	{
+		PrintName = "Ammo Type",
+		Slot = "ammo_shotgun"
+	},
+	{
+		PrintName = "Perk",
+		Slot = "perk"
+	},
+	{
+		PrintName = "Charm",
+		Slot = "charm",
+		FreeSlot = true,
+		Bone = "Base",
+		Offset = {
+			vpos = Vector(-0.5, -4.286, -2), -- offset that the attachment will be relative to the bone
+			vang = Angle(-90, 0, -90),
+			wpos = Vector(4, 1.5, -3),
+			wang = Angle(0, -4.211, 180)
+		},
+	},
 }
 
 SWEP.Animations = {

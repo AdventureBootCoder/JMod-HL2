@@ -27,8 +27,6 @@ SWEP.DamageType = DMG_BULLET
 SWEP.ShootEntity = nil -- entity to fire, if any
 SWEP.MuzzleVelocity = 1050 -- projectile or phys bullet muzzle velocity
 
-JModHL2.ApplyAmmoSpecs(SWEP, "Pistol Round", 1.2)
-
 -- IN M/S
 SWEP.ChamberSize = 0 -- how many rounds can be chambered.
 SWEP.Primary.ClipSize = 32 -- DefaultClip is automatically set.
@@ -52,14 +50,14 @@ SWEP.Delay = 60 / 900 -- 60 / RPM.
 SWEP.Num = 1 -- number of shots per trigger pull.
 SWEP.FireMode = 2
 SWEP.Firemodes = {
-	{
-		Mode = -3,
-		PrintName = "BURST"
-	},
     {
         Mode = 2,
 		PrintName = "FULL-AUTO"
     },
+	{
+		Mode = -3,
+		PrintName = "BURST"
+	},
     {
         Mode = 1,
 		PrintName = "SEMI-AUTO"
@@ -75,12 +73,14 @@ SWEP.NPCWeight = 100
 SWEP.Force = 4
 
 SWEP.AccuracyMOA = 5 -- accuracy in Minutes of Angle. There are 60 MOA in a degree.
-SWEP.HipDispersion = 600 -- inaccuracy added by hip firing.
+SWEP.HipDispersion = 500 -- inaccuracy added by hip firing.
 SWEP.MoveDispersion = 100
-SWEP.SightsDispersion = 100
+SWEP.SightsDispersion = 80
 
-SWEP.Primary.Ammo = "smg1" -- what ammo type the gun uses
-SWEP.MagID = "smg1" -- the magazine pool this gun draws from
+--SWEP.Primary.Ammo = "smg1" -- what ammo type the gun uses
+SWEP.MagID = "mp5k" -- the magazine pool this gun draws from
+
+JModHL2.ApplyAmmoSpecs(SWEP, "Pistol Round", 1.2)
 
 SWEP.ShootVol = 80 -- volume of shoot sound
 SWEP.ShootPitch = 100 -- pitch of shoot sound
@@ -154,7 +154,10 @@ SWEP.AttachmentElements = {
 SWEP.ExtraSightDist = 10
 
 SWEP.Attachments = {
-
+	{
+		PrintName = "Perk",
+		Slot = "perk"
+	},
 }
 
 SWEP.Animations = {

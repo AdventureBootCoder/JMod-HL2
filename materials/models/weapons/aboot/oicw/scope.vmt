@@ -1,0 +1,6 @@
+VertexLitGeneric
+{
+	$basetexture 		"models\Weapons\aboot\OICW\scope"
+	$envmap			env_cubemap
+	$envmaptint 		"[0.4 1 0.4]"
+}
