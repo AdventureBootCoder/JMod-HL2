@@ -1,17 +1,12 @@
-SWEP.Base = "arccw_base"
+SWEP.Base = "wep_jack_gmod_gunbase"
 SWEP.Spawnable = false
 SWEP.Category = "ArcCW - Half-Life" -- edit this if you like
 SWEP.AdminOnly = false
-
 SWEP.PrintName = "OICW"
-
-SWEP.Slot = 2
-
-SWEP.UseHands = true
-
-SWEP.ViewModel = "models/weapons/oicw/c_oicw.mdl"
-SWEP.WorldModel = "models/weapons/oicw/w_oicw.mdl"
-SWEP.ViewModelFOV = 60
+SWEP.Slot = 3
+SWEP.ViewModel = "models/weapons/aboot/oicw/c_oicw.mdl"
+SWEP.WorldModel = "models/weapons/aboot/oicw/w_oicw.mdl"
+SWEP.ViewModelFOV = 70
 SWEP.MirrorVMWM = true
 SWEP.WorldModelOffset = {
     pos = Vector(10, 1, -3),
@@ -19,16 +14,9 @@ SWEP.WorldModelOffset = {
 }
 
 SWEP.DefaultBodygroups = "00000000000"
+JModHL2.ApplyAmmoSpecs(SWEP, "Light Rifle Round", 1.2)
 
-SWEP.Damage = 12
-SWEP.DamageMin = 8
-
-SWEP.BodyDamageMults = {
-    [HITGROUP_HEAD] = 1.4,
- }
- 
- SWEP.Force = 12
- 
+SWEP.Force = 12
 SWEP.Range = 100 -- in METRES
 SWEP.RangeMin = 60
 SWEP.Penetration = 8
@@ -42,7 +30,6 @@ SWEP.ExtendedClipSize = 40
 SWEP.ReducedClipSize = 20
 
 SWEP.PhysBulletMuzzleVelocity = 700
-
 
 SWEP.Recoil = 0.15
 SWEP.RecoilSide = 0.1
@@ -115,7 +102,7 @@ SWEP.TracerNum = 1 -- tracer every X
 SWEP.TracerFinalMag = 0 -- the last X bullets in a magazine are all tracers
 SWEP.Tracer = "arccw_tracer" -- override tracer (hitscan) effect
 SWEP.HullSize = 0 -- HullSize used by FireBullets
-SWEP.TracerCol = Color(120, 255, 0)
+SWEP.TracerCol = Color(148, 250, 32)
 SWEP.PhysTracerProfile = 2
 
 
@@ -123,7 +110,8 @@ SWEP.IronSightStruct = {
     Pos = Vector( -2, 2, 3 ),
     Ang = Angle( 2, 0, 0 ),
     Magnification = 2,
-    SwitchToSound = "", -- sound that plays when switching to this sight
+    SwitchToSound = JMod.GunHandlingSounds.aim.inn,
+	SwitchFromSound = JMod.GunHandlingSounds.aim.out,
     CrosshairInSights = true
 }
 
@@ -152,6 +140,22 @@ SWEP.CustomizeAng = Angle(15, 60, 30)
 SWEP.BarrelLength = 24
 
 SWEP.Attachments = {
+	{
+		PrintName = "Optic",
+		DefaultAttName = "No Scope",
+		Slot = {"ez_optic", "oicw_optic"},
+		Bone = "OICW_weapon",
+		Offset = {
+			vang = Angle(0, 0, 270),
+			vpos = Vector(-2.9, -2.75, 0),
+			wpos = Vector(0, 0, -0),
+			wang = Angle(0, 0, 0)
+		},
+		CorrectiveAng = Angle(0, 180, 0),
+		CorrectivePos = Vector(7, 0, -0.2),
+		-- remove Slide because it ruins my life
+		Installed = "optic_aboot_scope_oicw"
+	},
     {
         PrintName = "Grenade Launcher",
         Slot = {"hl2_oicw_gl"},

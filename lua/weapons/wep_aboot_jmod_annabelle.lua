@@ -2,7 +2,7 @@ SWEP.Base = "wep_jack_gmod_gunbase"
 SWEP.Spawnable = false
 SWEP.Category = "JMod: Half-Life - ArcCW" -- edit this if you like
 SWEP.AdminOnly = false
-SWEP.PrintName = "Annabelle"
+SWEP.PrintName = "EZ Thumper Gun"
 SWEP.Slot = 3
 
 SWEP.ViewModel = "models/weapons/annabelle/c_annabelle.mdl"
@@ -22,20 +22,20 @@ SWEP.BodyHolsterPosL = Vector(5, -10, 4)
 SWEP.DefaultBodygroups = "00000000000"
 
 JModHL2.ApplyAmmoSpecs(SWEP, "Magnum Rifle Round", 1.2)
-SWEP.Force = 25
+SWEP.Force = 30
 SWEP.MuzzleVelocity = 1050 -- projectile or phys bullet muzzle velocity
 -- IN M/S
 SWEP.ChamberSize = 1 -- how many rounds can be chambered.
-SWEP.Primary.ClipSize = 4 -- DefaultClip is automatically set.
-SWEP.ExtendedClipSize = 6
-SWEP.ReducedClipSize = 1
+SWEP.Primary.ClipSize = 6 -- DefaultClip is automatically set.
+SWEP.ExtendedClipSize = 8
+SWEP.ReducedClipSize = 4
 
-SWEP.PhysBulletMuzzleVelocity = 700
+SWEP.PhysBulletMuzzleVelocity = 800
 
 SWEP.Recoil = 2
 SWEP.RecoilSide = 0.2
-SWEP.RecoilRise = 1
-SWEP.MaxRecoilBlowback = -1
+SWEP.RecoilRise = 1.5
+SWEP.MaxRecoilBlowback = 1
 SWEP.VisualRecoilMult = 5
 SWEP.RecoilPunch = 2
 SWEP.RecoilPunchBackMax = 2
@@ -59,7 +59,7 @@ SWEP.NPCWeight = 100
 
 SWEP.AccuracyMOA = 5 -- accuracy in Minutes of Angle. There are 60 MOA in a degree.
 SWEP.HipDispersion = 350 -- inaccuracy added by hip firing.
-SWEP.MoveDispersion = 200
+SWEP.MoveDispersion = 300
 SWEP.SightsDispersion = 0
 
 SWEP.ShootVol = 90 -- volume of shoot sound
@@ -175,7 +175,7 @@ sound.Add({
 	channel = CHAN_WEAPON,
 	volume = 1,
 	level = SNDLVL_GUNFIRE,
-	pitch = {70, 90},
+	pitch = {60, 80},
 	sound = {
 		"weapon/annabelle/annabelle_fire_player_01.wav",
 		"weapon/annabelle/annabelle_fire_player_02.wav",
@@ -188,7 +188,7 @@ sound.Add({
 	channel = CHAN_STATIC,
 	volume = 0.3,
 	level = 140,
-	pitch = {80, 90},
+	pitch = {70, 90},
 	sound = {
 		")weapon/annabelle/annabelle_fire_player_01.wav",
 		")weapon/annabelle/annabelle_fire_player_02.wav",

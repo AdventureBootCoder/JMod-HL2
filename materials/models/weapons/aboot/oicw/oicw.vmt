@@ -15,5 +15,5 @@ VertexLitGeneric
 	"$envmaptint"		"[0.1 0.1 0.1]"
 	"$normalmapalphaenvmapmask"	"1"
 
-	$detail "models/APCnew/detail_metal"
+//	$detail "models/APCnew/detail_metal"
 }
