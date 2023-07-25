@@ -3,7 +3,7 @@ SWEP.Spawnable = false
 SWEP.Category = "ArcCW - Half-Life" -- edit this if you like
 SWEP.AdminOnly = false
 SWEP.PrintName = "OICW"
-SWEP.Slot = 3
+SWEP.Slot = 2
 SWEP.ViewModel = "models/weapons/aboot/oicw/c_oicw.mdl"
 SWEP.WorldModel = "models/weapons/aboot/oicw/w_oicw.mdl"
 SWEP.ViewModelFOV = 70
@@ -16,11 +16,6 @@ SWEP.WorldModelOffset = {
 SWEP.DefaultBodygroups = "00000000000"
 JModHL2.ApplyAmmoSpecs(SWEP, "Light Rifle Round", 1.2)
 
-SWEP.Force = 12
-SWEP.Range = 100 -- in METRES
-SWEP.RangeMin = 60
-SWEP.Penetration = 8
-SWEP.DamageType = DMG_BULLET
 SWEP.ShootEntity = nil -- entity to fire, if any
 SWEP.MuzzleVelocity = 1050 -- projectile or phys bullet muzzle velocity
 -- IN M/S
@@ -66,7 +61,6 @@ SWEP.HipDispersion = 300 -- inaccuracy added by hip firing.
 SWEP.MoveDispersion = 100
 SWEP.SightsDispersion = 50
 
-SWEP.Primary.Ammo = "ar2" -- what ammo type the gun uses
 SWEP.MagID = "OICW" -- the magazine pool this gun draws from
 
 SWEP.ShootVol = 80 -- volume of shoot sound
@@ -116,8 +110,8 @@ SWEP.IronSightStruct = {
 }
 
 SWEP.HoldtypeHolstered = "passive"
-SWEP.HoldtypeActive = "ar2"
-SWEP.HoldtypeSights = "rpg"
+SWEP.HoldtypeActive = "shotgun"
+SWEP.HoldtypeSights = "ar2"
 
 SWEP.AnimShoot = ACT_HL2MP_GESTURE_RANGE_ATTACK_AR2
 
@@ -148,8 +142,8 @@ SWEP.Attachments = {
 		Offset = {
 			vang = Angle(0, 0, 270),
 			vpos = Vector(-2.9, -2.75, 0),
-			wpos = Vector(0, 0, -0),
-			wang = Angle(0, 0, 0)
+			wpos = Vector(6, 1, -8),
+			wang = Angle(-5, 180, 180)
 		},
 		CorrectiveAng = Angle(0, 180, 0),
 		CorrectivePos = Vector(7, 0, -0.2),
@@ -189,6 +183,10 @@ SWEP.Animations = {
     },
     ["reload"] = {
         Source = "reload",
+        TPAnim = ACT_HL2MP_GESTURE_RELOAD_AR2,
+    },
+	["altreload"] = {
+        Source = "reloadsecondary",
         TPAnim = ACT_HL2MP_GESTURE_RELOAD_AR2,
     },
     ["gl_fire"] = {

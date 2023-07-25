@@ -93,7 +93,7 @@ JModHL2.AmmoTable = {
 		tracer = "tfa_mmod_tracer_ar3",
 		dmgtype = DMG_AIRBOAT
 	},
-	["20mm Grenade"] = {
+	["25mm Grenade"] = {
 		resourcetype = "munitions",
 		carrylimit = 12,
 		basedmg = 80,

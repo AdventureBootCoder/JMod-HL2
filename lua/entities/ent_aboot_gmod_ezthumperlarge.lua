@@ -20,11 +20,11 @@ ENT.SpawnHeight = 0
 ENT.EZcolorable = false
 ENT.EZupgradable = true
 ENT.StaticPerfSpecs = {
-	MaxDurability = 350,
+	MaxDurability = 380,
 	MaxElectricity = 800
 }
 ENT.DynamicPerfSpecs = {
-	Armor = 2.5
+	Armor = 2
 }
 ENT.BackupRecipe = {[JMod.EZ_RESOURCE_TYPES.BASICPARTS] = 100}
 --
@@ -213,7 +213,7 @@ if(SERVER)then
 					-- If it's a flow (i.e. water)
 					if JMod.NaturalResourceTable[self.DepositKey].rate then
 						-- We get the rate
-						local flowRate = JMod.NaturalResourceTable[self.DepositKey].rate
+						local flowRate = JMod.NaturalResourceTable[self.DepositKey].rate * JMod.Config.ResourceEconomy.ExtractionSpeed
 						-- and set the progress to what it was last tick + our ability * the flowrate
 						self:SetProgress(self:GetProgress() + pumpRate * flowRate)
 

@@ -20,17 +20,17 @@ att.MountPositionOverride = 0
 
 att.UBGL = true
 
-att.UBGL_PrintName = "M203"
+att.UBGL_PrintName = "XM-98"
 att.UBGL_Automatic = true
 att.UBGL_MuzzleEffect = "muzzleflash_m79"
 att.UBGL_ClipSize = 4
-att.UBGL_Ammo = "smg1_grenade"
+att.UBGL_Ammo = "25mm Grenade"
 att.UBGL_RPM = 85
 att.UBGL_Recoil = 2
 att.UBGL_Capacity = 4
 
 local function Ammo(wep)
-    return wep.Owner:GetAmmoCount("smg1_grenade")
+    return wep.Owner:GetAmmoCount("25mm Grenade")
 end
 
 att.UBGL_Fire = function(wep, ubgl)
@@ -38,7 +38,7 @@ att.UBGL_Fire = function(wep, ubgl)
         return wep:EmitSound("weapons/arccw/dryfire.wav", 100)
     end
 
-    wep.Owner:RemoveAmmo(1, "smg1_grenade")
+    wep.Owner:RemoveAmmo(1, "25mm Grenade")
 
     wep:PlayAnimation("gl_fire")
 	wep:EmitSound("Weapon_OICW.Fire_Alt")
@@ -56,7 +56,7 @@ att.UBGL_Reload = function(wep, ubgl)
     if Ammo(wep) <= 0 then return end
 
     wep:SetNextSecondaryFire(CurTime() + 1.55)
-	wep:PlayAnimation("reload", 0.7)
+	wep:PlayAnimation("altreload", 0.7)
     local reserve = Ammo(wep)
 
     reserve = reserve + wep:Clip2()
@@ -67,7 +67,7 @@ att.UBGL_Reload = function(wep, ubgl)
 
     local load = math.Clamp(clip, 0, reserve)
 
-    wep.Owner:SetAmmo(reserve - load, "smg1_grenade")
+    wep.Owner:SetAmmo(reserve - load, "25mm Grenade")
 
     wep:SetClip2(load)
 end

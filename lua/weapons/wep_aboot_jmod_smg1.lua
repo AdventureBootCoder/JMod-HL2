@@ -66,7 +66,7 @@ SWEP.MoveDispersion = 100
 SWEP.SightsDispersion = 100
 
 --SWEP.Primary.Ammo = "smg1" -- what ammo type the gun uses
-SWEP.Secondary.Ammo			= "SMG1_Grenade"
+SWEP.Secondary.Ammo			= "25mm Grenade"
 SWEP.Secondary.Sound		= Sound( "Weapon_SMG1.Double" )
 SWEP.MagID = "smg1" -- the magazine pool this gun draws from
 SWEP.Secondary.DefaultClip = 1
