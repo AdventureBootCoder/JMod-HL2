@@ -150,7 +150,7 @@ function JModHL2.ApplyAmmoSpecs(wep, typ, mult)
 	mult = mult or 1
 	wep.Primary.Ammo = typ
 	local Specs = JModHL2.GetAmmoSpecs(typ)
-	if not Specs then 
+	if not Specs then
 		timer.Simple(1, function()
 			JMod.ApplyAmmoSpecs(wep, typ, mult) 
 		end)

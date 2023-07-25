@@ -48,8 +48,7 @@ att.UBGL_Fire = function(wep, ubgl)
 	
     wep:PlayAnimation("gl_fire")
 	wep:EmitSound("TFA_MMOD.SMG1.2")
-    wep:FireRocket("arccw_hl2_riflegrenade", 2000)
-	--wep:FireRocket("smg_grenade", 2000)
+    wep:FireRocket("arccw_aboot_smggrenade", 2000)
 
     wep:SetClip2(wep:Clip2() - 1)
 

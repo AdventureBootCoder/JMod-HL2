@@ -15,6 +15,7 @@ SWEP.WorldModelOffset = {
 
 SWEP.DefaultBodygroups = "00000000000"
 JModHL2.ApplyAmmoSpecs(SWEP, "Light Rifle Round", 1.2)
+SWEP.CustomToggleCustomizeHUD = false
 
 SWEP.ShootEntity = nil -- entity to fire, if any
 SWEP.MuzzleVelocity = 1050 -- projectile or phys bullet muzzle velocity
@@ -110,7 +111,7 @@ SWEP.IronSightStruct = {
 }
 
 SWEP.HoldtypeHolstered = "passive"
-SWEP.HoldtypeActive = "shotgun"
+SWEP.HoldtypeActive = "ar2"
 SWEP.HoldtypeSights = "ar2"
 
 SWEP.AnimShoot = ACT_HL2MP_GESTURE_RANGE_ATTACK_AR2
@@ -141,20 +142,21 @@ SWEP.Attachments = {
 		Bone = "OICW_weapon",
 		Offset = {
 			vang = Angle(0, 0, 270),
-			vpos = Vector(-2.9, -2.75, 0),
+			vpos = Vector(-3, -3.5, 0),
 			wpos = Vector(6, 1, -8),
 			wang = Angle(-5, 180, 180)
 		},
 		CorrectiveAng = Angle(0, 180, 0),
-		CorrectivePos = Vector(7, 0, -0.2),
+		--CorrectivePos = Vector(7, 0, -0.2),
 		-- remove Slide because it ruins my life
 		Installed = "optic_aboot_scope_oicw"
+		--Installed = "optic_jack_scope_acog"
 	},
     {
         PrintName = "Grenade Launcher",
-        Slot = {"hl2_oicw_gl"},
+        Slot = {"ez_oicw_gl"},
         DefaultAttName = "DISABLED",
-        Installed = "ubgl_hl2_oicw_gl",
+        Installed = "ubgl_aboot_oicw_gl",
     },
 }
 
@@ -210,6 +212,40 @@ SWEP.Animations = {
         },
     },
 }
+
+function SWEP:Scroll(var)
+	local irons = self:GetActiveSights()
+
+	if irons.ScrollFunc == ArcCW.SCROLL_ZOOM then
+		if !irons.ScopeMagnificationMin then return end
+		if !irons.ScopeMagnificationMax then return end
+
+		local old = irons.ScopeMagnification
+
+		local minus = var < 0
+
+		var = math.abs(irons.ScopeMagnificationMax - irons.ScopeMagnificationMin)
+
+		var = var / (irons.ZoomLevels or 5)
+
+		if minus then
+			var = var * -1
+		end
+
+		irons.ScopeMagnification = irons.ScopeMagnification - var
+
+		irons.ScopeMagnification = math.Clamp(irons.ScopeMagnification, irons.ScopeMagnificationMin, irons.ScopeMagnificationMax)
+
+		self.SightMagnifications[irons.Slot or 0] = irons.ScopeMagnification
+
+		if old != irons.ScopeMagnification then
+			self:MyEmitSound(irons.ZoomSound or "", 75, math.Rand(95, 105), 1, CHAN_ITEM)
+		end
+	elseif irons.ScrollFunc == ArcCW.SCROLL_NONE then
+		self.EZfuseTime = self.EZfuseTime + var
+	end
+
+end
 
 sound.Add({
 	name = "Weapon_OICW.Fire",

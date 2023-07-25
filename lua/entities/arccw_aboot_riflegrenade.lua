@@ -11,8 +11,8 @@ ENT.CollisionGroup = COLLISION_GROUP_PROJECTILE
 
 
 -- Intentionally not ENT.Damage since ArcCW base overwrites it with weapon damage (for some reason)
-ENT.GrenadeDamage = 100
-ENT.GrenadeRadius = 256
+ENT.GrenadeDamage = 120
+ENT.GrenadeRadius = 300
 ENT.FuseTime = 10
 ENT.DragCoefficient = 1
 ENT.DetonateOnImpact = true

@@ -7,7 +7,7 @@ att.Desc_Pros = {
 att.Desc_Cons = {
 }
 att.AutoStats = true
-att.Slot = "hl2_oicw_gl"
+att.Slot = "ez_oicw_gl"
 
 att.SortOrder = 100
 
@@ -38,16 +38,18 @@ att.UBGL_Fire = function(wep, ubgl)
         return wep:EmitSound("weapons/arccw/dryfire.wav", 100)
     end
 
-    wep.Owner:RemoveAmmo(1, "25mm Grenade")
-
     wep:PlayAnimation("gl_fire")
 	wep:EmitSound("Weapon_OICW.Fire_Alt")
-    wep:FireRocket("arccw_hl2_riflegrenade", 8000)
+    wep:FireRocket("arccw_aboot_riflegrenade", 10000)
 
     wep:SetClip2(wep:Clip2() - 1)
 
 
     wep:DoEffects()
+end
+
+att.Hook_PostFireRocket = function(wep, rocket)
+	rocket.FuseTime = wep.EZfuseTime
 end
 
 att.UBGL_Reload = function(wep, ubgl)
@@ -60,8 +62,6 @@ att.UBGL_Reload = function(wep, ubgl)
     local reserve = Ammo(wep)
 
     reserve = reserve + wep:Clip2()
-	
-
 
     local clip = 4
 
