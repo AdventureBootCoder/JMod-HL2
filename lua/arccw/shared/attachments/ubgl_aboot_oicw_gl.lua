@@ -20,7 +20,7 @@ att.MountPositionOverride = 0
 
 att.UBGL = true
 
-att.UBGL_PrintName = "XM-98"
+att.UBGL_PrintName = "XM-29"
 att.UBGL_Automatic = true
 att.UBGL_MuzzleEffect = "muzzleflash_m79"
 att.UBGL_ClipSize = 4
@@ -49,7 +49,7 @@ att.UBGL_Fire = function(wep, ubgl)
 end
 
 att.Hook_PostFireRocket = function(wep, rocket)
-	if IsValid(wep) then rocket.EZfuseTime = wep.EZfuseTime or 1 end
+	if IsValid(wep) then rocket.EZfuseTime = wep:GetNW2Float("EZfuseTime", 1) end
 end
 
 att.UBGL_Reload = function(wep, ubgl)

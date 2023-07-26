@@ -12,6 +12,7 @@ att.Slot = "oicw_optic"
 att.Model = "models/weapons/arccw/atts/oicw_scope.mdl"
 
 local colormod = Material("pp/colour")
+local TextColor = Color(16, 136, 0)
 
 att.AdditionalSights = {
 	{
@@ -36,14 +37,16 @@ att.AdditionalSights = {
 			colormod:SetTexture("$fbtexture", tex)
 
 			render.PushRenderTarget(tex)
-
 			JMod.EZ_NightVisionScreenSpaceEffect(nil)
-
 			--if ply and not ply.EZflashbanged then
 				--DrawMotionBlur(FrameTime() * 50, .8, .01)
 			--end
-
+			cam.Start2D()
+				draw.DrawText("FUSE TIME: " .. tostring(math.Round(ply:GetActiveWeapon():GetNW2Float("EZfuseTime", 1), 2)), "JMod-Display-S", ScrW() * 0.52, ScrH() * 0.6, TextColor, TEXT_ALIGN_LEFT)
+				draw.DrawText("DIST: " .. tostring(math.Round(ply:GetEyeTrace().Fraction * 32768)), "JMod-Display-S", ScrW() * 0.52, ScrH() * 0.58, TextColor, TEXT_ALIGN_LEFT)
+			cam.End2D()
 			render.PopRenderTarget(tex)
+
 			colormod:SetTexture("$fbtexture", orig)
 		end
 	}
@@ -60,6 +63,6 @@ att.HolosightSize = 2
 att.HolosightBone = "holosight"
 att.HolosightPiece = "models/weapons/arccw/atts/oicw_scope_hsp.mdl"
 att.Colorable = true
-att.HolosightMagnification = 2 -- this is the scope magnification
+att.HolosightMagnification = 1.5 -- this is the scope magnification
 att.HolosightBlackbox = false
 att.Mult_SightTime = 1.4

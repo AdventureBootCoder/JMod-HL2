@@ -213,41 +213,14 @@ SWEP.Animations = {
     },
 }
 
--- This was client-side :(
---[[function SWEP:Scroll(var)
-	local irons = self:GetActiveSights()
-
-	if irons.ScrollFunc == ArcCW.SCROLL_ZOOM then
-		if !irons.ScopeMagnificationMin then return end
-		if !irons.ScopeMagnificationMax then return end
-
-		local old = irons.ScopeMagnification
-
-		local minus = var < 0
-
-		var = math.abs(irons.ScopeMagnificationMax - irons.ScopeMagnificationMin)
-
-		var = var / (irons.ZoomLevels or 5)
-
-		if minus then
-			var = var * -1
-		end
-
-		irons.ScopeMagnification = irons.ScopeMagnification - var
-
-		irons.ScopeMagnification = math.Clamp(irons.ScopeMagnification, irons.ScopeMagnificationMin, irons.ScopeMagnificationMax)
-
-		self.SightMagnifications[irons.Slot or 0] = irons.ScopeMagnification
-
-		if old != irons.ScopeMagnification then
-			self:MyEmitSound(irons.ZoomSound or "", 75, math.Rand(95, 105), 1, CHAN_ITEM)
-		end
-	elseif irons.ScrollFunc == ArcCW.SCROLL_NONE then
-		self.EZfuseTime = (self.EZfuseTime or 1) + var * 0.1
-		self.EZfuseTime = math.Clamp(self.EZfuseTime, 0.1, 5)
-		jprint(self.EZfuseTime)
+hook.Add( "StartCommand", "JModHL2_OICWscrollCapture", function( ply, cmd )
+	local Wep = ply:GetActiveWeapon()
+	if (cmd:GetMouseWheel() ~= 0) and IsValid(Wep) and (Wep:GetClass() == "wep_aboot_jmod_oicw") and (Wep:GetState() == ArcCW.STATE_SIGHTS) and (Wep:GetActiveSights().ScrollFunc == ArcCW.SCROLL_NONE) then
+		Wep:SetNW2Float("EZfuseTime", math.Clamp(Wep:GetNW2Float("EZfuseTime", 1) + cmd:GetMouseWheel() * 0.1, 0.2, 5))
+		--jprint(Wep:GetNW2Float("EZfuseTime", 1))
+		--jprint(ply, " scrolled ", cmd:GetMouseWheel())
 	end
-end]]--
+end)
 
 sound.Add({
 	name = "Weapon_OICW.Fire",

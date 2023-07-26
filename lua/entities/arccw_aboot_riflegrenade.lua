@@ -50,44 +50,42 @@ if SERVER then
 			end
 		end)]]--
     end
-
-    function ENT:Think()
-        if SERVER and CurTime() - self.SpawnTime >= self.EZfuseTime then
-            self:Detonate()
-        end
-    end
-else
-    function ENT:Think()
-        if self.SmokeTrail then
-            if self.Ticks % 5 == 0 then
-                local emitter = ParticleEmitter(self:GetPos())
-                if not self:IsValid() or self:WaterLevel() > 2 then return end
-                if not IsValid(emitter) then return end
-                local smoke = emitter:Add("particle/particle_smokegrenade", self:GetPos())
-                smoke:SetVelocity(VectorRand() * 25)
-                smoke:SetGravity(Vector(math.Rand(-5, 5), math.Rand(-5, 5), math.Rand(-20, -25)))
-                smoke:SetDieTime(math.Rand(1.5, 2.0))
-                smoke:SetStartAlpha(255)
-                smoke:SetEndAlpha(0)
-                smoke:SetStartSize(0)
-                smoke:SetEndSize(100)
-                smoke:SetRoll(math.Rand(-180, 180))
-                smoke:SetRollDelta(math.Rand(-0.2, 0.2))
-                smoke:SetColor(50, 50, 50)
-                smoke:SetAirResistance(5)
-                smoke:SetPos(self:GetPos())
-                smoke:SetLighting(false)
-                emitter:Finish()
-            end
-            self.Ticks = self.Ticks + 1
-        end
-    end
+end
+function ENT:Think()
+	if SERVER and CurTime() - self.SpawnTime >= self.EZfuseTime then
+		self:Detonate()
+	elseif CLIENT then
+		if self.SmokeTrail then
+			if self.Ticks % 5 == 0 then
+				local emitter = ParticleEmitter(self:GetPos())
+				if not self:IsValid() or self:WaterLevel() > 2 then return end
+				if not IsValid(emitter) then return end
+				local smoke = emitter:Add("particle/particle_smokegrenade", self:GetPos())
+				smoke:SetVelocity(VectorRand() * 25)
+				smoke:SetGravity(Vector(math.Rand(-5, 5), math.Rand(-5, 5), math.Rand(-20, -25)))
+				smoke:SetDieTime(math.Rand(1.5, 2.0))
+				smoke:SetStartAlpha(255)
+				smoke:SetEndAlpha(0)
+				smoke:SetStartSize(0)
+				smoke:SetEndSize(100)
+				smoke:SetRoll(math.Rand(-180, 180))
+				smoke:SetRollDelta(math.Rand(-0.2, 0.2))
+				smoke:SetColor(50, 50, 50)
+				smoke:SetAirResistance(5)
+				smoke:SetPos(self:GetPos())
+				smoke:SetLighting(false)
+				emitter:Finish()
+			end
+			self.Ticks = self.Ticks + 1
+		end
+	end
 end
 
 -- overwrite to do special explosion things
 function ENT:DoDetonation()
     local attacker = IsValid(self:GetOwner()) and self:GetOwner() or self
     util.BlastDamage(self, attacker, self:GetPos(), self.GrenadeRadius, self.GrenadeDamage or self.Damage or 0)
+	JMod.BlastDoors(attacker, self:GetPos(),  self.GrenadeDamage or self.Damage or 0, self.GrenadeRadius, false)
 end
 
 function ENT:DoImpact(ent)
@@ -103,7 +101,7 @@ function ENT:DoImpact(ent)
 end
 
 function ENT:Detonate()
-    if not self:IsValid() or self.BOOM then return end
+    if not IsValid(self) or self.BOOM then return end
     self.BOOM = true
 
     if self.ExplosionEffect then
@@ -159,7 +157,7 @@ function ENT:PhysicsCollide(colData, collider)
 
     self:DoImpact(colData.HitEntity)
 
-    if self.DetonateOnImpact then
+    if self.DetonateOnImpact and (CurTime() - self.SpawnTime >= 0.1) then
         self:Detonate()
     else
         local effectdata = EffectData()
