@@ -2,7 +2,7 @@ SWEP.Base = "wep_jack_gmod_gunbase"
 SWEP.Spawnable = false
 SWEP.Category = "JMod: Half-Life - ArcCW" -- edit this if you like
 SWEP.AdminOnly = false
-SWEP.PrintName = "EZ Thumper Gun"
+SWEP.PrintName = "EZ Brush Gun"
 SWEP.Slot = 3
 
 SWEP.ViewModel = "models/weapons/annabelle/c_annabelle.mdl"

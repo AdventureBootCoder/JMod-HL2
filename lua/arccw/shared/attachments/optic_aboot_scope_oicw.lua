@@ -21,11 +21,11 @@ att.AdditionalSights = {
 		IgnoreExtra = true,
 		NVScope = true, -- enables night vision effects for scope
         NVScopeColor = Color(0, 235, 60),
-		NVFullColor = true,
+		NVFullColor = false,
 		SwitchToSound = "snds_jack_gmod/ez_weapons/handling/aim1.wav",
 		SwitchFromSound = "snds_jack_gmod/ez_weapons/handling/aim_out.wav",
-		Contrast = 1, -- allows you to adjust the values for contrast and brightness when either NVScope or Thermal is enabled.
-        Brightness = 0.2,
+		--Contrast = 0.5, -- allows you to adjust the values for contrast and brightness when either NVScope or Thermal is enabled.
+        --Brightness = 0.5,
 	}
 }
 

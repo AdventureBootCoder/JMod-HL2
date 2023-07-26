@@ -242,7 +242,7 @@ function SWEP:Scroll(var)
 			self:MyEmitSound(irons.ZoomSound or "", 75, math.Rand(95, 105), 1, CHAN_ITEM)
 		end
 	elseif irons.ScrollFunc == ArcCW.SCROLL_NONE then
-		self.EZfuseTime = self.EZfuseTime + var
+		self.EZfuseTime = (self.EZfuseTime or 1) + var * 0.1
 	end
 
 end
