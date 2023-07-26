@@ -213,7 +213,8 @@ SWEP.Animations = {
     },
 }
 
-function SWEP:Scroll(var)
+-- This was client-side :(
+--[[function SWEP:Scroll(var)
 	local irons = self:GetActiveSights()
 
 	if irons.ScrollFunc == ArcCW.SCROLL_ZOOM then
@@ -243,9 +244,10 @@ function SWEP:Scroll(var)
 		end
 	elseif irons.ScrollFunc == ArcCW.SCROLL_NONE then
 		self.EZfuseTime = (self.EZfuseTime or 1) + var * 0.1
+		self.EZfuseTime = math.Clamp(self.EZfuseTime, 0.1, 5)
+		jprint(self.EZfuseTime)
 	end
-
-end
+end]]--
 
 sound.Add({
 	name = "Weapon_OICW.Fire",

@@ -13,7 +13,6 @@ ENT.CollisionGroup = COLLISION_GROUP_PROJECTILE
 -- Intentionally not ENT.Damage since ArcCW base overwrites it with weapon damage (for some reason)
 ENT.GrenadeDamage = 120
 ENT.GrenadeRadius = 300
-ENT.FuseTime = 10
 ENT.DragCoefficient = 1
 ENT.DetonateOnImpact = true
 
@@ -43,10 +42,17 @@ if SERVER then
         end
 
         self.SpawnTime = CurTime()
+		self.EZfuseTime = 1
+		--[[timer.Simple(0.1, function()
+			jprint(self.EZlauncher)
+			if IsValid(self) and IsValid(self.EZlauncher) and self.EZlauncher.EZfuseTime then
+				self.EZfuseTime = self.EZlauncher.EZfuseTime
+			end
+		end)]]--
     end
 
     function ENT:Think()
-        if SERVER and CurTime() - self.SpawnTime >= self.FuseTime then
+        if SERVER and CurTime() - self.SpawnTime >= self.EZfuseTime then
             self:Detonate()
         end
     end

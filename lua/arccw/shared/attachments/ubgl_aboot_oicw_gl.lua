@@ -49,7 +49,7 @@ att.UBGL_Fire = function(wep, ubgl)
 end
 
 att.Hook_PostFireRocket = function(wep, rocket)
-	rocket.FuseTime = wep.EZfuseTime
+	if IsValid(wep) then rocket.EZfuseTime = wep.EZfuseTime or 1 end
 end
 
 att.UBGL_Reload = function(wep, ubgl)

@@ -11,6 +11,8 @@ att.AutoStats = true
 att.Slot = "oicw_optic"
 att.Model = "models/weapons/arccw/atts/oicw_scope.mdl"
 
+local colormod = Material("pp/colour")
+
 att.AdditionalSights = {
 	{
 		Pos = Vector(0, 17, -1.489),
@@ -19,13 +21,31 @@ att.AdditionalSights = {
 		Magnification = 1.5, -- this is how much your eyes zoom into the scope, not scope magnification
 		ScrollFunc = ArcCW.SCROLL_NONE,
 		IgnoreExtra = true,
-		NVScope = true, -- enables night vision effects for scope
-        NVScopeColor = Color(0, 235, 60),
-		NVFullColor = false,
+		--NVScope = true, -- enables night vision effects for scope
+        --NVScopeColor = Color(0, 235, 60),
+		--NVFullColor = false,
 		SwitchToSound = "snds_jack_gmod/ez_weapons/handling/aim1.wav",
 		SwitchFromSound = "snds_jack_gmod/ez_weapons/handling/aim_out.wav",
 		--Contrast = 0.5, -- allows you to adjust the values for contrast and brightness when either NVScope or Thermal is enabled.
         --Brightness = 0.5,
+		SpecialScopeFunction = function(tex) 
+			--local asight = self:GetActiveSights()
+			local ply = LocalPlayer()
+			local orig = colormod:GetTexture("$fbtexture")
+
+			colormod:SetTexture("$fbtexture", tex)
+
+			render.PushRenderTarget(tex)
+
+			JMod.EZ_NightVisionScreenSpaceEffect(nil)
+
+			--if ply and not ply.EZflashbanged then
+				--DrawMotionBlur(FrameTime() * 50, .8, .01)
+			--end
+
+			render.PopRenderTarget(tex)
+			colormod:SetTexture("$fbtexture", orig)
+		end
 	}
 }
 
