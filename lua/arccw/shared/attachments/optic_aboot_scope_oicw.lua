@@ -34,7 +34,9 @@ att.AdditionalSights = {
 			local ply = LocalPlayer()
 			local orig = colormod:GetTexture("$fbtexture")
 
-			colormod:SetTexture("$fbtexture", tex)
+			if tex then
+				colormod:SetTexture("$fbtexture", tex)
+			end
 
 			render.PushRenderTarget(tex)
 			JModHL2.EZ_NightVisionScreenSpaceEffect(nil)
@@ -42,12 +44,15 @@ att.AdditionalSights = {
 				--DrawMotionBlur(FrameTime() * 50, .8, .01)
 			--end
 			cam.Start2D()
-				draw.DrawText("FUSE TIME: " .. tostring(math.Round(ply:GetActiveWeapon():GetNW2Float("EZfuseTime", 1), 2)), "JMod-Display-S", ScrW() * 0.52, ScrH() * 0.6, TextColor, TEXT_ALIGN_LEFT)
-				draw.DrawText("DIST: " .. tostring(math.Round(ply:GetEyeTrace().Fraction * 32768)), "JMod-Display-S", ScrW() * 0.52, ScrH() * 0.58, TextColor, TEXT_ALIGN_LEFT)
+				local FOV = ((GetConVar("arccw_cheapscopes"):GetBool() and GetConVar("arccw_cheapscopesv2_ratio"):GetFloat()) or .5) * 20
+				draw.DrawText("FUSE TIME: " .. tostring(math.Round(ply:GetActiveWeapon():GetNW2Float("EZfuseTime", 1), 2)), "JMod-Display-XS", (ScrW() * 0.52) - FOV, (ScrH() * 0.53) - FOV , TextColor, TEXT_ALIGN_LEFT)
+				draw.DrawText("DIST: " .. tostring(math.Round(ply:GetEyeTrace().Fraction * 32768)), "JMod-Display-XS", (ScrW() * 0.52) - FOV, (ScrH() * 0.55) - FOV, TextColor, TEXT_ALIGN_LEFT)
 			cam.End2D()
 			render.PopRenderTarget(tex)
 
-			colormod:SetTexture("$fbtexture", orig)
+			if orig then
+				colormod:SetTexture("$fbtexture", orig)
+			end
 		end
 	}
 }
