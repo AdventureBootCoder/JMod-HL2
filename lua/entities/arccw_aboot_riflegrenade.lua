@@ -168,7 +168,15 @@ function ENT:PhysicsCollide(colData, collider)
         effectdata:SetNormal(self.GrenadeDir)
         util.Effect("Sparks", effectdata)
         self:EmitSound("weapons/rpg/shotdown.wav", 100, 150)
-        self:Remove()
+		--[[if colData.OurOldVelocity:Length() > 100 then
+			timer.Simple(0, function()
+				if IsValid(self) then
+					self:GetPhysicsObject():SetVelocity((colData.HitNormal - self.GrenadeDir) * colData.OurOldVelocity:Length())
+				end
+			end)
+		else]]--
+			self:Remove()
+		--end
     end
 end
 

@@ -163,3 +163,34 @@ hook.Add("PostDrawTranslucentRenderables", "JMod_HL2_TRANSREND", function()
 		end
 	end
 end)
+
+JModHL2.EZ_NightVisionScreenSpaceEffect = function(ply)
+
+	DrawColorModify({
+		["$pp_colour_addr"] = 0,
+		["$pp_colour_addg"] = 0,
+		["$pp_colour_addb"] = 0,
+		["$pp_colour_brightness"] = .01,
+		["$pp_colour_contrast"] = 7,
+		["$pp_colour_colour"] = 0,
+		["$pp_colour_mulr"] = 0,
+		["$pp_colour_mulg"] = 0,
+		["$pp_colour_mulb"] = 0
+	})
+
+	DrawColorModify({
+		["$pp_colour_addr"] = 0,
+		["$pp_colour_addg"] = .1,
+		["$pp_colour_addb"] = 0,
+		["$pp_colour_brightness"] = 0,
+		["$pp_colour_contrast"] = 1,
+		["$pp_colour_colour"] = 1,
+		["$pp_colour_mulr"] = 0,
+		["$pp_colour_mulg"] = 0,
+		["$pp_colour_mulb"] = 0
+	})
+
+	if ply and not ply.EZflashbanged then
+		DrawMotionBlur(FrameTime() * 50, .8, .01)
+	end
+end

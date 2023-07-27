@@ -37,7 +37,7 @@ att.AdditionalSights = {
 			colormod:SetTexture("$fbtexture", tex)
 
 			render.PushRenderTarget(tex)
-			JMod.EZ_NightVisionScreenSpaceEffect(nil)
+			JModHL2.EZ_NightVisionScreenSpaceEffect(nil)
 			--if ply and not ply.EZflashbanged then
 				--DrawMotionBlur(FrameTime() * 50, .8, .01)
 			--end
