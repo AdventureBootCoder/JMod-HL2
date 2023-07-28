@@ -41,6 +41,8 @@ if SERVER then
 		self.SoundLoop:ChangeVolume(1)
 		self.SoundLoop:SetSoundLevel(120)
 		self.NextThrust = 0
+		local SelfOwner = self.Owner
+		self.OwnerTr = util.QuickTrace(SelfOwner:GetShootPos(), SelfOwner:GetAimVector() * 9e9, {self, SelfOwner})
 		self:Think()
 	end
 
@@ -99,10 +101,12 @@ if SERVER then
 
 	function ENT:Think()
 		local Time, Pos, Dir, Speed, SelfOwner = CurTime(), self:GetPos(), self.CurVel:GetNormalized(), self.CurVel:Length(), self.Owner
+		local Wep = SelfOwner:GetActiveWeapon()
+		if IsValid(Wep) and Wep.EZrocket and Wep.EZrocket == self then
+			self.OwnerTr = util.QuickTrace(SelfOwner:GetShootPos(), SelfOwner:GetAimVector() * 9e9, {self, SelfOwner})
+		end
+
 		local Tr
-
-		local OwnerTr = util.QuickTrace(SelfOwner:GetShootPos(), SelfOwner:GetAimVector() * 9e9, {self, SelfOwner})
-
 		if self.InitialTrace then
 			Tr = self.InitialTrace
 			self.InitialTrace = nil
@@ -141,13 +145,15 @@ if SERVER then
 			self:Detonate(Tr)
 		else
 			self:SetPos(Pos + self.CurVel / ThinkRate)
-			local AngleToBe = self.CurVel:GetNormalized():Angle()
+			--local AngleToBe = self.CurVel:GetNormalized():Angle()
+			local AngleToBe = (self.OwnerTr.HitPos - self:GetPos()):GetNormalized():Angle()
 			AngleToBe:RotateAroundAxis(AngleToBe:Up(), -90)
 			self:SetAngles(AngleToBe)
 			local RandomDir = VectorRand() * 2000
 			if self.Guided then
-				local NewDir = (OwnerTr.HitPos - self:GetPos()):GetNormalized() * 600
-				self.CurVel = self.CurVel + NewDir / ThinkRate
+				--local NewDir = (self.OwnerTr.HitPos - self:GetPos()):GetNormalized() * 600
+				local NewDir = AngleToBe:Right() * -60000
+				self.CurVel = NewDir / ThinkRate
 			else
 				self.CurVel = self.CurVel + (physenv.GetGravity() + RandomDir) / ThinkRate * .2
 			end

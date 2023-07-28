@@ -24,11 +24,11 @@ att.Model = "models/weapons/arccw/atts/laser_pointer.mdl"
 
 att.Hook_PostFireRocket = function(wep, rocket)
 	rocket.Guided = true
-	att.EZRocket = rocket
+	wep.EZrocket = rocket
 end
 
 att.Hook_PreReload = function(wep)
-	if IsValid(att.EZRocket) then return true end
+	if IsValid(wep.EZrocket) then return true end
 end
 
 att.Mult_MuzzleVelocity = 0.3
