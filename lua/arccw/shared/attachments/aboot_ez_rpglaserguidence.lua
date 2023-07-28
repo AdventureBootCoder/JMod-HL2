@@ -22,14 +22,35 @@ att.Free = true
 
 att.Model = "models/weapons/arccw/atts/laser_pointer.mdl"
 
+--att.Mult_MuzzleVelocity = 0.3
+--att.Mult_HipDispersion = 0
+
+att.ToggleStats = {
+	{
+	    PrintName = "Laser Guidence System",
+	    AutoStatName = "On",
+	    NoAutoStat = false,
+	    Laser = true,
+	    LaserColor = Color(255, 0, 0),
+	    Mult_HipDispersion = 0,
+	},
+	{
+	    PrintName = "Off",
+	    Laser = false,
+	    Mult_HipDispersion = 1,
+	}
+}
+
 att.Hook_PostFireRocket = function(wep, rocket)
-	rocket.Guided = true
-	wep.EZrocket = rocket
+	--if att.Laser then
+		rocket.Guided = true
+		wep.EZrocket = rocket
+	--end
 end
 
 att.Hook_PreReload = function(wep)
-	if IsValid(wep.EZrocket) then return true end
-end
+	if IsValid(wep.EZrocket) then
 
-att.Mult_MuzzleVelocity = 0.3
-att.Mult_HipDispersion = 0
+		return true
+	end
+end

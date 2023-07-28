@@ -33,7 +33,7 @@ if SERVER then
 			if self.Guided then
 				self.DieTime = CurTime() + 30
 			else
-				self.DieTime = CurTime() + 5
+				self.DieTime = CurTime() + 10
 			end
 		end)
 		self.SoundLoop = CreateSound(self, "weapons/rpg/rocket1.wav")

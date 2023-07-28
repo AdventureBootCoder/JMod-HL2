@@ -9,7 +9,7 @@ JModHL2.WeaponTable = {
 		ent = "ent_aboot_jmod_ezweapon_ar2",
 		Category = "JMod - EZ HL:2"
 	},
-	["Annabelle"] = {
+	["Brush Gun"] = {
 		mdl = "models/weapons/annabelle/w_annabelle.mdl",
 		swep = "wep_aboot_jmod_annabelle",
 		ent = "ent_aboot_jmod_ezweapon_annabelle",
