@@ -97,12 +97,12 @@ SWEP.TracerNum = 1 -- tracer every X
 SWEP.TracerFinalMag = 0 -- the last X bullets in a magazine are all tracers
 SWEP.Tracer = "arccw_tracer" -- override tracer (hitscan) effect
 SWEP.HullSize = 0 -- HullSize used by FireBullets
-SWEP.TracerCol = Color(148, 250, 32)
+SWEP.TracerCol = Color(21, 248, 40)
 SWEP.PhysTracerProfile = 2
 
 
 SWEP.IronSightStruct = {
-    Pos = Vector( -2, 2, 3 ),
+    Pos = Vector( -5.5, 0, 3 ),
     Ang = Angle( 2, 0, 0 ),
     Magnification = 2,
     SwitchToSound = JMod.GunHandlingSounds.aim.inn,
@@ -141,13 +141,13 @@ SWEP.Attachments = {
 		Slot = {"ez_optic", "oicw_optic"},
 		Bone = "OICW_weapon",
 		Offset = {
-			vang = Angle(0, 0, 270),
-			vpos = Vector(-3, -3.5, 0),
+			vang = Angle(0, 180, 90),
+			vpos = Vector(2.6, -3.5, -0.05),
 			wpos = Vector(6, 1, -8),
-			wang = Angle(-5, 180, 180)
+			wang = Angle(-5, 180, 90)
 		},
-		CorrectiveAng = Angle(0, 180, 0),
-		--CorrectivePos = Vector(7, 0, -0.2),
+		CorrectiveAng = Angle(0, 0, 0),
+		CorrectivePos = Vector(0, 0, 0.03),
 		-- remove Slide because it ruins my life
 		Installed = "optic_aboot_scope_oicw"
 		--Installed = "optic_jack_scope_acog"

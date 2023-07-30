@@ -169,6 +169,31 @@ if(SERVER)then
 		end
 	end)
 
+	hook.Remove("PlayerAmmoChanged", "JMod_HL2_EZammoSwap")
+	--[[local HLtoEZammoTypes = {
+		["357"] = "Magnum Pistol Round",
+		["AR2"] = "Light Pulse Ammo",
+		["Pistol"] = "Pistol Round",
+		["SMG1"] = "Pistol Round",
+		["Buckshot"] = "Shotgun Round",
+		["RPG_Round"] = "RPG Rocket",
+	}
+
+	hook.Add("PlayerAmmoChanged", "JMod_HL2_EZammoSwap", function(ply, ammoID, oldCount, newCount) 
+		local AmmoName = game.GetAmmoName(ammoID)
+		jprint(AmmoName)
+		if (EZammoPickup:GetBool() == true) and (HLtoEZammoTypes[AmmoName]) then
+			local EZammoID = game.GetAmmoID(HLtoEZammoTypes[AmmoName])
+			local Diff = newCount - oldCount
+			local MaxAmmo = game.GetAmmoMax(EZammoID) * JMod.Config.Weapons.AmmoCarryLimitMult
+			local AmmoToGive = math.min(Diff, MaxAmmo - ply:GetAmmoCount(EZammoID))
+			if AmmoToGive > 0 then
+				ply:GiveAmmo(AmmoToGive, EZammoID)
+				ply:RemoveAmmo(AmmoToGive, ammoID)
+			end
+		end
+	end)]]--
+
 	local HLtoEZammo = {
 		["item_ammo_357"] = {"Magnum Pistol Round", 12},
 		["item_ammo_357_large"] = {"Magnum Pistol Round", 24},
@@ -182,6 +207,7 @@ if(SERVER)then
 		["item_rpg_round"] = {"RPG Rocket", 1},
 	}
 
+	--hook.Remove("PlayerCanPickupItem", "JMod_HL2_EZpickup")
 	hook.Add("PlayerCanPickupItem", "JMod_HL2_EZpickup", function(ply, item)
 		if (EZammoPickup:GetBool() == true) and (HLtoEZammo[item:GetClass()]) then
 			EZammoConversion = HLtoEZammo[item:GetClass()]

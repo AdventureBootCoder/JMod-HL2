@@ -72,11 +72,12 @@ att.UBGL_Fire = function(wep, ubgl)
 			FireCombineBall(wep.Owner, 1)
 			wep:EmitSound("Project_MMOD_AR2.SecondaryFire")
 			wep:PlayAnimation("alt_fire")
+			--wep:DoEffects()
 			hook.Remove("KeyRelease", wep.Owner:Nick() .. "Ar2AltFireRelease")
 		end
 	end)
 
-    wep:SetClip2(wep:Clip2() - 1)
+	wep:TakeSecondaryAmmo(1)
 
     wep:DoEffects()
     if wep:Clip2() >= 1 then return end
@@ -92,7 +93,7 @@ att.UBGL_Fire = function(wep, ubgl)
 
     local load = math.Clamp(clip, 0, reserve)
 
-    wep.Owner:SetAmmo(reserve - load, "MP5_Grenade")
+    wep.Owner:SetAmmo(reserve - load, "AR2AltFire")
 	
     wep:SetClip2(load)
 end
@@ -105,15 +106,11 @@ att.UBGL_Reload = function(wep, ubgl)
     wep:SetNextSecondaryFire(CurTime() + 0.2)
 	wep:EmitSound("weapons/arccw/dryfire.wav", 100)
 	wep:PlayAnimation("reload_ubgl", 0.5)
-    local reserve = Ammo(wep)
+    local Reserve = Ammo(wep)
 
-    reserve = reserve + wep:Clip2()
+	local Load = math.min(1, Reserve)
 
-    local clip = 1
-
-    local load = math.Clamp(clip, 0, reserve)
-
-    wep.Owner:SetAmmo(reserve - load, "MP5_Grenade")
+    wep.Owner:SetAmmo(Reserve - Load, "AR2AltFire")
 	
-    wep:SetClip2(load)
+    wep:SetClip2(Load)
 end

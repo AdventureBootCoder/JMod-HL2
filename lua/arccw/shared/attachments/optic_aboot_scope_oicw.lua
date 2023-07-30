@@ -61,7 +61,7 @@ att.AdditionalSights = {
 	}
 }
 
-att.ModelOffset = Vector(0, 0.15, -0.55)
+att.ModelOffset = Vector(-0.1, 0.37, -0.56)
 --att.OffsetAng = Angle(0, 0, 0)
 
 att.ScopeGlint = false -- lmao
@@ -75,4 +75,4 @@ att.Colorable = false
 att.HolosightColor = TextColor
 att.HolosightMagnification = 1.5 -- this is the scope magnification
 att.HolosightBlackbox = false
-att.Mult_SightTime = 1.4
+att.Mult_SightTime = 1.2
