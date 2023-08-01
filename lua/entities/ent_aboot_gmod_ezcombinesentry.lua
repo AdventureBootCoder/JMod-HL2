@@ -67,8 +67,18 @@ ENT.AmmoTypes = {
 		Damage = .4,
 		MaxElectricity = 2,
 		BarrelLength = .75
-	} -- bzew
-	
+	}, -- bzew
+	["Super Soaker"] = {
+		FireRate = 2,
+		Damage = 0.01,
+		Accuracy = .5,
+		BarrelLength = 1,
+		MaxAmmo = 1,
+		TargetingRadius = 2,
+		SearchSpeed = 2,
+		TargetLockTime = .1,
+		TurnSpeed = 2
+	}	
 }
 
 --[[
@@ -132,16 +142,20 @@ function ENT:SetMods(tbl, ammoType)
 		local AmmoTypeToSpawn = JMod.EZ_RESOURCE_TYPES.AMMO
 		if (OldAmmo == "HE Grenade") then
 			AmmoTypeToSpawn = JMod.EZ_RESOURCE_TYPES.MUNITIONS
+		elseif (OldAmmo == "Super Soaker") then
+			AmmoTypeToSpawn = JMod.EZ_RESOURCE_TYPES.WATER
 		end
 		JMod.MachineSpawnResource(self, AmmoTypeToSpawn, self:GetAmmo(), self:GetForward() * -50 + self:GetUp() * 50, Angle(0, 0, 0), self:GetForward(), true)
 	end
-	self:InitPerfSpecs(OldAmmo~=ammoType)
-	if(ammoType=="Pulse Laser")then
-		self.EZconsumes={JMod.EZ_RESOURCE_TYPES.POWER,JMod.EZ_RESOURCE_TYPES.BASICPARTS,JMod.EZ_RESOURCE_TYPES.COOLANT}
-	elseif(ammoType=="HE Grenade")then
-		self.EZconsumes={JMod.EZ_RESOURCE_TYPES.MUNITIONS,JMod.EZ_RESOURCE_TYPES.POWER,JMod.EZ_RESOURCE_TYPES.BASICPARTS,JMod.EZ_RESOURCE_TYPES.COOLANT}
+	self:InitPerfSpecs(OldAmmo ~= ammoType)
+	if(ammoType == "Pulse Laser")then
+		self.EZconsumes={JMod.EZ_RESOURCE_TYPES.POWER, JMod.EZ_RESOURCE_TYPES.BASICPARTS, JMod.EZ_RESOURCE_TYPES.COOLANT}
+	elseif(ammoType == "HE Grenade")then
+		self.EZconsumes = {JMod.EZ_RESOURCE_TYPES.MUNITIONS, JMod.EZ_RESOURCE_TYPES.POWER, JMod.EZ_RESOURCE_TYPES.BASICPARTS, JMod.EZ_RESOURCE_TYPES.COOLANT}
+	elseif(ammoType == "Super Soaker")then
+		self.EZconsumes = {JMod.EZ_RESOURCE_TYPES.WATER, JMod.EZ_RESOURCE_TYPES.POWER, JMod.EZ_RESOURCE_TYPES.BASICPARTS, JMod.EZ_RESOURCE_TYPES.COOLANT}
 	else
-		self.EZconsumes={JMod.EZ_RESOURCE_TYPES.AMMO,JMod.EZ_RESOURCE_TYPES.POWER,JMod.EZ_RESOURCE_TYPES.BASICPARTS,JMod.EZ_RESOURCE_TYPES.COOLANT}
+		self.EZconsumes = {JMod.EZ_RESOURCE_TYPES.AMMO, JMod.EZ_RESOURCE_TYPES.POWER, JMod.EZ_RESOURCE_TYPES.BASICPARTS, JMod.EZ_RESOURCE_TYPES.COOLANT}
 	end
 end
 
@@ -175,6 +189,10 @@ function ENT:InitPerfSpecs(removeAmmo)
 		end
 	end
 
+	if self:GetAmmoType() == "Super Soaker" then
+		self.MaxWater = self.MaxAmmo
+	end
+
 	if self:GetAmmoType() ~= "Pulse Laser" then
 		-- no juking the ammo capacity, fag
 		self:SetAmmo((removeAmmo and 0) or math.min(self:GetAmmo(), self.MaxAmmo))
@@ -195,6 +213,15 @@ function ENT:CustomSetupDataTables()
 	self:NetworkVar("Float",4,"Coolant")
 	self:NetworkVar("String",0,"AmmoType")
 end
+
+function ENT:SetWater(amt)
+	self:SetAmmo(math.Clamp(amt, 0, self.MaxWater))
+end
+
+function ENT:GetWater()
+	return self:GetAmmo()
+end
+
 if(SERVER)then
 	function ENT:CustomInit()
 		local phys=self.Entity:GetPhysicsObject()
@@ -419,11 +446,22 @@ if(SERVER)then
 		return not Tr.Hit
 	end
 
+	function ENT:ShouldSoak(ent)
+		if not IsValid(ent) then return false end
+		if ent == self then return false end
+		if ent:IsOnFire() then return true end
+		if ent.TryLoadResource and ent.GetWater and (ent:GetWater() < 100) then return true end
+	end
+
 	function ENT:CanEngage(ent)
 		if not IsValid(ent) then return false end
 		if ent == self.NPCTarget then return false end
 
-		return JMod.ShouldAttack(self, ent) and self:CanSee(ent)
+		if self:GetAmmoType() == "Super Soaker" then
+			return self:ShouldSoak(ent) and self:CanSee(ent)
+		else
+			return JMod.ShouldAttack(self, ent) and self:CanSee(ent)
+		end
 	end
 
 	function ENT:TryFindTarget()
@@ -981,6 +1019,39 @@ if(SERVER)then
 			Heat = Heat * 3
 			AmmoConsume = 0
 			ElecConsume = .025 * Dmg
+		elseif ProjType == "Super Soaker" then
+			local ShellAng = AimAng:GetCopy()
+			ShellAng:RotateAroundAxis(ShellAng:Up(), -90)
+			local Eff = EffectData()
+			Eff:SetOrigin(SelfPos + Up * 36 + AimForward * 5)
+			Eff:SetAngles(ShellAng)
+			Eff:SetFlags(5)
+			Eff:SetEntity(self)
+			---
+			local ShootDir = (point - ShootPos):GetNormalized()
+
+			util.Effect("MuzzleFlash", Eff)
+
+			sound.Play("physics/surfaces/underwater_impact_bullet"..math.random(1, 3)..".wav", SelfPos + Up, 100, math.random(80, 100))
+			
+			local EntsToWet = ents.FindInSphere(point, 256)
+			for i = 1, #EntsToWet do
+				local Ent = EntsToWet[i]
+				if Ent:IsOnFire() then
+					if math.random(1, 3) == 3 then
+						Ent:Extinguish() 
+					end
+
+					break
+				elseif Ent.GetWater and Ent:GetWater() < 100 then
+					Ent:SetWater(math.Clamp(Ent:GetWater() + 1, 0, 100))
+					
+					break
+				end
+			end
+			Heat = 0
+			AmmoConsume = 2
+			ElecConsume = 0.1
 		end
 
 		---
@@ -1094,7 +1165,8 @@ elseif(CLIENT)then
 		["API Bullet"] = 0,
 		["Buckshot"] = 1,
 		["HE Grenade"] = 2,
-		["Pulse Laser"] = 3
+		["Pulse Laser"] = 3,
+		["Super Soaker"] = 0
 	}
 
 	local FirstFrame = true
@@ -1203,10 +1275,15 @@ elseif(CLIENT)then
 					JMod.StandardRankDisplay(Grade, -35, -75, 118, Opacity + 20)
 
 					if AmmoType ~= "Pulse Laser" then
-						local Ammo = self:GetAmmo()
+						local Ammo, AmmoName = self:GetAmmo(), "AMMO"
 						local AmmoFrac = Ammo / self.MaxAmmo
 						local R, G, B = JMod.GoodBadColor(AmmoFrac)
-						draw.SimpleTextOutlined("AMMO", "JMod-Display", -50, 0, Color(255, 255, 255, Opacity), TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP, 3, Color(0, 0, 0, Opacity))
+						if AmmoType == "Super Soaker" then
+							AmmoName = "WATER"
+						elseif AmmoType == "HE Grenade" then
+							AmmoName = "MUNI"
+						end
+						draw.SimpleTextOutlined(AmmoName, "JMod-Display", -50, 0, Color(255, 255, 255, Opacity), TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP, 3, Color(0, 0, 0, Opacity))
 						draw.SimpleTextOutlined(tostring(Ammo), "JMod-Display", -50, 30, Color(R, G, B, Opacity), TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP, 3, Color(0, 0, 0, Opacity))
 					end
 
