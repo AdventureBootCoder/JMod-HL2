@@ -1038,14 +1038,14 @@ if(SERVER)then
 			for i = 1, #EntsToWet do
 				local Ent = EntsToWet[i]
 				if Ent:IsOnFire() then
-					if math.random(1, 3) == 3 then
+					if math.random(1, 2) == 2 then
 						Ent:Extinguish() 
 					end
 
 					break
 				elseif Ent.GetWater and Ent:GetWater() < 100 then
 					Ent:SetWater(math.Clamp(Ent:GetWater() + 1, 0, 100))
-					
+
 					break
 				end
 			end
