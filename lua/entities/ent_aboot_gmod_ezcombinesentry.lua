@@ -74,7 +74,7 @@ ENT.AmmoTypes = {
 		Accuracy = .5,
 		BarrelLength = 1,
 		MaxAmmo = 1,
-		TargetingRadius = 2,
+		TargetingRadius = 1.2,
 		SearchSpeed = 2,
 		TargetLockTime = .1,
 		TurnSpeed = 2
@@ -1021,16 +1021,15 @@ if(SERVER)then
 			ElecConsume = .025 * Dmg
 		elseif ProjType == "Super Soaker" then
 			local ShellAng = AimAng:GetCopy()
-			ShellAng:RotateAroundAxis(ShellAng:Up(), -90)
-			local Eff = EffectData()
-			Eff:SetOrigin(SelfPos + Up * 36 + AimForward * 5)
-			Eff:SetAngles(ShellAng)
-			Eff:SetFlags(5)
-			Eff:SetEntity(self)
+			--ShellAng:RotateAroundAxis(ShellAng:Up(), 0)
+			local Splach = EffectData()
+			Splach:SetOrigin(SelfPos + Up * 55 + Right * -5 + AimForward * 16)
+			local Zoop = ShellAng:Forward()
+			Splach:SetStart(Zoop * 12)
+			Splach:SetScale(1)
+			util.Effect("eff_jack_gmod_spranklerspray", Splach)
 			---
 			local ShootDir = (point - ShootPos):GetNormalized()
-
-			util.Effect("MuzzleFlash", Eff)
 
 			sound.Play("physics/surfaces/underwater_impact_bullet"..math.random(1, 3)..".wav", SelfPos + Up, 100, math.random(80, 100))
 			
@@ -1038,9 +1037,7 @@ if(SERVER)then
 			for i = 1, #EntsToWet do
 				local Ent = EntsToWet[i]
 				if Ent:IsOnFire() then
-					if math.random(1, 2) == 2 then
-						Ent:Extinguish() 
-					end
+					Ent:Extinguish()
 
 					break
 				elseif Ent.GetWater and Ent:GetWater() < 100 then
@@ -1216,6 +1213,9 @@ elseif(CLIENT)then
 		---
 		if AmmoType ~= self.LastAmmoType then
 			self.LastAmmoType = AmmoType
+			if not IsValid(self.MachineGun) then
+				self.MachineGun = JMod.MakeModel(self, "models/jmod/ez/sentrygun.mdl")
+			end
 			self.MachineGun:SetBodygroup(0, AmmoBGs[AmmoType])
 			if AmmoType == "Pulse Rifle" then
 				self.RenderGun = false
