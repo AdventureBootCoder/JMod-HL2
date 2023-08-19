@@ -17,6 +17,12 @@ SWEP.DefaultBodygroups = "00000000000"
 JModHL2.ApplyAmmoSpecs(SWEP, "Light Rifle Round", 1.2)
 SWEP.CustomToggleCustomizeHUD = false
 
+SWEP.BodyHolsterSlot = "back"
+SWEP.BodyHolsterAng = Angle(-10, 0, 0)
+SWEP.BodyHolsterAngL = Angle(-10, 10, 180)
+SWEP.BodyHolsterPos = Vector(4, -10, -6)
+SWEP.BodyHolsterPosL = Vector(4, -10, 4)
+
 SWEP.ShootEntity = nil -- entity to fire, if any
 SWEP.MuzzleVelocity = 1050 -- projectile or phys bullet muzzle velocity
 -- IN M/S
@@ -143,8 +149,8 @@ SWEP.Attachments = {
 		Offset = {
 			vang = Angle(0, 180, 90),
 			vpos = Vector(2.6, -3.5, -0.05),
-			wpos = Vector(6, 1, -8),
-			wang = Angle(-5, 180, 90)
+			wpos = Vector(0.6, 0.8, -8.2),
+			wang = Angle(-4, 0, 180)
 		},
 		CorrectiveAng = Angle(0, 0, 0),
 		CorrectivePos = Vector(0, 0, 0.03),

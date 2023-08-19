@@ -3,7 +3,7 @@ SWEP.Spawnable = false
 SWEP.Category = "ArcCW - Half-Life" -- edit this if you like
 SWEP.AdminOnly = false
 SWEP.PrintName = "Crowbar"
-SWEP.Slot = 1
+SWEP.Slot = 0
 SWEP.EZdroppable = true
 
 SWEP.ViewModel = "models/weapons/v_crowbar.mdl"--"models/weapons/crowbar/c_crowbar.mdl"

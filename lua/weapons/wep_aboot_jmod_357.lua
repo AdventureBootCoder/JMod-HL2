@@ -23,7 +23,7 @@ SWEP.CustomToggleCustomizeHUD = false
 ---
 SWEP.DefaultBodygroups = "00000000000"
 
-JModHL2.ApplyAmmoSpecs(SWEP, "Magnum Pistol Round", 1.2)
+JModHL2.ApplyAmmoSpecs(SWEP, "Magnum Pistol Round", 2)
 SWEP.MuzzleVelocity = 1050 -- projectile or phys bullet muzzle velocity
 -- IN M/S
 SWEP.ChamberSize = 0 -- how many rounds can be chambered.

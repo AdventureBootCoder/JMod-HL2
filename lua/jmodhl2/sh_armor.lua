@@ -38,6 +38,21 @@ local NonArmorProtectionProfile = {
 	[DMG_ACID] = .05
 }
 
+local ScrapArmorProtectionProfile = {
+	[DMG_BUCKSHOT] = .55,
+	[DMG_BLAST] = .65,
+	[DMG_BULLET] = .55,
+	[DMG_SNIPER] = .45,
+	[DMG_AIRBOAT] = .35,
+	[DMG_CLUB] = .99,
+	[DMG_SLASH] = .99,
+	[DMG_CRUSH] = .99,
+	[DMG_VEHICLE] = .99,
+	[DMG_BURN] = .99,
+	[DMG_PLASMA] = .75,
+	[DMG_ACID] = .75
+}
+
 JModHL2.ArmorTable = {
 	["ABoot HEV Suit"]={
 		PrintName = "EZ HEV Suit",
@@ -90,7 +105,7 @@ JModHL2.ArmorTable = {
 			blackvisionwhendead = true,
 			mskmat = "mats_aboot_gmod_sprites/helmet_vignette1.png",
 			eff = {nightVision = true},
-			slots = {}
+			--slots = {}
 		},
 		plymdl="models/aboot/player/hev_suit.mdl", -- https://steamcommunity.com/sharedfiles/filedetails/?id=1341386337&searchtext=hev+suit
 		mskmat="mats_aboot_gmod_sprites/helmet_vignette1.png",
@@ -150,7 +165,7 @@ JModHL2.ArmorTable = {
 			blackvisionwhendead = true,
 			mskmat = "mats_aboot_gmod_sprites/helmet_vignette2.png",
 			eff = {thermalVision = true},
-			slots = {}
+			--slots = {}
 		},
 		plymdl = "models/aboot/combine/hev_suit/combine_super_solder.mdl",
 		mskmat = "mats_aboot_gmod_sprites/helmet_vignette2.png",
@@ -243,7 +258,7 @@ JModHL2.ArmorTable = {
 		dur = 100,
 		ent = "ent_aboot_gmod_ezarmor_jetmodule"
 	},
-	["Aboot Headcrab"] = {
+	["Headcrab"] = {
 		PrintName = "Headcrab Armor",
 		Category = "JMod - EZ HL:2",
 		mdl = "models/headcrabclassic.mdl",
@@ -281,6 +296,53 @@ JModHL2.ArmorTable = {
 		dur = 20,
 		mskmat="mats_aboot_gmod_sprites/headcrab_vignette.png",
 		ent = "ent_aboot_gmod_ezarmor_headcrab"
+	},
+	["Welding Mask"] = {
+		PrintName = "Welding Mask",
+		Category = "JMod - EZ HL:2",
+		mdl = "models/hl2ep2/welding_helmet.mdl",
+		Spawnable = true,
+		clr = { r = 255, g = 255, b = 255 },
+		clrForced = true,
+		slots = {
+			eyes = .85,
+			mouthnose = .75
+		},
+		def = table.Inherit({
+			[DMG_NERVEGAS]=1,
+			[DMG_RADIATION]=1,
+			[DMG_ACID]=1,
+			[DMG_POISON]=1,
+		}, ScrapArmorProtectionProfile),
+		resist={
+			[DMG_ACID]=.75,
+			[DMG_POISON]=.90
+		},
+		eff={
+			flashresistant = true
+		},
+		tgl = {
+			eff = {flashresistant = false},
+			slots = {
+				eyes = 0,
+				mouthnose = 0
+			},
+			pos = Vector(9, 2, 0),
+			ang = Angle(-10, 0, -90),
+			mskmat = false
+		},
+		--[[snds={
+			eq="npc/headcrab/headbite.wav",
+			uneq="npc/headcrab/pain1.wav"
+		},]]--
+		bon = "ValveBiped.Bip01_Head1",
+		siz = Vector(1.1, 1.1, 1.1),
+		pos = Vector(0, -4.5, 0),
+		ang = Angle(-90, 0, -90),
+		wgt = 5,
+		dur = 30,
+		mskmat="mats_aboot_gmod_sprites/weldingmask_vignette.png",
+		ent = "ent_aboot_gmod_ezarmor_weldingmask"
 	}
 }
 
@@ -507,6 +569,13 @@ if CLIENT then
 					render.DrawSprite(Pos + Up * 8 + Right * 5 + Dir * (i * 3 + math.random(5, 10)), 2 * Inv, 2 * Inv, Color(255, 255 - i * 20, 255 - i * 10, 255))
 				end
 			end
+		end
+	end)
+
+	hook.Add("RenderScreenspaceEffects", "JMODHL2_SCREENSPACE", function() 
+		local Ply = LocalPlayer()
+		if Ply.EZflashbanged and Ply.EZarmor and Ply.EZarmor.effects and Ply.EZarmor.effects.flashresistant then
+			Ply.EZflashbanged = nil
 		end
 	end)
 end
