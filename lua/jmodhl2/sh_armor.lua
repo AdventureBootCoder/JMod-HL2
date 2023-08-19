@@ -340,7 +340,7 @@ JModHL2.ArmorTable = {
 		pos = Vector(0, -4.5, 0),
 		ang = Angle(-90, 0, -90),
 		wgt = 5,
-		dur = 30,
+		dur = 50,
 		mskmat="mats_aboot_gmod_sprites/weldingmask_vignette.png",
 		ent = "ent_aboot_gmod_ezarmor_weldingmask"
 	}
