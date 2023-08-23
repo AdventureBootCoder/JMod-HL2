@@ -65,9 +65,16 @@ if SERVER then
 	end
 
 	---
+	local Objectives = {"steal", "kill"}
 	function ENT:GetObjective()
-
-		return "steal"
+		local CurObjective = self.EZobjective
+		if self.EZobjective then
+			local Target = self:GetTarget(self.EZobjective)
+			if self:CanCompleteObjective(self.EZobjective, Target) then
+				return self.EZobjective
+			end 
+		end
+		return table.Random(Objectives)
 	end
 
 	function ENT:GetTarget(objective)
@@ -302,6 +309,7 @@ if SERVER then
 			local Objective = self:GetObjective()
 			local Target = self:GetTarget(Objective)
 			local DesiredPosition = self:GetDesiredPosition(Objective, Target)
+			self.EZobjective = Objective
 
 			if DesiredPosition and (DesiredPosition:Distance(SelfPos) >= 100) then
 				local Moved = self:TryMoveTowardPoint(DesiredPosition)

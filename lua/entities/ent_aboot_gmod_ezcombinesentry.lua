@@ -995,7 +995,8 @@ if(SERVER)then
 				util.Effect("eff_jack_heavylaserbeamimpact", Derp2, true, true)
 				---
 				local DmgInfo = DamageInfo()
-				DmgInfo:SetAttacker(self.EZowner or self)
+				local Attacka = JMod.GetEZOwner(self)
+				DmgInfo:SetAttacker((IsValid(Attacka) and Attacka) or self)
 				DmgInfo:SetInflictor(self)
 
 				if Tr.Entity:IsOnFire() then
