@@ -218,15 +218,16 @@ SWEP.Hook_Think = function(self)
 		self.Owner:GiveAmmo(math.min(100 - Ammo(self), 2), "Heavy Pulse Ammo", true)
 	end
 	
-	if (self:GetHeat() >= self.HeatCapacity) and not(self.CoolSoundPlayed) then
+	local Heat = self:GetHeat()
+	if (Heat >= self.HeatCapacity) and not(self.CoolSoundPlayed) then
 		self.CoolSoundPlayed = true
 		self.Owner:EmitSound("snd_jack_plasmavent.wav", 70, 100)
 		local Pewf = EffectData()
 		Pewf:SetOrigin(self.Owner:GetShootPos() + self.Owner:GetAimVector()*20 + self.Owner:GetRight()*2 - self.Owner:GetUp()*5)
 		Pewf:SetStart(self.Owner:GetVelocity())
 		util.Effect("eff_jack_instantvent", Pewf, true, true)
-		
-		timer.Simple(5, function() self.CoolSoundPlayed = nil end)
+	elseif (Heat < self.HeatCapacity) then
+		self.CoolSoundPlayed = nil
 	end
 end
 
