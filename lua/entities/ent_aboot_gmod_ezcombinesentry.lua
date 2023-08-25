@@ -1266,6 +1266,7 @@ elseif(CLIENT)then
 			---
 			if (Closeness < 20000) and (State > 0) then
 				local LeftRightMaxy = self:GetBoneMatrix(1)
+				if not LeftRightMaxy then return end
 				local DisplayAng = LeftRightMaxy:GetAngles():GetCopy()
 				local DisplayPos = LeftRightMaxy:GetTranslation()
 				DisplayAng:RotateAroundAxis(DisplayAng:Right(), 85)

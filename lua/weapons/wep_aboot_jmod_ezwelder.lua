@@ -68,6 +68,34 @@ SWEP.VElements = {
 }
 
 SWEP.WElements = {
+	["pliers"] = {
+		type = "Model",
+		model = "models/props_c17/tools_pliers01a.mdl",
+		bone = "ValveBiped.Bip01_L_Hand",
+		rel = "",
+		pos = Vector(4.675, 0, -1.558),
+		angle = Angle(0, 0, 90),
+		size = Vector(1, 1, 1),
+		color = Color(255, 255, 255, 255),
+		surpresslightning = false,
+		material = "",
+		skin = 0,
+		bodygroup = {}
+	},
+	["torch"] = {
+		type = "Model",
+		model = "models/props_silo/welding_torch.mdl",
+		bone = "ValveBiped.Bip01_R_Hand",
+		rel = "",
+		pos = Vector(0, 0, 1.5),
+		angle = Angle(90, 0, -90),
+		size = Vector(1, 1, 1),
+		color = Color(255, 255, 255, 255),
+		surpresslightning = false,
+		material = "",
+		skin = 0,
+		bodygroup = {}
+	}
 	--[[["saw"] = {
 		type = "Model",
 		model = "models/props_forest/circularsaw01.mdl",
@@ -312,7 +340,7 @@ end
 
 function SWEP:PrimaryAttack()
 	if self.Owner:KeyDown(IN_SPEED) then return end
-	self:Pawnch()
+	--self:Pawnch()
 	self:SetNextPrimaryFire(CurTime() + .6)
 	self:SetNextSecondaryFire(CurTime() + 1)
 
@@ -476,7 +504,7 @@ end
 
 --
 function SWEP:OnDrop()
-	local Kit = ents.Create("ent_aboot_jmod_eztoolbox")
+	local Kit = ents.Create("ent_aboot_gmod_ezwelder")
 	Kit:SetPos(self:GetPos())
 	Kit:SetAngles(self:GetAngles())
 	Kit:Spawn()
@@ -613,7 +641,7 @@ function SWEP:Think()
 						if Message then
 							self:Msg(Message)
 						else
-							self:Pawnch()
+							--self:Pawnch()
 							sound.Play("snds_jack_gmod/ez_tools/hit.wav", Pos + VectorRand(), 60, math.random(50, 70))
 							sound.Play("snds_jack_gmod/ez_dismantling/" .. math.random(1, 10) .. ".wav", Pos, 65, math.random(90, 110))
 							if SERVER then

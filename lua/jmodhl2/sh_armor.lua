@@ -105,7 +105,22 @@ JModHL2.ArmorTable = {
 			blackvisionwhendead = true,
 			mskmat = "mats_aboot_gmod_sprites/helmet_vignette1.png",
 			eff = {nightVision = true},
-			--slots = {}
+			slots={
+				eyes = 1,
+				mouthnose = 1,
+				head = 1,
+				chest = 1,
+				abdomen = 1,
+				pelvis = 1,
+				leftthigh = 1,
+				leftcalf = 1,
+				rightthigh = 1,
+				rightcalf = 1,
+				rightshoulder = 1,
+				rightforearm = 1,
+				leftshoulder = 1,
+				leftforearm = 1
+			}
 		},
 		plymdl="models/aboot/player/hev_suit.mdl", -- https://steamcommunity.com/sharedfiles/filedetails/?id=1341386337&searchtext=hev+suit
 		mskmat="mats_aboot_gmod_sprites/helmet_vignette1.png",
@@ -165,7 +180,22 @@ JModHL2.ArmorTable = {
 			blackvisionwhendead = true,
 			mskmat = "mats_aboot_gmod_sprites/helmet_vignette2.png",
 			eff = {thermalVision = true},
-			--slots = {}
+			slots={
+				eyes = 1,
+				mouthnose = 1,
+				head = 1,
+				chest = 1,
+				abdomen = 1,
+				pelvis = 1,
+				leftthigh = 1,
+				leftcalf = 1,
+				rightthigh = 1,
+				rightcalf = 1,
+				rightshoulder = 1,
+				rightforearm = 1,
+				leftshoulder = 1,
+				leftforearm = 1
+			}
 		},
 		plymdl = "models/aboot/combine/hev_suit/combine_super_solder.mdl",
 		mskmat = "mats_aboot_gmod_sprites/helmet_vignette2.png",

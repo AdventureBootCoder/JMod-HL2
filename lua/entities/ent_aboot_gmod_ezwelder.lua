@@ -38,7 +38,7 @@ if SERVER then
 	end
 
 	function ENT:Initialize()
-		self:SetModel("models/weapons/w_models/w_tooljox.mdl")
+		self:SetModel("models/hl2ep2/welding_torch.mdl")
 		self:PhysicsInit(SOLID_VPHYSICS)
 		self:SetMoveType(MOVETYPE_VPHYSICS)
 		self:SetSolid(SOLID_VPHYSICS)

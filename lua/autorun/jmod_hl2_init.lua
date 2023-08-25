@@ -231,6 +231,8 @@ if(SERVER)then
 		end]]--
 	end)
 
+	local TrackableMachines = {"ent_jack_gmod_ezsentry", "ent_aboot_gmod_ezcombinesentry", "ent_jack_gmod_ezgroundscanner"}
+
 	hook.Add("PlayerUse", "JMod_HL2_MachineTracking", function(ply, ent) 
 		if not(IsValid(ply)) or not(IsValid(ent)) or not(ent.IsJackyEZmachine) then return end
 		if not(ply:Alive() and ply.EZarmor and ply.EZarmor.effects and ply.EZarmor.effects.HEVsuit) then 
@@ -239,7 +241,7 @@ if(SERVER)then
 			return 
 		end
 
-		if ent ~= ply:GetNW2Entity("EZmachineTracking", nil) and (JMod.GetEZowner(ent) == ply) and (ent:GetState() > 0) then
+		if ent ~= ply:GetNW2Entity("EZmachineTracking", nil) and (JMod.GetEZowner(ent) == ply) and (ent:GetState() > 0) and table.HasValue(TrackableMachines, ent:GetClass()) then
 			ply:SetNW2Entity("EZmachineTracking", ent)
 			jprint("Linking to: " .. tostring(ply:GetNW2Entity("EZmachineTracking", nil)))
 		elseif ent == ply:GetNW2Entity("EZmachineTracking", ent) and (ent:GetState() == 0) then
