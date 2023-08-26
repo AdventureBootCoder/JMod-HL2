@@ -98,6 +98,7 @@ SWEP.TracerNum = 2 -- tracer every X
 SWEP.TracerFinalMag = 0 -- the last X bullets in a magazine are all tracers
 SWEP.Tracer = "arccw_tracer" -- override tracer (hitscan) effect
 SWEP.HullSize = 1 -- HullSize used by FireBullets
+--
 SWEP.ManualAction = true
 SWEP.ShotgunReload = true
 

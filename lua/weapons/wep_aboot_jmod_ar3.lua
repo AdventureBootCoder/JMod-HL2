@@ -97,7 +97,7 @@ SWEP.AlwaysFreeAim = nil
 
 SWEP.TracerNum = 1 -- tracer every X
 SWEP.TracerFinalMag = 0 -- the last X bullets in a magazine are all tracers
-SWEP.Tracer = "tfa_mmod_tracer_ar3" -- override tracer (hitscan) effect
+SWEP.Tracer = "tfa_mmod_tracer_ar2"--"tfa_mmod_tracer_ar3" -- override tracer (hitscan) effect
 SWEP.TracerCol = Color(0, 0, 255)
 SWEP.HullSize = 0 -- HullSize used by FireBullets
 
@@ -152,16 +152,33 @@ SWEP.ExtraSightDist = 10
 
 SWEP.Attachments = {
 	{
-        PrintName = "Underbarrel",
-        Slot = {"bipod"},
-        Bone = "Base",
+        PrintName = "Grip",
+		DefaultAttName = "Rambo",
+        Slot = {"bipod", "ez_bipod_ar3"},
+        --[[Bone = "Base",
         Offset = {
             vpos = Vector(0, 0, -1),
-            vang = Angle(0, 90, 0),
+            vang = Angle(0, 180, 0),
             wpos = Vector(14.329, 1.5, -3.453),
-            wang = Angle(-6, 0, 180)
-        },
+            wang = Angle(-6, 0, 0)
+        },--]]
+		Installed = "underbarrel_aboot_bipod",
+		Hidden = true, -- attachment cannot be seen in customize menu
+		Integral = true,
     },
+	{
+		PrintName = "Flashlight", -- print name
+		DefaultAttName = "No-light",
+		Slot = {"tac", "ez_tac"},
+		Bone = "Base",
+		Offset = {
+			vpos = Vector(-26, 0, 2), -- offset that the attachment will be relative to the bone
+			vang = Angle(180, 0, 180),
+			wpos = Vector(28, .5, -6),
+			wang = Angle(-5, 0, -92)
+		},
+		Hidden = true, -- attachment cannot be seen in customize menu
+	},
 	{
 		PrintName = "Perk",
 		Slot = "perk"
