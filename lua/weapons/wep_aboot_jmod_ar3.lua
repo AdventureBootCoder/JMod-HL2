@@ -163,8 +163,8 @@ SWEP.Attachments = {
             wang = Angle(-6, 0, 0)
         },--]]
 		Installed = "underbarrel_aboot_bipod",
-		Hidden = true, -- attachment cannot be seen in customize menu
-		Integral = true,
+		--Hidden = true, -- attachment cannot be seen in customize menu
+		--Integral = true,
     },
 	{
 		PrintName = "Flashlight", -- print name
@@ -177,7 +177,7 @@ SWEP.Attachments = {
 			wpos = Vector(28, .5, -6),
 			wang = Angle(-5, 0, -92)
 		},
-		Hidden = true, -- attachment cannot be seen in customize menu
+		--Hidden = true, -- attachment cannot be seen in customize menu
 	},
 	{
 		PrintName = "Perk",

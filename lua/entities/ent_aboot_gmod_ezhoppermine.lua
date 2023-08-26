@@ -361,7 +361,7 @@ if SERVER then
 		end
 	end
 
-	hook.Remove("GravGunOnDropped", "ABootGravGunHopperGrab")
+	--hook.Remove("GravGunOnDropped", "ABootGravGunHopperGrab")
 	hook.Add("GravGunOnPickedUp", "ABootGravGunHopperGrab", function(ply, ent)
 		if ent.EZhopperMine then 
 			local State = ent:GetState()
@@ -387,7 +387,7 @@ if SERVER then
 		end
 	end)
 
-	hook.Remove("GravGunOnDropped", "ABootGravGunHopperDrop")
+	--hook.Remove("GravGunOnDropped", "ABootGravGunHopperDrop")
 	hook.Add("GravGunOnDropped", "ABootGravGunHopperDrop", function(ply, ent)
 		if ent.EZhopperMine then
 			if ent:GetState() == STATE_HELD then
