@@ -82,10 +82,12 @@ JModHL2.ArmorTable = {
 			[DMG_RADIATION]=1,
 			[DMG_ACID]=1,
 			[DMG_POISON]=1,
+			[DMG_DROWN]=1
 		},HEVArmorProtectionProfile),
 		resist={
 			[DMG_ACID]=.90,
-			[DMG_POISON]=.99
+			[DMG_POISON]=.99,
+			[DMG_DROWN]=1
 		},
 		chrg={
 			chemicals = 50,
@@ -97,8 +99,7 @@ JModHL2.ArmorTable = {
 		},
 		eff={
 			HEVsuit = true,
-			speedBoost = 1,
-			--nightVision = false
+			speedBoost = 1
 		},
 		blackvisionwhendead = false,
 		tgl = {
