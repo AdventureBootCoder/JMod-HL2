@@ -243,7 +243,7 @@ if(SERVER)then
 
 		if ent ~= ply:GetNW2Entity("EZmachineTracking", nil) and (JMod.GetEZowner(ent) == ply) and (ent:GetState() > 0) and table.HasValue(TrackableMachines, ent:GetClass()) then
 			ply:SetNW2Entity("EZmachineTracking", ent)
-			jprint("Linking to: " .. tostring(ply:GetNW2Entity("EZmachineTracking", nil)))
+			ply:PrintMessage(HUD_PRINTCENTER, "Linking to: " .. tostring(ply:GetNW2Entity("EZmachineTracking", nil)))
 		elseif ent == ply:GetNW2Entity("EZmachineTracking", ent) and (ent:GetState() == 0) then
 			ply:SetNW2Entity("EZmachineTracking", nil)
 		end

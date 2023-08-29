@@ -173,8 +173,8 @@ SWEP.Attachments = {
 		FreeSlot = true,
 		Bone = "Base",
 		Offset = {
-			vpos = Vector(-0.5, -4.286, -2), -- offset that the attachment will be relative to the bone
-			vang = Angle(-90, 0, -90),
+			vpos = Vector(1, 1, 1), -- offset that the attachment will be relative to the bone
+			vang = Angle(0, 180, 0),
 			wpos = Vector(4, 1.5, -3),
 			wang = Angle(0, -4.211, 180)
 		},
