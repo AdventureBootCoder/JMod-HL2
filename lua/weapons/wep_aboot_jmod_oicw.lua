@@ -164,6 +164,10 @@ SWEP.Attachments = {
         DefaultAttName = "DISABLED",
         Installed = "ubgl_aboot_oicw_gl",
     },
+	{
+		PrintName = "Perk",
+		Slot = "perk"
+	}
 }
 
 SWEP.ExtraSightDist = 10

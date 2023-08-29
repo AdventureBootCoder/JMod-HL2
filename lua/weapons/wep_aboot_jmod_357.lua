@@ -174,7 +174,11 @@ SWEP.Attachments = {
 			wpos = Vector(10, 1.75, -5.5),
 			wang = Angle(-10, -2, 183)
 		},
-	}]]--
+	},]]--
+	{
+		PrintName = "Perk",
+		Slot = "perk"
+	}
 }
 
 SWEP.Animations = {

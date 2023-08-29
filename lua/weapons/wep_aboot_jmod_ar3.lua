@@ -169,7 +169,7 @@ SWEP.Attachments = {
 	{
 		PrintName = "Flashlight", -- print name
 		DefaultAttName = "No-light",
-		Slot = {"tac", "ez_tac"},
+		Slot = {"tac", "ez_tac", "flashlight", "light"},
 		Bone = "Base",
 		Offset = {
 			vpos = Vector(-26, 0, 2), -- offset that the attachment will be relative to the bone
@@ -182,7 +182,7 @@ SWEP.Attachments = {
 	{
 		PrintName = "Perk",
 		Slot = "perk"
-	},
+	}
 }
 
 SWEP.Animations = {

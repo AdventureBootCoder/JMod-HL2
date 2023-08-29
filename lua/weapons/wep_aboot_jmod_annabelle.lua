@@ -22,6 +22,7 @@ SWEP.BodyHolsterPosL = Vector(5, -10, 4)
 SWEP.DefaultBodygroups = "00000000000"
 
 JModHL2.ApplyAmmoSpecs(SWEP, "Magnum Rifle Round", 1.2)
+SWEP.CustomToggleCustomizeHUD = false
 SWEP.Force = 30
 SWEP.MuzzleVelocity = 1050 -- projectile or phys bullet muzzle velocity
 -- IN M/S
@@ -132,7 +133,10 @@ SWEP.AttachmentElements = {
 SWEP.ExtraSightDist = 10
 
 SWEP.Attachments = {
-
+	{
+		PrintName = "Perk",
+		Slot = "perk"
+	}
 }
 
 SWEP.Animations = {

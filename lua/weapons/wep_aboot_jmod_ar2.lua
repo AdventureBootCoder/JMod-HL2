@@ -146,6 +146,10 @@ SWEP.Attachments = {
 		Slot = {"hl2_cbl"},
 		DefaultAttName = "DISABLED",
 		Installed = "ubgl_hl2_ar2cbl",
+	},
+	{
+		PrintName = "Perk",
+		Slot = "perk"
 	}
 }
 

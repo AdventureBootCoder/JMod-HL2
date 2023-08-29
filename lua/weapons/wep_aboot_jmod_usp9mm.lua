@@ -18,6 +18,7 @@ SWEP.DefaultBodygroups = "00000000000"
 
 
 JModHL2.ApplyAmmoSpecs(SWEP, "Pistol Round", 1)
+SWEP.CustomToggleCustomizeHUD = false
 SWEP.MuzzleVelocity = 1050 -- projectile or phys bullet muzzle velocity
 -- IN M/S
 SWEP.ChamberSize = 0 -- how many rounds can be chambered.
@@ -55,8 +56,8 @@ SWEP.Force = 8
 SWEP.NPCWeaponType = "weapon_pistol"
 SWEP.NPCWeight = 100
 
-SWEP.AccuracyMOA = 1 -- accuracy in Minutes of Angle. There are 60 MOA in a degree.
-SWEP.HipDispersion = 150 -- inaccuracy added by hip firing.
+SWEP.AccuracyMOA = 5 -- accuracy in Minutes of Angle. There are 60 MOA in a degree.
+SWEP.HipDispersion = 300 -- inaccuracy added by hip firing.
 SWEP.MoveDispersion = 100
 SWEP.SightsDispersion = 0
 
@@ -129,7 +130,7 @@ SWEP.CustomizeAng = Angle(5, 30, 30)
 SWEP.SprintPos = Vector(0.039, -18.122, -11.672)
 SWEP.SprintAng = Angle(70, 0.721, -2.056)
 
-SWEP.BarrelLength = 24
+SWEP.BarrelLength = 10
 
 SWEP.AttachmentElements = {
 }
@@ -137,7 +138,10 @@ SWEP.AttachmentElements = {
 SWEP.ExtraSightDist = 10
 
 SWEP.Attachments = {
-
+	{
+		PrintName = "Perk",
+		Slot = "perk"
+	}
 }
 
 SWEP.Animations = {
