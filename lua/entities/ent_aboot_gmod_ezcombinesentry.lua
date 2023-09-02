@@ -510,7 +510,7 @@ if(SERVER)then
 		self.NextTargetReSearch = CurTime() + self.TargetLockTime
 		self.SearchData.State = 0
 		self:SetState(STATE_ENGAGING)
-		self:EmitSound("npc/turret_floor/active.wav", 100, 100)
+		self:EmitSound("npc/turret_floor/active.wav", 75, 100)
 		JMod.Hint(self.EZowner, "sentry upgrade")
 	end
 
