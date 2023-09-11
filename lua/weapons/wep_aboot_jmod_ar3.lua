@@ -86,7 +86,7 @@ SWEP.ImpactDecal = nil
 SWEP.MuzzleEffectAttachment = 1 -- which attachment to put the muzzle on
 SWEP.CaseEffectAttachment = 0 -- which attachment to put the case effect on
 
-SWEP.SpeedMult = 0.6
+SWEP.SpeedMult = 0.7
 SWEP.SightedSpeedMult = 0.5
 SWEP.SightTime = 0.66
 SWEP.ShootSpeedMult = 0.6
