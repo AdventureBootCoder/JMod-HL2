@@ -1,0 +1,6 @@
+VertexLitGeneric
+{
+	$basetexture 		"models/weapons/aboot/v_gr9/gr9_scope"
+	$envmap			env_cubemap
+	$envmaptint 		"[0.4 0.4 1]"
+}
