@@ -74,7 +74,7 @@ JModHL2.WeaponTable = {
 		swep = "wep_aboot_jmod_gr9",
 		ent = "ent_aboot_jmod_ezweapon_gr9",
 		Category = "JMod - EZ HL:2"
-	},
+	}
 }
 
 -- keepcorpses caauses floating arrow bug
@@ -146,6 +146,8 @@ JModHL2.LoadAdditionalAmmo()
 JModHL2.LoadAdditionalWeaponEntities()--]]
 --JMod.LoadAdditionalAmmo()
 --JMod.LoadAdditionalWeaponEntities()
+hook.Add("Initialize", "JModHL2_LoadAdditionalAmmo", JMod.LoadAdditionalAmmo)
+hook.Add("Initialize", "JModHL2_LoadAdditionalWeaponEntities", JMod.LoadAdditionalWeaponEntities)
 
 function JModHL2.GetAmmoSpecs(typ)
 	if JMod.GetAmmoSpecs and JMod.GetAmmoSpecs(typ) then return JMod.GetAmmoSpecs(typ) end
