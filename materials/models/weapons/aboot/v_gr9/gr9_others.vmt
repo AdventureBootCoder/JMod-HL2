@@ -3,7 +3,7 @@ VertexLitGeneric
 
 	// MAIN SETTINGS
 	$basetexture                "models/weapons/aboot/v_gr9/gr9_others"
-	$bumpmap                    "models/weapon/aboots/v_gr9/gr9_others_n"
+	$bumpmap                    "models/weapons/aboot/v_gr9/gr9_others_n"
 
 	"$phong"  				"1"
 	"$phongexponent" 		"48"

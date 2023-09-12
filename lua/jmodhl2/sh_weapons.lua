@@ -69,6 +69,12 @@ JModHL2.WeaponTable = {
 		ent = "ent_aboot_jmod_ezweapon_oicw",
 		Category = "JMod - EZ HL:2"
 	},
+	["GR9"] = {
+		mdl = "models/weapons/aboot/hmg/w_gr9.mdl",
+		swep = "wep_aboot_jmod_gr9",
+		ent = "ent_aboot_jmod_ezweapon_gr9",
+		Category = "JMod - EZ HL:2"
+	},
 }
 
 -- keepcorpses caauses floating arrow bug
@@ -116,7 +122,7 @@ JModHL2.AmmoTable = {
 table.Merge(JMod.AdditionalWeaponTable, JModHL2.WeaponTable)
 table.Merge(JMod.AdditionalAmmoTable, JModHL2.AmmoTable)
 
-function JModHL2.LoadAdditionalAmmo()
+--[[function JModHL2.LoadAdditionalAmmo()
 	timer.Simple(0, function()
 		if JMod.AmmoTable then
 			table.Merge(JMod.AmmoTable, JMod.AdditionalAmmoTable)
@@ -124,7 +130,7 @@ function JModHL2.LoadAdditionalAmmo()
 		end
 	end)
 end
-hook.Add("Initialize", "JMod_LoadAdditionalAmmo", JModHL2.LoadAdditionalAmmo)
+hook.Add("Initialize", "JModHL2_LoadAdditionalAmmo", JModHL2.LoadAdditionalAmmo)
 
 function JModHL2.LoadAdditionalWeaponEntities()
 	timer.Simple(0, function()
@@ -134,10 +140,12 @@ function JModHL2.LoadAdditionalWeaponEntities()
 		end
 	end)
 end
-hook.Add("Initialize", "JMod_LoadAdditionalWeaponEntities", JModHL2.LoadAdditionalWeaponEntities)
+hook.Add("Initialize", "JModHL2_LoadAdditionalWeaponEntities", JModHL2.LoadAdditionalWeaponEntities)
 
 JModHL2.LoadAdditionalAmmo()
-JModHL2.LoadAdditionalWeaponEntities()
+JModHL2.LoadAdditionalWeaponEntities()--]]
+--JMod.LoadAdditionalAmmo()
+--JMod.LoadAdditionalWeaponEntities()
 
 function JModHL2.GetAmmoSpecs(typ)
 	if JMod.GetAmmoSpecs and JMod.GetAmmoSpecs(typ) then return JMod.GetAmmoSpecs(typ) end

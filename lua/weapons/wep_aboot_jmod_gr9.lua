@@ -2,21 +2,22 @@ SWEP.Base = "wep_jack_gmod_gunbase"
 SWEP.Spawnable = false
 SWEP.Category = "JMod: Half-Life - ArcCW" -- edit this if you like
 SWEP.AdminOnly = false
-SWEP.PrintName = "HMG"
-SWEP.Slot = 3
+SWEP.PrintName = "GR9-LMG"
+SWEP.Slot = 4
 
-SWEP.ViewModel = "models/weapons/hmg/c_gr9.mdl"
-SWEP.WorldModel = "models/weapons/hmg/w_gr9.mdl"
+SWEP.ViewModel = "models/weapons/aboot/hmg/c_gr9.mdl"
+SWEP.WorldModel = "models/weapons/aboot/hmg/w_gr9.mdl"
 SWEP.ViewModelFOV = 60
-SWEP.MirrorVMWM = true
-SWEP.WorldModelOffset = {
-    pos = Vector(9, 1, -4),
-    ang = Angle(-10, 180, 180)
-}
+SWEP.DefaultBodygroups = "00000200000"
+SWEP.DefaultWMBodygroups = "01000000"
 SWEP.MirrorVMWM = false -- Copy the viewmodel, along with all its attachments, to the worldmodel. Super convenient!
 SWEP.MirrorWorldModel = true -- Use this to set the mirrored viewmodel to a different model, without any floating speedloaders or cartridges you may have. Needs MirrorVMWM
-SWEP.DefaultBodygroups = "00000000000"
-SWEP.CustomToggleCustomizeHUD = false
+SWEP.WorldModelOffset = {
+    pos = Vector(6, .7, -2.5),
+    ang = Angle(-10, 180, 180),
+	scale = 1
+}
+---
 
 SWEP.BodyHolsterSlot = "back"
 SWEP.BodyHolsterAng = Angle(10, 10, 0)
@@ -24,7 +25,8 @@ SWEP.BodyHolsterAngL = Angle(-10, 10, 180)
 SWEP.BodyHolsterPos = Vector(5, -10, -4)
 SWEP.BodyHolsterPosL = Vector(5, -10, 4)
 
-JModHL2.ApplyAmmoSpecs(SWEP, " Ammo", 1)
+JModHL2.ApplyAmmoSpecs(SWEP, "Light Rifle Round", 1)
+SWEP.CustomToggleCustomizeHUD = false
 
 --[[
 SWEP.Damage = 15
@@ -44,7 +46,6 @@ SWEP.ExtendedClipSize = 100
 SWEP.ReducedClipSize = 52
 
 SWEP.PhysBulletMuzzleVelocity = 700
-
 
 SWEP.Recoil = 0.3
 SWEP.RecoilSide = 0.2
@@ -78,8 +79,7 @@ SWEP.HipDispersion = 500 -- inaccuracy added by hip firing.
 SWEP.MoveDispersion = 150
 SWEP.SightsDispersion = 150
 
-SWEP.Primary.Ammo = "ar2" -- what ammo type the gun uses
-SWEP.MagID = "GR9" -- the magazine pool this gun draws from
+--SWEP.MagID = "GR9" -- the magazine pool this gun draws from
 
 SWEP.ShootVol = 90 -- volume of shoot sound
 SWEP.ShootPitch = 80 -- pitch of shoot sound
@@ -115,6 +115,17 @@ SWEP.TracerFinalMag = 0 -- the last X bullets in a magazine are all tracers
 SWEP.Tracer = "arccw_tracer" -- override tracer (hitscan) effect
 SWEP.HullSize = 0 -- HullSize used by FireBullets
 
+-- If Jamming is enabled, a heat meter will gradually build up until it reaches HeatCapacity.
+-- Once that happens, the gun will overheat, playing an animation. If HeatLockout is true, it cannot be fired until heat is 0 again.
+SWEP.Jamming = false
+SWEP.HeatGain = 1 -- heat gained per shot
+SWEP.HeatCapacity = 100 -- rounds that can be fired non-stop before the gun jams, playing the "fix" animation
+SWEP.HeatDissipation = 20 -- rounds' worth of heat lost per second
+SWEP.HeatLockout = true -- overheating means you cannot fire until heat has been fully depleted
+SWEP.HeatDelayTime = 0.2
+SWEP.HeatFix = true -- when the "fix" animation is played, all heat is restored.
+SWEP.HeatOverflow = nil -- if true, heat is allowed to exceed capacity (this only applies when the default overheat handling is overridden)
+
 
 SWEP.IronSightStruct = {
     Pos = Vector( -4.5, -4, 3 ),
@@ -132,8 +143,8 @@ SWEP.InBipodPos = Vector(-6, 0, -6)
 SWEP.InBipodMult = Vector(2, 1, 1)
 
 SWEP.HoldtypeHolstered = "passive"
-SWEP.HoldtypeActive = "rpg"
-SWEP.HoldtypeSights = "rpg"
+SWEP.HoldtypeActive = "ar2"
+SWEP.HoldtypeSights = "ar2"
 
 SWEP.AnimShoot = ACT_HL2MP_GESTURE_RANGE_ATTACK_AR2
 
@@ -161,7 +172,33 @@ SWEP.AttachmentElements = {
 SWEP.ExtraSightDist = 10
 
 SWEP.Attachments = {
-
+	{
+		PrintName = "Optic",
+		DefaultAttName = "No Scope",
+		Slot = {"ez_optic", "oicw_optic"},
+		Bone = "base",
+		Offset = {
+			vang = Angle(0, 180, 90),
+			vpos = Vector(-5.5, -3.5, 0),
+			wpos = Vector(0.7, 0.5, -4.8),
+			wang = Angle(10, 0, 0)
+		},
+		CorrectiveAng = Angle(0, 0, 0),
+		CorrectivePos = Vector(0, 0, 0.03),
+		-- remove Slide because it ruins my life
+		--Installed = "optic_aboot_scope_gr9"
+		Installed = "optic_jack_scope_acog"
+	},
+    --[[{
+        PrintName = "Grenade Launcher",
+        Slot = {"ez_oicw_gl"},
+        DefaultAttName = "DISABLED",
+        Installed = "ubgl_aboot_oicw_gl",
+    },--]]
+	{
+		PrintName = "Perk",
+		Slot = "perk"
+	}
 }
 
 SWEP.Animations = {
