@@ -7,15 +7,15 @@ SWEP.Slot = 4
 
 SWEP.ViewModel = "models/weapons/aboot/hmg/c_gr9.mdl"
 SWEP.WorldModel = "models/weapons/aboot/hmg/w_gr9.mdl"
-SWEP.ViewModelFOV = 60
+SWEP.ViewModelFOV = 65
 SWEP.DefaultBodygroups = "00000200000"
 SWEP.DefaultWMBodygroups = "01000000"
 SWEP.MirrorVMWM = false -- Copy the viewmodel, along with all its attachments, to the worldmodel. Super convenient!
 SWEP.MirrorWorldModel = true -- Use this to set the mirrored viewmodel to a different model, without any floating speedloaders or cartridges you may have. Needs MirrorVMWM
 SWEP.WorldModelOffset = {
-    pos = Vector(6, .7, -2.5),
+    pos = Vector(9, .8, -3.5),
     ang = Angle(-10, 180, 180),
-	scale = 1
+	scale = 0.9
 }
 ---
 
@@ -79,7 +79,7 @@ SWEP.HipDispersion = 500 -- inaccuracy added by hip firing.
 SWEP.MoveDispersion = 150
 SWEP.SightsDispersion = 150
 
---SWEP.MagID = "GR9" -- the magazine pool this gun draws from
+SWEP.MagID = "GR9" -- the magazine pool this gun draws from
 
 SWEP.ShootVol = 90 -- volume of shoot sound
 SWEP.ShootPitch = 80 -- pitch of shoot sound
@@ -175,19 +175,19 @@ SWEP.Attachments = {
 	{
 		PrintName = "Optic",
 		DefaultAttName = "No Scope",
-		Slot = {"ez_optic", "oicw_optic"},
+		Slot = {"ez_optic", "gr9_optic"},
 		Bone = "base",
 		Offset = {
 			vang = Angle(0, 180, 90),
 			vpos = Vector(-5.5, -3.5, 0),
-			wpos = Vector(0.7, 0.5, -4.8),
-			wang = Angle(10, 0, 0)
+			wpos = Vector(0.7, 0.5, -7),
+			wang = Angle(-10, 0.3, 0)
 		},
 		CorrectiveAng = Angle(0, 0, 0),
 		CorrectivePos = Vector(0, 0, 0.03),
 		-- remove Slide because it ruins my life
 		--Installed = "optic_aboot_scope_gr9"
-		Installed = "optic_jack_scope_acog"
+		Installed = "optic_aboot_scope_gr9"
 	},
     --[[{
         PrintName = "Grenade Launcher",

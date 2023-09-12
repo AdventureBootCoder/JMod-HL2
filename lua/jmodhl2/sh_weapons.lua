@@ -69,12 +69,12 @@ JModHL2.WeaponTable = {
 		ent = "ent_aboot_jmod_ezweapon_oicw",
 		Category = "JMod - EZ HL:2"
 	},
-	["GR9"] = {
+	["GR9-LMG"] = {
 		mdl = "models/weapons/aboot/hmg/w_gr9.mdl",
 		swep = "wep_aboot_jmod_gr9",
 		ent = "ent_aboot_jmod_ezweapon_gr9",
 		Category = "JMod - EZ HL:2"
-	}
+	},
 }
 
 -- keepcorpses caauses floating arrow bug
@@ -107,12 +107,12 @@ JModHL2.AmmoTable = {
 		terminaldmg = 50,
 		penetration = 1
 	},
-	["RPG Rocket"] = {
+	["RPG Round"] = {
 		resourcetype = "munitions",
 		sizemult = 40,
 		carrylimit = 4,
 		ent = "ent_aboot_gmod_ezhl2rocket",
-		nicename = "EZ RPG Rocket",
+		nicename = "EZ RPG Round",
 		basedmg = 350,
 		blastrad = 200,
 		dmgtype = DMG_BLAST
