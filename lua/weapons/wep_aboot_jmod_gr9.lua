@@ -126,7 +126,6 @@ SWEP.HeatDelayTime = 0.2
 SWEP.HeatFix = true -- when the "fix" animation is played, all heat is restored.
 SWEP.HeatOverflow = nil -- if true, heat is allowed to exceed capacity (this only applies when the default overheat handling is overridden)
 
-
 SWEP.IronSightStruct = {
     Pos = Vector( -4.5, -4, 3 ),
     Ang = Angle( 0, 0, 0 ),
@@ -135,9 +134,9 @@ SWEP.IronSightStruct = {
     CrosshairInSights = true
 }
 
-SWEP.Bipod_Integral = true -- Integral bipod (ie, weapon model has one)
+--[[SWEP.Bipod_Integral = true -- Integral bipod (ie, weapon model has one)
 SWEP.BipodDispersion = 0.5 -- Bipod dispersion for Integral bipods
-SWEP.BipodRecoil = 0.2 -- Bipod recoil for Integral bipods
+SWEP.BipodRecoil = 0.2 -- Bipod recoil for Integral bipods--]]
 
 SWEP.InBipodPos = Vector(-6, 0, -6)
 SWEP.InBipodMult = Vector(2, 1, 1)
@@ -173,6 +172,21 @@ SWEP.ExtraSightDist = 10
 
 SWEP.Attachments = {
 	{
+		PrintName = "Forward Grip",
+		DefaultAttName = "No Attachment",
+		Slot = {"gr9_bipod", "ez_bipod"},
+		Bone = "base",
+		Offset = {
+			vpos = Vector(-32.15, -1.2, 0),
+			vang = Angle(0, 180, 90),
+			wpos = Vector(31.5, 0.6, -9.6),
+			wang = Angle(-15, 0, 180)
+		},
+		Installed = "underbarrel_aboot_gr9_bipod",
+		--Hidden = true, -- attachment cannot be seen in customize menu
+		--Integral = true
+	},
+	{
 		PrintName = "Optic",
 		DefaultAttName = "No Scope",
 		Slot = {"ez_optic", "gr9_optic"},
@@ -181,20 +195,12 @@ SWEP.Attachments = {
 			vang = Angle(0, 180, 90),
 			vpos = Vector(-5.5, -3.5, 0),
 			wpos = Vector(0.7, 0.5, -7),
-			wang = Angle(-10, 0.3, 0)
+			wang = Angle(-10, 0.3, 180)
 		},
 		CorrectiveAng = Angle(0, 0, 0),
 		CorrectivePos = Vector(0, 0, 0.03),
-		-- remove Slide because it ruins my life
-		--Installed = "optic_aboot_scope_gr9"
 		Installed = "optic_aboot_scope_gr9"
 	},
-    --[[{
-        PrintName = "Grenade Launcher",
-        Slot = {"ez_oicw_gl"},
-        DefaultAttName = "DISABLED",
-        Installed = "ubgl_aboot_oicw_gl",
-    },--]]
 	{
 		PrintName = "Perk",
 		Slot = "perk"

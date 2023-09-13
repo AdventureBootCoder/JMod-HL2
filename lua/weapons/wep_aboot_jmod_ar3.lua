@@ -152,20 +152,20 @@ SWEP.ExtraSightDist = 10
 
 SWEP.Attachments = {
 	{
-        PrintName = "Grip",
+		PrintName = "Forward Grip",
 		DefaultAttName = "Rambo",
-        Slot = {"bipod", "ez_bipod_ar3"},
-        --[[Bone = "Base",
-        Offset = {
-            vpos = Vector(0, 0, -1),
-            vang = Angle(0, 180, 0),
-            wpos = Vector(14.329, 1.5, -3.453),
-            wang = Angle(-6, 0, 0)
-        },--]]
+		Slot = {"ez_bipod", "ar3_bipod"},
+		--[[Bone = "Base",
+		Offset = {
+			vpos = Vector(0, 0, -1),
+			vang = Angle(0, 180, 0),
+			wpos = Vector(14.329, 1.5, -3.453),
+			wang = Angle(-6, 0, 0)
+		},--]]
 		Installed = "underbarrel_aboot_bipod",
 		--Hidden = true, -- attachment cannot be seen in customize menu
 		--Integral = true,
-    },
+	},
 	{
 		PrintName = "Flashlight", -- print name
 		DefaultAttName = "No-light",

@@ -1,4 +1,4 @@
-﻿att.PrintName = "AR3 Bipod"
+﻿att.PrintName = "GR9 Bipod"
 att.Icon = Material("entities/acwatt_bipod.png")
 att.Description = "Stabilize that gun"
 att.SortOrder = 10
@@ -7,17 +7,18 @@ att.Desc_Pros = {"+ Bipod",}
 
 att.Desc_Cons = {}
 att.AutoStats = true
-att.Slot = "ar3_bipod"
-att.LHIK = true
-att.LHIK_Animation = true
+att.Slot = "gr9_bipod"
+--att.LHIK = true
+--att.LHIK_Animation = true
 att.MountPositionOverride = 1
-att.Model = "models/weapons/arccw/atts/bipod.mdl"
+att.Model = "models/weapons/arccw/atts/gr9_bipod.mdl"
+att.ModelBodygroups = "010000"
 att.Bipod = true
-att.Mult_BipodRecoil = 0.5
+att.Mult_BipodRecoil = 0.2
 att.Mult_BipodDispersion = 0.5
-att.Mult_SightTime = 0.9
-att.Mult_HipDispersion = 0.5
-att.Mult_SpeedMult = 1
+att.Mult_SightTime = 1.1
+att.Mult_HipDispersion = 1
+att.Mult_SpeedMult = 0.95
 
 --[[att.Hook_LHIK_TranslateAnimation = function(wep, anim)
 	if anim == "idle" or anim == "in" or anim == "out" then

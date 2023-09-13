@@ -146,8 +146,8 @@ JModHL2.LoadAdditionalAmmo()
 JModHL2.LoadAdditionalWeaponEntities()--]]
 --JMod.LoadAdditionalAmmo()
 --JMod.LoadAdditionalWeaponEntities()
-hook.Add("Initialize", "JModHL2_LoadAdditionalAmmo", JMod.LoadAdditionalAmmo)
-hook.Add("Initialize", "JModHL2_LoadAdditionalWeaponEntities", JMod.LoadAdditionalWeaponEntities)
+--hook.Add("Initialize", "JModHL2_LoadAdditionalAmmo", JMod.LoadAdditionalAmmo)
+--hook.Add("Initialize", "JModHL2_LoadAdditionalWeaponEntities", JMod.LoadAdditionalWeaponEntities)
 
 function JModHL2.GetAmmoSpecs(typ)
 	if JMod.GetAmmoSpecs and JMod.GetAmmoSpecs(typ) then return JMod.GetAmmoSpecs(typ) end

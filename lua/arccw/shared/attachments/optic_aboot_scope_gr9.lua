@@ -14,7 +14,7 @@ att.Model = "models/weapons/arccw/atts/gr9_scope.mdl"
 att.AdditionalSights = {
 	{
 		Pos = Vector(0, 17, -1.489),
-		Ang = Angle(0, 180, -1),
+		Ang = Angle(0, 0, -1),
 		ViewModelFOV = 30,
 		Magnification = 1.5, -- this is how much your eyes zoom into the scope, not scope magnification
 		ScrollFunc = ArcCW.SCROLL_NONE,
@@ -25,7 +25,7 @@ att.AdditionalSights = {
 }
 
 att.ModelOffset = Vector(0, 0, -0.5)
-att.OffsetAng = Angle(180, 0, 0)
+att.OffsetAng = Angle(0, 0, 0)
 
 att.ScopeGlint = false -- lmao
 att.Holosight = true
