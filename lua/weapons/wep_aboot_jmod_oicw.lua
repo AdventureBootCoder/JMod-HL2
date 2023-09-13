@@ -158,6 +158,19 @@ SWEP.Attachments = {
 		Installed = "optic_aboot_scope_oicw"
 		--Installed = "optic_jack_scope_acog"
 	},
+	{
+		PrintName = "Tactical",
+		DefaultAttName = "No Attachment",
+		Slot = {"tac", "ez_tac", "flashlight", "light"},
+		Bone = "OICW_weapon",
+		Offset = {
+			vpos = Vector(-14, -1.5, 1.4), -- offset that the attachment will be relative to the bone
+			vang = Angle(0, 180, 180),
+			wpos = Vector(28, -1, -10),
+			wang = Angle(-5, 0, -92)
+		},
+		--Hidden = true, -- attachment cannot be seen in customize menu
+	},
     {
         PrintName = "Grenade Launcher",
         Slot = {"ez_oicw_gl"},

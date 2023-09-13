@@ -15,8 +15,8 @@ att.Model = "models/weapons/arccw/atts/bipod.mdl"
 att.Bipod = true
 att.Mult_BipodRecoil = 0.5
 att.Mult_BipodDispersion = 0.5
-att.Mult_SightTime = 0.9
-att.Mult_HipDispersion = 0.5
+att.Mult_SightTime = 1.2
+att.Mult_HipDispersion = 1
 att.Mult_SpeedMult = 1
 
 --[[att.Hook_LHIK_TranslateAnimation = function(wep, anim)

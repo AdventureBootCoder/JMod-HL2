@@ -9,15 +9,15 @@ SWEP.UseHands = true
 SWEP.DrawAmmo = false
 SWEP.DrawCrosshair = false
 SWEP.EZdroppable = true
-SWEP.ViewModel = "models/weapons/c_arms_citizen.mdl"
+SWEP.ViewModel = "models/weapons/c_grenade.mdl"
 SWEP.WorldModel = "models/hl2ep2/welding_torch.mdl"
 SWEP.BodyHolsterModel = "models/hl2ep2/welding_torch.mdl"
 SWEP.BodyHolsterSlot = "hips"
 SWEP.BodyHolsterAng = Angle(-70, 0, 200)
 SWEP.BodyHolsterAngL = Angle(-70, -10, -30)
 SWEP.BodyHolsterPos = Vector(0, -15, 10)
-SWEP.BodyHolsterPosL = Vector(0, -15, -11)
-SWEP.BodyHolsterScale = .4
+SWEP.BodyHolsterPosL = Vector(0, -15, -10)
+SWEP.BodyHolsterScale = 5
 SWEP.ViewModelFOV = 52
 SWEP.Slot = 0
 SWEP.SlotPos = 5
@@ -42,8 +42,8 @@ SWEP.VElements = {
 		model = "models/hl2ep2/welding_torch.mdl",
 		bone = "ValveBiped.Bip01_R_Hand",
 		rel = "",
-		pos = Vector(3.5, 1.5, 6),
-		angle = Angle(0, -45, 180),
+		pos = Vector(3.5, 2.5, 3),
+		angle = Angle(0, -40, 180),
 		size = Vector(1, 1, 1),
 		color = Color(255, 255, 255, 255),
 		surpresslightning = false,
@@ -246,7 +246,6 @@ function SWEP:Initialize()
 	self:SCKInitialize()
 	self.NextIdle = 0
 	self:Deploy()
-	self:SetSelectedBuild("")
 	self:SetTaskProgress(0)
 	self.TaskEntity = nil
 	self.NextTaskProgress = 0
@@ -340,7 +339,7 @@ end
 
 function SWEP:PrimaryAttack()
 	if self.Owner:KeyDown(IN_SPEED) then return end
-	--self:Pawnch()
+	self:Pawnch()
 	self:SetNextPrimaryFire(CurTime() + .6)
 	self:SetNextSecondaryFire(CurTime() + 1)
 
@@ -444,7 +443,8 @@ function SWEP:UpgradeEntWithResource(recipient, donor, amt, resourceType)
 end
 
 --,"fists_uppercut"} -- the uppercut looks so bad
-local Anims = {"fists_right", "fists_right", "fists_left", "fists_left"}
+--local Anims = {"fists_right", "fists_right", "fists_left", "fists_left"}
+local Anims = {"drawbacklow", "throw"}
 
 function SWEP:Pawnch()
 	self.Owner:SetAnimation(PLAYER_ATTACK1)
@@ -453,15 +453,6 @@ function SWEP:Pawnch()
 	self:UpdateNextIdle()
 end
 
-function SWEP:SwitchSelectedBuild(name)
-	self:SetSelectedBuild(name)
-	local BuildInfo = JMod.Config.Craftables[name]
-	if BuildInfo and BuildInfo.oneHanded then
-		self:SetNW2Bool("EZoneHandedBuild", true)
-	else
-		self:SetNW2Bool("EZoneHandedBuild", false)
-	end
-end
 
 function SWEP:Reload()
 	if SERVER then
@@ -576,7 +567,8 @@ function SWEP:Deploy()
 	local vm = self.Owner:GetViewModel()
 
 	if IsValid(vm) and vm.LookupSequence then
-		vm:SendViewModelMatchingSequence(vm:LookupSequence("fists_draw"))
+		--vm:SendViewModelMatchingSequence(vm:LookupSequence("fists_draw"))
+		vm:SendViewModelMatchingSequence(vm:LookupSequence("draw"))
 		self:UpdateNextIdle()
 		self:EmitSound("snds_jack_gmod/toolbox" .. math.random(1, 7) .. ".wav", 65, math.random(90, 110))
 	end
@@ -613,7 +605,8 @@ function SWEP:Think()
 	local idletime = self.NextIdle
 
 	if idletime > 0 and Time > idletime then
-		vm:SendViewModelMatchingSequence(vm:LookupSequence("fists_idle_0" .. math.random(1, 2)))
+		--vm:SendViewModelMatchingSequence(vm:LookupSequence("fists_idle_0" .. math.random(1, 2)))
+		vm:SendViewModelMatchingSequence(vm:LookupSequence("idle01" .. math.random(1, 2)))
 		self:UpdateNextIdle()
 	end
 

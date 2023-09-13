@@ -49,17 +49,20 @@ SWEP.PhysBulletMuzzleVelocity = 700
 
 SWEP.Recoil = 0.3
 SWEP.RecoilSide = 0.2
-SWEP.RecoilRise = 0.3
+SWEP.RecoilRise = 0.2
 SWEP.MaxRecoilBlowback = -1
-SWEP.VisualRecoilMult = 4
-SWEP.RecoilPunch = 2
+SWEP.VisualRecoilMult = 3
+SWEP.RecoilPunch = 1
 SWEP.RecoilPunchBackMax = 3
 SWEP.RecoilPunchBackMaxSights = nil -- may clip with scopes
-SWEP.RecoilVMShake = 4 -- random viewmodel offset when shooty
+SWEP.RecoilVMShake = 2 -- random viewmodel offset when shooty
 
 SWEP.Delay = 60 / 850 -- 60 / RPM.
 SWEP.Num = 1 -- number of shots per trigger pull.
 SWEP.Firemodes = {
+	{
+		Mode = 2
+	},
     {
         Mode = -4,
 		RunawayBurst = true,
@@ -76,7 +79,7 @@ SWEP.NPCWeight = 100
 
 SWEP.AccuracyMOA = 5 -- accuracy in Minutes of Angle. There are 60 MOA in a degree.
 SWEP.HipDispersion = 500 -- inaccuracy added by hip firing.
-SWEP.MoveDispersion = 150
+SWEP.MoveDispersion = 180
 SWEP.SightsDispersion = 150
 
 SWEP.MagID = "GR9" -- the magazine pool this gun draws from
@@ -96,7 +99,7 @@ SWEP.GMMuzzleEffect = false
 SWEP.ShellPitch = 80
 SWEP.ShellPhysScale = 1
 SWEP.ShellRotate = 240
-SWEP.ShellTime = 0.1
+SWEP.ShellTime = 30
 
 SWEP.MuzzleEffectAttachment = 1 -- which attachment to put the muzzle on
 SWEP.CaseEffectAttachment = 2 -- which attachment to put the case effect on
@@ -187,6 +190,19 @@ SWEP.Attachments = {
 		--Integral = true
 	},
 	{
+		PrintName = "Tactical",
+		DefaultAttName = "No Attachment",
+		Slot = {"tac", "ez_tac", "flashlight", "light"},
+		Bone = "Base",
+		Offset = {
+			vpos = Vector(-30, -2, 1.5), -- offset that the attachment will be relative to the bone
+			vang = Angle(180, 0, 180),
+			wpos = Vector(28, -1, -10),
+			wang = Angle(-5, 0, -92)
+		},
+		--Hidden = true, -- attachment cannot be seen in customize menu
+	},
+	{
 		PrintName = "Optic",
 		DefaultAttName = "No Scope",
 		Slot = {"ez_optic", "gr9_optic"},
@@ -204,7 +220,19 @@ SWEP.Attachments = {
 	{
 		PrintName = "Perk",
 		Slot = "perk"
-	}
+	},
+	{
+		PrintName = "Charm",
+		Slot = "charm",
+		FreeSlot = true,
+		Bone = "base",
+		Offset = {
+			vpos = Vector(-8, 0.5, 0.5), -- offset that the attachment will be relative to the bone
+			vang = Angle(0, 180, 90),
+			wpos = Vector(4, 1.5, -3),
+			wang = Angle(0, -4.211, 180)
+		},
+	},
 }
 
 SWEP.Animations = {

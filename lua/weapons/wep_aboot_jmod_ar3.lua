@@ -167,8 +167,8 @@ SWEP.Attachments = {
 		--Integral = true,
 	},
 	{
-		PrintName = "Flashlight", -- print name
-		DefaultAttName = "No-light",
+		PrintName = "Tactical",
+		DefaultAttName = "No Attachment",
 		Slot = {"tac", "ez_tac", "flashlight", "light"},
 		Bone = "Base",
 		Offset = {
