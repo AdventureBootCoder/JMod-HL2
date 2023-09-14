@@ -83,8 +83,12 @@ if SERVER then
 			end
 
 			if (data.Speed > 450) and (State == STATE_ARMED) then
-				self:StartCooking()
-
+				if JMod.ShouldAttack(self, data.HitEntity) then
+					self:Detonate()
+				else
+					self:StartCooking()
+				end
+				
 				return
 			end
 
