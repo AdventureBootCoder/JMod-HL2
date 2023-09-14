@@ -16,11 +16,11 @@ SWEP.WorldModelOffset = {
 }
 SWEP.DefaultBodygroups = "00000000000"
 
-SWEP.MeleeDamage = 25
+SWEP.MeleeDamage = 15
 SWEP.MeleeDamageBackstab = nil -- If not exists, use multiplier on standard damage
 SWEP.MeleeRange = 32
 SWEP.MeleeDamageType = DMG_CLUB
-SWEP.MeleeTime = 0.4
+SWEP.MeleeTime = 0.5
 SWEP.MeleeGesture = ACT_HL2MP_GESTURE_RANGE_ATTACK_MELEE
 SWEP.MeleeAttackTime = 0.1
 

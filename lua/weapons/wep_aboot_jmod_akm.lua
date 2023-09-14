@@ -1,4 +1,4 @@
-SWEP.Base = "arccw_base"
+SWEP.Base = "wep_jack_gmod_gunbase"
 SWEP.Spawnable = false
 SWEP.Category = "ArcCW - Half-Life" -- edit this if you like
 SWEP.AdminOnly = false
@@ -10,8 +10,8 @@ SWEP.Slot = 2
 SWEP.UseHands = true
 SWEP.NoHideLeftHandInCustomization = true
 
-SWEP.ViewModel = "models/weapons/akm/c_akm.mdl"
-SWEP.WorldModel = "models/weapons/akm/w_akm.mdl"
+SWEP.ViewModel = "models/weapons/aboot/akm/c_akm.mdl"
+SWEP.WorldModel = "models/weapons/aboot/akm/w_akm.mdl"
 SWEP.ViewModelFOV = 60
 SWEP.MirrorVMWM = true
 SWEP.WorldModelOffset = {
@@ -20,8 +20,10 @@ SWEP.WorldModelOffset = {
 }
 
 SWEP.DefaultBodygroups = "00000000000"
+JModHL2.ApplyAmmoSpecs(SWEP, "Light Rifle Round", 1)
+SWEP.CustomToggleCustomizeHUD = false
 
-SWEP.Damage = 15
+--[[SWEP.Damage = 15
 SWEP.DamageMin = 9
 
 SWEP.Force = 15
@@ -31,19 +33,14 @@ SWEP.RangeMin = 60
 SWEP.Penetration = 12
 SWEP.DamageType = DMG_BULLET
 SWEP.ShootEntity = nil -- entity to fire, if any
-SWEP.MuzzleVelocity = 1050 -- projectile or phys bullet muzzle velocity
+SWEP.MuzzleVelocity = 1050 -- projectile or phys bullet muzzle velocity--]]
 -- IN M/S
-SWEP.ChamberSize = 0 -- how many rounds can be chambered.
+SWEP.ChamberSize = 1 -- how many rounds can be chambered.
 SWEP.Primary.ClipSize = 30 -- DefaultClip is automatically set.
 SWEP.ExtendedClipSize = 40
 SWEP.ReducedClipSize = 20
-
-SWEP.BodyDamageMults = {
-    [HITGROUP_HEAD] = 1.5,
- }
  
 SWEP.PhysBulletMuzzleVelocity = 700
-
 
 SWEP.Recoil = 0.25
 SWEP.RecoilSide = 0.25
@@ -77,7 +74,6 @@ SWEP.HipDispersion = 300 -- inaccuracy added by hip firing.
 SWEP.MoveDispersion = 100
 SWEP.SightsDispersion = 10
 
-SWEP.Primary.Ammo = "ar2" -- what ammo type the gun uses
 SWEP.MagID = "akm" -- the magazine pool this gun draws from
 
 SWEP.ShootVol = 80 -- volume of shoot sound
@@ -153,7 +149,49 @@ SWEP.AttachmentElements = {
 SWEP.ExtraSightDist = 10
 
 SWEP.Attachments = {
-
+	{
+		PrintName = "Optic",
+		DefaultAttName = "No Scope",
+		Slot = {"ez_optic", "optic"},
+		Bone = "weapon",
+		Offset = {
+			vang = Angle(0, 180, 90),
+			vpos = Vector(-5, -5, 0),
+			wpos = Vector(10, 1.1, -6.5),
+			wang = Angle(-5, 0.3, 180)
+		},
+		CorrectiveAng = Angle(0, 0, 0),
+		CorrectivePos = Vector(0, 0, 0.03)
+	},
+	{
+		PrintName = "Tactical",
+		DefaultAttName = "No Attachment",
+		Slot = {"tac", "ez_tac", "flashlight", "light"},
+		Bone = "weapon",
+		Offset = {
+			vpos = Vector(-18, -3.5, 0.5), -- offset that the attachment will be relative to the bone
+			vang = Angle(180, 0, 0),
+			wpos = Vector(22, 1.5, -6),
+			wang = Angle(-5, 0, -92)
+		},
+		--Hidden = true, -- attachment cannot be seen in customize menu
+	},
+	{
+		PrintName = "Perk",
+		Slot = "perk"
+	},
+	{
+		PrintName = "Charm",
+		Slot = "charm",
+		FreeSlot = true,
+		Bone = "weapon",
+		Offset = {
+			vpos = Vector(-4.4, -3, 0.5), -- offset that the attachment will be relative to the bone
+			vang = Angle(0, 180, 90),
+			wpos = Vector(8.5, 1.8, -4),
+			wang = Angle(0, -5, 180)
+		},
+	},
 }
 
 SWEP.Animations = {
@@ -194,14 +232,7 @@ sound.Add({
 		"weapon/akm/akm_fire_player_02.wav",
 		"weapon/akm/akm_fire_player_03.wav",
 		"weapon/akm/akm_fire_player_04.wav",
-		"weapon/akm/akm_fire_player_05.wav",
-		"weapon/akm/akm_fire_player_06.wav",
-		"weapon/akm/akm_fire_player_07.wav",
-		"weapon/akm/akm_fire_player_08.wav",
-		"weapon/akm/akm_fire_player_09.wav",
-		"weapon/akm/akm_fire_player_10.wav",
-		"weapon/akm/akm_fire_player_11.wav",
-		"weapon/akm/akm_fire_player_12.wav"
+		"weapon/akm/akm_fire_player_05.wav"
 	}
 })
 
@@ -216,14 +247,7 @@ sound.Add({
 		")weapon/akm/akm_fire_player_02.wav",
 		")weapon/akm/akm_fire_player_03.wav",
 		")weapon/akm/akm_fire_player_04.wav",
-		")weapon/akm/akm_fire_player_05.wav",
-		")weapon/akm/akm_fire_player_06.wav",
-		")weapon/akm/akm_fire_player_07.wav",
-		")weapon/akm/akm_fire_player_08.wav",
-		")weapon/akm/akm_fire_player_09.wav",
-		")weapon/akm/akm_fire_player_10.wav",
-		")weapon/akm/akm_fire_player_11.wav",
-		")weapon/akm/akm_fire_player_12.wav"
+		")weapon/akm/akm_fire_player_05.wav"
 	}
 })
 

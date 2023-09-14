@@ -75,6 +75,12 @@ JModHL2.WeaponTable = {
 		ent = "ent_aboot_jmod_ezweapon_gr9",
 		Category = "JMod - EZ HL:2"
 	},
+	["AR1"] = {
+		mdl = "models/weapons/aboot/akm/w_akm.mdl",
+		swep = "wep_aboot_jmod_akm",
+		ent = "ent_aboot_jmod_ezweapon_akm",
+		Category = "JMod - EZ HL:2"
+	},
 }
 
 -- keepcorpses caauses floating arrow bug

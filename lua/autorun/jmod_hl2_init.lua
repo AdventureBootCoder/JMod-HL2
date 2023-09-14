@@ -79,7 +79,7 @@ if(SERVER)then
 		end
 		if PlyEff and PlyEff.HEVreq and not(PlyEff.HEVsuit) then
 			for id, items in pairs(playa.EZarmor.items) do
-				if JMod.ArmorTable[items.name].eff.HEVreq then
+				if (JMod.ArmorTable[items.name].eff) and (JMod.ArmorTable[items.name].eff.HEVreq) then
 					playa:PrintMessage(HUD_PRINTCENTER, "This armor requires an HEV suit")
 					JMod.RemoveArmorByID(playa, id)
 				end
