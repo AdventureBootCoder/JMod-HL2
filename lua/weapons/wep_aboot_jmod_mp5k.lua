@@ -194,10 +194,7 @@ sound.Add({
 	sound = {
 		"weapon/hmg/hmg_fire_player_01.wav",
 		"weapon/hmg/hmg_fire_player_02.wav",
-		"weapon/hmg/hmg_fire_player_03.wav",
-		"weapon/hmg/hmg_fire_player_04.wav",
-		"weapon/hmg/hmg_fire_player_05.wav",
-		"weapon/hmg/hmg_fire_player_06.wav",
+		"weapon/hmg/hmg_fire_player_03.wav"
 	}
 })
 
@@ -210,10 +207,7 @@ sound.Add({
 	sound = {
 		")weapon/hmg/hmg_fire_player_01.wav",
 		")weapon/hmg/hmg_fire_player_02.wav",
-		")weapon/hmg/hmg_fire_player_03.wav",
-		")weapon/hmg/hmg_fire_player_04.wav",
-		")weapon/hmg/hmg_fire_player_05.wav",
-		")weapon/hmg/hmg_fire_player_06.wav",
+		")weapon/hmg/hmg_fire_player_03.wav"
 	}
 })
 
