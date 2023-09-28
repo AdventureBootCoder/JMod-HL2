@@ -1,0 +1,27 @@
+"VertexLitGeneric"
+{
+	"$baseTexture" "models\weapons\aboot/v_smg1_new\v_smg1_glass_d2"
+	"$bumpmap" "models\weapons\aboot/v_smg1_new\v_smg1_glass_n"
+	
+	"$translucent"			"1"
+	"$additive"			"0"
+	
+	"$detail"		"models\weapons\v_smg1_new\v_smg1_glass_d2"
+	"$detailblendmode" "5"
+	"$detailscale" "1"
+	
+
+	"$phong"				"1"
+	"$phongexponent"			"20"
+	"$phongboost"			"0"
+	"$phongfresnelranges"		"[2 4 6]"
+	"$phongtint"			"[25 0 0]"
+
+	"$rimlight"			"1"
+	"$rimlightexponent"			"50"	
+	"$rimlightboost"			"0.2"	
+				
+	"$envmap"			"1"
+	"$normalmapalphaenvmapmask"	"1"
+	"$envmaptint"			"[25 0 0]"
+}

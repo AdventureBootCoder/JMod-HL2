@@ -1,0 +1,20 @@
+VertexLitGeneric
+{
+	"$basetexture"				"models/weapons/aboot/v_smg1/MP7_d"
+	"$bumpmap"					"models/weapons/aboot/v_smg1/MP7_n"
+	"$phongexponenttexture"		"models/weapons/aboot/v_smg1/MP7_e"
+	"$color2"					"[0.65 0.65 0.65]"
+
+	"$envmap"					"env_cubemap"
+	"$envmaptint"				"[ .08 .08 .08 ]"
+	
+	$phong						1
+	$phongexponent				30
+	$phongboost					2
+	$phongfresnelranges			"[0.25 0.5 1]"
+
+	"$rimlight"					"1"
+	"$rimlightexponent"			"80"	
+	"$rimlightboost"			"1"
+	"$rimmask"					"1"
+}

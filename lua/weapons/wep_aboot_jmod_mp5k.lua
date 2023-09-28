@@ -16,17 +16,17 @@ SWEP.WorldModelOffset = {
 SWEP.ProceduralIronFire = true
 SWEP.DefaultBodygroups = "00000000000"
 SWEP.CustomToggleCustomizeHUD = false
+JModHL2.ApplyAmmoSpecs(SWEP, "Pistol Round", 1.2)
 
 --SWEP.Damage = 9
 --SWEP.DamageMin = 3
 
-SWEP.Range = 50 -- in METRES
-SWEP.RangeMin = 20
-SWEP.Penetration = 4
-SWEP.DamageType = DMG_BULLET
-SWEP.ShootEntity = nil -- entity to fire, if any
-SWEP.MuzzleVelocity = 1050 -- projectile or phys bullet muzzle velocity
-
+--SWEP.Range = 50 -- in METRES
+--SWEP.RangeMin = 20
+--SWEP.Penetration = 4
+--SWEP.DamageType = DMG_BULLET
+--SWEP.ShootEntity = nil -- entity to fire, if any
+--SWEP.MuzzleVelocity = 1050 -- projectile or phys bullet muzzle velocity
 -- IN M/S
 SWEP.ChamberSize = 0 -- how many rounds can be chambered.
 SWEP.Primary.ClipSize = 32 -- DefaultClip is automatically set.
@@ -79,8 +79,6 @@ SWEP.SightsDispersion = 80
 
 --SWEP.Primary.Ammo = "smg1" -- what ammo type the gun uses
 SWEP.MagID = "mp5k" -- the magazine pool this gun draws from
-
-JModHL2.ApplyAmmoSpecs(SWEP, "Pistol Round", 1.2)
 
 SWEP.ShootVol = 80 -- volume of shoot sound
 SWEP.ShootPitch = 100 -- pitch of shoot sound
