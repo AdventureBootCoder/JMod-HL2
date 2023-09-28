@@ -1,8 +1,8 @@
 VertexLitGeneric
 {
-	"$basetexture"				"models/weapons/aboot/v_smg1/MP7_d"
-	"$bumpmap"					"models/weapons/aboot/v_smg1/MP7_n"
-	"$phongexponenttexture"		"models/weapons/aboot/v_smg1/MP7_e"
+	"$basetexture"				"models/weapons/aboot/tfa_mmod/v_smg1/MP7_d"
+	"$bumpmap"					"models/weapons/aboot/tfa_mmod/v_smg1/MP7_n"
+	"$phongexponenttexture"		"models/weapons/aboot/tfa_mmod/v_smg1/MP7_e"
 	"$color2"					"[0.65 0.65 0.65]"
 
 	"$envmap"					"env_cubemap"
