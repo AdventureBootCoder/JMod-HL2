@@ -29,15 +29,15 @@ JModHL2.ApplyAmmoSpecs(SWEP, "Pistol Round", 1.2)
 --SWEP.MuzzleVelocity = 1050 -- projectile or phys bullet muzzle velocity
 -- IN M/S
 SWEP.ChamberSize = 0 -- how many rounds can be chambered.
-SWEP.Primary.ClipSize = 32 -- DefaultClip is automatically set.
+SWEP.Primary.ClipSize = 30 -- DefaultClip is automatically set.
 SWEP.ExtendedClipSize = 45
-SWEP.ReducedClipSize = 25
+SWEP.ReducedClipSize = 15
 
 SWEP.PhysBulletMuzzleVelocity = 700
 
 
-SWEP.Recoil = 0.1
-SWEP.RecoilSide = 0.35
+SWEP.Recoil = 0.5
+SWEP.RecoilSide = 0.1
 SWEP.RecoilRise = 0.2
 SWEP.MaxRecoilBlowback = 4
 SWEP.VisualRecoilMult = 2
@@ -67,14 +67,14 @@ SWEP.Firemodes = {
     }
 }
 
+SWEP.Force = 4
+
 SWEP.NPCWeaponType = "weapon_smg1"
 SWEP.NPCWeight = 100
 
-SWEP.Force = 4
-
 SWEP.AccuracyMOA = 5 -- accuracy in Minutes of Angle. There are 60 MOA in a degree.
-SWEP.HipDispersion = 500 -- inaccuracy added by hip firing.
-SWEP.MoveDispersion = 100
+SWEP.HipDispersion = 400 -- inaccuracy added by hip firing.
+SWEP.MoveDispersion = 80
 SWEP.SightsDispersion = 80
 
 --SWEP.Primary.Ammo = "smg1" -- what ammo type the gun uses

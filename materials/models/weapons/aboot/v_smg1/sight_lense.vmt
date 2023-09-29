@@ -1,13 +1,13 @@
 VertexLitGeneric
 {
-	"$basetexture"			"models\Weapons\aboot/v_smg1/sight_lense"
-	$bumpmap			"models\Weapons\aboot/v_smg1/sight_lense_n"
+	"$basetexture"			"models/weapons/aboot/v_smg1/sight_lense"
+	$bumpmap			"models/weapons/aboot/v_smg1/sight_lense_n"
 
 
 //PHONG
 	$phong                      1
 	$phongboost                 0.2
 	$phongfresnelranges         "[1 3 6]"
+	$alphatest 1
 	$nocull 1
-
 }

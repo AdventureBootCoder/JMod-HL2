@@ -30,8 +30,8 @@ JModHL2.ApplyAmmoSpecs(SWEP, "Pistol Round", 1.3)
 -- IN M/S
 SWEP.ChamberSize = 0 -- how many rounds can be chambered.
 SWEP.Primary.ClipSize = 30 -- DefaultClip is automatically set.
-SWEP.ExtendedClipSize = 45
-SWEP.ReducedClipSize = 24
+SWEP.ExtendedClipSize = 40
+SWEP.ReducedClipSize = 20
 
 SWEP.PhysBulletMuzzleVelocity = 700
 
@@ -46,7 +46,7 @@ SWEP.RecoilPunchBackMax = 2
 SWEP.RecoilPunchBackMaxSights = nil -- may clip with scopes
 SWEP.RecoilVMShake = 1.0 -- random viewmodel offset when shooty
 
-SWEP.Delay = 60 / 1000 -- 60 / RPM.
+SWEP.Delay = 60 / 950 -- 60 / RPM.
 SWEP.Num = 1 -- number of shots per trigger pull.
 SWEP.Firemodes = {
 	{
@@ -54,22 +54,24 @@ SWEP.Firemodes = {
 		PrintName = "FULL-AUTO"
 	},
     {
-		PrintName = "BURST",
-        Mode = -3,
-		RunawayBurst = true,
-		AutoBurst = true,
-		PostBurstDelay = 0.2,
+		PrintName = "SINGLE",
+        Mode = 1,
+		--RunawayBurst = true,
+		--AutoBurst = true,
+		--PostBurstDelay = 0.2,
     },
 	{
 		Mode = 0
 	}
 }
 
+SWEP.Force = 5
+
 SWEP.NPCWeaponType = "weapon_smg1"
 SWEP.NPCWeight = 100
 
 SWEP.AccuracyMOA = 5 -- accuracy in Minutes of Angle. There are 60 MOA in a degree.
-SWEP.HipDispersion = 400 -- inaccuracy added by hip firing.
+SWEP.HipDispersion = 600 -- inaccuracy added by hip firing.
 SWEP.MoveDispersion = 100
 SWEP.SightsDispersion = 50
 
@@ -110,11 +112,9 @@ SWEP.TracerFinalMag = 0 -- the last X bullets in a magazine are all tracers
 SWEP.Tracer = "arccw_tracer" -- override tracer (hitscan) effect
 SWEP.HullSize = 0 -- HullSize used by FireBullets
 
-SWEP.Force = 5
-
 SWEP.IronSightStruct = {
-    Pos = Vector(-6.5, -6, 1.8),
-    Ang = Angle(-1.2, -0.05, 0),
+    Pos = Vector(-6.5, -6, 1.75),
+    Ang = Angle(-1.6, -0.05, 0),
     Magnification = 1.2,
     SwitchToSound = "", -- sound that plays when switching to this sight
     CrosshairInSights = false
@@ -128,8 +128,11 @@ SWEP.HoldtypeSights = "rpg"
 
 SWEP.AnimShoot = ACT_HL2MP_GESTURE_RANGE_ATTACK_AR2
 
-SWEP.ActivePos = Vector(0,0,0)
-SWEP.ActiveAng = Angle(0, 0, 0)
+SWEP.ActivePos = Vector(0, 0, -1)
+SWEP.ActiveAng = Angle(1, 0, 0)
+
+SWEP.SprintPos = Vector(6, -3, -2)
+SWEP.SprintAng = Angle(0, 30, -10)
 
 SWEP.CrouchPos = Vector(-1, -2, -1)
 SWEP.CrouchAng = Angle(0, 0, -15)
@@ -155,20 +158,57 @@ SWEP.Attachments = {
 		PrintName = "Optic",
 		DefaultAttName = "No Attachment",
 		Slot = {"ez_optic", "smg2_optic"},
-		Bone = "base",
+		Bone = "smdimport",
 		Offset = {
-			vang = Angle(0, 180, 90),
-			vpos = Vector(-5.5, -3.5, 0),
-			wpos = Vector(0.7, 0.5, -7),
+			vang = Angle(0, -90, 0),
+			vpos = Vector(-0.15, -6.5, 4.3),
+			wpos = Vector(0.7, 0, -7),
 			wang = Angle(-10, 0.3, 180)
 		},
-		--CorrectiveAng = Angle(0, 0, 0),
+		CorrectiveAng = Angle(0, 180, 0),
 		--CorrectivePos = Vector(0, 0, 0.03),
 		--Installed = ""
 	},
 	{
+		PrintName = "Tactical",
+		DefaultAttName = "No Attachment",
+		Slot = {"tac", "ez_tac", "flashlight", "light"},
+		Bone = "smdimport",
+		Offset = {
+			vpos = Vector(1, 4.4, 1.2), -- offset that the attachment will be relative to the bone
+			vang = Angle(90, -90, 0),
+			wpos = Vector(22, 1.5, -6),
+			wang = Angle(-5, 0, -92)
+		},
+		--Hidden = true, -- attachment cannot be seen in customize menu
+	},
+	{
+		PrintName = "Muzzle", -- print name
+		DefaultAttName = "Default",
+		Slot = "muzzle", -- what kind of attachments can fit here, can be string or table
+		Bone = "smdimport", -- relevant bone any attachments will be mostly referring to
+		Offset = {
+			vpos = Vector(-0.1, 7.5, 1.3), -- offset that the attachment will be relative to the bone
+			vang = Angle(0, -90, 0),
+			wpos = Vector(10, 1.75, -5.5),
+			wang = Angle(-10, -2, 183)
+		},
+	},
+	{
 		PrintName = "Perk",
 		Slot = "perk"
+	},
+	{
+		PrintName = "Charm",
+		Slot = "charm",
+		FreeSlot = true,
+		Bone = "smdimport",
+		Offset = {
+			vpos = Vector(0.7, -7.5, 2), -- offset that the attachment will be relative to the bone
+			vang = Angle(0, -90, 0),
+			wpos = Vector(8.5, 1.8, -4),
+			wang = Angle(0, -5, 180)
+		},
 	},
 }
 

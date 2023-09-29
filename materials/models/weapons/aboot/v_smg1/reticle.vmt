@@ -1,6 +1,6 @@
 VertexLitGeneric
 {
-	"$basetexture"			"models/weapons/v_smg1/aboot/sight_lense"
+	$basetexture	"models/weapons/v_smg1/aboot/sight_lense"
 	$selfillum 1
 
 }
