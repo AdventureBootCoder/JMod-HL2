@@ -2,7 +2,7 @@
 att.Icon = Material("entities/acwatt_optic_aimpoint.png")
 att.Description = "wew lad"
 att.SortOrder = 0
-att.ModelOffset = Vector(0, 1, -0.2)
+att.ModelOffset = Vector(-0.05, 1, -0.1)
 att.OffsetAng = Angle(0, -90, 0)
 
 att.Desc_Pros = {"+ Precision sight picture",}
@@ -14,7 +14,7 @@ att.Model = "models/weapons/arccw/atts/smg2_optic.mdl"
 
 att.AdditionalSights = {
 	{
-		Pos = Vector(0, 15, -1.2),
+		Pos = Vector(0, 15, -1.5),
 		Ang = Angle(0, 90, 0),
 		Magnification = 1.25,
 		ScrollFunc = ArcCW.SCROLL_NONE,

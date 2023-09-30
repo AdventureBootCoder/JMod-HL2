@@ -39,6 +39,7 @@ if SERVER then
             phys:Wake()
             phys:SetDragCoefficient(self.DragCoefficient)
             phys:SetBuoyancyRatio(0.1)
+			phys:EnableDrag(false)
         end
 
         self.SpawnTime = CurTime()
@@ -83,9 +84,11 @@ end
 
 -- overwrite to do special explosion things
 function ENT:DoDetonation()
-    local attacker = IsValid(self:GetOwner()) and self:GetOwner() or self
-    util.BlastDamage(self, attacker, self:GetPos(), self.GrenadeRadius, self.GrenadeDamage or self.Damage or 0)
-	JMod.BlastDoors(attacker, self:GetPos(),  self.GrenadeDamage or self.Damage or 0, self.GrenadeRadius, false)
+	local attacker = IsValid(self:GetOwner()) and self:GetOwner() or self
+	local SelfPos = self:GetPos()
+	--util.BlastDamage(self, attacker, self:GetPos(), self.GrenadeRadius, self.GrenadeDamage or self.Damage or 0)
+	JMod.FragSplosion(self, SelfPos, 2000, 30, 2000, attacker, self:GetVelocity():GetNormalized(), .01)
+	JMod.BlastDoors(attacker, SelfPos,  self.GrenadeDamage or self.Damage or 0, self.GrenadeRadius, false)
 end
 
 function ENT:DoImpact(ent)
@@ -175,7 +178,7 @@ function ENT:PhysicsCollide(colData, collider)
 				end
 			end)
 		else]]--
-			self:Remove()
+			--self:Remove()
 		--end
     end
 end

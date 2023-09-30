@@ -14,7 +14,7 @@ SWEP.WorldModelOffset = {
 }
 
 SWEP.DefaultBodygroups = "00000000000"
-JModHL2.ApplyAmmoSpecs(SWEP, "Light Rifle Round", 1.2)
+JModHL2.ApplyAmmoSpecs(SWEP, "Light Rifle Round", 0.8)
 SWEP.CustomToggleCustomizeHUD = false
 
 SWEP.BodyHolsterSlot = "back"
@@ -39,9 +39,9 @@ SWEP.RecoilRise = 0.25
 SWEP.MaxRecoilBlowback = -1
 SWEP.VisualRecoilMult = 1
 SWEP.RecoilPunch = 2
-SWEP.RecoilPunchBackMax = 2
-SWEP.RecoilPunchBackMaxSights = nil -- may clip with scopes
-SWEP.RecoilVMShake = 2 -- random viewmodel offset when shooty
+SWEP.RecoilPunchBackMax = 0
+SWEP.RecoilPunchBackMaxSights = 0 -- may clip with scopes
+SWEP.RecoilVMShake = 0 -- random viewmodel offset when shooty
 
 SWEP.Delay = 60 / 650 -- 60 / RPM.
 SWEP.Num = 1 -- number of shots per trigger pull.
@@ -64,7 +64,7 @@ SWEP.NPCWeaponType = "weapon_ar2"
 SWEP.NPCWeight = 100
 
 SWEP.AccuracyMOA = 1 -- accuracy in Minutes of Angle. There are 60 MOA in a degree.
-SWEP.HipDispersion = 300 -- inaccuracy added by hip firing.
+SWEP.HipDispersion = 800 -- inaccuracy added by hip firing.
 SWEP.MoveDispersion = 100
 SWEP.SightsDispersion = 50
 
@@ -91,7 +91,7 @@ SWEP.GMMuzzleEffect = false
 SWEP.MuzzleEffectAttachment = 1 -- which attachment to put the muzzle on
 SWEP.CaseEffectAttachment = 2 -- which attachment to put the case effect on
 
-SWEP.SpeedMult = 0.9
+SWEP.SpeedMult = 0.8
 SWEP.SightedSpeedMult = 0.5
 SWEP.SightTime = 0.55
 
@@ -238,10 +238,17 @@ SWEP.Animations = {
 
 hook.Add( "StartCommand", "JModHL2_OICWscrollCapture", function( ply, cmd )
 	local Wep = ply:GetActiveWeapon()
-	if (cmd:GetMouseWheel() ~= 0) and IsValid(Wep) and (Wep:GetClass() == "wep_aboot_jmod_oicw") and (Wep:GetState() == ArcCW.STATE_SIGHTS) and (Wep:GetActiveSights().ScrollFunc == ArcCW.SCROLL_NONE) then
-		Wep:SetNW2Float("EZfuseTime", math.Clamp(Wep:GetNW2Float("EZfuseTime", 1) + cmd:GetMouseWheel() * 0.1, 0.2, 5))
-		--jprint(Wep:GetNW2Float("EZfuseTime", 1))
-		--jprint(ply, " scrolled ", cmd:GetMouseWheel())
+	if IsValid(Wep) and (Wep:GetClass() == "wep_aboot_jmod_oicw") and Wep.GetState and (Wep:GetState() == ArcCW.STATE_SIGHTS) and (Wep:GetActiveSights().ScrollFunc == ArcCW.SCROLL_NONE) then
+		if (cmd:KeyDown(IN_USE)) then
+			local Tr = util.QuickTrace(ply:GetShootPos(), ply:GetAimVector() * 5000, ply)
+			local DistToTime = Tr.HitPos:Distance(Tr.StartPos) / 5000
+			Wep:SetNW2Float("EZfuseTime", math.Clamp(math.Round(DistToTime, 2), 0.1, 5))
+		end
+		if (cmd:GetMouseWheel() ~= 0) then
+			Wep:SetNW2Float("EZfuseTime", math.Clamp(Wep:GetNW2Float("EZfuseTime", 2) + cmd:GetMouseWheel() * 0.1, 0.1, 5))
+			--jprint(Wep:GetNW2Float("EZfuseTime", 1))
+			--jprint(ply, " scrolled ", cmd:GetMouseWheel())
+		end
 	end
 end)
 

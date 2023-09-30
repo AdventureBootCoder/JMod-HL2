@@ -36,9 +36,9 @@ SWEP.ReducedClipSize = 20
 SWEP.PhysBulletMuzzleVelocity = 700
 
 
-SWEP.Recoil = 1
-SWEP.RecoilSide = 0.1
-SWEP.RecoilRise = 0.3
+SWEP.Recoil = 0.3
+SWEP.RecoilSide = 0.3
+SWEP.RecoilRise = 0.1
 SWEP.MaxRecoilBlowback = -1
 SWEP.VisualRecoilMult = 1.5
 SWEP.RecoilPunch = 1.5
@@ -71,8 +71,8 @@ SWEP.NPCWeaponType = "weapon_smg1"
 SWEP.NPCWeight = 100
 
 SWEP.AccuracyMOA = 5 -- accuracy in Minutes of Angle. There are 60 MOA in a degree.
-SWEP.HipDispersion = 600 -- inaccuracy added by hip firing.
-SWEP.MoveDispersion = 100
+SWEP.HipDispersion = 800 -- inaccuracy added by hip firing.
+SWEP.MoveDispersion = 120
 SWEP.SightsDispersion = 50
 
 --SWEP.Primary.Ammo = "smg1" -- what ammo type the gun uses
@@ -113,7 +113,7 @@ SWEP.Tracer = "arccw_tracer" -- override tracer (hitscan) effect
 SWEP.HullSize = 0 -- HullSize used by FireBullets
 
 SWEP.IronSightStruct = {
-    Pos = Vector(-6.5, -6, 1.75),
+    Pos = Vector(-6.5, -8, 1.75),
     Ang = Angle(-1.6, -0.05, 0),
     Magnification = 1.2,
     SwitchToSound = "", -- sound that plays when switching to this sight
@@ -149,6 +149,20 @@ SWEP.CustomizeAng = Angle(5, 30, 30)
 SWEP.BarrelLength = 24
 
 SWEP.AttachmentElements = {
+	["stock_in"] = {
+--		NameChange = "Retracted",
+		VMBodygroups = {{ind = 2, bg = 0}},
+	},
+	["stock_out"] = {
+--		RequireFlags = {"aboot_ez_extendedstock"},
+--		NameChange = "Extended",
+		VMBodygroups = {{ind = 2, bg = 1}},
+	},
+	["stock_none"] = {
+		ExludeFlags = {"aboot_ez_extendedstock"},
+--		NameChange = "",
+		VMBodygroups = {{ind = 2, bg = 2}},
+	}
 }
 
 SWEP.ExtraSightDist = 10
@@ -193,6 +207,24 @@ SWEP.Attachments = {
 			wpos = Vector(10, 1.75, -5.5),
 			wang = Angle(-10, -2, 183)
 		},
+	},
+	{
+		PrintName = "Stock",
+		DefaultAttName = "Retracted",
+		Slot = {"ez_smg2_stock"},
+		Bone = "smdimport",
+		Offset = {
+			vpos = Vector(0, 0, 0), -- offset that the attachment will be relative to the bone
+			vang = Angle(0, -90, 0),
+			wpos = Vector(0, 0, 0),
+			wang = Angle(0, 0, 0)
+		},
+		InstalledEles = {"stock_out"},
+		DefaultEles = {"stock_in"}
+	},
+	{
+		PrintName = "Ammo Type",
+		Slot = "ammo_bullet"
 	},
 	{
 		PrintName = "Perk",
@@ -264,13 +296,7 @@ sound.Add({
 		")weapon/smg1/smg1_fire_player_03.wav",
 		")weapon/smg1/smg1_fire_player_04.wav",
 		")weapon/smg1/smg1_fire_player_05.wav",
-		")weapon/smg1/smg1_fire_player_06.wav",
-		")weapon/smg1/smg1_fire_player_07.wav",
-		")weapon/smg1/smg1_fire_player_08.wav",
-		")weapon/smg1/smg1_fire_player_09.wav",
-		")weapon/smg1/smg1_fire_player_10.wav",
-		")weapon/smg1/smg1_fire_player_11.wav",
-		")weapon/smg1/smg1_fire_player_12.wav"
+		")weapon/smg1/smg1_fire_player_06.wav"
 	}
 })
 
