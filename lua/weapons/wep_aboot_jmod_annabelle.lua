@@ -133,6 +133,10 @@ SWEP.AttachmentElements = {
 SWEP.ExtraSightDist = 10
 
 SWEP.Attachments = {
+	--{
+	--	PrintName = "Ammo Type",
+	--	Slot = {"ammo_shotgun"}
+	--},
 	{
 		PrintName = "Perk",
 		Slot = "perk"

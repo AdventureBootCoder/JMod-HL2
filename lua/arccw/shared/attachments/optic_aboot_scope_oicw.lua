@@ -43,7 +43,7 @@ local TextFunc = function(tex)
 	cam.Start2D()
 		local FOV = ((GetConVar("arccw_cheapscopes"):GetBool() and GetConVar("arccw_cheapscopesv2_ratio"):GetFloat()) or .5) * 20
 		draw.DrawText("DET TIME: " .. tostring(math.Round(ActiveWep:GetNW2Float("EZfuseTime", 1), 2)), "JMod-Display-XS", (ScrW() * 0.55) - FOV, (ScrH() * 0.42) - FOV , TextColor, TEXT_ALIGN_LEFT)
-		draw.DrawText("DIST: " .. tostring(math.Round(ply:GetEyeTrace().Fraction * 32768)), "JMod-Display-XS", (ScrW() * 0.55) - FOV, (ScrH() * 0.43) - FOV, TextColor, TEXT_ALIGN_LEFT)
+		draw.DrawText("DIST: " .. tostring(math.Round((ply:GetEyeTrace().Fraction * 32768) * 0.0254, 1)), "JMod-Display-XS", (ScrW() * 0.55) - FOV, (ScrH() * 0.43) - FOV, TextColor, TEXT_ALIGN_LEFT)
 	cam.End2D()
 	
 	render.PopRenderTarget(tex)
@@ -86,7 +86,7 @@ local ThermalScopeFunction = function(tex)
 	cam.Start2D()
 		local FOV = ((GetConVar("arccw_cheapscopes"):GetBool() and GetConVar("arccw_cheapscopesv2_ratio"):GetFloat()) or .5) * 20
 		draw.DrawText("DET TIME: " .. tostring(math.Round(ActiveWep:GetNW2Float("EZfuseTime", 1), 2)), "JMod-Display-XS", (ScrW() * 0.55) - FOV, (ScrH() * 0.42) - FOV , TextColor, TEXT_ALIGN_LEFT)
-		draw.DrawText("DIST: " .. tostring(math.Round(ply:GetEyeTrace().Fraction * 32768)), "JMod-Display-XS", (ScrW() * 0.55) - FOV, (ScrH() * 0.43) - FOV, TextColor, TEXT_ALIGN_LEFT)
+		draw.DrawText("DIST: " .. tostring(math.Round((ply:GetEyeTrace().Fraction * 32768) * 0.0254, 1)), "JMod-Display-XS", (ScrW() * 0.55) - FOV, (ScrH() * 0.43) - FOV, TextColor, TEXT_ALIGN_LEFT)
 	cam.End2D()
 	
 	render.PopRenderTarget(tex)

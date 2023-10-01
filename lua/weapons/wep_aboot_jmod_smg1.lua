@@ -7,7 +7,7 @@ SWEP.Slot = 2
 
 SWEP.ViewModel = "models/weapons/aboot/tfa_mmod/c_smg1.mdl"
 SWEP.WorldModel = "models/weapons/aboot/tfa_mmod/w_smg1.mdl"
-SWEP.ViewModelFOV = 70
+SWEP.ViewModelFOV = 60
 SWEP.MirrorVMWM = true
 SWEP.WorldModelOffset = {
     pos = Vector(10, 0, -4),

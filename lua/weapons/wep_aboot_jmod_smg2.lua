@@ -152,16 +152,19 @@ SWEP.AttachmentElements = {
 	["stock_in"] = {
 --		NameChange = "Retracted",
 		VMBodygroups = {{ind = 2, bg = 0}},
+		--WMBodygroups = {{ind = 2, bg = 0}},
 	},
 	["stock_out"] = {
 --		RequireFlags = {"aboot_ez_extendedstock"},
 --		NameChange = "Extended",
 		VMBodygroups = {{ind = 2, bg = 1}},
+		--WMBodygroups = {{ind = 2, bg = 1}},
 	},
 	["stock_none"] = {
 		ExludeFlags = {"aboot_ez_extendedstock"},
 --		NameChange = "",
 		VMBodygroups = {{ind = 2, bg = 2}},
+		--WMBodygroups = {{ind = 2, bg = 2}},
 	}
 }
 
@@ -176,9 +179,10 @@ SWEP.Attachments = {
 		Offset = {
 			vang = Angle(0, -90, 0),
 			vpos = Vector(-0.15, -6.5, 4.3),
-			wpos = Vector(0.7, 0, -7),
-			wang = Angle(-10, 0.3, 180)
+			wpos = Vector(1.5, 1.5, -5.7),
+			wang = Angle(-10, 180, 180)
 		},
+		Scale = 2,
 		CorrectiveAng = Angle(0, 180, 0),
 		--CorrectivePos = Vector(0, 0, 0.03),
 		--Installed = ""
@@ -191,8 +195,8 @@ SWEP.Attachments = {
 		Offset = {
 			vpos = Vector(1, 4.4, 1.2), -- offset that the attachment will be relative to the bone
 			vang = Angle(90, -90, 0),
-			wpos = Vector(22, 1.5, -6),
-			wang = Angle(-5, 0, -92)
+			wpos = Vector(14, 2.5, -5),
+			wang = Angle(-10, 0, -90)
 		},
 		--Hidden = true, -- attachment cannot be seen in customize menu
 	},
@@ -204,8 +208,8 @@ SWEP.Attachments = {
 		Offset = {
 			vpos = Vector(-0.1, 7.5, 1.3), -- offset that the attachment will be relative to the bone
 			vang = Angle(0, -90, 0),
-			wpos = Vector(10, 1.75, -5.5),
-			wang = Angle(-10, -2, 183)
+			wpos = Vector(17, 1.25, -5.25),
+			wang = Angle(-10, 0, 180)
 		},
 	},
 	{
@@ -238,7 +242,7 @@ SWEP.Attachments = {
 		Offset = {
 			vpos = Vector(0.7, -7.5, 2), -- offset that the attachment will be relative to the bone
 			vang = Angle(0, -90, 0),
-			wpos = Vector(8.5, 1.8, -4),
+			wpos = Vector(2, 2.5, -4),
 			wang = Angle(0, -5, 180)
 		},
 	},

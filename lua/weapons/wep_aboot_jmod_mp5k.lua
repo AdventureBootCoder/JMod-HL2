@@ -153,6 +153,21 @@ SWEP.ExtraSightDist = 10
 
 SWEP.Attachments = {
 	{
+		PrintName = "Optic",
+		DefaultAttName = "No Attachment",
+		Slot = {"ez_optic"},
+		Bone = "weapon",
+		Offset = {
+			vang = Angle(90, 1, -90),
+			vpos = Vector(0, -5.4, 4),
+			wpos = Vector(1.5, 1.5, -5.7),
+			wang = Angle(-10, 0, 0)
+		},
+		--CorrectiveAng = Angle(0, 0, 0),
+		--CorrectivePos = Vector(0, 0, 0.03),
+		--Installed = ""
+	},
+	{
 		PrintName = "Perk",
 		Slot = "perk"
 	},

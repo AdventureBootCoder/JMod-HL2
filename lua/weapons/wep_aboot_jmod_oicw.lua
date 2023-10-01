@@ -204,6 +204,7 @@ SWEP.Animations = {
 		ShellEjectAt = 0,
     },
     ["enter_inspect"] = {
+		Mult = 0.8,
         Source = {"fidget","fidget2"},
     },
     ["reload"] = {
@@ -240,12 +241,13 @@ hook.Add( "StartCommand", "JModHL2_OICWscrollCapture", function( ply, cmd )
 	local Wep = ply:GetActiveWeapon()
 	if IsValid(Wep) and (Wep:GetClass() == "wep_aboot_jmod_oicw") and Wep.GetState and (Wep:GetState() == ArcCW.STATE_SIGHTS) and (Wep:GetActiveSights().ScrollFunc == ArcCW.SCROLL_NONE) then
 		if (cmd:KeyDown(IN_USE)) then
-			local Tr = util.QuickTrace(ply:GetShootPos(), ply:GetAimVector() * 5000, ply)
-			local DistToTime = Tr.HitPos:Distance(Tr.StartPos) / 5000
-			Wep:SetNW2Float("EZfuseTime", math.Clamp(math.Round(DistToTime, 2), 0.1, 5))
+			local Tr = util.QuickTrace(ply:GetShootPos(), ply:GetAimVector() * 32768, ply)
+			local DistToTime = Tr.HitPos:Distance(Tr.StartPos) / 2400
+			--jprint(Tr.HitPos:Distance(Tr.StartPos) / 10000)
+			Wep:SetNW2Float("EZfuseTime", math.Clamp(math.Round(DistToTime, 2), 0.1, 2))
 		end
 		if (cmd:GetMouseWheel() ~= 0) then
-			Wep:SetNW2Float("EZfuseTime", math.Clamp(Wep:GetNW2Float("EZfuseTime", 2) + cmd:GetMouseWheel() * 0.1, 0.1, 5))
+			Wep:SetNW2Float("EZfuseTime", math.Clamp(Wep:GetNW2Float("EZfuseTime", 2) + cmd:GetMouseWheel() * 0.1, 0.1, 2))
 			--jprint(Wep:GetNW2Float("EZfuseTime", 1))
 			--jprint(ply, " scrolled ", cmd:GetMouseWheel())
 		end
