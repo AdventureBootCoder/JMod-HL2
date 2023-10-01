@@ -51,6 +51,7 @@ end
 att.Hook_PostFireRocket = function(wep, rocket)
 	if IsValid(wep) then
 		rocket.EZfuseTime = wep:GetNW2Float("EZfuseTime", 1) 
+		rocket.EZfragment = true
 	end
 end
 

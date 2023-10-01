@@ -86,8 +86,10 @@ end
 function ENT:DoDetonation()
 	local attacker = IsValid(self:GetOwner()) and self:GetOwner() or self
 	local SelfPos = self:GetPos()
-	--util.BlastDamage(self, attacker, self:GetPos(), self.GrenadeRadius, self.GrenadeDamage or self.Damage or 0)
-	JMod.FragSplosion(self, SelfPos, 2000, 30, 2000, attacker, self:GetVelocity():GetNormalized(), .01)
+	if self.EZfragment then
+		JMod.FragSplosion(self, SelfPos, 2000, 30, 2000, attacker, self:GetVelocity():GetNormalized(), .01)
+	end
+	util.BlastDamage(self, attacker, self:GetPos(), self.GrenadeRadius, self.GrenadeDamage or self.Damage or 0)
 	JMod.BlastDoors(attacker, SelfPos,  self.GrenadeDamage or self.Damage or 0, self.GrenadeRadius, false)
 end
 
