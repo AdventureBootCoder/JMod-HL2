@@ -2,17 +2,17 @@ SWEP.Base = "arccw_base_melee"
 SWEP.Spawnable = false
 SWEP.Category = "ArcCW - Half-Life" -- edit this if you like
 SWEP.AdminOnly = false
-SWEP.PrintName = "Crowbar"
+SWEP.PrintName = "Stun-Baton"
 SWEP.Slot = 0
 SWEP.EZdroppable = true
 
-SWEP.ViewModel = "models/weapons/c_crowbar.mdl"--"models/weapons/crowbar/c_crowbar.mdl"
-SWEP.WorldModel = "models/weapons/w_crowbar.mdl"
-SWEP.ViewModelFOV = 60
+SWEP.ViewModel = "models/weapons/c_stunstick.mdl"--"models/weapons/crowbar/c_crowbar.mdl"
+SWEP.WorldModel = "models/weapons/w_stunbaton.mdl"
+SWEP.ViewModelFOV = 50
 SWEP.MirrorVMWM = false
 SWEP.WorldModelOffset = {
-	pos = Vector(4, 2, -4),
-	ang = Angle(-90, 180, 0)
+	pos = Vector(3, 1, -6.5),
+	ang = Angle(-90, 182, 0)
 }
 SWEP.DefaultBodygroups = "00000000000"
 
@@ -25,10 +25,10 @@ SWEP.MeleeGesture = ACT_HL2MP_GESTURE_RANGE_ATTACK_MELEE
 SWEP.MeleeAttackTime = 0.1
 
 SWEP.Melee2 = true
-SWEP.Melee2Damage = 0
-SWEP.Melee2DamageBackstab = nil -- If not exists, use multiplier on standard damage
-SWEP.Melee2Range = 16
-SWEP.Melee2Time = 0.5
+SWEP.Melee2Damage = 20
+SWEP.Melee2DamageBackstab = 50 -- If not exists, use multiplier on standard damage
+SWEP.Melee2Range = 20
+SWEP.Melee2Time = 1
 SWEP.Melee2Gesture = ACT_HL2MP_GESTURE_RANGE_ATTACK_MELEE
 SWEP.Melee2AttackTime = 0.2
 
@@ -72,18 +72,10 @@ SWEP.SprintAng = Angle( -11.0898, 9.5787, -10.7118 )
 
 SWEP.BarrelLength = 0
 
-SWEP.MeleeSwingSound = "JMod_Weapon_HEV.Crowbar_Swing"
-SWEP.MeleeMissSound = "JMod_Weapon_Crowbar.Melee_Miss2"
-SWEP.MeleeHitSound = "JMod_Weapon_Crowbar.Melee_Hit2"
-SWEP.MeleeHitNPCSound = {"physics/body/body_medium_impact_hard2.wav", "physics/body/body_medium_impact_hard3.wav", "physics/body/body_medium_impact_hard4.wav", "physics/body/body_medium_impact_hard5.wav", "physics/body/body_medium_impact_hard6.wav"}--"JMod_Weapon_Crowbar.Melee_Hit2"
---[[SWEP.MeleeHitSound = {
-	")weapon/crowbar/crowbar_hit_world01.wav",
-	")weapon/crowbar/crowbar_hit_world02.wav",
-	")weapon/crowbar/crowbar_hit_world03.wav",
-	")weapon/crowbar/crowbar_hit_world04.wav",
-	")weapon/crowbar/crowbar_hit_world05.wav",
-	")weapon/crowbar/crowbar_hit_world06.wav"
-}--]]
+SWEP.MeleeSwingSound = "Weapon_StunStick.Swing" --"JMod_Weapon_HEV.StunBaton_Swing"
+SWEP.MeleeMissSound = "Weapon_StunStick.Melee_Miss" --"JMod_Weapon_StunBaton.Melee_Miss2"
+SWEP.MeleeHitSound = "Weapon_StunStick.Melee_HitWorld" --JMod_Weapon_StunBaton.Melee_Hit1"
+SWEP.MeleeHitNPCSound = "Weapon_StunStick.Melee_Hit" --"JMod_Weapon_StunBaton.Melee_Hit2"
 
 SWEP.IronSightStruct = false
 
@@ -101,40 +93,28 @@ SWEP.Animations = {
         Source = "holster",
     },
     ["bash"] = {
-        Source = {"misscenter1","misscenter2"},
-		
+        Source = {"misscenter1","misscenter2"},--,"hitcenter1","hitcenter2"},
+
     },
 }
 
 SWEP.Hook_PostBash = function(wep, data)
-	if data.dmg ~= 0 then return end
-	local Alt = wep.Owner:KeyDown(JMod.Config.General.AltFunctionKey)
-	local Task = "loosen"
 	local Tr = util.QuickTrace(wep.Owner:GetShootPos(), wep.Owner:GetAimVector() * 80, {wep.Owner})
 	local Ent, Pos = Tr.Entity, Tr.HitPos
 
-	if IsValid(Ent) then
-		if Ent ~= wep.TaskEntity or Task ~= wep.CurTask then
-			wep:SetNW2Float("EZtaskProgress", 0)
-			wep.TaskEntity = Ent
-			wep.CurTask = Task
-		elseif IsValid(Ent:GetPhysicsObject()) then
-			local Message = JMod.EZprogressTask(Ent, Pos, wep.Owner, Task)
+	if Tr.Hit then
+		local fx = EffectData()
+		fx:SetOrigin(Pos)
+		fx:SetNormal(Tr.HitNormal)
+		util.Effect("StunstickImpact", fx, true, true)
+	end
 
-			if Message then
-				wep.Owner:PrintMessage(HUD_PRINTCENTER, Message)
-			else
-				wep.TaskEntity = Ent
-				--sound.Play("snds_jack_gmod/ez_tools/hit.wav", Pos + VectorRand(), 60, math.random(50, 70))
-				--sound.Play("snds_jack_gmod/ez_dismantling/" .. math.random(1, 10) .. ".wav", Pos, 65, math.random(90, 110))
-				if SERVER then
-					JMod.Hint(wep.Owner, "work spread")
-					wep:SetNW2Float("EZtaskProgress", Ent:GetNW2Float("EZ"..Task.."Progress", 0))
-				end
-			end 
+	if IsValid(Ent) then
+		if Ent:IsNPC() then
+			Ent.EZNPCincapacitate = CurTime() + math.Rand(1, 3)
+		elseif Ent:IsPlayer() then
+			Ent:ViewPunch(Angle(math.random(-40, 2), math.random(-2, 2), math.random(-2, 2)))
 		end
-	else
-		wep:SetNW2Float("EZtaskProgress", 0)
 	end
 end
 
@@ -162,18 +142,7 @@ if CLIENT then
 	local LastProg = 0
 
 	SWEP.Hook_DrawHUD = function(self)
-		if GetConVar("cl_drawhud"):GetBool() == false then return end
-		local Ply = self.Owner
-		if Ply:ShouldDrawLocalPlayer() then return end
-		local Prog = self:GetNW2Float("EZtaskProgress", 0)
-		local W, H, Build = ScrW(), ScrH()
-
-		if Prog > 0 then
-			draw.SimpleTextOutlined("Loosening...", "Trebuchet24", W * .5, H * .45, Color(255, 255, 255, 100), TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP, 3, Color(0, 0, 0, 50))
-			draw.RoundedBox(10, W * .3, H * .5, W * .4, H * .05, Color(0, 0, 0, 100))
-			draw.RoundedBox(10, W * .3 + 5, H * .5 + 5, W * .4 * LastProg / 100 - 10, H * .05 - 10, Color(255, 255, 255, 100))
-		end
-		LastProg = Lerp(FrameTime() * 5, LastProg, Prog)
+		--
 	end
 end
 
@@ -221,12 +190,12 @@ function SWEP:MeleeAttack(melee2)
                 self:MyEmitSound(self.MeleeHitSound, 75, 100, 1, CHAN_USER_BASE + 2)
             end
 
-            if tr.MatType == MAT_FLESH or tr.MatType == MAT_ALIENFLESH or tr.MatType == MAT_ANTLION or tr.MatType == MAT_BLOODYFLESH then
-                local fx = EffectData()
-                fx:SetOrigin(tr.HitPos)
+            --if tr.MatType == MAT_FLESH or tr.MatType == MAT_ALIENFLESH or tr.MatType == MAT_ANTLION or tr.MatType == MAT_BLOODYFLESH then
+                --local fx = EffectData()
+                --fx:SetOrigin(tr.HitPos)
 
-                util.Effect("BloodImpact", fx)
-            end
+                --util.Effect("BloodImpact", fx)
+            --end
         else
             self:MyEmitSound(self.MeleeMissSound, 75, 100, 1, CHAN_USER_BASE + 3)
         end
@@ -274,53 +243,68 @@ function SWEP:MeleeAttack(melee2)
 end
 
 sound.Add({
-	name = "JMod_Weapon_Crowbar.Melee_Miss2",
+	name = "JMod_Weapon_StunBaton.Melee_Miss2",
 	channel = CHAN_WEAPON,
 	level = 79,
 	volume = 0.6,
 	pitch = {97, 103},
 	sound = {
-		"weapon/crowbar/crowbar_swing1.wav",
-		"weapon/crowbar/crowbar_swing2.wav",
-		"weapon/crowbar/crowbar_swing3.wav"
+		"weapons/stunstick/spark1.wav",
+		"weapons/stunstick/spark2.wav",
+		"weapons/stunstick/spark3.wav"
 	}
 })
 sound.Add({
-	name = "JMod_Weapon_Crowbar.Melee_Hit2",
+	name = "JMod_Weapon_StunBaton.Melee_Hit1",
 	channel = CHAN_STATIC,
 	level = 60,
 	volume = 0.75,
 	pitch = {97, 103},
 	sound = {
-		")weapon/crowbar/crowbar_hit_world01.wav",
-		")weapon/crowbar/crowbar_hit_world02.wav",
-		")weapon/crowbar/crowbar_hit_world03.wav",
-		")weapon/crowbar/crowbar_hit_world04.wav",
-		")weapon/crowbar/crowbar_hit_world05.wav",
-		")weapon/crowbar/crowbar_hit_world06.wav"
+		")weapons/stunstick/stunstick_impact1.wav",
+		")weapons/stunstick/stunstick_impact2.wav"
+	}
+})
+sound.Add({
+	name = "JMod_Weapon_StunBaton.Melee_Hit2",
+	channel = CHAN_STATIC,
+	level = 60,
+	volume = 0.75,
+	pitch = {97, 103},
+	sound = {
+		")weapons/stunstick/stunstick_fleshhit1.wav",
+		")weapons/stunstick/stunstick_fleshhit2.wav"
 	}
 })
 
 sound.Add({
-	name = "JMod_Weapon_HEV.Crowbar_Draw",
+	name = "JMod_Weapon_HEV.StunBaton_Draw",
 	channel = CHAN_STATIC,
 	level = 60,
 	volume = 0.75,
 	sound = {
-		"fx/hev_suit/hev_draw_crowbar_01.wav",
-		"fx/hev_suit/hev_draw_crowbar_02.wav",
-		"fx/hev_suit/hev_draw_crowbar_03.wav"
+		"weapons/stunstick/activate.wav"
 	}
 })
 sound.Add({
-	name = "JMod_Weapon_HEV.Crowbar_Swing",
+	name = "JMod_Weapon_HEV.StunBaton_Swing",
 	channel = CHAN_WEAPON,
 	level = 79,
 	volume = 0.6,
 	pitch = {97, 103},
 	sound = {
-		"fx/hev_suit/hev_swing_crowbar_01.wav",
-		"fx/hev_suit/hev_swing_crowbar_02.wav",
-		"fx/hev_suit/hev_swing_crowbar_03.wav"
+		"weapons/stunstick/stunstick_swing1.wav",
+		"weapons/stunstick/stunstick_swing2.wav"
 	}
 })
+--[[
+weapons/stunstick/spark1.wav
+weapons/stunstick/spark2.wav
+weapons/stunstick/spark3.wav
+weapons/stunstick/stunstick_fleshhit1.wav
+weapons/stunstick/stunstick_fleshhit2.wav
+weapons/stunstick/stunstick_impact1.wav
+weapons/stunstick/stunstick_impact2.wav
+weapons/stunstick/stunstick_swing1.wav
+weapons/stunstick/stunstick_swing2.wav
+--]]
