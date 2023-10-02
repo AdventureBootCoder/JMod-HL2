@@ -16,7 +16,7 @@ SWEP.WorldModelOffset = {
 SWEP.ProceduralIronFire = true
 SWEP.DefaultBodygroups = "00000000000"
 SWEP.CustomToggleCustomizeHUD = false
-JModHL2.ApplyAmmoSpecs(SWEP, "Pistol Round", 1.2)
+JModHL2.ApplyAmmoSpecs(SWEP, "Pistol Round", 1.1)
 
 --SWEP.Damage = 9
 --SWEP.DamageMin = 3
@@ -28,7 +28,7 @@ JModHL2.ApplyAmmoSpecs(SWEP, "Pistol Round", 1.2)
 --SWEP.ShootEntity = nil -- entity to fire, if any
 --SWEP.MuzzleVelocity = 1050 -- projectile or phys bullet muzzle velocity
 -- IN M/S
-SWEP.ChamberSize = 0 -- how many rounds can be chambered.
+SWEP.ChamberSize = 1 -- how many rounds can be chambered.
 SWEP.Primary.ClipSize = 30 -- DefaultClip is automatically set.
 SWEP.ExtendedClipSize = 45
 SWEP.ReducedClipSize = 15
@@ -189,12 +189,12 @@ SWEP.Animations = {
     ["fire"] = {
         Source = {"fire01","fire02","fire03","fire04"},
 		ShellEjectAt = 0,
-		
     },
     ["reload"] = {
+		Time = 2.5,
         Source = "reload",
         TPAnim = ACT_HL2MP_GESTURE_RELOAD_AR2,
-		Mult = 0.8,
+		Mult = 1,
     },
 }
 

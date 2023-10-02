@@ -264,11 +264,11 @@ SWEP.Animations = {
     ["fire"] = {
         Source = {"fire01","fire02","fire03","fire04"},
 		ShellEjectAt = 0,
-		
     },
     ["reload"] = {
         Source = "reload",
         TPAnim = ACT_HL2MP_GESTURE_RELOAD_AR2,
+		Mult = 1.5,
     },
 }
 

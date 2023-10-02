@@ -74,8 +74,8 @@ SWEP.BarrelLength = 0
 
 SWEP.MeleeSwingSound = "JMod_Weapon_HEV.Crowbar_Swing"
 SWEP.MeleeMissSound = "JMod_Weapon_Crowbar.Melee_Miss2"
-SWEP.MeleeHitSound = "JMod_Weapon_Crowbar.Melee_Hit2"
-SWEP.MeleeHitNPCSound = {"physics/body/body_medium_impact_hard2.wav", "physics/body/body_medium_impact_hard3.wav", "physics/body/body_medium_impact_hard4.wav", "physics/body/body_medium_impact_hard5.wav", "physics/body/body_medium_impact_hard6.wav"}--"JMod_Weapon_Crowbar.Melee_Hit2"
+SWEP.MeleeHitSound = {}--"JMod_Weapon_Crowbar.Melee_Hit2"
+SWEP.MeleeHitNPCSound = {} --{"physics/body/body_medium_impact_hard2.wav", "physics/body/body_medium_impact_hard3.wav", "physics/body/body_medium_impact_hard4.wav", "physics/body/body_medium_impact_hard5.wav", "physics/body/body_medium_impact_hard6.wav"}--"JMod_Weapon_Crowbar.Melee_Hit2"
 --[[SWEP.MeleeHitSound = {
 	")weapon/crowbar/crowbar_hit_world01.wav",
 	")weapon/crowbar/crowbar_hit_world02.wav",
@@ -107,12 +107,21 @@ SWEP.Animations = {
 }
 
 SWEP.Hook_PostBash = function(wep, data)
-	if data.dmg ~= 0 then return end
 	local Alt = wep.Owner:KeyDown(JMod.Config.General.AltFunctionKey)
 	local Task = "loosen"
 	local Tr = util.QuickTrace(wep.Owner:GetShootPos(), wep.Owner:GetAimVector() * 80, {wep.Owner})
 	local Ent, Pos = Tr.Entity, Tr.HitPos
 
+	--[[print(Tr.MatType)
+	if (Tr.MatType) and (Tr.MatType > 0) and (JMod.EZ_BulletMatImpactTable[Tr.MatType]) then
+		EmitSound(table.Random(JMod.EZ_BulletMatImpactTable[Tr.MatType]), Pos, 0, CHAN_WEAPON)
+	end]]--
+	local Surface = Tr.SurfaceProps
+	if Tr.Hit and (Surface) and (util.GetSurfaceData(Surface)) then
+		EmitSound(util.GetSurfaceData(Surface).bulletImpactSound, Pos, 0, CHAN_WEAPON)
+	end
+
+	if data.dmg ~= 0 then return end
 	if IsValid(Ent) then
 		if Ent ~= wep.TaskEntity or Task ~= wep.CurTask then
 			wep:SetNW2Float("EZtaskProgress", 0)

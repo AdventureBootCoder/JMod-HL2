@@ -63,7 +63,7 @@ JModHL2.WeaponTable = {
 		ent = "ent_aboot_jmod_ezweapon_crowbar",
 		Category = "JMod - EZ HL:2"
 	},
-	["Stun-Baton"] = {
+	["StunStick"] = {
 		mdl = "models/weapons/w_stunbaton.mdl",
 		swep = "wep_aboot_jmod_baton",
 		ent = "ent_aboot_jmod_ezweapon_baton",
@@ -163,7 +163,7 @@ hook.Add("Initialize", "JModHL2_LoadAdditionalWeaponEntities", JModHL2.LoadAddit
 JModHL2.LoadAdditionalAmmo()
 JModHL2.LoadAdditionalWeaponEntities()--]]
 --JMod.LoadAdditionalAmmo()
---JMod.LoadAdditionalWeaponEntities()
+JMod.LoadAdditionalWeaponEntities()
 --hook.Add("Initialize", "JModHL2_LoadAdditionalAmmo", JMod.LoadAdditionalAmmo)
 --hook.Add("Initialize", "JModHL2_LoadAdditionalWeaponEntities", JMod.LoadAdditionalWeaponEntities)
 

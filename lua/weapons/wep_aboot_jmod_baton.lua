@@ -2,7 +2,7 @@ SWEP.Base = "arccw_base_melee"
 SWEP.Spawnable = false
 SWEP.Category = "ArcCW - Half-Life" -- edit this if you like
 SWEP.AdminOnly = false
-SWEP.PrintName = "Stun-Baton"
+SWEP.PrintName = "StunStick"
 SWEP.Slot = 0
 SWEP.EZdroppable = true
 
@@ -20,6 +20,7 @@ SWEP.MeleeDamage = 15
 SWEP.MeleeDamageBackstab = nil -- If not exists, use multiplier on standard damage
 SWEP.MeleeRange = 32
 SWEP.MeleeDamageType = DMG_CLUB
+SWEP.MeleePush = 10000
 SWEP.MeleeTime = 0.5
 SWEP.MeleeGesture = ACT_HL2MP_GESTURE_RANGE_ATTACK_MELEE
 SWEP.MeleeAttackTime = 0.1
@@ -94,7 +95,6 @@ SWEP.Animations = {
     },
     ["bash"] = {
         Source = {"misscenter1","misscenter2"},--,"hitcenter1","hitcenter2"},
-
     },
 }
 
@@ -110,10 +110,10 @@ SWEP.Hook_PostBash = function(wep, data)
 	end
 
 	if IsValid(Ent) then
-		if Ent:IsNPC() then
-			Ent.EZNPCincapacitate = CurTime() + math.Rand(1, 3)
+		if Ent:IsNPC() and (math.random(0, 3) == 1) then
+			Ent.EZNPCincapacitate = (Ent.EZNPCincapacitate or CurTime()) + math.Rand(1, 3)
 		elseif Ent:IsPlayer() then
-			Ent:ViewPunch(Angle(math.random(-40, 2), math.random(-2, 2), math.random(-2, 2)))
+			Ent:ViewPunch(Angle(math.random(-40, 2), math.random(-20, 20), math.random(-2, 2)))
 		end
 	end
 end
