@@ -267,7 +267,7 @@ SWEP.Animations = {
     },
     ["reload"] = {
         Source = "reload",
-        TPAnim = ACT_HL2MP_GESTURE_RELOAD_AR2,
+        TPAnim = ACT_HL2MP_GESTURE_RELOAD_SMG1,
 		Mult = 1.5,
     },
 }

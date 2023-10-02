@@ -63,7 +63,7 @@ JModHL2.WeaponTable = {
 		ent = "ent_aboot_jmod_ezweapon_crowbar",
 		Category = "JMod - EZ HL:2"
 	},
-	["StunStick"] = {
+	["Stun Baton"] = {
 		mdl = "models/weapons/w_stunbaton.mdl",
 		swep = "wep_aboot_jmod_baton",
 		ent = "ent_aboot_jmod_ezweapon_baton",

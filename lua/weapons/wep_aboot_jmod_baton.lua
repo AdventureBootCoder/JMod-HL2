@@ -2,7 +2,7 @@ SWEP.Base = "arccw_base_melee"
 SWEP.Spawnable = false
 SWEP.Category = "ArcCW - Half-Life" -- edit this if you like
 SWEP.AdminOnly = false
-SWEP.PrintName = "StunStick"
+SWEP.PrintName = "Stun Baton"
 SWEP.Slot = 0
 SWEP.EZdroppable = true
 

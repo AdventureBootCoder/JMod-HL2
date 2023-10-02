@@ -8,10 +8,11 @@ SWEP.Slot = 2
 SWEP.ViewModel = "models/weapons/aboot/mp5k/c_mp5k.mdl"
 SWEP.WorldModel = "models/weapons/aboot/mp5k/w_mp5k.mdl"
 SWEP.ViewModelFOV = 70
-SWEP.MirrorVMWM = true
+SWEP.MirrorVMWM = false
 SWEP.WorldModelOffset = {
-    pos = Vector(6, 2, -4),
-    ang = Angle(-10, 180, 180)
+    pos = Vector(5.5, 1, -3.8),
+    ang = Angle(-10, 180, 180),
+	scale = 1.2
 }
 SWEP.ProceduralIronFire = true
 SWEP.DefaultBodygroups = "00000000000"
@@ -191,9 +192,9 @@ SWEP.Animations = {
 		ShellEjectAt = 0,
     },
     ["reload"] = {
-		Time = 2.5,
+		--Time = 2.5,
         Source = "reload",
-        TPAnim = ACT_HL2MP_GESTURE_RELOAD_AR2,
+        TPAnim = ACT_HL2MP_GESTURE_RELOAD_SMG1,
 		Mult = 1,
     },
 }
