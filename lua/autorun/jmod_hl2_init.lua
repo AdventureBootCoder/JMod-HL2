@@ -194,6 +194,11 @@ if(SERVER)then
 		end
 	end)]]--
 
+	--[[concommand.Add( "givetrail", function( ply )
+		local trail = util.SpriteTrail( ply, 0, Color( 255, 0, 0 ), false, 15, 1, 4, 1 / ( 15 + 1 ) * 0.5, "trails/plasma" )
+		print( trail )
+	end )--]]
+
 	local HLtoEZammo = {
 		["item_ammo_357"] = {"Magnum Pistol Round", 12},
 		["item_ammo_357_large"] = {"Magnum Pistol Round", 24},

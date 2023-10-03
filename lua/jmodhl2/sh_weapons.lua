@@ -163,7 +163,7 @@ hook.Add("Initialize", "JModHL2_LoadAdditionalWeaponEntities", JModHL2.LoadAddit
 JModHL2.LoadAdditionalAmmo()
 JModHL2.LoadAdditionalWeaponEntities()--]]
 --JMod.LoadAdditionalAmmo()
-JMod.LoadAdditionalWeaponEntities()
+--JMod.LoadAdditionalWeaponEntities()
 --hook.Add("Initialize", "JModHL2_LoadAdditionalAmmo", JMod.LoadAdditionalAmmo)
 --hook.Add("Initialize", "JModHL2_LoadAdditionalWeaponEntities", JMod.LoadAdditionalWeaponEntities)
 
