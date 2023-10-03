@@ -9,29 +9,55 @@ ENT.Spawnable = true
 ENT.JModPreferredCarryAngles = Angle(0, 100, 0)
 ENT.Model= "models/weapons/w_npcnade.mdl"
 --ENT.Material=""
-ENT.HardThrowStr = 350
-ENT.SoftThrowStr = 250
+ENT.HardThrowStr = 450
+ENT.SoftThrowStr = 320
 ENT.SpoonScale = 2
+ENT.DetTime = 1
 
 if(SERVER)then
 	function ENT:Prime()
 		self:SetState(JMod.EZ_STATE_PRIMED)
 		self:EmitSound("weapons/pinpull.wav", 60, 100)
 		--self:SetBodygroup(3, 1)
+		self.LastSpeed = 0
+		self.Ticks = 0
+		self.NextTickTime = 0
 	end
 
 	function ENT:Arm()
 		--self:SetBodygroup(2, 1)
-		self:SetState(JMod.EZ_STATE_ARMED)
+		self:SetState(JMod.EZ_STATE_ON)
 		self:SpoonEffect()
-		if math.random(1, 1000) == 1 then
-			util.SpriteTrail( self, 1, Color( 255, 0, 0 ), false, 3, 1, 1, 1 / ( 3 + 1 ) * 0.5, "trails/lol" )
-		else
-			util.SpriteTrail( self, 1, Color( 255, 0, 0 ), false, 2, 0.1, 1, 1 / ( 2 + 0.1 ) * 0.5, "trails/plasma" )
+		--timer.Simple(4, function()
+			--if(IsValid(self))then self:Detonate() end
+		--end)
+	end
+
+	function ENT:CustomThink(State, Time)
+		if (State == JMod.EZ_STATE_ON) then
+			local Vel = self:GetPhysicsObject():GetVelocity()
+			local Sped = Vel:Length()
+			if((Sped - self.LastSpeed) > 300)then
+				self:SetState(JMod.EZ_STATE_ARMED)
+				if math.random(1, 1000) == 1 then
+					util.SpriteTrail( self, 1, Color( 255, 0, 0 ), false, 3, 1, 1, 1 / ( 3 + 1 ) * 0.5, "trails/lol" )
+				else
+					util.SpriteTrail( self, 1, Color( 255, 0, 0 ), false, 2, 0.1, 1, 1 / ( 2 + 0.1 ) * 0.5, "trails/plasma" )
+				end
+			else
+				self.LastSpeed = Sped
+			end
 		end
-		timer.Simple(4, function()
-			if(IsValid(self))then self:Detonate() end
-		end)
+		if (State == JMod.EZ_STATE_ARMED) then
+			if (self.NextTickTime < Time) then
+				self.NextTickTime = Time + 0.2
+				self.Ticks = self.Ticks + 0.2
+				self:EmitSound("weapons/grenade/tick1.wav", 100, math.random(90, 110), 1)
+				if (self.Ticks >= self.DetTime) then
+					self:Detonate()
+				end
+			end
+		end
 	end
 
 	function ENT:Detonate()
@@ -47,7 +73,7 @@ if(SERVER)then
 		plooie:SetScale(0.5)
 		util.Effect("eff_jack_plastisplosion", plooie, true, true)
 		util.ScreenShake(SelfPos, 99999, 99999, 1, 750 * 1.75)
-		local OnGround = util.QuickTrace(SelfPos+Vector(0, 0, 5),Vector(0, 0, -15), {self}).Hit
+		--local OnGround = util.QuickTrace(SelfPos+Vector(0, 0, 5),Vector(0, 0, -15), {self}).Hit
 		self:Remove()
 	end
 
@@ -75,7 +101,7 @@ elseif(CLIENT)then
 	function ENT:Draw()
 		local State = self:GetState()
 		self:DrawModel()
-		if State ~= JMod.EZ_STATE_ARMED then
+		if (State ~= JMod.EZ_STATE_ARMED) and (State ~= JMod.EZ_STATE_ON) then
 			local SpoonAng = self:GetAngles()
 			SpoonAng:RotateAroundAxis(self:GetUp(), -90)
 			JMod.RenderModel(self.Spoon, self:GetPos() - self:GetUp() * 0.4 - self:GetRight() * 0.2, SpoonAng, Vector(1.5, 1.5, 1.5))
@@ -84,7 +110,7 @@ elseif(CLIENT)then
 
 	function ENT:Think()
 		local State, Pos, Up = self:GetState(), self:GetPos(), self:GetUp()
-		if State == JMod.EZ_STATE_ARMED then
+		if (State == JMod.EZ_STATE_ARMED) then
 			local DLight = DynamicLight(self:EntIndex())
 
 			if DLight then
