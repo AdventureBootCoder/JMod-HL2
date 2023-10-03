@@ -77,7 +77,8 @@ elseif(CLIENT)then
 		self:DrawModel()
 		if State ~= JMod.EZ_STATE_ARMED then
 			local SpoonAng = self:GetAngles()
-			JMod.RenderModel(self.Spoon, self:GetPos(), SpoonAng)
+			SpoonAng:RotateAroundAxis(self:GetUp(), -90)
+			JMod.RenderModel(self.Spoon, self:GetPos() - self:GetUp() * 0.4 - self:GetRight() * 0.2, SpoonAng, Vector(1.5, 1.5, 1.5))
 		end
 	end
 
