@@ -28,6 +28,7 @@ if(SERVER)then
 		--self:SetBodygroup(2, 1)
 		self:SetState(JMod.EZ_STATE_ON)
 		self:SpoonEffect()
+		self:EmitSound("weapons/grenade/tick1.wav", 100, math.random(90, 110), 1)
 		--timer.Simple(4, function()
 			--if(IsValid(self))then self:Detonate() end
 		--end)
@@ -37,7 +38,7 @@ if(SERVER)then
 		if (State == JMod.EZ_STATE_ON) then
 			local Vel = self:GetPhysicsObject():GetVelocity()
 			local Sped = Vel:Length()
-			if((Sped - self.LastSpeed) > 300)then
+			if((Sped - self.LastSpeed) > 280)then
 				self:SetState(JMod.EZ_STATE_ARMED)
 				if math.random(1, 1000) == 1 then
 					util.SpriteTrail( self, 1, Color( 255, 0, 0 ), false, 3, 1, 1, 1 / ( 3 + 1 ) * 0.5, "trails/lol" )
