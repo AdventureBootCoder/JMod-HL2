@@ -74,7 +74,7 @@ SWEP.ShootPitch = 100 -- pitch of shoot sound
 SWEP.ShootSound = "Project_MMOD_AR2.Fire"
 SWEP.DistantShootSound = "Project_MMOD_AR2.NPC"
 
-SWEP.MuzzleEffect = "muzzleflash_minimi"
+SWEP.MuzzleEffect = "muzzleflash_4"--"muzzleflash_minimi"
 SWEP.ShellModel = nil--"models/weapons/shells/projectmmodirifleshell.mdl"
 SWEP.ShellScale = 1
 SWEP.MuzzleFlashColor = Color(70, 255, 200)

@@ -99,6 +99,8 @@ elseif(CLIENT)then
 		self.Spoon = JMod.MakeModel(self, "models/jmod/explosives/grenades/firenade/incendiary_grenade_spoon.mdl")
 	end
 
+	local GlowSprite = Material("sprites/mat_jack_basicglow")
+
 	function ENT:Draw()
 		local State = self:GetState()
 		self:DrawModel()
@@ -106,6 +108,10 @@ elseif(CLIENT)then
 			local SpoonAng = self:GetAngles()
 			SpoonAng:RotateAroundAxis(self:GetUp(), -90)
 			JMod.RenderModel(self.Spoon, self:GetPos() - self:GetUp() * 0.4 - self:GetRight() * 0.2, SpoonAng, Vector(1.5, 1.5, 1.5))
+		elseif (State == JMod.EZ_STATE_ARMED) then
+			render.SetMaterial(GlowSprite)
+			render.DrawSprite(self:GetPos() + self:GetUp() * 5, 20, 20, Color(255, 0, 0, 150))
+			--render.DrawSprite(self:GetPos() + Vector(0, 0, 4), 15, 15, Color(255, 255, 255))
 		end
 	end
 
@@ -119,10 +125,10 @@ elseif(CLIENT)then
 				DLight.r = 255
 				DLight.g = 0
 				DLight.b = 0
-				DLight.Brightness = 1
-				DLight.Size = 80
+				DLight.Brightness = 5
+				DLight.Size = 35
 				DLight.Decay = 15000
-				DLight.DieTime = CurTime() + .3
+				DLight.DieTime = CurTime() + 1
 				DLight.Style = 0
 			end
 		end
