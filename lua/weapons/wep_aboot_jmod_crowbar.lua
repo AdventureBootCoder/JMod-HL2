@@ -106,6 +106,26 @@ SWEP.Animations = {
     },
 }
 
+function SWEP:OnDrop()
+	local Specs = JMod.WeaponTable[self.PrintName]
+
+	if Specs then
+		local Ent = ents.Create(Specs.ent)
+		Ent:SetPos(self:GetPos())
+		Ent:SetAngles(self:GetAngles())
+		Ent.MagRounds = self:Clip1()
+		Ent:Spawn()
+		Ent:Activate()
+		local Phys = Ent:GetPhysicsObject()
+
+		if Phys and self and IsValid(Phys) and IsValid(self) and IsValid(self:GetPhysicsObject()) then
+			Phys:SetVelocity(self:GetPhysicsObject():GetVelocity() / 2)
+		end
+
+		self:Remove()
+	end
+end
+
 SWEP.Hook_PostBash = function(wep, data)
 	local Alt = wep.Owner:KeyDown(JMod.Config.General.AltFunctionKey)
 	local Task = "loosen"
@@ -121,7 +141,7 @@ SWEP.Hook_PostBash = function(wep, data)
 		EmitSound(util.GetSurfaceData(Surface).bulletImpactSound, Pos, 0, CHAN_WEAPON)
 	end
 
-	if data.dmg ~= 0 then return end
+	if not data.melee2 then return end
 	if IsValid(Ent) then
 		if Ent ~= wep.TaskEntity or Task ~= wep.CurTask then
 			wep:SetNW2Float("EZtaskProgress", 0)
@@ -144,26 +164,6 @@ SWEP.Hook_PostBash = function(wep, data)
 		end
 	else
 		wep:SetNW2Float("EZtaskProgress", 0)
-	end
-end
-
-function SWEP:OnDrop()
-	local Specs = JMod.WeaponTable[self.PrintName]
-
-	if Specs then
-		local Ent = ents.Create(Specs.ent)
-		Ent:SetPos(self:GetPos())
-		Ent:SetAngles(self:GetAngles())
-		Ent.MagRounds = self:Clip1()
-		Ent:Spawn()
-		Ent:Activate()
-		local Phys = Ent:GetPhysicsObject()
-
-		if Phys and self and IsValid(Phys) and IsValid(self) and IsValid(self:GetPhysicsObject()) then
-			Phys:SetVelocity(self:GetPhysicsObject():GetVelocity() / 2)
-		end
-
-		self:Remove()
 	end
 end
 
@@ -277,7 +277,7 @@ function SWEP:MeleeAttack(melee2)
         end
     end
 
-    self:GetBuff_Hook("Hook_PostBash", {tr = tr, dmg = dmg})
+    self:GetBuff_Hook("Hook_PostBash", {tr = tr, dmg = dmg, melee2 = melee2})
 
     self:GetOwner():LagCompensation(false)
 end

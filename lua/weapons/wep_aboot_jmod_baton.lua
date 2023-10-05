@@ -109,9 +109,14 @@ SWEP.Hook_PostBash = function(wep, data)
 		util.Effect("StunstickImpact", fx, true, true)
 	end
 
+	local Surface = Tr.SurfaceProps
+	if Tr.Hit and (Surface) and (util.GetSurfaceData(Surface)) then
+		EmitSound(util.GetSurfaceData(Surface).bulletImpactSound, Pos, 0, CHAN_WEAPON)
+	end
+
 	if IsValid(Ent) then
-		if Ent:IsNPC() and (math.random(0, 3) == 1) then
-			Ent.EZNPCincapacitate = (Ent.EZNPCincapacitate or CurTime()) + math.Rand(1, 3)
+		if Ent:IsNPC() and (data.melee2) then
+			Ent.EZNPCincapacitate = (Ent.EZNPCincapacitate or CurTime()) + math.Rand(2, 3)
 		elseif Ent:IsPlayer() then
 			Ent:ViewPunch(Angle(math.random(-40, 2), math.random(-20, 20), math.random(-2, 2)))
 		end
@@ -237,7 +242,7 @@ function SWEP:MeleeAttack(melee2)
         end
     end
 
-    self:GetBuff_Hook("Hook_PostBash", {tr = tr, dmg = dmg})
+    self:GetBuff_Hook("Hook_PostBash", {tr = tr, dmg = dmg, melee2 = melee2})
 
     self:GetOwner():LagCompensation(false)
 end
