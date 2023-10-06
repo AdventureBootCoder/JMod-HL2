@@ -186,7 +186,6 @@ function SWEP:TryBustDoor(ent, dmg, pos)
 	local WorkSpread = JMod.CalcWorkSpreadMult(ent, pos) ^ 1.1
 	local Amt = dmg * self.DoorBreachPower * WorkSpread
 	ent.ArcCW_BustDamage = (ent.ArcCW_BustDamage or 0) + Amt
-	jprint(ent.ArcCW_BustDamage, threshold)
 	if ent.ArcCW_BustDamage > threshold then
 		JMod.BlastThatDoor(ent, (ent:LocalToWorld(ent:OBBCenter()) - self:GetPos()):GetNormalized() * 100)
 		ent.ArcCW_BustDamage = nil
