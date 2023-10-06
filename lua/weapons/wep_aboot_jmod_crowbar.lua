@@ -36,6 +36,7 @@ SWEP.Lunge = false
 
 SWEP.Backstab = false
 SWEP.BackstabMultiplier = 2
+SWEP.DoorBreachPower = 2
 
 SWEP.CanBash = true
 SWEP.PrimaryBash = true -- primary attack triggers melee attack
@@ -142,21 +143,24 @@ SWEP.Hook_PostBash = function(wep, data)
 	end
 
 	if not data.melee2 then return end
-	if IsValid(Ent) then
-		if Ent ~= wep.TaskEntity or Task ~= wep.CurTask then
-			wep:SetNW2Float("EZtaskProgress", 0)
-			wep.TaskEntity = Ent
-			wep.CurTask = Task
-		elseif IsValid(Ent:GetPhysicsObject()) then
-			local Message = JMod.EZprogressTask(Ent, Pos, wep.Owner, Task)
-
-			if Message then
-				wep.Owner:PrintMessage(HUD_PRINTCENTER, Message)
-			else
+	if SERVER then
+		if IsValid(Ent) then
+			if Ent ~= wep.TaskEntity or Task ~= wep.CurTask then
+				wep:SetNW2Float("EZtaskProgress", 0)
 				wep.TaskEntity = Ent
-				--sound.Play("snds_jack_gmod/ez_tools/hit.wav", Pos + VectorRand(), 60, math.random(50, 70))
-				--sound.Play("snds_jack_gmod/ez_dismantling/" .. math.random(1, 10) .. ".wav", Pos, 65, math.random(90, 110))
-				if SERVER then
+				wep.CurTask = Task
+			elseif IsValid(Ent:GetPhysicsObject()) then
+			
+				local Message = JMod.EZprogressTask(Ent, Pos, wep.Owner, Task)
+
+				if Message then
+					wep.Owner:PrintMessage(HUD_PRINTCENTER, Message)
+					wep:TryBustDoor(Ent, wep.DoorBreachPower, Pos)
+				else
+					wep.TaskEntity = Ent
+					--sound.Play("snds_jack_gmod/ez_tools/hit.wav", Pos + VectorRand(), 60, math.random(50, 70))
+					--sound.Play("snds_jack_gmod/ez_dismantling/" .. math.random(1, 10) .. ".wav", Pos, 65, math.random(90, 110))
+					
 					JMod.Hint(wep.Owner, "work spread")
 					wep:SetNW2Float("EZtaskProgress", Ent:GetNW2Float("EZ"..Task.."Progress", 0))
 				end
@@ -164,6 +168,37 @@ SWEP.Hook_PostBash = function(wep, data)
 		end
 	else
 		wep:SetNW2Float("EZtaskProgress", 0)
+	end
+end
+
+function SWEP:TryBustDoor(ent, dmg, pos)
+	if not self.DoorBreachPower then return end
+	self.NextDoorShot = self.NextDoorShot or 0
+	if self.NextDoorShot > CurTime() then return end
+	if GetConVar("arccw_doorbust"):GetInt() == 0 or not IsValid(ent) or not JMod.IsDoor(ent) then return end
+	if ent:GetNoDraw() or ent.ArcCW_NoBust or ent.ArcCW_DoorBusted then return end
+	if ent:GetPos():Distance(self:GetPos()) > 150 then return end -- ugh, arctic, lol
+	self.NextDoorShot = CurTime() + .05 -- we only want this to run once per shot
+	-- Magic number: 119.506 is the size of door01_left
+	-- The bigger the door is, the harder it is to bust
+	local threshold = GetConVar("arccw_doorbust_threshold"):GetInt() * math.pow((ent:OBBMaxs() - ent:OBBMins()):Length() / 119.506, 2)
+	JMod.Hint(self.Owner, "shotgun breach")
+	local WorkSpread = JMod.CalcWorkSpreadMult(ent, pos) ^ 1.1
+	local Amt = dmg * self.DoorBreachPower * WorkSpread
+	ent.ArcCW_BustDamage = (ent.ArcCW_BustDamage or 0) + Amt
+	jprint(ent.ArcCW_BustDamage, threshold)
+	if ent.ArcCW_BustDamage > threshold then
+		JMod.BlastThatDoor(ent, (ent:LocalToWorld(ent:OBBCenter()) - self:GetPos()):GetNormalized() * 100)
+		ent.ArcCW_BustDamage = nil
+
+		-- Double doors are usually linked to the same areaportal. We must destroy the second half of the double door no matter what
+		for _, otherDoor in pairs(ents.FindInSphere(ent:GetPos(), 64)) do
+			if ent ~= otherDoor and otherDoor:GetClass() == ent:GetClass() and not otherDoor:GetNoDraw() then
+				JMod.BlastThatDoor(otherDoor, (ent:LocalToWorld(ent:OBBCenter()) - self:GetPos()):GetNormalized() * 100)
+				otherDoor.ArcCW_BustDamage = nil
+				break
+			end
+		end
 	end
 end
 
