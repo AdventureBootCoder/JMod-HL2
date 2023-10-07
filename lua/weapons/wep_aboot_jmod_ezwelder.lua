@@ -338,7 +338,7 @@ end
 function SWEP:PrimaryAttack()
 	if self.Owner:KeyDown(IN_SPEED) then return end
 	--self:Pawnch()
-	self:SetNextPrimaryFire(CurTime() + .6)
+	self:SetNextPrimaryFire(CurTime() + .3)
 	self:SetNextSecondaryFire(CurTime() + 1)
 
 	if SERVER then
@@ -361,39 +361,6 @@ function SWEP:Msg(msg)
 	self.Owner:PrintMessage(HUD_PRINTCENTER, msg)
 end
 
-function SWEP:UpgradeEntWithResource(recipient, donor, amt, resourceType)
-	local DonorCurAmt, Grade = donor:GetEZsupplies(resourceType), recipient:GetGrade()
-	local RequiredSupplies = recipient.UpgradeCosts[Grade + 1]
-	---
-	local CurAmt= recipient.UpgradeProgress[resourceType] or 0
-	local Limit = RequiredSupplies[resourceType]
-	local Given = math.min(DonorCurAmt, Limit - CurAmt, amt)
-	recipient.UpgradeProgress[resourceType] = CurAmt + Given
-	---
-	local Msg = "UPGRADING\n"
-
-	for typ, amount in pairs(RequiredSupplies) do
-		Msg = Msg .. typ .. ": " .. tostring(recipient.UpgradeProgress[typ] or 0) .. "/" .. tostring(RequiredSupplies[typ]) .. "\n"
-	end
-
-	self:Msg(Msg)
-
-	---
-	donor:SetEZsupplies(resourceType, DonorCurAmt - Given, self)
-
-	local HaveEverything = true
-
-	for typ, amount in pairs(RequiredSupplies) do
-		if (recipient.UpgradeProgress[typ] or 0) < amount then
-			HaveEverything = false
-		end
-	end
-
-	if HaveEverything then
-		recipient:Upgrade(Grade + 1)
-	end
-end
-
 --,"fists_uppercut"} -- the uppercut looks so bad
 --local Anims = {"fists_right", "fists_right", "fists_left", "fists_left"}
 --local Anims = {"drawbacklow", "throw"}
@@ -406,28 +373,10 @@ function SWEP:Pawnch()
 	self:UpdateNextIdle()
 end
 
-
 function SWEP:Reload()
 	if SERVER then
 		local Time = CurTime()
 		--
-	end
-end
-
-function SWEP:UpgradeEffect(pos, scale, suppressSound)
-	if CLIENT then return end
-	scale = scale or 1
-	local effectdata = EffectData()
-	effectdata:SetOrigin(pos + VectorRand())
-	effectdata:SetNormal((VectorRand() + Vector(0, 0, 1)):GetNormalized())
-	effectdata:SetMagnitude(math.Rand(1, 2) * scale) --amount and shoot hardness
-	effectdata:SetScale(math.Rand(.5, 1.5) * scale) --length of strands
-	effectdata:SetRadius(math.Rand(2, 4) * scale) --thickness of strands
-	util.Effect("Sparks", effectdata, true, true)
-
-	if not suppressSound then
-		sound.Play("snds_jack_gmod/ez_tools/hit.wav", pos + VectorRand(), 60, math.random(80, 120))
-		sound.Play("snds_jack_gmod/ez_tools/" .. math.random(1, 27) .. ".wav", pos, 60, math.random(80, 120))
 	end
 end
 
@@ -536,22 +485,6 @@ function SWEP:Deploy()
 	return true
 end
 
-function SWEP:CreateResourceEntity(pos, typ, amt)
-	local Ent = ents.Create(JMod.EZ_RESOURCE_ENTITIES[typ])
-	Ent:SetPos(pos)
-	Ent:SetAngles(AngleRand())
-	Ent:SetCreator(self.Owner)
-	Ent:Spawn()
-	Ent:Activate()
-	Ent:SetResource(amt)
-	JMod.SetEZowner(Ent, self.Owner)
-	timer.Simple(.1, function()
-		if (IsValid(Ent) and IsValid(Ent:GetPhysicsObject())) then 
-			Ent:GetPhysicsObject():SetVelocity(Vector(0, 0, 0)) --- This is so jank
-		end
-	end)
-end
-
 function SWEP:Think()
 	local Time = CurTime()
 	local vm = self.Owner:GetViewModel()
@@ -609,6 +542,88 @@ function SWEP:Think()
 		end
 	end
 end
+
+--[[if(SERVER)then
+	local WeldTable={}
+	local WeldPos=nil
+	local WeldNorm=nil
+	for i=1,2 do
+		local TressDat={start=BaseShootPos,endpos=ShootPos+AimVec*math.Rand(100,110)+VectorRand()*math.Rand(0,20),filter=self.Owner,mask=MASK_SHOT}
+		local Tress=util.TraceLine(TressDat)
+		if(Tress.Hit)then
+			local WantSomeIceWithThatBurn=DamageInfo()
+			WantSomeIceWithThatBurn:SetDamage(math.Rand(.2,.4))
+			WantSomeIceWithThatBurn:SetDamagePosition(Tress.HitPos)
+			WantSomeIceWithThatBurn:SetDamageForce(AimVec*900)
+			WantSomeIceWithThatBurn:SetAttacker(self.Owner)
+			WantSomeIceWithThatBurn:SetInflictor(self.Weapon)
+			if(Tress.Entity:IsOnFire())then
+				WantSomeIceWithThatBurn:SetDamageType(DMG_GENERIC)
+			elseif(math.random(1,9)==5)then
+				WantSomeIceWithThatBurn:SetDamageType(DMG_BURN)
+			else
+				WantSomeIceWithThatBurn:SetDamageType(DMG_DIRECT)
+			end
+			Tress.Entity:TakeDamageInfo(WantSomeIceWithThatBurn)
+			
+			if not(self.NextBurnSoundEmitTime)then self.NextBurnSoundEmitTime=CurTime() end
+			if(self.NextBurnSoundEmitTime<CurTime())then
+				self.NextBurnSoundEmitTime=CurTime()+.075
+			end
+			
+			if(math.random(1,2)==1)then
+				local Poof=EffectData()
+				Poof:SetOrigin(Tress.HitPos)
+				Poof:SetScale(2)
+				Poof:SetNormal(Tress.HitNormal)
+				if((Tress.MatType==MAT_CONCRETE)or(Tress.MatType==MAT_METAL)or(Tress.MatType==MAT_COMPUTER)or(Tress.MatType==MAT_GRATE)or(Tress.MatType==MAT_TILE)or(Tress.MatType==MAT_GLASS)or(Tress.MatType==MAT_SAND))then
+					Poof:SetStart(Tress.Entity:GetVelocity())
+					Poof:SetNormal(Tress.HitNormal)
+					util.Effect("eff_jack_tinymelt",Poof,true,true)
+					Poof:SetScale(.07)
+					util.Effect("eff_jack_fadingmelt",Poof,true,true)
+				else
+					util.Effect("eff_jack_tinyburn",Poof,true,true)
+				end
+			end
+			
+			if((Tress.MatType==MAT_METAL)or(Tress.MatType==MAT_VENT)or(Tress.MatType==MAT_GRATE))then
+				WeldTable[i]=Tress.Entity
+				WeldPos=Tress.HitPos
+				WeldNorm=Tress.HitNormal
+			end
+		end	
+	end
+	if(math.random(1,3)==2)then
+		local EntOne=WeldTable[1]
+		local EntTwo=WeldTable[2]
+		if((IsValid(EntOne))and(IsValid(EntOne)))then
+			if not(EntOne==EntTwo)then
+				local Strength=math.random(1,20000)
+				Strength=Strength+math.random(1,20000)
+				Strength=Strength+math.random(1,20000)
+				Strength=Strength+math.random(1,20000)
+				Strength=Strength+math.random(1,20000)
+				constraint.Weld(EntOne,EntTwo,0,0,Strength,false)
+				local effectdata=EffectData()
+				effectdata:SetOrigin(WeldPos)
+				effectdata:SetNormal(WeldNorm)
+				effectdata:SetMagnitude(8) --amount and shoot hardness
+				effectdata:SetScale(2) --length of strands
+				effectdata:SetRadius(2) --thickness of strands
+				util.Effect("Sparks",effectdata,true,true)
+			end
+		end
+	end
+	if(math.random(1,2)==2)then
+		if(self.Owner:WaterLevel()==3)then
+			local Blamo=EffectData()
+			Blamo:SetOrigin(ShootPos+AimVec*30)
+			Blamo:SetStart(AimVec)
+			util.Effect("eff_jack_plasmajetwater",Blamo,true,true)
+		end
+	end
+end--]]
 
 function SWEP:WeldEffect(Pos, Norm) 
 	--local Tr = util.QuickTrace({self.Owner:GetShootPos(), self.Owner:GetAimVector() * 80, self.Owner})
