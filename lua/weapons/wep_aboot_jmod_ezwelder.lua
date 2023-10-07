@@ -18,7 +18,7 @@ SWEP.BodyHolsterAngL = Angle(-70, -10, -30)
 SWEP.BodyHolsterPos = Vector(0, -15, 10)
 SWEP.BodyHolsterPosL = Vector(0, -15, -10)
 SWEP.BodyHolsterScale = 5
-SWEP.ViewModelFOV = 52
+SWEP.ViewModelFOV = 60
 SWEP.Slot = 0
 SWEP.SlotPos = 5
 SWEP.InstantPickup = true -- Fort Fights compatibility
@@ -43,7 +43,7 @@ SWEP.VElements = {
 		bone = "ValveBiped.Bip01_R_Hand",
 		rel = "",
 		pos = Vector(3.5, 2.5, 3),
-		angle = Angle(0, -40, 180),
+		angle = Angle(0, -20, 180),
 		size = Vector(1, 1, 1),
 		color = Color(255, 255, 255, 255),
 		surpresslightning = false,
@@ -242,7 +242,7 @@ SWEP.LastSalvageAttempt = 0
 SWEP.NextSwitch = 0
 
 function SWEP:Initialize()
-	self:SetHoldType("fist")
+	self:SetHoldType("slam")
 	self:SCKInitialize()
 	self.NextIdle = 0
 	self:Deploy()
@@ -250,7 +250,6 @@ function SWEP:Initialize()
 	self.TaskEntity = nil
 	self.NextTaskProgress = 0
 	self.CurTask = nil
-	self.CurrentBuildSize = 1
 
 	if SERVER then
 		self.Craftables = {}
@@ -300,7 +299,6 @@ function SWEP:GetViewModelPosition(pos, ang)
 end
 
 function SWEP:SetupDataTables()
-	self:NetworkVar("String", 0, "SelectedBuild")
 	self:NetworkVar("Float", 1, "TaskProgress")
 	self:NetworkVar("Int", 0, "Electricity")
 	self:NetworkVar("Int", 1, "Gas")
@@ -315,8 +313,8 @@ end
 function SWEP:GetEZsupplies(resourceType)
 	local AvaliableResources = {
 		[JMod.EZ_RESOURCE_TYPES.STEEL] = self:GetSteel(),
-		[JMod.EZ_RESOURCE_TYPES.POWER] = math.floor(self:GetElectricity() - 8 * (self.CurrentBuildSize or 1)),
-		[JMod.EZ_RESOURCE_TYPES.GAS] = math.floor(self:GetGas() - 4 * (self.CurrentBuildSize or 1))
+		[JMod.EZ_RESOURCE_TYPES.POWER] = math.floor(self:GetElectricity()),
+		[JMod.EZ_RESOURCE_TYPES.GAS] = math.floor(self:GetGas())
 	}
 	if resourceType then
 		if AvaliableResources[resourceType] and AvaliableResources[resourceType] > 0 then
@@ -339,68 +337,22 @@ end
 
 function SWEP:PrimaryAttack()
 	if self.Owner:KeyDown(IN_SPEED) then return end
-	self:Pawnch()
+	--self:Pawnch()
 	self:SetNextPrimaryFire(CurTime() + .6)
 	self:SetNextSecondaryFire(CurTime() + 1)
 
 	if SERVER then
-		local Built, Upgraded, SelectedBuild = false, false, self:GetSelectedBuild()
+		local Built, Upgraded = false, false
 		local Ent, Pos, Norm = self:WhomIlookinAt()
 
-		if IsValid(Ent) and Ent:IsVehicle() and Ent.Health and Ent.MaxHealth then
-			
-		elseif IsValid(Ent) and Ent.EZupgradable then
-			local State = Ent:GetState()
-
-			if State == -1 then
-				self:Msg("device must be repaired before upgrading")
-			elseif State ~= 0 then
-				self:Msg("device must be turned off to upgrade")
-			else
-				local Grade = Ent:GetGrade()
-
-				if Grade < 5 then
-					local WorkSpreadMult = JMod.CalcWorkSpreadMult(Ent, Pos)
-					local UpgradeRate = JMod.Config.Tools.Toolbox.UpgradeMult * 1 * math.Round(WorkSpreadMult)
-					local RequiredMats = Ent.UpgradeCosts[Grade + 1]
-
-					for resourceType, requiredAmt in pairs(RequiredMats) do
-						local CurAmt = Ent.UpgradeProgress[resourceType] or 0
-
-						if CurAmt < requiredAmt then
-							local ResourceContainer = JMod.FindResourceContainer(resourceType, UpgradeRate, nil, nil, self)
-
-							if ResourceContainer then
-								self:UpgradeEntWithResource(Ent, ResourceContainer, UpgradeRate, resourceType)
-								Upgraded = true
-								break
-							end
-						end
-					end
-
-					if not Upgraded then
-						local str = "missing supplies for upgrade"
-
-						if Ent.UpgradeProgress then 
-							for typ, amount in pairs(RequiredMats) do
-								str = str .. " \n " .. typ .. ": " .. tostring(RequiredMats[typ] - (Ent.UpgradeProgress[typ] or 0 ))
-							end
-						else
-							for k, v in pairs(RequiredMats) do
-								str = str .. " \n " .. k .. " " .. v
-							end
-						end
-
-						self:Msg(str)
-					end
-				else
-					self:Msg("device already highest grade")
-				end
+		if IsValid(Ent) then
+			if self.Owner:KeyDown(JMod.Config.General.AltFunctionKey) and (hook.Run("JModHL2_WeldShouldFix", self.Owner, Ent, Pos) ~= false) then
+				hook.Run("JModHL2_WeldFix", self.Owner, Ent, Pos)
+				self:SetHoldType("pistol")
+				self:WeldEffect(Pos, Norm)
+			elseif Ent then
+				self:SetHoldType("pistol")
 			end
-		end
-		
-		if Upgraded then
-			self:UpgradeEffect(Pos, nil, not Sound)
 		end
 	end
 end
@@ -444,7 +396,8 @@ end
 
 --,"fists_uppercut"} -- the uppercut looks so bad
 --local Anims = {"fists_right", "fists_right", "fists_left", "fists_left"}
-local Anims = {"drawbacklow", "throw"}
+--local Anims = {"drawbacklow", "throw"}
+local Anims = {"fire"}
 
 function SWEP:Pawnch()
 	self.Owner:SetAnimation(PLAYER_ATTACK1)
@@ -485,7 +438,7 @@ function SWEP:WhomIlookinAt()
 		table.insert(Filter, v)
 	end
 
-	local Tr = util.QuickTrace(self.Owner:GetShootPos(), self.Owner:GetAimVector() * 100 * math.Clamp(self.CurrentBuildSize, .5, 100), Filter)
+	local Tr = util.QuickTrace(self.Owner:GetShootPos(), self.Owner:GetAimVector() * 100, Filter)
 
 	return Tr.Entity, Tr.HitPos, Tr.HitNormal
 end
@@ -613,8 +566,6 @@ function SWEP:Think()
 	if (self.Owner:KeyDown(IN_SPEED)) or (self.Owner:KeyDown(IN_ZOOM)) then
 		self:SetHoldType("normal")
 	else
-		self:SetHoldType("fist")
-
 		if self.Owner:KeyDown(IN_ATTACK2) then
 			if self.NextTaskProgress < Time then
 				self.NextTaskProgress = Time + .6
@@ -624,6 +575,7 @@ function SWEP:Think()
 				local Ent, Pos = Tr.Entity, Tr.HitPos
 
 				if IsValid(Ent) then
+					self:SetHoldType("pistol")
 					if Ent ~= self.TaskEntity or Task ~= self.CurTask then
 						self:SetTaskProgress(0)
 						self.TaskEntity = Ent
@@ -634,8 +586,9 @@ function SWEP:Think()
 						if Message then
 							self:Msg(Message)
 						else
-							--self:Pawnch()
-							sound.Play("snds_jack_gmod/ez_tools/hit.wav", Pos + VectorRand(), 60, math.random(50, 70))
+							self:WeldEffect(Pos, Tr.HitNormal)
+							self:Pawnch()
+							--sound.Play("snds_jack_gmod/ez_tools/hit.wav", Pos + VectorRand(), 60, math.random(50, 70))
 							sound.Play("snds_jack_gmod/ez_dismantling/" .. math.random(1, 10) .. ".wav", Pos, 65, math.random(90, 110))
 							if SERVER then
 								JMod.Hint(self.Owner, "work spread")
@@ -651,10 +604,66 @@ function SWEP:Think()
 				end
 			end
 		else
+			self:SetHoldType("slam")
 			self:SetTaskProgress(0)
 		end
 	end
 end
+
+function SWEP:WeldEffect(Pos, Norm) 
+	--local Tr = util.QuickTrace({self.Owner:GetShootPos(), self.Owner:GetAimVector() * 80, self.Owner})
+	local effectdata = EffectData()
+	effectdata:SetOrigin(Pos)
+	effectdata:SetNormal(Norm)
+	util.Effect( "stunstickimpact", effectdata, true, true )
+end
+
+--[[function SWEP:DrawEffects( weapon, ply )
+	local ID = weapon:LookupAttachment( "muzzle" )
+
+	local Muzzle = weapon:GetAttachment( ID )
+
+	if not Muzzle then return end
+
+	local T = CurTime()
+
+	if self:GetFlameTime() < T or (self._NextFX1 or 0) > T then return end
+
+	self._NextFX1 = T + 0.02
+
+	local effectdata = EffectData()
+	effectdata:SetOrigin( Muzzle.Pos )
+	effectdata:SetAngles( Muzzle.Ang )
+	effectdata:SetScale( 0.5 )
+	util.Effect( "MuzzleEffect", effectdata, true, true )
+
+	if (self._NextFX2 or 0) > T then return end
+
+	self._NextFX2 = T + 0.06
+
+	local trace = ply:GetEyeTrace()
+	local ShootPos = ply:GetShootPos()
+
+	if (ShootPos - trace.HitPos):Length() > self.MaxRange then return end
+
+	local effectdata = EffectData()
+	effectdata:SetOrigin( trace.HitPos )
+	effectdata:SetNormal( trace.HitNormal * 0.15 )
+	util.Effect( "manhacksparks", effectdata, true, true )
+
+	local dlight = DynamicLight( self:EntIndex() )
+
+	if not dlight then return end
+
+	dlight.pos = (trace.HitPos + ShootPos) * 0.5
+	dlight.r = 206
+	dlight.g = 253
+	dlight.b = 255
+	dlight.brightness = 3
+	dlight.decay = 1000
+	dlight.size = 256
+	dlight.dietime = CurTime() + 0.1
+end--]]
 
 local LastProg = 0
 
@@ -662,11 +671,7 @@ function SWEP:DrawHUD()
 	if GetConVar("cl_drawhud"):GetBool() == false then return end
 	local Ply = self.Owner
 	if Ply:ShouldDrawLocalPlayer() then return end
-	local W, H, Build = ScrW(), ScrH(), self:GetSelectedBuild()
-
-	if Build and (Build ~= "") then
-		draw.SimpleTextOutlined(Build, "Trebuchet24", W * .5, H * .7 - 60, Color(255, 255, 255, 150), TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP, 3, Color(0, 0, 0, 150))
-	end
+	local W, H = ScrW(), ScrH()
 
 	draw.SimpleTextOutlined("Power: "..math.floor(self:GetElectricity()), "Trebuchet24", W * .1, H * .5, Color(255, 255, 255, 100), TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP, 3, Color(0, 0, 0, 50))
 	draw.SimpleTextOutlined("Gas: "..math.floor(self:GetGas()), "Trebuchet24", W * .1, H * .5 + 30, Color(255, 255, 255, 100), TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP, 3, Color(0, 0, 0, 50))

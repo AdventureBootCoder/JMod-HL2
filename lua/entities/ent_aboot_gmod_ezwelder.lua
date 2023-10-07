@@ -1,16 +1,16 @@
-﻿-- Jackarunda 2021
+﻿-- AdventureBoots 2023
 AddCSLuaFile()
 ENT.Type = "anim"
-ENT.Author = "Jackarunda"
+ENT.Author = "Adventure Boots"
 ENT.Category = "JMod - EZ HL:2"
 ENT.Information = "glhfggwpezpznore"
-ENT.PrintName = "EZ Welder"
+ENT.PrintName = "EZ Welding Torch"
 ENT.NoSitAllowed = true
-ENT.Spawnable = false
+ENT.Spawnable = true
 ENT.AdminSpawnable = true
 ---
 ENT.JModPreferredCarryAngles = Angle(0, 0, 0)
-ENT.DamageThreshold = 120
+ENT.DamageThreshold = 100
 ENT.JModEZstorable = true
 
 ---

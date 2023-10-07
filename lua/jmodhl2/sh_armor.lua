@@ -329,7 +329,7 @@ JModHL2.ArmorTable = {
 		ent = "ent_aboot_gmod_ezarmor_headcrab"
 	},
 	["Welding Mask"] = {
-		PrintName = "Welding Mask",
+		PrintName = "EZ Welding Mask",
 		Category = "JMod - EZ HL:2",
 		mdl = "models/hl2ep2/welding_helmet.mdl",
 		Spawnable = true,
