@@ -13,11 +13,11 @@ SWEP.ViewModel = "models/weapons/c_grenade.mdl"
 SWEP.WorldModel = "models/hl2ep2/welding_torch.mdl"
 SWEP.BodyHolsterModel = "models/hl2ep2/welding_torch.mdl"
 SWEP.BodyHolsterSlot = "hips"
-SWEP.BodyHolsterAng = Angle(-70, 0, 200)
+SWEP.BodyHolsterAng = Angle(-100, 0, 100)
 SWEP.BodyHolsterAngL = Angle(-70, -10, -30)
-SWEP.BodyHolsterPos = Vector(0, -15, 10)
-SWEP.BodyHolsterPosL = Vector(0, -15, -10)
-SWEP.BodyHolsterScale = 5
+SWEP.BodyHolsterPos = Vector(0, -10, 8)
+SWEP.BodyHolsterPosL = Vector(0, -10, -8)
+SWEP.BodyHolsterScale = 1
 SWEP.ViewModelFOV = 60
 SWEP.Slot = 0
 SWEP.SlotPos = 5
@@ -87,8 +87,8 @@ SWEP.WElements = {
 		model = "models/props_silo/welding_torch.mdl",
 		bone = "ValveBiped.Bip01_R_Hand",
 		rel = "",
-		pos = Vector(0, 0, 1.5),
-		angle = Angle(90, 0, -90),
+		pos = Vector(-0.5, 2.5, 0.9),
+		angle = Angle(95, 0, -50),
 		size = Vector(1, 1, 1),
 		color = Color(255, 255, 255, 255),
 		surpresslightning = false,
@@ -96,146 +96,6 @@ SWEP.WElements = {
 		skin = 0,
 		bodygroup = {}
 	}
-	--[[["saw"] = {
-		type = "Model",
-		model = "models/props_forest/circularsaw01.mdl",
-		bone = "ValveBiped.Bip01_Spine",
-		rel = "",
-		pos = Vector(-6.753, -0.519, 10.909),
-		angle = Angle(104.026, -12.858, -157.793),
-		size = Vector(0.75, 0.75, 0.75),
-		color = Color(255, 255, 255, 255),
-		surpresslightning = false,
-		material = "",
-		skin = 0,
-		bodygroup = {}
-	},
-	["wrench"] = {
-		type = "Model",
-		model = "models/props_c17/tools_wrench01a.mdl",
-		bone = "ValveBiped.Bip01_R_Hand",
-		rel = "",
-		pos = Vector(2.596, 1, 3.635),
-		angle = Angle(0, -90, -90),
-		size = Vector(1, 1, 1),
-		color = Color(255, 255, 255, 255),
-		surpresslightning = false,
-		material = "",
-		skin = 0,
-		bodygroup = {}
-	},
-	["pliers"] = {
-		type = "Model",
-		model = "models/props_c17/tools_pliers01a.mdl",
-		bone = "ValveBiped.Bip01_L_Hand",
-		rel = "",
-		pos = Vector(4.675, 0, -1.558),
-		angle = Angle(0, 0, 90),
-		size = Vector(1, 1, 1),
-		color = Color(255, 255, 255, 255),
-		surpresslightning = false,
-		material = "",
-		skin = 0,
-		bodygroup = {}
-	},
-	["torch"] = {
-		type = "Model",
-		model = "models/props_silo/welding_torch.mdl",
-		bone = "ValveBiped.Bip01_Spine",
-		rel = "",
-		pos = Vector(-1.558, 2.596, -8.832),
-		angle = Angle(180, 26.882, 38.57),
-		size = Vector(1, 1, 1),
-		color = Color(255, 255, 255, 255),
-		surpresslightning = false,
-		material = "",
-		skin = 0,
-		bodygroup = {}
-	},
-	["pickaxe"] = {
-		type = "Model",
-		model = "models/props_mining/pickaxe01.mdl",
-		bone = "ValveBiped.Bip01_Spine4",
-		rel = "",
-		pos = Vector(-22.338, 2.596, -1.558),
-		angle = Angle(-92.338, 0, 0),
-		size = Vector(0.75, 0.75, 0.75),
-		color = Color(255, 255, 255, 255),
-		surpresslightning = false,
-		material = "",
-		skin = 0,
-		bodygroup = {}
-	},
-	["mask"] = {
-		type = "Model",
-		model = "models/props_silo/welding_helmet.mdl",
-		bone = "ValveBiped.Bip01_Head1",
-		rel = "",
-		pos = Vector(2, 4, 0),
-		angle = Angle(90, -20, 0),
-		size = Vector(1.1, 1.1, 1.1),
-		color = Color(255, 255, 255, 255),
-		surpresslightning = false,
-		material = "",
-		skin = 0,
-		bodygroup = {}
-	},
-	["axe"] = {
-		type = "Model",
-		model = "models/props_forest/axe.mdl",
-		bone = "ValveBiped.Bip01_Spine4",
-		rel = "",
-		pos = Vector(-7.792, 2, 4),
-		angle = Angle(118.052, 87.662, 180),
-		size = Vector(1, 1, 1),
-		color = Color(255, 255, 255, 255),
-		surpresslightning = false,
-		material = "",
-		skin = 0,
-		bodygroup = {}
-	},
-	["toolbox"] = {
-		type = "Model",
-		model = "models/weapons/w_models/w_tooljox.mdl",
-		bone = "ValveBiped.Bip01_Spine4",
-		rel = "",
-		pos = Vector(-7, 6, 0.518),
-		angle = Angle(-180, 85.324, 87.662),
-		size = Vector(0.5, 0.5, 0.5),
-		color = Color(255, 255, 255, 255),
-		surpresslightning = false,
-		material = "",
-		skin = 0,
-		bodygroup = {}
-	},
-	["pack1"] = {
-		type = "Model",
-		model = "models/weapons/w_defuser.mdl",
-		bone = "ValveBiped.Bip01_Spine",
-		rel = "",
-		pos = Vector(-4.676, -7.792, 0),
-		angle = Angle(180, 108.7, 90),
-		size = Vector(1, 1, 1),
-		color = Color(255, 255, 255, 255),
-		surpresslightning = false,
-		material = "",
-		skin = 0,
-		bodygroup = {}
-	},
-	["pack2"] = {
-		type = "Model",
-		model = "models/weapons/w_defuser.mdl",
-		bone = "ValveBiped.Bip01_Spine",
-		rel = "",
-		pos = Vector(-3.636, 3.635, 0),
-		angle = Angle(3.506, 68.96, 90),
-		size = Vector(1, 1, 1),
-		color = Color(255, 255, 255, 255),
-		surpresslightning = false,
-		material = "",
-		skin = 0,
-		bodygroup = {}
-	}]]--
 }
 
 SWEP.LastSalvageAttempt = 0
@@ -246,10 +106,6 @@ function SWEP:Initialize()
 	self:SCKInitialize()
 	self.NextIdle = 0
 	self:Deploy()
-	self:SetTaskProgress(0)
-	self.TaskEntity = nil
-	self.NextTaskProgress = 0
-	self.CurTask = nil
 
 	if SERVER then
 		self.Craftables = {}
@@ -276,10 +132,50 @@ end
 
 function SWEP:ViewModelDrawn()
 	self:SCKViewModelDrawn()
+	if self:GetWelding() then
+		local VM = self.Owner:GetViewModel()
+		local Pos,Ang = VM:GetBonePosition(VM:LookupBone("ValveBiped.Grenade_body"))
+		Pos = Pos + Ang:Right()*2 - Ang:Up()*1
+		local Dir = self.Owner:GetAimVector()
+
+		local dlight = DynamicLight(self:EntIndex())
+		if(dlight)then
+			dlight.MinLight=0
+			dlight.Pos = Pos + Dir * 5
+			dlight.r = 175
+			dlight.g = 200
+			dlight.b = 255
+			dlight.Brightness = 6
+			dlight.Size = 500
+			dlight.Decay = 10000
+			dlight.DieTime = CurTime() + .2
+			dlight.Style = 0
+		end--]]
+	end
 end
 
 function SWEP:DrawWorldModel()
 	self:SCKDrawWorldModel()
+	if self:GetWelding() then
+		local VM = self.Owner
+		local Pos, Ang = VM:GetBonePosition(VM:LookupBone("ValveBiped.Bip01_R_Hand"))
+		Pos = Pos + Ang:Right()*2 - Ang:Up()*1
+		local Dir = self.Owner:GetAimVector()
+
+		local dlight = DynamicLight(self:EntIndex())
+		if(dlight)then
+			dlight.MinLight=0
+			dlight.Pos = Pos + Dir * 5
+			dlight.r = 175
+			dlight.g = 200
+			dlight.b = 255
+			dlight.Brightness = 6
+			dlight.Size = 500
+			dlight.Decay = 10000
+			dlight.DieTime = CurTime() + .2
+			dlight.Style = 0
+		end--]]
+	end
 end
 
 local Downness = 0
@@ -299,10 +195,10 @@ function SWEP:GetViewModelPosition(pos, ang)
 end
 
 function SWEP:SetupDataTables()
-	self:NetworkVar("Float", 1, "TaskProgress")
 	self:NetworkVar("Int", 0, "Electricity")
 	self:NetworkVar("Int", 1, "Gas")
 	self:NetworkVar("Int", 2, "Steel")
+	self:NetworkVar("Bool", 0, "Welding")
 end
 
 function SWEP:UpdateNextIdle()
@@ -337,40 +233,12 @@ end
 
 function SWEP:PrimaryAttack()
 	if self.Owner:KeyDown(IN_SPEED) then return end
-	--self:Pawnch()
-	self:SetNextPrimaryFire(CurTime() + .3)
-	self:SetNextSecondaryFire(CurTime() + 1)
-
-	if SERVER then
-		local Built, Upgraded = false, false
-		local Ent, Pos, Norm = self:WhomIlookinAt()
-
-		if IsValid(Ent) then
-			if self.Owner:KeyDown(JMod.Config.General.AltFunctionKey) and (hook.Run("JModHL2_WeldShouldFix", self.Owner, Ent, Pos) ~= false) then
-				hook.Run("JModHL2_WeldFix", self.Owner, Ent, Pos)
-				self:SetHoldType("pistol")
-				self:WeldEffect(Pos, Norm)
-			elseif Ent then
-				self:SetHoldType("pistol")
-			end
-		end
-	end
+	self:SetNextPrimaryFire(CurTime() + .01)
+	self:SetNextSecondaryFire(CurTime() + .01)
 end
 
 function SWEP:Msg(msg)
 	self.Owner:PrintMessage(HUD_PRINTCENTER, msg)
-end
-
---,"fists_uppercut"} -- the uppercut looks so bad
---local Anims = {"fists_right", "fists_right", "fists_left", "fists_left"}
---local Anims = {"drawbacklow", "throw"}
-local Anims = {"fire"}
-
-function SWEP:Pawnch()
-	self.Owner:SetAnimation(PLAYER_ATTACK1)
-	local vm = self.Owner:GetViewModel()
-	vm:SendViewModelMatchingSequence(vm:LookupSequence(table.Random(Anims)))
-	self:UpdateNextIdle()
 end
 
 function SWEP:Reload()
@@ -393,6 +261,8 @@ function SWEP:WhomIlookinAt()
 end
 
 function SWEP:SecondaryAttack()
+	self:SetNextPrimaryFire(CurTime() + .01)
+	self:SetNextSecondaryFire(CurTime() + .01)
 end
 
 --
@@ -485,6 +355,8 @@ function SWEP:Deploy()
 	return true
 end
 
+local WeldMats = {MAT_METAL, MAT_VENT, MAT_GRATE}
+
 function SWEP:Think()
 	local Time = CurTime()
 	local vm = self.Owner:GetViewModel()
@@ -496,141 +368,135 @@ function SWEP:Think()
 		self:UpdateNextIdle()
 	end
 
+	local Alt = self.Owner:KeyDown(JMod.Config.General.AltFunctionKey)
+
 	if (self.Owner:KeyDown(IN_SPEED)) or (self.Owner:KeyDown(IN_ZOOM)) then
 		self:SetHoldType("normal")
 	else
-		if self.Owner:KeyDown(IN_ATTACK2) then
-			if self.NextTaskProgress < Time then
-				self.NextTaskProgress = Time + .6
-				local Alt = self.Owner:KeyDown(JMod.Config.General.AltFunctionKey)
-				local Task = (Alt and "loosen") or "salvage"
-				local Tr = util.QuickTrace(self.Owner:GetShootPos(), self.Owner:GetAimVector() * 80, {self.Owner})
-				local Ent, Pos = Tr.Entity, Tr.HitPos
+		if self.Owner:KeyDown(IN_ATTACK2) and (self:GetNextSecondaryFire() <= Time) then
+			local Ent, Pos, Norm = self:WhomIlookinAt()
 
-				if IsValid(Ent) then
-					self:SetHoldType("pistol")
-					if Ent ~= self.TaskEntity or Task ~= self.CurTask then
-						self:SetTaskProgress(0)
-						self.TaskEntity = Ent
-						self.CurTask = Task
-					elseif IsValid(Ent:GetPhysicsObject()) then
-						local Message = JMod.EZprogressTask(Ent, Pos, self.Owner, (Alt and "loosen") or "salvage")
-
-						if Message then
-							self:Msg(Message)
+			if IsValid(Ent) and (hook.Run("JModHL2_WeldShouldFix", self.Owner, Ent, Pos) ~= false) then
+				hook.Run("JModHL2_WeldFix", self.Owner, Ent, Pos)
+				self:WeldEffect()
+				self:SetWelding(true)
+				self:SetHoldType("pistol")
+			end
+		elseif self.Owner:KeyDown(IN_ATTACK) and (self:GetNextPrimaryFire() <= Time) then
+			self:SetHoldType("pistol")
+			--
+			if (SERVER) then
+				local BaseShootPos = self.Owner:GetShootPos()
+				local ShootPos = BaseShootPos + self.Owner:GetRight() * 4 - self.Owner:GetUp() * 5
+				local AimVec = self.Owner:GetAimVector()
+				local WeldTable = {}
+				local WeldPos = nil
+				local WeldNorm = nil
+				for i = 1, 2 do
+					local Tress=util.TraceLine({
+						start = BaseShootPos, 
+						endpos = ShootPos + AimVec * math.Rand(10, 100),
+						filter = self.Owner,
+						mask = MASK_SHOT
+					})
+					if(Tress.Hit) then
+						local Burrn = DamageInfo()
+						Burrn:SetDamage(math.Rand(.2, .4))
+						Burrn:SetDamagePosition(Tress.HitPos)
+						Burrn:SetDamageForce(AimVec * 100)
+						Burrn:SetAttacker(self.Owner)
+						Burrn:SetInflictor(self)
+						if(Tress.Entity:IsOnFire())then
+							Burrn:SetDamageType(DMG_GENERIC)
+						elseif(math.random(1, 9) == 5)then
+							Burrn:SetDamageType(DMG_BURN)
 						else
-							self:WeldEffect(Pos, Tr.HitNormal)
-							self:Pawnch()
-							--sound.Play("snds_jack_gmod/ez_tools/hit.wav", Pos + VectorRand(), 60, math.random(50, 70))
-							sound.Play("snds_jack_gmod/ez_dismantling/" .. math.random(1, 10) .. ".wav", Pos, 65, math.random(90, 110))
-							if SERVER then
-								JMod.Hint(self.Owner, "work spread")
-								self:SetTaskProgress(Ent:GetNW2Float("EZ"..Task.."Progress", 0))
-								timer.Simple(.1, function()
-									if IsValid(self) then
-										self:UpgradeEffect(Pos, 2, true)
-									end
-								end)
-							end
-						end 
+							Burrn:SetDamageType(DMG_DIRECT)
+						end
+						Tress.Entity:TakeDamageInfo(Burrn)
+
+						if((Tress.MatType==MAT_METAL)or(Tress.MatType==MAT_VENT)or(Tress.MatType==MAT_GRATE))then
+							WeldTable[i]=Tress.Entity
+							WeldPos=Tress.HitPos
+							WeldNorm=Tress.HitNormal
+						end
+
+						self:WeldEffect(Tress)
+						self:SetWelding(true)
+					else
+						self:SetWelding(false)
+					end	
+				end
+				if(math.random(1,3)==2)then
+					local EntOne=WeldTable[1]
+					local EntTwo=WeldTable[2]
+					if((IsValid(EntOne))and(IsValid(EntOne)))then
+						if not(EntOne==EntTwo)then
+							local Strength=math.random(1,20000)
+							Strength=Strength+math.random(1,20000)
+							Strength=Strength+math.random(1,20000)
+							Strength=Strength+math.random(1,20000)
+							Strength=Strength+math.random(1,20000)
+							constraint.Weld(EntOne,EntTwo,0,0,Strength,false)
+							local effectdata=EffectData()
+							effectdata:SetOrigin(WeldPos)
+							effectdata:SetNormal(WeldNorm)
+							effectdata:SetMagnitude(8) --amount and shoot hardness
+							effectdata:SetScale(2) --length of strands
+							effectdata:SetRadius(2) --thickness of strands
+							util.Effect("Sparks",effectdata,true,true)
+						end
+					end
+				end
+				if(math.random(1,2)==2)then
+					if(self.Owner:WaterLevel()==3)then
+						local Blamo=EffectData()
+						Blamo:SetOrigin(ShootPos+AimVec*30)
+						Blamo:SetStart(AimVec)
+						util.Effect("eff_jack_plasmajetwater",Blamo,true,true)
 					end
 				end
 			end
 		else
 			self:SetHoldType("slam")
-			self:SetTaskProgress(0)
+			self:SetWelding(false)
 		end
 	end
 end
 
---[[if(SERVER)then
-	local WeldTable={}
-	local WeldPos=nil
-	local WeldNorm=nil
-	for i=1,2 do
-		local TressDat={start=BaseShootPos,endpos=ShootPos+AimVec*math.Rand(100,110)+VectorRand()*math.Rand(0,20),filter=self.Owner,mask=MASK_SHOT}
-		local Tress=util.TraceLine(TressDat)
-		if(Tress.Hit)then
-			local WantSomeIceWithThatBurn=DamageInfo()
-			WantSomeIceWithThatBurn:SetDamage(math.Rand(.2,.4))
-			WantSomeIceWithThatBurn:SetDamagePosition(Tress.HitPos)
-			WantSomeIceWithThatBurn:SetDamageForce(AimVec*900)
-			WantSomeIceWithThatBurn:SetAttacker(self.Owner)
-			WantSomeIceWithThatBurn:SetInflictor(self.Weapon)
-			if(Tress.Entity:IsOnFire())then
-				WantSomeIceWithThatBurn:SetDamageType(DMG_GENERIC)
-			elseif(math.random(1,9)==5)then
-				WantSomeIceWithThatBurn:SetDamageType(DMG_BURN)
-			else
-				WantSomeIceWithThatBurn:SetDamageType(DMG_DIRECT)
-			end
-			Tress.Entity:TakeDamageInfo(WantSomeIceWithThatBurn)
-			
-			if not(self.NextBurnSoundEmitTime)then self.NextBurnSoundEmitTime=CurTime() end
-			if(self.NextBurnSoundEmitTime<CurTime())then
-				self.NextBurnSoundEmitTime=CurTime()+.075
-			end
-			
-			if(math.random(1,2)==1)then
-				local Poof=EffectData()
-				Poof:SetOrigin(Tress.HitPos)
-				Poof:SetScale(2)
-				Poof:SetNormal(Tress.HitNormal)
-				if((Tress.MatType==MAT_CONCRETE)or(Tress.MatType==MAT_METAL)or(Tress.MatType==MAT_COMPUTER)or(Tress.MatType==MAT_GRATE)or(Tress.MatType==MAT_TILE)or(Tress.MatType==MAT_GLASS)or(Tress.MatType==MAT_SAND))then
-					Poof:SetStart(Tress.Entity:GetVelocity())
-					Poof:SetNormal(Tress.HitNormal)
-					util.Effect("eff_jack_tinymelt",Poof,true,true)
-					Poof:SetScale(.07)
-					util.Effect("eff_jack_fadingmelt",Poof,true,true)
-				else
-					util.Effect("eff_jack_tinyburn",Poof,true,true)
-				end
-			end
-			
-			if((Tress.MatType==MAT_METAL)or(Tress.MatType==MAT_VENT)or(Tress.MatType==MAT_GRATE))then
-				WeldTable[i]=Tress.Entity
-				WeldPos=Tress.HitPos
-				WeldNorm=Tress.HitNormal
-			end
-		end	
+function SWEP:WeldEffect(Tr)
+	local ShootPos, AimVec = self.Owner:GetShootPos(), self.Owner:GetAimVector()
+	if not istable(Tr) then
+		Tr = util.QuickTrace(ShootPos, AimVec * 100, self.Owner)
 	end
-	if(math.random(1,3)==2)then
-		local EntOne=WeldTable[1]
-		local EntTwo=WeldTable[2]
-		if((IsValid(EntOne))and(IsValid(EntOne)))then
-			if not(EntOne==EntTwo)then
-				local Strength=math.random(1,20000)
-				Strength=Strength+math.random(1,20000)
-				Strength=Strength+math.random(1,20000)
-				Strength=Strength+math.random(1,20000)
-				Strength=Strength+math.random(1,20000)
-				constraint.Weld(EntOne,EntTwo,0,0,Strength,false)
-				local effectdata=EffectData()
-				effectdata:SetOrigin(WeldPos)
-				effectdata:SetNormal(WeldNorm)
-				effectdata:SetMagnitude(8) --amount and shoot hardness
-				effectdata:SetScale(2) --length of strands
-				effectdata:SetRadius(2) --thickness of strands
-				util.Effect("Sparks",effectdata,true,true)
-			end
-		end
-	end
-	if(math.random(1,2)==2)then
-		if(self.Owner:WaterLevel()==3)then
-			local Blamo=EffectData()
-			Blamo:SetOrigin(ShootPos+AimVec*30)
-			Blamo:SetStart(AimVec)
-			util.Effect("eff_jack_plasmajetwater",Blamo,true,true)
-		end
-	end
-end--]]
+	local Pos, Norm = Tr.HitPos, Tr.HitNormal
 
-function SWEP:WeldEffect(Pos, Norm) 
-	--local Tr = util.QuickTrace({self.Owner:GetShootPos(), self.Owner:GetAimVector() * 80, self.Owner})
 	local effectdata = EffectData()
 	effectdata:SetOrigin(Pos)
 	effectdata:SetNormal(Norm)
-	util.Effect( "stunstickimpact", effectdata, true, true )
+	util.Effect("stunstickimpact", effectdata, true, true )
+
+	if not(self.NextBurnSoundEmitTime)then self.NextBurnSoundEmitTime=CurTime() end
+	if(self.NextBurnSoundEmitTime < CurTime())then
+		self.NextBurnSoundEmitTime = CurTime()+.075
+		sound.Play("snd_jack_heavylaserburn.wav", Tr.HitPos, 65, math.random(90, 110))
+	end
+	
+	if(math.random(1,2)==1)then
+		local Poof=EffectData()
+		Poof:SetOrigin(Tr.HitPos)
+		Poof:SetScale(2)
+		Poof:SetNormal(Tr.HitNormal)
+		if((Tr.MatType==MAT_CONCRETE)or(Tr.MatType==MAT_METAL)or(Tr.MatType==MAT_COMPUTER)or(Tr.MatType==MAT_GRATE)or(Tr.MatType==MAT_TILE)or(Tr.MatType==MAT_GLASS)or(Tr.MatType==MAT_SAND))then
+			Poof:SetStart(Tr.Entity:GetVelocity())
+			Poof:SetNormal(Tr.HitNormal)
+			util.Effect("eff_jack_tinymelt",Poof,true,true)
+			Poof:SetScale(.07)
+			util.Effect("eff_jack_fadingmelt",Poof,true,true)
+		else
+			util.Effect("eff_jack_tinyburn",Poof,true,true)
+		end
+	end
 end
 
 --[[function SWEP:DrawEffects( weapon, ply )
