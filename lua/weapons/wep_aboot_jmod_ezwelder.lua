@@ -131,6 +131,7 @@ end
 function SWEP:ViewModelDrawn()
 	self:SCKViewModelDrawn()
 	if self:GetWelding() then
+		local Ply = LocalPlayer()
 		local VM = self.Owner:GetViewModel()
 		local Pos, Ang = VM:GetBonePosition(VM:LookupBone("ValveBiped.Grenade_body"))
 		Ang:RotateAroundAxis(Ang:Up(), -10)
@@ -143,6 +144,7 @@ function SWEP:ViewModelDrawn()
 		effectdata:SetScale(0.5)
 		util.Effect( "MuzzleEffect", effectdata, true, true )
 
+		local WeldingMask = Ply.EZarmor and Ply.EZarmor.effects and Ply.EZarmor.effects.flashresistant
 		local dlight = DynamicLight(self:EntIndex())
 		if(dlight)then
 			dlight.MinLight=0
@@ -150,7 +152,7 @@ function SWEP:ViewModelDrawn()
 			dlight.r = 175
 			dlight.g = 200
 			dlight.b = 255
-			dlight.Brightness = 6
+			dlight.Brightness = (WeldingMask and 1) or 10
 			dlight.Size = 500
 			dlight.Decay = 10000
 			dlight.DieTime = CurTime() + .2
@@ -167,6 +169,7 @@ function SWEP:DrawWorldModel()
 		Pos = Pos + Ang:Right()*2 - Ang:Up()*1
 		local Dir = self.Owner:GetAimVector()
 
+		local WeldingMask = not(Ply:ShouldDrawLocalPlayer()) and Ply.EZarmor and Ply.EZarmor.effects and Ply.EZarmor.effects.flashresistant
 		local dlight = DynamicLight(self:EntIndex())
 		if(dlight)then
 			dlight.MinLight=0
@@ -174,7 +177,7 @@ function SWEP:DrawWorldModel()
 			dlight.r = 175
 			dlight.g = 200
 			dlight.b = 255
-			dlight.Brightness = 6
+			dlight.Brightness = (WeldingMask and 1) or 6
 			dlight.Size = 500
 			dlight.Decay = 10000
 			dlight.DieTime = CurTime() + .2
@@ -234,12 +237,6 @@ function SWEP:SetEZsupplies(typ, amt, setter)
 	end
 end
 
-function SWEP:PrimaryAttack()
-	if self.Owner:KeyDown(IN_SPEED) then return end
-	self:SetNextPrimaryFire(CurTime() + .01)
-	self:SetNextSecondaryFire(CurTime() + .01)
-end
-
 function SWEP:Msg(msg)
 	self.Owner:PrintMessage(HUD_PRINTCENTER, msg)
 end
@@ -261,11 +258,6 @@ function SWEP:WhomIlookinAt()
 	local Tr = util.QuickTrace(self.Owner:GetShootPos(), self.Owner:GetAimVector() * 100, Filter)
 
 	return Tr.Entity, Tr.HitPos, Tr.HitNormal
-end
-
-function SWEP:SecondaryAttack()
-	self:SetNextPrimaryFire(CurTime() + .01)
-	self:SetNextSecondaryFire(CurTime() + .01)
 end
 
 --
@@ -357,7 +349,19 @@ function SWEP:Deploy()
 	return true
 end
 
-local WeldMats = {MAT_METAL, MAT_VENT, MAT_GRATE}
+function SWEP:PrimaryAttack()
+	if self.Owner:KeyDown(IN_SPEED) then return end
+	self:SetNextPrimaryFire(CurTime() + .01)
+	self:SetNextSecondaryFire(CurTime() + .01)
+end
+
+function SWEP:SecondaryAttack()
+	if self.Owner:KeyDown(IN_SPEED) then return end
+	self:SetNextPrimaryFire(CurTime() + .01)
+	self:SetNextSecondaryFire(CurTime() + .01)
+end
+
+local WeldMats = {MAT_METAL, MAT_VENT, MAT_GRATE, MAT_TILE}
 
 function SWEP:Think()
 	local Time = CurTime()
@@ -407,7 +411,7 @@ function SWEP:Think()
 					})
 					if(Tress.Hit) then
 						local Burrn = DamageInfo()
-						Burrn:SetDamage(math.Rand(1, 1.5) * 10)
+						Burrn:SetDamage(math.Rand(0.5, 1))
 						Burrn:SetDamagePosition(Tress.HitPos)
 						Burrn:SetDamageForce(AimVec * 100)
 						Burrn:SetAttacker(self.Owner)
@@ -421,10 +425,10 @@ function SWEP:Think()
 						end
 						Tress.Entity:TakeDamageInfo(Burrn)
 
-						if((Tress.MatType==MAT_METAL)or(Tress.MatType==MAT_VENT)or(Tress.MatType==MAT_GRATE))then
-							WeldTable[i]=Tress.Entity
-							WeldPos=Tress.HitPos
-							WeldNorm=Tress.HitNormal
+						if(table.HasValue(WeldMats, Tress.MatType))then
+							WeldTable[i] = Tress.Entity
+							WeldPos = Tress.HitPos
+							WeldNorm = Tress.HitNormal
 						end
 
 						self:WeldEffect(Tress)
@@ -438,7 +442,9 @@ function SWEP:Think()
 				if(math.random(1,3)==2)then
 					local EntOne=WeldTable[1]
 					local EntTwo=WeldTable[2]
-					if((IsValid(EntOne))and(IsValid(EntOne)))then
+					if IsValid(EntOne) and JMod.IsDoor(EntOne)then EntOne:Fire("lock", "", 0) end
+					if IsValid(EntTwo) and JMod.IsDoor(EntTwo)then EntTwo:Fire("lock", "", 0) end
+					if((IsValid(EntOne))and(IsValid(EntTwo)))then
 						if not(EntOne==EntTwo)then
 							local Strength=math.random(1,20000)
 							Strength=Strength+math.random(1,20000)
