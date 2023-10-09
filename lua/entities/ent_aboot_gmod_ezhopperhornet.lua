@@ -258,7 +258,7 @@ if SERVER then
 				self:EmitSound("NPC_CombineMine.Hop")
 				local SelfPos = self:GetPos()
 				local ToVec = targetPos - SelfPos
-				ToVec.z = 0
+				--ToVec.z = 0
 				local ToDir = ToVec:GetNormalized()
 				local ToAng = ToDir:Angle()
 				local LaunchAngle = 80

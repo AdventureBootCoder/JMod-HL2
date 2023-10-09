@@ -129,8 +129,8 @@ if SERVER then
 	function ENT:PhysicsCollide(data, physobj)
 		if data.DeltaTime > 0.2 then
 			if data.Speed > 10 then
-				if self:GetState() == STATE_LAUNCHED then
-					timer.Simple(0.01, function()
+				if (self:GetState() == STATE_LAUNCHED) then--and (self.DetTime and self.DetTime < CurTime()) then
+					timer.Simple(0, function()
 						if IsValid(self) then
 							self:Detonate()
 						end
@@ -144,12 +144,13 @@ if SERVER then
 
 	function ENT:Launch(targetPos)
 		self:SetState(STATE_LAUNCHED)
+		--self.DetTime = CurTime() + 0.3
 		timer.Simple(0.2 * JMod.Config.Explosives.Mine.Delay, function()
 			if IsValid(self) then
 				self:EmitSound("NPC_CombineMine.Hop")
 				local SelfPos = self:GetPos()
 				local ToVec = targetPos - SelfPos
-				ToVec.z = 0
+				--ToVec.z = 0
 				local ToDir = ToVec:GetNormalized()
 				local ToAng = ToDir:Angle()
 				local Dist = SelfPos:Distance(targetPos)
@@ -177,8 +178,8 @@ if SERVER then
 		if self.Exploded then return end
 		self.Exploded = true
 		local SelfPos = self:LocalToWorld(self:OBBCenter())
-		local Up = Vector(0, 0, 1)
-		--[[local EffectType = 1
+		local Up = self:GetUp() --Vector(0, 0, 1)
+		local EffectType = 1
 		local Traec = util.QuickTrace(self:GetPos(), Vector(0, 0, -5), self)
 
 		if Traec.Hit then
@@ -200,7 +201,7 @@ if SERVER then
 		plooie:SetScale(1)
 		plooie:SetRadius(EffectType)
 		plooie:SetNormal(Up)
-		util.Effect("eff_jack_minesplode", plooie, true, true)]]--
+		util.Effect("eff_jack_minesplode", plooie, true, true)
 		util.ScreenShake(SelfPos, 99999, 99999, 1, 500)
 		self:EmitSound("snd_jack_fragsplodeclose.wav", 90, 100)
 		JMod.Sploom(JMod.GetEZowner(self), SelfPos, 150, 125)
@@ -223,10 +224,10 @@ if SERVER then
 		timer.Simple(1, function()
 			if IsValid(self) then
 				if self:GetState() == STATE_ARMING then
-					local Tr = util.QuickTrace(self:GetPos(), Vector(0, 0, -2), self)
-					local IsUp = self:GetUp().z > 0.3
+					local Tr = util.QuickTrace(self:GetPos(), self:GetUp()*-2, self)
+					--local IsUp = self:GetUp().z > 0.3
 
-					if (Tr.Hit) and not(Tr.Entity:IsNPC() or Tr.Entity:IsPlayer()) and (IsUp) then
+					if (Tr.Hit) and not(Tr.Entity:IsNPC() or Tr.Entity:IsPlayer()) then
 						self.Weld = constraint.Weld(Tr.Entity, self, Tr.PhysicsBone, 0, 50000, false, false)
 						if self.Weld then
 							self.Weld:Activate()

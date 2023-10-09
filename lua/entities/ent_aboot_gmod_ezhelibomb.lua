@@ -82,7 +82,7 @@ if SERVER then
 				self:EmitSound("Canister.ImpactHard")
 			end
 
-			if (data.Speed > 450) and (State == STATE_ARMED) then
+			if (data.Speed > 300) and (State == STATE_ARMED) then
 				if JMod.ShouldAttack(self, data.HitEntity) then
 					self:Detonate()
 				else
