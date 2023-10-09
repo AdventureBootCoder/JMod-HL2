@@ -19,7 +19,6 @@ local Props = {"models/props_c17/tools_pliers01a.mdl", "models/props_silo/weldin
 function ENT:SetupDataTables() 
 	self:NetworkVar("Float", 0, "Electricity")
 	self:NetworkVar("Float", 1, "Gas")
-	self:NetworkVar("Float", 2, "Steel")
 end
 
 if SERVER then
@@ -52,7 +51,6 @@ if SERVER then
 		end)
 		self.MaxElectricity = 100
 		self.MaxGas = 100
-		self.MaxSteel = 100
 		if self.SpawnFull then
 			self:SetElectricity(100)
 			self:SetGas(100)
@@ -105,7 +103,6 @@ if SERVER then
 			activator:SelectWeapon("wep_aboot_jmod_ezwelder")
 
 			local Welder = activator:GetWeapon("wep_aboot_jmod_ezwelder")
-			Welder:SetSteel(self:GetSteel())
 			Welder:SetElectricity(self:GetElectricity())
 			Welder:SetGas(self:GetGas())
 
@@ -119,16 +116,14 @@ elseif CLIENT then
 	function ENT:Initialize()
 		self.MaxElectricity = 100
 		self.MaxGas = 100
-		self.MaxSteel = 100
 	end
 	function ENT:Draw()
 		self:DrawModel()
 		local Opacity = math.random(50, 200)
-		local ElecFrac, GasFrac, PartFrac = self:GetElectricity()/self.MaxElectricity, self:GetGas()/self.MaxGas, self:GetSteel()/self.MaxSteel
+		local ElecFrac, GasFrac = self:GetElectricity()/self.MaxElectricity, self:GetGas()/self.MaxGas
 		JMod.HoloGraphicDisplay(self, Vector(0, -5, 17), Angle(90, -50, 90), .05, 300, function()
 --			draw.SimpleTextOutlined("POWER "..math.Round(ElecFrac*100).."%","JMod-Display",-200,10,JMod.GoodBadColor(ElecFrac, true, Opacity),TEXT_ALIGN_CENTER,TEXT_ALIGN_TOP,3,Color(0,0,0,Opacity))
 --			draw.SimpleTextOutlined("GAS "..math.Round(GasFrac*100).."%","JMod-Display",0,10,JMod.GoodBadColor(GasFrac, true, Opacity),TEXT_ALIGN_CENTER,TEXT_ALIGN_TOP,3,Color(0,0,0,Opacity))
---			draw.SimpleTextOutlined("STEEL "..math.Round(PartFrac*100).."%","JMod-Display",200,10,JMod.GoodBadColor(PartFrac, true, Opacity),TEXT_ALIGN_CENTER,TEXT_ALIGN_TOP,3,Color(0,0,0,Opacity))
 		end)
 	end
 

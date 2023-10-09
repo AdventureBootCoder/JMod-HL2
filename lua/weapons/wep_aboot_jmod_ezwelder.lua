@@ -1,7 +1,7 @@
-﻿-- Jackarunda 2021
+﻿-- AdventureBoots 2023
 AddCSLuaFile()
 SWEP.PrintName = "EZ Welder"
-SWEP.Author = "Jackarunda"
+SWEP.Author = "AdventureBoots"
 SWEP.Purpose = ""
 JMod.SetWepSelectIcon(SWEP, "entities/ent_jack_gmod_eztoolbox")
 SWEP.Spawnable = false
@@ -31,8 +31,7 @@ SWEP.Secondary.DefaultClip = -1
 SWEP.Secondary.Automatic = true
 SWEP.Secondary.Ammo = "none"
 SWEP.ShowWorldModel = false
-SWEP.EZaccepts = {JMod.EZ_RESOURCE_TYPES.STEEL, JMod.EZ_RESOURCE_TYPES.POWER, JMod.EZ_RESOURCE_TYPES.GAS}
-SWEP.EZmaxSteel = 100
+SWEP.EZaccepts = {JMod.EZ_RESOURCE_TYPES.POWER, JMod.EZ_RESOURCE_TYPES.GAS}
 SWEP.EZmaxElectricity = 100
 SWEP.EZmaxGas = 100
 
@@ -123,7 +122,6 @@ function SWEP:Initialize()
 
 	self:SetGas(0)
 	self:SetElectricity(0)
-	self:SetSteel(0)
 end
 
 function SWEP:PreDrawViewModel(vm, wep, ply)
@@ -134,9 +132,16 @@ function SWEP:ViewModelDrawn()
 	self:SCKViewModelDrawn()
 	if self:GetWelding() then
 		local VM = self.Owner:GetViewModel()
-		local Pos,Ang = VM:GetBonePosition(VM:LookupBone("ValveBiped.Grenade_body"))
-		Pos = Pos + Ang:Right()*2 - Ang:Up()*1
+		local Pos, Ang = VM:GetBonePosition(VM:LookupBone("ValveBiped.Grenade_body"))
+		Ang:RotateAroundAxis(Ang:Up(), -10)
+		Pos = Pos - Ang:Up()*5
 		local Dir = self.Owner:GetAimVector()
+
+		local effectdata = EffectData()
+		effectdata:SetOrigin(Pos)
+		effectdata:SetAngles(Ang)
+		effectdata:SetScale(0.5)
+		util.Effect( "MuzzleEffect", effectdata, true, true )
 
 		local dlight = DynamicLight(self:EntIndex())
 		if(dlight)then
@@ -195,9 +200,8 @@ function SWEP:GetViewModelPosition(pos, ang)
 end
 
 function SWEP:SetupDataTables()
-	self:NetworkVar("Int", 0, "Electricity")
-	self:NetworkVar("Int", 1, "Gas")
-	self:NetworkVar("Int", 2, "Steel")
+	self:NetworkVar("Float", 0, "Electricity")
+	self:NetworkVar("Float", 1, "Gas")
 	self:NetworkVar("Bool", 0, "Welding")
 end
 
@@ -208,7 +212,6 @@ end
 
 function SWEP:GetEZsupplies(resourceType)
 	local AvaliableResources = {
-		[JMod.EZ_RESOURCE_TYPES.STEEL] = self:GetSteel(),
 		[JMod.EZ_RESOURCE_TYPES.POWER] = math.floor(self:GetElectricity()),
 		[JMod.EZ_RESOURCE_TYPES.GAS] = math.floor(self:GetGas())
 	}
@@ -273,7 +276,6 @@ function SWEP:OnDrop()
 	Kit:Spawn()
 	Kit:Activate()
 
-	Kit:SetSteel(self:GetSteel())
 	Kit:SetElectricity(self:GetElectricity())
 	Kit:SetGas(self:GetGas())
 
@@ -373,11 +375,15 @@ function SWEP:Think()
 	if (self.Owner:KeyDown(IN_SPEED)) or (self.Owner:KeyDown(IN_ZOOM)) then
 		self:SetHoldType("normal")
 	else
-		if self.Owner:KeyDown(IN_ATTACK2) and (self:GetNextSecondaryFire() <= Time) then
+		if (self:GetElectricity() <= 0) or (self:GetGas() <= 0) then
+			self:Msg("You need power and/or gas")
+		elseif self.Owner:KeyDown(IN_ATTACK2) and (self:GetNextSecondaryFire() <= Time) then
 			local Ent, Pos, Norm = self:WhomIlookinAt()
 
 			if IsValid(Ent) and (hook.Run("JModHL2_WeldShouldFix", self.Owner, Ent, Pos) ~= false) then
-				hook.Run("JModHL2_WeldFix", self.Owner, Ent, Pos)
+				if (SERVER) then
+					hook.Run("JModHL2_WeldFix", self.Owner, Ent, Pos)
+				end
 				self:WeldEffect()
 				self:SetWelding(true)
 				self:SetHoldType("pistol")
@@ -387,7 +393,7 @@ function SWEP:Think()
 			--
 			if (SERVER) then
 				local BaseShootPos = self.Owner:GetShootPos()
-				local ShootPos = BaseShootPos + self.Owner:GetRight() * 4 - self.Owner:GetUp() * 5
+				local ShootPos = BaseShootPos + self.Owner:GetRight() * 4 - self.Owner:GetUp() * 1
 				local AimVec = self.Owner:GetAimVector()
 				local WeldTable = {}
 				local WeldPos = nil
@@ -401,7 +407,7 @@ function SWEP:Think()
 					})
 					if(Tress.Hit) then
 						local Burrn = DamageInfo()
-						Burrn:SetDamage(math.Rand(.2, .4))
+						Burrn:SetDamage(math.Rand(1, 1.5) * 10)
 						Burrn:SetDamagePosition(Tress.HitPos)
 						Burrn:SetDamageForce(AimVec * 100)
 						Burrn:SetAttacker(self.Owner)
@@ -423,6 +429,8 @@ function SWEP:Think()
 
 						self:WeldEffect(Tress)
 						self:SetWelding(true)
+						self:SetElectricity(math.max(self:GetElectricity() - .05, 0))
+						self:SetGas(math.max(self:GetGas() - .02, 0))
 					else
 						self:SetWelding(false)
 					end	
@@ -556,23 +564,10 @@ function SWEP:DrawHUD()
 
 	draw.SimpleTextOutlined("Power: "..math.floor(self:GetElectricity()), "Trebuchet24", W * .1, H * .5, Color(255, 255, 255, 100), TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP, 3, Color(0, 0, 0, 50))
 	draw.SimpleTextOutlined("Gas: "..math.floor(self:GetGas()), "Trebuchet24", W * .1, H * .5 + 30, Color(255, 255, 255, 100), TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP, 3, Color(0, 0, 0, 50))
-	draw.SimpleTextOutlined("Steel: "..math.floor(self:GetSteel()), "Trebuchet24", W * .1, H * .5 + 60, Color(255, 255, 255, 100), TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP, 3, Color(0, 0, 0, 50))
-	
-	draw.SimpleTextOutlined("ALT+R: clear build item", "Trebuchet24", W * .4, H * .7 - 30, Color(255, 255, 255, 30), TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP, 3, Color(0, 0, 0, 10))
-	draw.SimpleTextOutlined("R: select build item", "Trebuchet24", W * .4, H * .7, Color(255, 255, 255, 30), TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP, 3, Color(0, 0, 0, 10))
-	draw.SimpleTextOutlined("LMB: build or upgrade", "Trebuchet24", W * .4, H * .7 + 30, Color(255, 255, 255, 30), TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP, 3, Color(0, 0, 0, 10))
-	draw.SimpleTextOutlined("ALT+LMB: modify", "Trebuchet24", W * .4, H * .7 + 60, Color(255, 255, 255, 30), TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP, 3, Color(0, 0, 0, 10))
-	draw.SimpleTextOutlined("RMB: salvage", "Trebuchet24", W * .4, H * .7 + 90, Color(255, 255, 255, 30), TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP, 3, Color(0, 0, 0, 10))
-	draw.SimpleTextOutlined("ALT+RMB: loosen", "Trebuchet24", W * .4, H * .7 + 120, Color(255, 255, 255, 30), TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP, 3, Color(0, 0, 0, 10))
-	draw.SimpleTextOutlined("Backspace: drop kit", "Trebuchet24", W * .4, H * .7 + 150, Color(255, 255, 255, 30), TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP, 3, Color(0, 0, 0, 10))
-	
-	local Prog = self:GetTaskProgress()
 
-	if Prog > 0 then
-		draw.SimpleTextOutlined((Ply:KeyDown(JMod.Config.General.AltFunctionKey) and "Loosening...") or "Salvaging...", "Trebuchet24", W * .5, H * .45, Color(255, 255, 255, 100), TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP, 3, Color(0, 0, 0, 50))
-		draw.RoundedBox(10, W * .3, H * .5, W * .4, H * .05, Color(0, 0, 0, 100))
-		draw.RoundedBox(10, W * .3 + 5, H * .5 + 5, W * .4 * LastProg / 100 - 10, H * .05 - 10, Color(255, 255, 255, 100))
-	end
+	draw.SimpleTextOutlined("LMB: weld", "Trebuchet24", W * .4, H * .7, Color(255, 255, 255, 30), TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP, 3, Color(0, 0, 0, 10))
+	draw.SimpleTextOutlined("RMB: repair", "Trebuchet24", W * .4, H * .7 + 20, Color(255, 255, 255, 30), TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP, 3, Color(0, 0, 0, 10))
+	draw.SimpleTextOutlined("Backspace: drop kit", "Trebuchet24", W * .4, H * .7 + 40, Color(255, 255, 255, 30), TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP, 3, Color(0, 0, 0, 10))
 
 	local Tr = util.QuickTrace(Ply:EyePos(), Ply:GetAimVector() * 80, {Ply})
 	local Ent = Tr.Entity
@@ -585,8 +580,6 @@ function SWEP:DrawHUD()
 		draw.SimpleTextOutlined("Grade: "..tostring(Ent:GetGrade()), "Trebuchet24", W * .7, H * .5 + 60, Color(255, 255, 255, 100), TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP, 3, Color(0, 0, 0, 50))
 		end
 	end
-
-	LastProg = Lerp(FrameTime() * 5, LastProg, Prog)
 end
 
 ----------------- sck -------------------
