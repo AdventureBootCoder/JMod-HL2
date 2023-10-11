@@ -61,7 +61,7 @@ if SERVER then
 		if data.DeltaTime > 0.2 then
 			if data.Speed > 100 then
 				self:EmitSound("Metal_Box.ImpactHard")
-				self:EmitSound("Canister.ImpactHard")
+				self:EmitSound("Canister.ImpactSoft")
 			end
 		end
 	end

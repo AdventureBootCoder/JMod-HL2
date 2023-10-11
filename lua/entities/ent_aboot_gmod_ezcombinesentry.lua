@@ -1067,7 +1067,7 @@ if(SERVER)then
 	end
 
 	function ENT:GetTargetAimOffset(point)
-		if not point then return nil, nil end
+		if not point then return 0, 0 end
 		local SelfPos = self:GetPos() + self:GetUp() * 35
 		local TargAng = self:WorldToLocalAngles((point - SelfPos):Angle())
 		local GoalPitch, GoalYaw = -TargAng.p, TargAng.y

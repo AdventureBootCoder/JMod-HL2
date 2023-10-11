@@ -34,6 +34,8 @@ SWEP.ShowWorldModel = false
 SWEP.EZaccepts = {JMod.EZ_RESOURCE_TYPES.POWER, JMod.EZ_RESOURCE_TYPES.GAS}
 SWEP.EZmaxElectricity = 100
 SWEP.EZmaxGas = 100
+---
+SWEP.MaxRange = 150
 
 SWEP.VElements = {
 	["welder"] = {
@@ -104,6 +106,8 @@ function SWEP:Initialize()
 	self:SetHoldType("slam")
 	self:SCKInitialize()
 	self.NextIdle = 0
+	self.Snd1 = CreateSound(self, "snds_jack_gmod/plasmaloop1.wav")
+	self.Snd2 = CreateSound(self, "snds_jack_gmod/plasmaloop_reversed1.wav")
 	self:Deploy()
 
 	if SERVER then
@@ -206,6 +210,7 @@ function SWEP:SetupDataTables()
 	self:NetworkVar("Float", 0, "Electricity")
 	self:NetworkVar("Float", 1, "Gas")
 	self:NetworkVar("Bool", 0, "Welding")
+	self:NetworkVar("String", 0, "StatusMessage")
 end
 
 function SWEP:UpdateNextIdle()
@@ -289,6 +294,13 @@ function SWEP:OnRemove()
 		if IsValid(vm) then
 			vm:SetMaterial("")
 		end
+	end
+
+	if IsValid(self.Snd1)then
+		self.Snd1:Stop()
+	end
+	if IsValid(self.Snd2)then
+		self.Snd2:Stop()
 	end
 
 	-- ADDED :
@@ -378,15 +390,25 @@ function SWEP:Think()
 
 	if (self.Owner:KeyDown(IN_SPEED)) or (self.Owner:KeyDown(IN_ZOOM)) then
 		self:SetHoldType("normal")
+		self:SetWelding(false)
 	else
 		if (self:GetElectricity() <= 0) or (self:GetGas() <= 0) then
 			self:Msg("You need power and/or gas")
+			self:SetWelding(false)
 		elseif self.Owner:KeyDown(IN_ATTACK2) and (self:GetNextSecondaryFire() <= Time) then
 			local Ent, Pos, Norm = self:WhomIlookinAt()
 
-			if IsValid(Ent) and (hook.Run("JModHL2_WeldShouldFix", self.Owner, Ent, Pos) ~= false) then
-				if (SERVER) then
-					hook.Run("JModHL2_WeldFix", self.Owner, Ent, Pos)
+			if IsValid(Ent) and (hook.Run("JModHL2_ShouldWeldFix", self.Owner, Ent, Pos) ~= false) then
+				--if (SERVER) then
+				local PowerConsume, GasConsume, Message = hook.Run("JModHL2_WeldFix", self.Owner, Ent, Pos)
+				if PowerConsume and (PowerConsume > 0) then
+					self:SetElectricity(math.max(self:GetElectricity() - PowerConsume, 0))
+				end
+				if GasConsume and (GasConsume > 0) then
+					self:SetGas(math.max(self:GetGas() - GasConsume, 0))
+				end
+				if Message then
+					self:SetStatusMessage(Message)
 				end
 				self:WeldEffect()
 				self:SetWelding(true)
@@ -430,15 +452,14 @@ function SWEP:Think()
 							WeldPos = Tress.HitPos
 							WeldNorm = Tress.HitNormal
 						end
-
 						self:WeldEffect(Tress)
-						self:SetWelding(true)
-						self:SetElectricity(math.max(self:GetElectricity() - .05, 0))
-						self:SetGas(math.max(self:GetGas() - .02, 0))
 					else
-						self:SetWelding(false)
-					end	
+						--self:SetWelding(false)
+					end
 				end
+				self:SetElectricity(math.max(self:GetElectricity() - .05, 0))
+				self:SetGas(math.max(self:GetGas() - .02, 0))
+				self:SetWelding(true)
 				if(math.random(1,3)==2)then
 					local EntOne=WeldTable[1]
 					local EntTwo=WeldTable[2]
@@ -474,6 +495,20 @@ function SWEP:Think()
 		else
 			self:SetHoldType("slam")
 			self:SetWelding(false)
+			self:SetStatusMessage("")
+		end
+	end
+	if (SERVER) then
+		--jprint(self.WasWelding)
+		if self:GetWelding() and not(self.WasWelding) then
+			self.Snd1:Play()
+			self.Snd2:Play()
+			self.WasWelding = true
+		elseif not(self:GetWelding()) and self.WasWelding then
+			self.Snd1:Stop()
+			self.Snd2:Stop()
+			sound.Play("snd_jack_plasmapop.wav", self.Owner:GetPos(), 75, math.random(95, 110), 1)
+			self.WasWelding = false
 		end
 	end
 end
@@ -492,8 +527,10 @@ function SWEP:WeldEffect(Tr)
 
 	if not(self.NextBurnSoundEmitTime)then self.NextBurnSoundEmitTime=CurTime() end
 	if(self.NextBurnSoundEmitTime < CurTime())then
-		self.NextBurnSoundEmitTime = CurTime()+.075
-		sound.Play("snd_jack_heavylaserburn.wav", Tr.HitPos, 65, math.random(90, 110))
+		self.NextBurnSoundEmitTime = CurTime()+math.random(.5, 1)--.075
+		--sound.Play("snd_jack_heavylaserburn.wav", Tr.HitPos, 65, math.random(90, 110))
+		self.Snd1:ChangePitch(math.random(90, 110))
+		self.Snd2:ChangePitch(math.random(90, 110))
 	end
 	
 	if(math.random(1,2)==1)then
@@ -513,54 +550,123 @@ function SWEP:WeldEffect(Tr)
 	end
 end
 
---[[function SWEP:DrawEffects( weapon, ply )
-	local ID = weapon:LookupAttachment( "muzzle" )
+local function GetLVS(self)
+	local ply = self:GetOwner()
 
-	local Muzzle = weapon:GetAttachment( ID )
+	if not IsValid( ply ) then return NULL end
 
-	if not Muzzle then return end
+	local ent = ply:GetEyeTrace().Entity
 
-	local T = CurTime()
+	if not IsValid( ent ) then return NULL end
 
-	if self:GetFlameTime() < T or (self._NextFX1 or 0) > T then return end
+	if ent.LVS then return ent end
 
-	self._NextFX1 = T + 0.02
+	if not ent.GetBase then return NULL end
 
-	local effectdata = EffectData()
-	effectdata:SetOrigin( Muzzle.Pos )
-	effectdata:SetAngles( Muzzle.Ang )
-	effectdata:SetScale( 0.5 )
-	util.Effect( "MuzzleEffect", effectdata, true, true )
+	ent = ent:GetBase()
 
-	if (self._NextFX2 or 0) > T then return end
+	if IsValid( ent ) and ent.LVS then return ent end
 
-	self._NextFX2 = T + 0.06
+	return NULL
+end
 
-	local trace = ply:GetEyeTrace()
+local function FindClosest(self)
+	local lvsEnt = GetLVS(self)
+
+	if not IsValid( lvsEnt ) then return NULL end
+
+	local ply = self:GetOwner()
+
+	if ply:InVehicle() then return end
+
 	local ShootPos = ply:GetShootPos()
+	local AimVector = ply:GetAimVector()
 
-	if (ShootPos - trace.HitPos):Length() > self.MaxRange then return end
+	local ClosestDist = self.MaxRange
+	local ClosestPiece = NULL
 
-	local effectdata = EffectData()
-	effectdata:SetOrigin( trace.HitPos )
-	effectdata:SetNormal( trace.HitNormal * 0.15 )
-	util.Effect( "manhacksparks", effectdata, true, true )
+	for _, entity in pairs( lvsEnt:GetChildren() ) do
+		if entity:GetClass() ~= "lvs_wheeldrive_armor" then continue end
 
-	local dlight = DynamicLight( self:EntIndex() )
+		local boxOrigin = entity:GetPos()
+		local boxAngles = entity:GetAngles()
+		local boxMins = entity:GetMins()
+		local boxMaxs = entity:GetMaxs()
 
-	if not dlight then return end
+		local HitPos, _, _ = util.IntersectRayWithOBB( ShootPos, AimVector * 1000, boxOrigin, boxAngles, boxMins, boxMaxs )
 
-	dlight.pos = (trace.HitPos + ShootPos) * 0.5
-	dlight.r = 206
-	dlight.g = 253
-	dlight.b = 255
-	dlight.brightness = 3
-	dlight.decay = 1000
-	dlight.size = 256
-	dlight.dietime = CurTime() + 0.1
-end--]]
+		if isvector( HitPos ) then
+			local Dist = (ShootPos - HitPos):Length()
+
+			if Dist < ClosestDist then
+				ClosestDist = Dist
+				ClosestPiece = entity
+			end
+		end
+	end
+
+	return ClosestPiece
+end
+
+hook.Add("JModHL2_ShouldWeldFix", "JMODHL2_LVS_CAR_REPAIR", function(ply, target, pos) 
+	local Welder = ply:GetActiveWeapon()
+	--local ArmorMode = true
+	local Target = FindClosest(Welder)
+
+	if IsValid(ply) and ply:KeyDown(IN_RELOAD) then
+		Target = GetLVS(Welder)
+		--ArmorMode = false
+		jprint(Target)
+	end
+
+	
+
+	if IsValid(Target) then
+		local HP = Target:GetHP()
+		local MaxHP = Target:GetMaxHP()
+
+		return (HP < MaxHP)
+	end
+end)
+
+hook.Add("JModHL2_WeldFix", "JMODHL2_LVS_CAR_REPAIR", function(ply, target, pos) 
+	if not IsValid(ply) then return end
+	local Welder = ply:GetActiveWeapon()
+	local ArmorMode = true
+	local Target = FindClosest(Welder)
+
+	if ply:KeyDown(IN_RELOAD) then
+		Target = GetLVS(Welder)
+		ArmorMode = false
+	end
+
+	if not IsValid(Target) then
+		local ent = ply:GetEyeTrace().Entity
+	
+		if IsValid( ent ) and (ent:GetPos() - ply:GetShootPos()):Length() < Welder.MaxRange and ent:GetClass() == "lvs_item_mine" then
+			if SERVER then timer.Simple(0, function() if not IsValid( ent ) then return 0.02, 0.01 end ent:Detonate() end ) end
+		end
+		return 0, 0
+	end
+	
+	local HP = Target:GetHP()
+	local MaxHP = Target:GetMaxHP()
+	
+	if CLIENT then return end
+	
+	Target:SetHP( math.min(math.Round(HP + 5), MaxHP ) )
+	
+	if not ArmorMode then return 0.03, 0.02, HP.."/"..MaxHP end
+	
+	if Target:GetDestroyed() then Target:SetDestroyed( false ) end
+	
+	Target:OnRepaired()
+	return 0.03, 0.02, HP.."/"..MaxHP
+end)
+
 
 local LastProg = 0
+local InfoTextColor, ManualTextColor, OutlineColor =  Color(255, 255, 255, 100), Color(255, 255, 255, 30), Color(0, 0, 0, 10)
 
 function SWEP:DrawHUD()
 	if GetConVar("cl_drawhud"):GetBool() == false then return end
@@ -568,12 +674,16 @@ function SWEP:DrawHUD()
 	if Ply:ShouldDrawLocalPlayer() then return end
 	local W, H = ScrW(), ScrH()
 
-	draw.SimpleTextOutlined("Power: "..math.floor(self:GetElectricity()), "Trebuchet24", W * .1, H * .5, Color(255, 255, 255, 100), TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP, 3, Color(0, 0, 0, 50))
-	draw.SimpleTextOutlined("Gas: "..math.floor(self:GetGas()), "Trebuchet24", W * .1, H * .5 + 30, Color(255, 255, 255, 100), TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP, 3, Color(0, 0, 0, 50))
+	draw.SimpleTextOutlined("Power: "..math.floor(self:GetElectricity()), "Trebuchet24", W * .1, H * .5, InfoTextColor, TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP, 3, Color(0, 0, 0, 50))
+	draw.SimpleTextOutlined("Gas: "..math.floor(self:GetGas()), "Trebuchet24", W * .1, H * .5 + 30, InfoTextColor, TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP, 3, Color(0, 0, 0, 50))
 
-	draw.SimpleTextOutlined("LMB: weld", "Trebuchet24", W * .4, H * .7, Color(255, 255, 255, 30), TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP, 3, Color(0, 0, 0, 10))
-	draw.SimpleTextOutlined("RMB: repair", "Trebuchet24", W * .4, H * .7 + 20, Color(255, 255, 255, 30), TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP, 3, Color(0, 0, 0, 10))
-	draw.SimpleTextOutlined("Backspace: drop kit", "Trebuchet24", W * .4, H * .7 + 40, Color(255, 255, 255, 30), TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP, 3, Color(0, 0, 0, 10))
+	draw.SimpleTextOutlined("LMB: weld", "Trebuchet24", W * .4, H * .7, ManualTextColor, TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP, 3, OutlineColor)
+	draw.SimpleTextOutlined("RMB: repair", "Trebuchet24", W * .4, H * .7 + 20, ManualTextColor, TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP, 3, OutlineColor)
+	draw.SimpleTextOutlined("Backspace: drop kit", "Trebuchet24", W * .4, H * .7 + 40, ManualTextColor, TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP, 3, OutlineColor)
+
+	if self:GetStatusMessage() then
+		draw.SimpleTextOutlined(self:GetStatusMessage(), "Trebuchet24", W * .5, H * .4, InfoTextColor, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER, 1, OutlineColor)
+	end
 
 	local Tr = util.QuickTrace(Ply:EyePos(), Ply:GetAimVector() * 80, {Ply})
 	local Ent = Tr.Entity

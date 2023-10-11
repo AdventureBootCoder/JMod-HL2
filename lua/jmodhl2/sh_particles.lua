@@ -11,6 +11,7 @@ local function AddParticles()
 	game.AddParticles("particles/hl2mmod_muzzleflashes.pcf")
 	game.AddParticles("particles/hl2mmod_tracers.pcf")
 	game.AddParticles("particles/hl2mmod_weaponeffects.pcf")
+--	game.AddParticles("particles/hl2mmod_muzzleflash_ar2.pcf")
 
 	PrecacheParticleSystem("hl2mmod_explosion_grenade")
 end
