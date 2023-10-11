@@ -398,7 +398,7 @@ function SWEP:Think()
 		elseif self.Owner:KeyDown(IN_ATTACK2) and (self:GetNextSecondaryFire() <= Time) then
 			local Ent, Pos, Norm = self:WhomIlookinAt()
 
-			if IsValid(Ent) and (hook.Run("JModHL2_ShouldWeldFix", self.Owner, Ent, Pos) ~= false) then
+			if IsValid(Ent) and (hook.Run("JModHL2_ShouldWeldFix", self.Owner, Ent, Pos)) then
 				--if (SERVER) then
 				local PowerConsume, GasConsume, Message = hook.Run("JModHL2_WeldFix", self.Owner, Ent, Pos)
 				if PowerConsume and (PowerConsume > 0) then
@@ -610,20 +610,22 @@ end
 
 hook.Add("JModHL2_ShouldWeldFix", "JMODHL2_LVS_CAR_REPAIR", function(ply, target, pos) 
 	local Welder = ply:GetActiveWeapon()
-	--local ArmorMode = true
-	local Target = FindClosestArmor(Welder)
+	local ArmorMode = false
+	local Target = GetLVS(Welder)
 
 	if IsValid(ply) and ply:KeyDown(IN_RELOAD) then
-		Target = GetLVS(Welder)
-		--ArmorMode = false
-		jprint(Target)
+		Target = FindClosestArmor(Welder)
+		ArmorMode = true
 	end
 
 	
-
 	if IsValid(Target) then
 		local HP = Target:GetHP()
 		local MaxHP = Target:GetMaxHP()
+		--jprint(Target, HP)
+		if not ArmorMode then
+			ply:PrintMessage(HUD_PRINTCENTER, "Hold R for Armor Mode")
+		end
 
 		return (HP < MaxHP)
 	end
@@ -632,12 +634,12 @@ end)
 hook.Add("JModHL2_WeldFix", "JMODHL2_LVS_CAR_REPAIR", function(ply, target, pos) 
 	if not IsValid(ply) then return end
 	local Welder = ply:GetActiveWeapon()
-	local ArmorMode = true
-	local Target = FindClosestArmor(Welder)
+	local ArmorMode = false
+	local Target = GetLVS(Welder)
 
 	if ply:KeyDown(IN_RELOAD) then
-		Target = GetLVS(Welder)
-		ArmorMode = false
+		Target = FindClosestArmor(Welder)
+		ArmorMode = true
 	end
 
 	if not IsValid(Target) then
@@ -654,14 +656,14 @@ hook.Add("JModHL2_WeldFix", "JMODHL2_LVS_CAR_REPAIR", function(ply, target, pos)
 	
 	if CLIENT then return end
 	
-	Target:SetHP( math.min(math.Round(HP + 5), MaxHP ) )
+	Target:SetHP( math.min(math.Round(HP + 3), MaxHP ) )
 	
-	if not ArmorMode then return 0.03, 0.02, HP.."/"..MaxHP end
+	if not ArmorMode then return 0.03, 0.02, "Frame: "..HP.."/"..MaxHP end
 	
 	if Target:GetDestroyed() then Target:SetDestroyed( false ) end
 	
 	Target:OnRepaired()
-	return 0.03, 0.02, HP.."/"..MaxHP
+	return 0.03, 0.02, "Armor: "..HP.."/"..MaxHP
 end)
 
 
