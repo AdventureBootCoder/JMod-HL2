@@ -570,7 +570,7 @@ local function GetLVS(self)
 	return NULL
 end
 
-local function FindClosest(self)
+local function FindClosestArmor(self)
 	local lvsEnt = GetLVS(self)
 
 	if not IsValid( lvsEnt ) then return NULL end
@@ -611,7 +611,7 @@ end
 hook.Add("JModHL2_ShouldWeldFix", "JMODHL2_LVS_CAR_REPAIR", function(ply, target, pos) 
 	local Welder = ply:GetActiveWeapon()
 	--local ArmorMode = true
-	local Target = FindClosest(Welder)
+	local Target = FindClosestArmor(Welder)
 
 	if IsValid(ply) and ply:KeyDown(IN_RELOAD) then
 		Target = GetLVS(Welder)
@@ -633,7 +633,7 @@ hook.Add("JModHL2_WeldFix", "JMODHL2_LVS_CAR_REPAIR", function(ply, target, pos)
 	if not IsValid(ply) then return end
 	local Welder = ply:GetActiveWeapon()
 	local ArmorMode = true
-	local Target = FindClosest(Welder)
+	local Target = FindClosestArmor(Welder)
 
 	if ply:KeyDown(IN_RELOAD) then
 		Target = GetLVS(Welder)
