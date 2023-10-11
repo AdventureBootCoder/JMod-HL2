@@ -432,20 +432,22 @@ function SWEP:Think()
 						mask = MASK_SHOT
 					})
 					if(Tress.Hit) then
-						local Burrn = DamageInfo()
-						Burrn:SetDamage(math.Rand(0.5, 1))
-						Burrn:SetDamagePosition(Tress.HitPos)
-						Burrn:SetDamageForce(AimVec * 100)
-						Burrn:SetAttacker(self.Owner)
-						Burrn:SetInflictor(self)
-						if(Tress.Entity:IsOnFire())then
-							Burrn:SetDamageType(DMG_GENERIC)
-						elseif(math.random(1, 9) == 5)then
-							Burrn:SetDamageType(DMG_BURN)
-						else
-							Burrn:SetDamageType(DMG_DIRECT)
+						if IsValid(Tress.Entity) then
+							local Burrn = DamageInfo()
+							Burrn:SetDamage(math.Rand(0.4, 1))
+							Burrn:SetDamagePosition(Tress.HitPos)
+							Burrn:SetDamageForce(AimVec * 100)
+							Burrn:SetAttacker(self.Owner)
+							Burrn:SetInflictor(self)
+							if(Tress.Entity:IsOnFire())then
+								Burrn:SetDamageType(DMG_GENERIC)
+							elseif(math.random(1, 9) == 5)then
+								Burrn:SetDamageType(DMG_BURN)
+							else
+								Burrn:SetDamageType(DMG_DIRECT)
+							end
+							Tress.Entity:TakeDamageInfo(Burrn)
 						end
-						Tress.Entity:TakeDamageInfo(Burrn)
 
 						if(table.HasValue(WeldMats, Tress.MatType))then
 							WeldTable[i] = Tress.Entity
