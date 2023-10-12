@@ -377,7 +377,8 @@ local WeldMats = {MAT_METAL, MAT_VENT, MAT_GRATE, MAT_TILE}
 
 function SWEP:Think()
 	local Time = CurTime()
-	local vm = self.Owner:GetViewModel()
+	local Ply = self.Owner
+	local vm = Ply:GetViewModel()
 	local idletime = self.NextIdle
 
 	if idletime > 0 and Time > idletime then
@@ -386,21 +387,21 @@ function SWEP:Think()
 		self:UpdateNextIdle()
 	end
 
-	local Alt = self.Owner:KeyDown(JMod.Config.General.AltFunctionKey)
+	local Alt = Ply:KeyDown(JMod.Config.General.AltFunctionKey)
 
-	if (self.Owner:KeyDown(IN_SPEED)) or (self.Owner:KeyDown(IN_ZOOM)) then
+	if (Ply:KeyDown(IN_SPEED)) or (Ply:KeyDown(IN_ZOOM)) then
 		self:SetHoldType("normal")
 		self:SetWelding(false)
 	else
 		if (self:GetElectricity() <= 0) or (self:GetGas() <= 0) then
 			self:Msg("You need power and/or gas")
 			self:SetWelding(false)
-		elseif self.Owner:KeyDown(IN_ATTACK2) and (self:GetNextSecondaryFire() <= Time) then
+		elseif Ply:KeyDown(IN_ATTACK2) and (self:GetNextSecondaryFire() <= Time) then
 			local Ent, Pos, Norm = self:WhomIlookinAt()
 
-			if IsValid(Ent) and (hook.Run("JModHL2_ShouldWeldFix", self.Owner, Ent, Pos)) then
+			if IsValid(Ent) and (hook.Run("JModHL2_ShouldWeldFix", Ply, Ent, Pos)) then
 				--if (SERVER) then
-				local PowerConsume, GasConsume, Message = hook.Run("JModHL2_WeldFix", self.Owner, Ent, Pos)
+				local PowerConsume, GasConsume, Message = hook.Run("JModHL2_WeldFix", Ply, Ent, Pos)
 				if PowerConsume and (PowerConsume > 0) then
 					self:SetElectricity(math.max(self:GetElectricity() - PowerConsume, 0))
 				end
@@ -414,7 +415,7 @@ function SWEP:Think()
 				self:SetWelding(true)
 				self:SetHoldType("pistol")
 			end
-		elseif self.Owner:KeyDown(IN_ATTACK) and (self:GetNextPrimaryFire() <= Time) then
+		elseif Ply:KeyDown(IN_ATTACK) and (self:GetNextPrimaryFire() <= Time) then
 			self:SetHoldType("pistol")
 			--
 			if (SERVER) then
@@ -433,23 +434,9 @@ function SWEP:Think()
 					})
 					if(Tress.Hit) then
 						if IsValid(Tress.Entity) then
-							local Burrn = DamageInfo()
-							Burrn:SetDamage(math.Rand(0.4, 1))
-							Burrn:SetDamagePosition(Tress.HitPos)
-							Burrn:SetDamageForce(AimVec * 100)
-							Burrn:SetAttacker(self.Owner)
-							Burrn:SetInflictor(self)
-							if(Tress.Entity:IsOnFire())then
-								Burrn:SetDamageType(DMG_GENERIC)
-							elseif(math.random(1, 9) == 5)then
-								Burrn:SetDamageType(DMG_BURN)
-							else
-								Burrn:SetDamageType(DMG_DIRECT)
-							end
-							Tress.Entity:TakeDamageInfo(Burrn)
+							self:WeldBurn(Tress.Entity, Tress.HitPos, AimVec * 100)
 						end
-
-						if(table.HasValue(WeldMats, Tress.MatType))then
+						if (table.HasValue(WeldMats, Tress.MatType) or JMod.IsDoor(Tress.Entity)) then
 							WeldTable[i] = Tress.Entity
 							WeldPos = Tress.HitPos
 							WeldNorm = Tress.HitNormal
@@ -462,30 +449,63 @@ function SWEP:Think()
 				self:SetElectricity(math.max(self:GetElectricity() - .05, 0))
 				self:SetGas(math.max(self:GetGas() - .02, 0))
 				self:SetWelding(true)
-				if(math.random(1,3)==2)then
-					local EntOne=WeldTable[1]
-					local EntTwo=WeldTable[2]
-					if IsValid(EntOne) and JMod.IsDoor(EntOne)then EntOne:Fire("lock", "", 0) end
-					if IsValid(EntTwo) and JMod.IsDoor(EntTwo)then EntTwo:Fire("lock", "", 0) end
-					if((IsValid(EntOne))and(IsValid(EntTwo)))then
-						if not(EntOne==EntTwo)then
-							local Strength=math.random(1,20000)
-							Strength=Strength+math.random(1,20000)
-							Strength=Strength+math.random(1,20000)
-							Strength=Strength+math.random(1,20000)
-							Strength=Strength+math.random(1,20000)
-							constraint.Weld(EntOne,EntTwo,0,0,Strength,false)
-							local effectdata=EffectData()
-							effectdata:SetOrigin(WeldPos)
-							effectdata:SetNormal(WeldNorm)
-							effectdata:SetMagnitude(8) --amount and shoot hardness
-							effectdata:SetScale(2) --length of strands
-							effectdata:SetRadius(2) --thickness of strands
-							util.Effect("Sparks",effectdata,true,true)
+
+				if(math.random(1, 3) == 2)then
+					local EntOne = WeldTable[1]
+					local EntTwo = WeldTable[2]
+					if Alt then --Deweld
+						if IsValid(EntOne) and IsValid(EntOne:GetPhysicsObject()) then 
+							MassOne = EntOne:GetPhysicsObject():GetMass()
+							if math.random(0, MassOne) >= (MassOne * 0.9) then
+								if JMod.IsDoor(EntOne) then EntOne:Fire("unlock", "", 0) end
+								local ConTable = constraint.FindConstraint(EntOne, "Weld")
+								if ConTable and ConTable.Constraint then
+									SafeRemoveEntity(ConTable.Constraint)
+								end
+							end
+						end
+						if IsValid(EntTwo) and IsValid(EntTwo:GetPhysicsObject()) then 
+							MassTwo = EntTwo:GetPhysicsObject():GetMass()
+							if math.random(0, MassTwo) >= (MassTwo * 0.9) then 
+								if JMod.IsDoor(EntTwo) then EntOne:Fire("unlock", "", 0) end
+								local ConTable = constraint.FindConstraint(EntTwo, "Weld")
+								if ConTable and ConTable.Constraint then
+									SafeRemoveEntity(ConTable.Constraint)
+								end
+							end
+						end
+					else --Weld
+						if IsValid(EntOne) and JMod.IsDoor(EntOne)then EntOne:Fire("lock", "", 0) end
+						if IsValid(EntTwo) and JMod.IsDoor(EntTwo)then EntTwo:Fire("lock", "", 0) end
+						if((IsValid(EntOne))and(IsValid(EntTwo)))then
+							if not(EntOne==EntTwo)then
+								local Strength=math.random(1,20000)
+								Strength=Strength+math.random(1,20000)
+								Strength=Strength+math.random(1,20000)
+								Strength=Strength+math.random(1,20000)
+								Strength=Strength+math.random(1,20000)
+								constraint.Weld(EntOne,EntTwo,0,0,Strength,false)
+								local effectdata=EffectData()
+								effectdata:SetOrigin(WeldPos)
+								effectdata:SetNormal(WeldNorm)
+								effectdata:SetMagnitude(8) --amount and shoot hardness
+								effectdata:SetScale(2) --length of strands
+								effectdata:SetRadius(2) --thickness of strands
+								util.Effect("Sparks",effectdata,true,true)
+							end
 						end
 					end
+					local WeldingMask = Ply.EZarmor and Ply.EZarmor.effects and Ply.EZarmor.effects.flashresistant
+					if not(WeldingMask) and (math.random(1, 5) == 1) then
+						self:WeldBurn(Ply, Ply:GetShootPos())
+						local plooie = EffectData()
+						plooie:SetOrigin(ShootPos)
+						plooie:SetScale(.2)
+						util.Effect("eff_jack_gmod_flashbang", plooie, true, true)
+					end
 				end
-				if(math.random(1,2)==2)then
+
+				if(math.random(1, 2) == 2)then
 					if(self.Owner:WaterLevel()==3)then
 						local Blamo=EffectData()
 						Blamo:SetOrigin(ShootPos+AimVec*30)
@@ -503,8 +523,13 @@ function SWEP:Think()
 	if (SERVER) then
 		--jprint(self.WasWelding)
 		if self:GetWelding() and not(self.WasWelding) then
-			self.Snd1:Play()
-			self.Snd2:Play()
+			sound.Play("snd_jack_plasmapop.wav", self.Owner:GetPos(), 75, math.random(95, 110), 1)
+			timer.Simple(0.1, function()
+				if IsValid(self) and (self:GetWelding()) then
+					self.Snd1:Play()
+					self.Snd2:Play()
+				end
+			end)
 			self.WasWelding = true
 		elseif not(self:GetWelding()) and self.WasWelding then
 			self.Snd1:Stop()
@@ -513,6 +538,27 @@ function SWEP:Think()
 			self.WasWelding = false
 		end
 	end
+end
+
+function SWEP:WeldBurn(target, pos, dir)
+	local Burrn = DamageInfo()
+	Burrn:SetDamage(math.Rand(0.2, 0.5))
+	if pos then
+	Burrn:SetDamagePosition(pos)
+	end
+	if dir then
+	Burrn:SetDamageForce(dir)
+	end
+	Burrn:SetAttacker(self.Owner)
+	Burrn:SetInflictor(self)
+	if(target:IsOnFire())then
+		Burrn:SetDamageType(DMG_GENERIC)
+	elseif(math.random(1, 9) == 5)then
+		Burrn:SetDamageType(DMG_BURN)
+	else
+		Burrn:SetDamageType(DMG_DIRECT)
+	end
+	target:TakeDamageInfo(Burrn)
 end
 
 function SWEP:WeldEffect(Tr)
@@ -682,8 +728,9 @@ function SWEP:DrawHUD()
 	draw.SimpleTextOutlined("Gas: "..math.floor(self:GetGas()), "Trebuchet24", W * .1, H * .5 + 30, InfoTextColor, TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP, 3, Color(0, 0, 0, 50))
 
 	draw.SimpleTextOutlined("LMB: weld", "Trebuchet24", W * .4, H * .7, ManualTextColor, TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP, 3, OutlineColor)
-	draw.SimpleTextOutlined("RMB: repair", "Trebuchet24", W * .4, H * .7 + 20, ManualTextColor, TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP, 3, OutlineColor)
-	draw.SimpleTextOutlined("Backspace: drop kit", "Trebuchet24", W * .4, H * .7 + 40, ManualTextColor, TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP, 3, OutlineColor)
+	draw.SimpleTextOutlined("LMB: de-weld", "Trebuchet24", W * .4, H * .7 + 20, ManualTextColor, TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP, 3, OutlineColor)
+	draw.SimpleTextOutlined("RMB: repair", "Trebuchet24", W * .4, H * .7 + 40, ManualTextColor, TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP, 3, OutlineColor)
+	draw.SimpleTextOutlined("Backspace: drop kit", "Trebuchet24", W * .4, H * .7 + 60, ManualTextColor, TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP, 3, OutlineColor)
 
 	if self:GetStatusMessage() then
 		draw.SimpleTextOutlined(self:GetStatusMessage(), "Trebuchet24", W * .5, H * .4, InfoTextColor, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER, 1, OutlineColor)
