@@ -433,13 +433,12 @@ function SWEP:Think()
 						mask = MASK_SHOT
 					})
 					if(Tress.Hit) then
-						if IsValid(Tress.Entity) then
-							self:WeldBurn(Tress.Entity, Tress.HitPos, AimVec * 100)
-						end
 						if (table.HasValue(WeldMats, Tress.MatType) or JMod.IsDoor(Tress.Entity)) then
 							WeldTable[i] = Tress.Entity
 							WeldPos = Tress.HitPos
 							WeldNorm = Tress.HitNormal
+						elseif IsValid(Tress.Entity) then
+							self:WeldBurn(Tress.Entity, Tress.HitPos, AimVec * 100)
 						end
 						self:WeldEffect(Tress)
 					else
