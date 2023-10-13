@@ -154,6 +154,9 @@ elseif(CLIENT)then
 			local Up, Right, Forward = Ang:Up(), Ang:Right(), Ang:Forward()
 			--local Vary = math.sin(CurTime()*12)/2+.5
 			-- the spinner
+			if not(ent:GetBoneName(1)) then
+				return
+			end
 			if(DrainedFraction <= 0.98)then
 				local SpinAng = Ang:GetCopy()
 				SpinAng:RotateAroundAxis(Up, 360 * DrainedFraction)

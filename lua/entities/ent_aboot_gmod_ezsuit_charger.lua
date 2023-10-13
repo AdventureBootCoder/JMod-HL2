@@ -125,7 +125,9 @@ elseif(CLIENT)then
 			local Pos,Ang=ent:GetBonePosition(0)
 			local Up, Right, Forward = Ang:Up(), Ang:Right(), Ang:Forward()
 			local Vary=math.sin(CurTime()*12)/2+.5
-
+			if not(ent:GetBoneName(1)) then
+				return
+			end
 			-- the booper
 			if DrainedFraction >= .98 then
 				ent:SetBonePosition(1,Pos+Up*5.1-Right*7.8-Forward*4.25,Ang)
