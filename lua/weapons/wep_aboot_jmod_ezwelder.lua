@@ -727,7 +727,7 @@ function SWEP:DrawHUD()
 	draw.SimpleTextOutlined("Gas: "..math.floor(self:GetGas()), "Trebuchet24", W * .1, H * .5 + 30, InfoTextColor, TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP, 3, Color(0, 0, 0, 50))
 
 	draw.SimpleTextOutlined("LMB: weld", "Trebuchet24", W * .4, H * .7, ManualTextColor, TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP, 3, OutlineColor)
-	draw.SimpleTextOutlined("LMB: de-weld", "Trebuchet24", W * .4, H * .7 + 20, ManualTextColor, TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP, 3, OutlineColor)
+	draw.SimpleTextOutlined("ALT+LMB: de-weld", "Trebuchet24", W * .4, H * .7 + 20, ManualTextColor, TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP, 3, OutlineColor)
 	draw.SimpleTextOutlined("RMB: repair", "Trebuchet24", W * .4, H * .7 + 40, ManualTextColor, TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP, 3, OutlineColor)
 	draw.SimpleTextOutlined("Backspace: drop kit", "Trebuchet24", W * .4, H * .7 + 60, ManualTextColor, TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP, 3, OutlineColor)
 
