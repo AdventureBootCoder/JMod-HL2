@@ -37,6 +37,12 @@ SWEP.EZmaxGas = 100
 ---
 SWEP.MaxRange = 150
 
+--[[function SWEP:FrontSight()
+	local Flicker = math.Rand(.5,1)
+	if(self:GetElectricity() < self.EZmaxElectricity * .01) or (self:GetGas() < self.EZmaxGas * .01) then Flicker = math.Rand(0,.5) end
+	surface.DrawCircle(0, 0, 80, Color(255,255,255,150*Flicker))
+end--]]
+
 SWEP.VElements = {
 	["welder"] = {
 		type = "Model",
@@ -65,7 +71,8 @@ SWEP.VElements = {
 		material = "",
 		skin = 0,
 		bodygroup = {}
-	}
+	},
+	--["sightty"]={ type="Quad", bone="ValveBiped.Bip01_R_Hand", rel="", pos=Vector(10, 3.7, -6), angle=Angle(0, -100, 90), size=0.025, draw_func=SWEP.FrontSight}
 }
 
 SWEP.WElements = {
@@ -134,14 +141,24 @@ end
 
 function SWEP:ViewModelDrawn()
 	self:SCKViewModelDrawn()
-	if self:GetWelding() then
-		local Ply = LocalPlayer()
-		local VM = self.Owner:GetViewModel()
-		local Pos, Ang = VM:GetBonePosition(VM:LookupBone("ValveBiped.Grenade_body"))
-		Ang:RotateAroundAxis(Ang:Up(), -10)
-		Pos = Pos - Ang:Up()*5
-		local Dir = self.Owner:GetAimVector()
+	local Ply = LocalPlayer()
+	local VM = self.Owner:GetViewModel()
+	local Pos, Ang = VM:GetBonePosition(VM:LookupBone("ValveBiped.Grenade_body"))
+	Ang:RotateAroundAxis(Ang:Up(), -10)
+	Pos = Pos - Ang:Up()*5
+	local Dir = self.Owner:GetAimVector()
 
+	local ShootPos = self.Owner:GetShootPos() + self.Owner:GetRight() * 2 - self.Owner:GetUp()
+	local Tracey = util.QuickTrace(ShootPos, Dir * 100, {self, Ply})
+	if Tracey.Hit then
+		local HitAngy = Dir:Angle()
+		HitAngy:RotateAroundAxis(HitAngy:Right(), -90)
+		cam.Start3D2D(Tracey.HitPos, HitAngy, 0.5 * Tracey.Fraction)
+			surface.DrawCircle(0, 0, 10, 200, 200, 0, 200)
+		cam.End3D2D()
+	end
+
+	if self:GetWelding() then
 		local effectdata = EffectData()
 		effectdata:SetOrigin(Pos)
 		effectdata:SetAngles(Ang)
@@ -485,13 +502,13 @@ function SWEP:Think()
 						if IsValid(EntTwo) and JMod.IsDoor(EntTwo)then EntTwo:Fire("lock", "", 0) end
 						if((IsValid(EntOne) or (EntOne and EntOne:IsWorld())) and (IsValid(EntTwo) or (EntOne and EntOne:IsWorld())))then
 							if (EntOne ~= EntTwo) then
-								local Strength=math.random(1,20000)
-								Strength=Strength+math.random(1,20000)
-								Strength=Strength+math.random(1,20000)
-								Strength=Strength+math.random(1,20000)
-								Strength=Strength+math.random(1,20000)
-								constraint.Weld(EntOne,EntTwo,0,0,Strength,false)
-								local effectdata=EffectData()
+								local Strength = math.random(1, 20000)
+								Strength = Strength + math.random(1, 20000)
+								Strength = Strength + math.random(1, 20000)
+								Strength = Strength + math.random(1, 20000)
+								Strength = Strength + math.random(1, 20000)
+								constraint.Weld(EntOne, EntTwo, 0, 0, Strength, false)
+								local effectdata = EffectData()
 								effectdata:SetOrigin(WeldPos)
 								effectdata:SetNormal(WeldNorm)
 								effectdata:SetMagnitude(8) --amount and shoot hardness
@@ -753,6 +770,8 @@ function SWEP:DrawHUD()
 		draw.SimpleTextOutlined("Grade: "..tostring(Ent:GetGrade()), "Trebuchet24", W * .7, H * .5 + 60, Color(255, 255, 255, 100), TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP, 3, Color(0, 0, 0, 50))
 		end
 	end
+
+	--surface.DrawCircle(W * .5, H * .5, 100, 255, 255, 255, 200)
 end
 
 ----------------- sck -------------------
