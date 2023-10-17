@@ -164,6 +164,28 @@ hook.Add("PostDrawTranslucentRenderables", "JMod_HL2_TRANSREND", function()
 	end
 end)
 
+hook.Add("RenderScreenspaceEffects", "JMODHL2_SCREENSPACE", function() 
+	local Ply, FT, SelfPos, Time, W, H = LocalPlayer(), FrameTime(), EyePos(), CurTime(), ScrW(), ScrH()
+	local AimVec, FirstPerson = Ply:GetAimVector(), not Ply:ShouldDrawLocalPlayer()
+	local WeldingMask = not(Ply:ShouldDrawLocalPlayer()) and Ply.EZarmor and Ply.EZarmor.effects and Ply.EZarmor.effects.flashresistant
+	if WeldingMask and Ply.EZautoDarken and Ply.EZautoDarken > 0 then
+		DrawColorModify({
+			["$pp_colour_addr"] = 0,
+			["$pp_colour_addg"] = 0 + Ply.EZautoDarken * .1,
+			["$pp_colour_addb"] = 0 + Ply.EZautoDarken * .02,
+			["$pp_colour_brightness"] = 0 - Ply.EZautoDarken * .2,
+			["$pp_colour_contrast"] = 1,
+			["$pp_colour_colour"] = 1,
+			["$pp_colour_mulr"] = 0,
+			["$pp_colour_mulg"] = 0,
+			["$pp_colour_mulb"] = 0
+		})
+		Ply.EZautoDarken = math.Clamp(Ply.EZautoDarken - 0.5 * FT, 0, 1)
+	else
+		Ply.EZautoDarken = 0
+	end
+end)
+
 JModHL2.EZ_NightVisionScreenSpaceEffect = function(ply)
 
 	DrawColorModify({

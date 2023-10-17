@@ -156,12 +156,16 @@ function SWEP:ViewModelDrawn()
 			dlight.r = 175
 			dlight.g = 200
 			dlight.b = 255
-			dlight.Brightness = (WeldingMask and 1) or 10
+			dlight.Brightness = 6
 			dlight.Size = 500
 			dlight.Decay = 10000
 			dlight.DieTime = CurTime() + .2
 			dlight.Style = 0
 		end--]]
+		
+		if WeldingMask then
+			Ply.EZautoDarken = 1
+		end
 	end
 end
 
@@ -181,12 +185,15 @@ function SWEP:DrawWorldModel()
 			dlight.r = 175
 			dlight.g = 200
 			dlight.b = 255
-			dlight.Brightness = (WeldingMask and 1) or 6
+			dlight.Brightness = 6
 			dlight.Size = 500
 			dlight.Decay = 10000
 			dlight.DieTime = CurTime() + .2
 			dlight.Style = 0
 		end--]]
+		if WeldingMask then
+			Ply.EZautoDarken = 1
+		end
 	end
 end
 
@@ -476,8 +483,8 @@ function SWEP:Think()
 					else --Weld
 						if IsValid(EntOne) and JMod.IsDoor(EntOne)then EntOne:Fire("lock", "", 0) end
 						if IsValid(EntTwo) and JMod.IsDoor(EntTwo)then EntTwo:Fire("lock", "", 0) end
-						if((IsValid(EntOne))and(IsValid(EntTwo)))then
-							if not(EntOne==EntTwo)then
+						if((IsValid(EntOne) or (EntOne and EntOne:IsWorld())) and (IsValid(EntTwo) or (EntOne and EntOne:IsWorld())))then
+							if (EntOne ~= EntTwo) then
 								local Strength=math.random(1,20000)
 								Strength=Strength+math.random(1,20000)
 								Strength=Strength+math.random(1,20000)

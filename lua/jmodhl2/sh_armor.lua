@@ -99,7 +99,8 @@ JModHL2.ArmorTable = {
 		},
 		eff={
 			HEVsuit = true,
-			speedBoost = 1
+			speedBoost = 1,
+			flashresistant = true
 		},
 		blackvisionwhendead = false,
 		tgl = {
@@ -174,7 +175,7 @@ JModHL2.ArmorTable = {
 		eff={
 			HEVsuit = true,
 			speedBoost = 1,
-			thermalVision = false
+			flashresistant = true
 		},
 		blackvisionwhendead = false,
 		tgl = {
