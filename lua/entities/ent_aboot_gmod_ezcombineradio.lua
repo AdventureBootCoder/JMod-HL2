@@ -6,7 +6,7 @@ ENT.PrintName = "EZ Combine Radio"
 ENT.Author = "AdventureBoots"
 ENT.Category = "JMod - EZ HL:2"
 ENT.Information = "glhfggwpezpznore"
-ENT.Spawnable = false
+ENT.Spawnable = true
 ENT.AdminSpawnable = true
 ENT.NoSitAllowed = true
 ENT.Model = "models/props_combine/breenconsole.mdl"
@@ -30,7 +30,7 @@ if(SERVER)then
 		local SelfPos = self:LocalToWorld(Vector(0, 0, 50))
 
 		for i = 1, 3 do
-			local Dir = self:LocalToWorldAngles(Angle(-85 + i * 5, 0, 0)):Forward()
+			local Dir = self:LocalToWorldAngles(Angle(-165 + i * 25, 90, 0)):Forward()
 
 			local HitSky = util.TraceLine({
 				start = SelfPos,
@@ -94,10 +94,16 @@ elseif(CLIENT)then
 		---
 		self:DrawModel()
 		---
-		local DishAng = SelfAng:GetCopy()
-		DishAng:RotateAroundAxis(Right, 20)
-		DishAng:RotateAroundAxis(Up, 90)
+		--local DishAng = SelfAng:GetCopy()
+		--DishAng:RotateAroundAxis(Right, 20)
+		--DishAng:RotateAroundAxis(Up, 90)
 		--JMod.RenderModel(self.Dish, BasePos + Up * 8 + Forward * 8, DishAng, nil, Vector(.7, .7, .7))
+		--
+		--local DebugPos = self:LocalToWorld(Vector(0, 0, 50))
+		--for i = 1, 5 do
+		--	local Dir = self:LocalToWorldAngles(Angle(-165 + i * 25, 90, 0)):Forward()
+			--debugoverlay.Line(DebugPos, Dir * 9e9, 1, Color(255, 255, 255), false)
+		--end
 
 		---
 		if DetailDraw then
