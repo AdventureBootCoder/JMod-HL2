@@ -169,7 +169,7 @@ hook.Add("RenderScreenspaceEffects", "JMODHL2_SCREENSPACE", function()
 	local AimVec, FirstPerson = Ply:GetAimVector(), not Ply:ShouldDrawLocalPlayer()
 	local WeldingMask = not(Ply:ShouldDrawLocalPlayer()) and Ply.EZarmor and Ply.EZarmor.effects and Ply.EZarmor.effects.flashresistant
 	if WeldingMask then 
-		if Ply.EZautoDarken and Ply.EZautoDarken >= 0.1 then
+		if Ply.EZautoDarken and Ply.EZautoDarken >= 0 then
 			DrawColorModify({
 				["$pp_colour_addr"] = 0,
 				["$pp_colour_addg"] = 0 + Ply.EZautoDarken * .3,
@@ -182,7 +182,7 @@ hook.Add("RenderScreenspaceEffects", "JMODHL2_SCREENSPACE", function()
 				["$pp_colour_mulb"] = 0
 			})
 		end
-		Ply.EZautoDarken = (Ply.EZautoDarken and math.Clamp(Ply.EZautoDarken - 2 * FT, 0.1, 1)) or 0.1
+		Ply.EZautoDarken = (Ply.EZautoDarken and math.Clamp(Ply.EZautoDarken - 2 * FT, 0, 1)) or 0
 	else
 		Ply.EZautoDarken = 0
 	end

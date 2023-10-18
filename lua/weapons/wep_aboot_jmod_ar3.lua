@@ -44,7 +44,7 @@ SWEP.RecoilPunchBackMax = 2
 SWEP.RecoilPunchBackMaxSights = nil -- may clip with scopes
 SWEP.RecoilVMShake = 3.5 -- random viewmodel offset when shooty
 
-SWEP.Delay = 60 / 900 -- 60 / RPM.
+SWEP.Delay = 60 / 750 -- 60 / RPM.
 SWEP.Num = 1 -- number of shots per trigger pull.
 SWEP.Firemodes = {
     {
@@ -267,7 +267,7 @@ sound.Add( {
 } )
 
 sound.Add( {
-    name = "TFA_MMOD.AR3.Draw",
+    name = "Project_MMOD_AR3.Draw",
     channel = CHAN_AUTO,
     volume = 1,
     level = SNDLVL_NORM,
@@ -276,7 +276,7 @@ sound.Add( {
 } )
 
 sound.Add( {
-    name = "TFA_MMOD.AR3.Pump",
+    name = "Project_MMOD_AR3.Pump",
     channel = CHAN_AUTO,
     volume = 1,
     level = SNDLVL_NORM,
@@ -285,7 +285,7 @@ sound.Add( {
 } )
 
 sound.Add( {
-    name = "TFA_MMOD.AR3.Fidget",
+    name = "Project_MMOD_AR3.Fidget",
     channel = CHAN_AUTO,
     volume = 1,
     level = SNDLVL_NORM,
@@ -294,7 +294,7 @@ sound.Add( {
 } )
 
 sound.Add( {
-    name = "TFA_MMOD.AR3.Barrel_Open",
+    name = "Project_MMOD_AR3.Barrel_Open",
     channel = CHAN_AUTO,
     volume = 1,
     level = SNDLVL_NORM,
@@ -303,7 +303,7 @@ sound.Add( {
 } )
 
 sound.Add( {
-    name = "TFA_MMOD.AR3.Barrel_Close",
+    name = "Project_MMOD_AR3.Barrel_Close",
     channel = CHAN_AUTO,
     volume = 1,
     level = SNDLVL_NORM,
