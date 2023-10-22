@@ -11,6 +11,7 @@ ENT.AdminSpawnable = true
 ENT.JModPreferredCarryAngles = Angle(0, 0, 0)
 ENT.EZguidable = false
 ENT.EZbombBaySize = 12
+ENT.DetOnImpactEnts = {"npc_helicopter", "npc_gunship", "phys_bone_follower"}
 ---
 local STATE_BROKEN, STATE_OFF, STATE_ARMED, STATE_COOKING = -1, 0, 1, 2
 
@@ -83,7 +84,8 @@ if SERVER then
 			end
 
 			if (data.Speed > 300) and (State == STATE_ARMED) then
-				if JMod.ShouldAttack(self, data.HitEntity) then
+				jprint(data.HitEntity:GetClass())
+				if JMod.ShouldAttack(self, data.HitEntity) or (table.HasValue(self.DetOnImpactEnts, data.HitEntity:GetClass())) then
 					self:Detonate()
 				else
 					self:StartCooking()
@@ -93,7 +95,8 @@ if SERVER then
 			end
 
 			if State == STATE_COOKING then
-				if JMod.ShouldAttack(self, data.HitEntity) then
+				jprint(data.HitEntity:GetClass())
+				if JMod.ShouldAttack(self, data.HitEntity) or (IsValid(data.HitEntity) and table.HasValue(self.DetOnImpactEnts, data.HitEntity:GetClass())) then
 					self:Detonate()
 				end
 			end

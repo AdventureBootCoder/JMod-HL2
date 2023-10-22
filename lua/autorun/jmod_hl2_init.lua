@@ -360,4 +360,77 @@ elseif CLIENT then
 			end
 		end
 	end)
+
+	local GlowSprite, KnownSentrys, NextFloorSentryScan = Material("sprites/mat_jack_basicglow"), {}, 0
+	hook.Add("PostDrawTranslucentRenderables", "JMODHL2_POSTDRAWTRANSLUCENTRENDERABLES", function()
+		local Time = CurTime()
+	
+		if Time > NextFloorSentryScan then
+			NextFloorSentryScan = Time + .5
+			KnownSentrys = ents.FindByClass("ent_aboot_gmod_ezfloorsentry")
+		end
+	
+		for k, ent in pairs(KnownSentrys) do
+			if IsValid(ent) then
+				local pos = ent:GetAttachment(2).Pos
+				local ang = ent:GetAttachment(2).Ang
+	
+				if pos then
+					local AngVary = math.sin(CurTime() * 5) * 30
+					local VaryAngy = ang
+					VaryAngy:RotateAroundAxis(VaryAngy:Up(), AngVary)
+					local trace = util.QuickTrace(pos, VaryAngy:Forward() * ent.TargetingRadius, ent)
+					local State, Vary = ent:GetState(), math.sin(CurTime() * 50) / 2 + .5
+					local Forward = ent:GetForward()
+					pos = pos - Forward * .5
+	
+					if State == 2 then
+						render.SetMaterial(GlowSprite)
+						render.DrawSprite(pos, 15, 15, Color(0, 238, 255, 100 * Vary))
+						render.DrawSprite(pos, 7, 7, Color(255, 255, 255, 100 * Vary))
+						render.DrawQuadEasy(pos, Forward, 15, 15, Color(0, 238, 255, 100 * Vary), 0)
+						render.DrawQuadEasy(pos, Forward, 7, 7, Color(255, 255, 255, 100 * Vary), 0)
+					elseif State == 1 then
+						render.SetMaterial(BeamMat)
+						render.DrawBeam(pos, trace.HitPos, 0.5, 0, 255, Color(0, 162, 255, 30))
+	
+						if trace.Hit then
+							render.SetMaterial(GlowSprite)
+							render.DrawSprite(trace.HitPos, 8, 8, Color(0, 162, 255, 100))
+							render.DrawSprite(trace.HitPos, 4, 4, Color(255, 255, 255, 100))
+							render.DrawQuadEasy(trace.HitPos, trace.HitNormal, 15, 15, Color(0, 162, 255, 100), 0)
+							render.DrawQuadEasy(trace.HitPos, trace.HitNormal, 7, 7, Color(255, 255, 255, 100), 0)
+						end
+					end
+				end
+			end
+		end
+	end)
 end
+
+hook.Remove("OnEntityCreated", "PacifistNPCs")
+hook.Remove("EntityTakeDamage", "WhatdYouJustSay")
+--[[
+hook.Add("OnEntityCreated", "PacifistNPCs", function(ent)
+	if not SERVER then return end
+	print("Pacifiying!")
+	if IsValid(ent) and ent:IsNPC() and IsEnemyEntityName(ent:GetClass()) then
+		--timer.Simple(1, function()
+			if not IsValid(ent) then return end
+		
+			--ent:SetActivity(ACT_BIG_FLINCH)
+			--ent:SetSchedule(SCHED_AMBUSH)
+			for k, v in pairs(player.GetAll()) do
+				ent:AddEntityRelationship(v, D_NU, 99)
+				jprint(ent:Disposition(v))
+			end
+		--end)
+	end
+end)
+hook.Add("EntityTakeDamage", "WhatdYouJustSay", function(target, dmg)
+	if not SERVER then return end
+	local atk = dmg:GetAttacker()
+	if target:IsNPC() and IsEnemyEntityName(target:GetClass()) then
+		target:AddEntityRelationship(atk, D_HT, 99)
+	end
+end)--]]

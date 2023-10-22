@@ -104,8 +104,9 @@ ENT.StaticPerfSpecs = {
 	ThinkSpeed = 1,
 	Efficiency = .8,
 	ShotCount = 1,
-	BarrelLength = 25,
-	MaxCoolant = 100
+	BarrelLength = 26,
+	MaxCoolant = 100,
+	MaxYawTurn = 15
 }
 ENT.DynamicPerfSpecs={
 	MaxAmmo = 200,
@@ -114,9 +115,9 @@ ENT.DynamicPerfSpecs={
 	Armor = 2,
 	FireRate = 7,
 	Damage = 14,
-	Accuracy = 1,
-	SearchSpeed = .5,
-	TargetLockTime = 6,
+	Accuracy = 0.9,
+	SearchSpeed = .6,
+	TargetLockTime = 5,
 	Cooling = 1.1
 }
 ENT.DynamicPerfSpecExp=1.2
@@ -278,7 +279,7 @@ if(SERVER)then
 	function ENT:CreateNPCTarget()
 		if not IsValid(self.NPCTarget) then
 			self.NPCTarget = ents.Create("npc_bullseye")
-			self.NPCTarget:SetPos(self:GetPos() + self:GetUp() * 30 + self:GetForward() * 15)
+			self.NPCTarget:SetPos(self:GetPos() - self:GetUp() * 15 + self:GetForward() * 15)
 			self.NPCTarget:SetParent(self)
 			self.NPCTarget:Spawn()
 			self.NPCTarget:Activate()
@@ -297,12 +298,13 @@ if(SERVER)then
 		local AimVec = AimAng:Forward()
 		local AttackAngle = -math.deg(math.asin(AimVec:Dot(IncomingVec)))
 		if(AttackAngle >= 60)then
+			debugoverlay.Cross(dmginfo.HitPos)
 			Mult = Mult * .2
 			if (math.random(1, 2) == 1) then
 				local SelfPos = self:GetPos()
 				sound.Play("snds_jack_gmod/ricochet_"..math.random(1,2)..".wav",SelfPos+VectorRand(),70,math.random(80,120))
 				local effectdata = EffectData()
-				effectdata:SetOrigin(SelfPos + Up*30 + AimVec*20)
+				effectdata:SetOrigin(SelfPos - Up*16 + AimVec*20)
 				effectdata:SetNormal(VectorRand())
 				effectdata:SetMagnitude(2) --amount and shoot hardness
 				effectdata:SetScale(1) --length of strands
@@ -380,12 +382,12 @@ if(SERVER)then
 
 	function ENT:CanSee(ent)
 		if not IsValid(ent) then return false end
-		local TargPos, SelfPos = self:DetermineTargetAimPoint(ent), self:GetPos() + self:GetUp() * 30
+		local TargPos, SelfPos = self:DetermineTargetAimPoint(ent), self:GetPos() - self:GetUp() * 16
 		local Dist = TargPos:Distance(SelfPos)
 		if Dist > self.TargetingRadius then return false end
 
 		local TargetAngle = self:WorldToLocal(TargPos):Angle().y
-		if not((TargetAngle < 40) or (TargetAngle > 320)) then return false end
+		if not((TargetAngle < self.StaticPerfSpecs.MaxYawTurn) or (TargetAngle > (360 - self.StaticPerfSpecs.MaxYawTurn))) then return false end
 
 		local Tr = util.TraceLine({
 			start = SelfPos,
@@ -502,6 +504,10 @@ if(SERVER)then
 				else
 					self:ReturnToForward()
 				end
+				if self.NextPingTime < Time then
+					self.NextPingTime = Time + 1
+					self:EmitSound("npc/turret_floor/ping.wav", 70, 100)
+				end
 			elseif State == STATE_SEARCHING then
 				if self:CanEngage(self.Target) then
 					self:Engage(self.Target)
@@ -611,7 +617,7 @@ if(SERVER)then
 				AimAng:RotateAroundAxis(Right, self:GetAimPitch())
 				AimAng:RotateAroundAxis(Up, self:GetAimYaw())
 				local AimForward = AimAng:Forward()
-				local ShootPos = SelfPos + Up * 56 + AimForward * self.BarrelLength
+				local ShootPos = SelfPos - Up * 30 + AimForward * self.BarrelLength
 				---
 				local Exude = EffectData()
 				Exude:SetOrigin(ShootPos)
@@ -649,7 +655,7 @@ if(SERVER)then
 		local AimAng = self:GetAngles()
 		AimAng:RotateAroundAxis(AimAng:Up(), self:GetAimYaw())
 		local AimForward = AimAng:Forward()
-		local ShootPos = SelfPos + AimForward * (self.BarrelLength - 12) + AimAng:Up() * 56
+		local ShootPos = SelfPos + AimForward * (4 + self.BarrelLength) - AimAng:Up() * 20
 		local AmmoConsume, ElecConsume = 1, .02
 		local Heat = self.Damage * self.ShotCount / 30
 		self:AddVisualRecoil(Heat * 2)
@@ -659,7 +665,7 @@ if(SERVER)then
 			local ShellAng = AimAng:GetCopy()
 			ShellAng:RotateAroundAxis(ShellAng:Up(), -90)
 			local Eff = EffectData()
-			Eff:SetOrigin(SelfPos + Up * 36 + AimForward * 5)
+			Eff:SetOrigin(SelfPos - Up * 26 + AimForward * 5)
 			Eff:SetAngles(ShellAng)
 			Eff:SetEntity(self)
 			---
@@ -669,19 +675,19 @@ if(SERVER)then
 
 			if Dmg >= 60 then
 				util.Effect("RifleShellEject", Eff, true, true)
-				sound.Play("snds_jack_gmod/sentry_powerful.wav", SelfPos, 70, math.random(90, 110))
+				sound.Play("snds_jack_gmod/sentry_powerful.wav", ShootPos, 70, math.random(90, 110))
 				ParticleEffect("muzzle_center_M82", ShootPos, AimAng, self)
 			elseif Dmg >= 15 then
 				util.Effect("RifleShellEject", Eff, true, true)
-				sound.Play("snds_jack_gmod/sentry.wav", SelfPos, 70, math.random(90, 110))
+				sound.Play("snds_jack_gmod/sentry.wav", ShootPos, 70, math.random(90, 110))
 				ParticleEffect("muzzleflash_g3", ShootPos, AimAng, self)
 			else
 				util.Effect("ShellEject", Eff, true, true)
-				sound.Play("snds_jack_gmod/sentry_weak.wav", SelfPos, 70, math.random(90, 110))
+				sound.Play("snds_jack_gmod/sentry_weak.wav", ShootPos, 70, math.random(90, 110))
 				ParticleEffect("muzzleflash_pistol", ShootPos, AimAng, self)
 			end
 
-			sound.Play("snds_jack_gmod/sentry_far.wav", SelfPos + Up, 100, math.random(90, 110))
+			sound.Play("snds_jack_gmod/sentry_far.wav", SelfPos - Up, 100, math.random(90, 110))
 			ShootDir = (ShootDir + VectorRand() * math.Rand(.05, 1) * Inacc):GetNormalized()
 
 			local Ballut = {
@@ -705,7 +711,7 @@ if(SERVER)then
 			local ShellAng = AimAng:GetCopy()
 			ShellAng:RotateAroundAxis(ShellAng:Up(), -90)
 			local Eff = EffectData()
-			Eff:SetOrigin(SelfPos + Up * 36 + AimForward * 5)
+			Eff:SetOrigin(SelfPos - Up * 16 + AimForward * 5)
 			Eff:SetAngles(ShellAng)
 			Eff:SetFlags(5)
 			Eff:SetEntity(self)
@@ -716,7 +722,8 @@ if(SERVER)then
 
 			util.Effect("MuzzleFlash", Eff)
 
-			sound.Play("weapons/ar2/fire1.wav", SelfPos + Up, 100, math.random(80, 100))
+			sound.Play("weapons/ar2/fire1.wav", ShootPos, 100, math.random(80, 100))
+			--sound.Play("Weapon_AR2.Single", ShootPos, 100, math.random(80, 100))
 			ShootDir = (ShootDir + VectorRand() * math.Rand(.05, 1) * Inacc):GetNormalized()
 
 			local Ballut = {
@@ -741,7 +748,7 @@ if(SERVER)then
 			local ShellAng = AimAng:GetCopy()
 			ShellAng:RotateAroundAxis(ShellAng:Up(), -90)
 			local Eff = EffectData()
-			Eff:SetOrigin(SelfPos + Up * 36 + AimForward * 5)
+			Eff:SetOrigin(SelfPos - Up * 16 + AimForward * 5)
 			Eff:SetAngles(ShellAng)
 			Eff:SetEntity(self)
 			---
@@ -749,8 +756,8 @@ if(SERVER)then
 			local Force = Dmg / 5
 			local ShootDir = (point - ShootPos):GetNormalized()
 			util.Effect("ShotgunShellEject", Eff, true, true)
-			sound.Play("snds_jack_gmod/sentry_shotgun.wav", SelfPos, 70, math.random(90, 110))
-			sound.Play("snds_jack_gmod/sentry_far.wav", SelfPos + Up, 100, math.random(90, 110))
+			sound.Play("snds_jack_gmod/sentry_shotgun.wav", ShootPos, 70, math.random(90, 110))
+			sound.Play("snds_jack_gmod/sentry_far.wav", ShootPos - Up, 100, math.random(90, 110))
 
 			local Ballut = {
 				Attacker = self.EZowner or self,
@@ -782,7 +789,7 @@ if(SERVER)then
 			util.Effect("RifleShellEject", Eff, true, true)
 			sound.Play("snds_jack_gmod/sentry.wav", SelfPos, 70, math.random(90, 110))
 			ParticleEffect("muzzleflash_pistol_deagle", ShootPos, AimAng, self)
-			sound.Play("snds_jack_gmod/sentry_far.wav", SelfPos + Up, 100, math.random(90, 110))
+			sound.Play("snds_jack_gmod/sentry_far.wav", ShootPos - Up, 100, math.random(90, 110))
 			ShootDir = (ShootDir + VectorRand() * math.Rand(.05, 1) * Inacc):GetNormalized()
 
 			JMod.RicPenBullet(self, ShootPos, ShootDir, Dmg, false, false, 1, 15, "eff_jack_gmod_smallarmstracer", function(att, tr, dmg)
@@ -823,9 +830,9 @@ if(SERVER)then
 			end)
 		elseif ProjType == "HE Grenade" then
 			local Dmg, Inacc = self.Damage, .06 / self.Accuracy
-			sound.Play("snds_jack_gmod/sentry_gl.wav", SelfPos, 70, math.random(90, 110))
+			sound.Play("snds_jack_gmod/sentry_gl.wav", ShootPos, 70, math.random(90, 110))
 			ParticleEffect("muzzleflash_m79", ShootPos, AimAng, self)
-			sound.Play("snds_jack_gmod/sentry_far.wav", SelfPos + Up, 100, math.random(90, 110))
+			sound.Play("snds_jack_gmod/sentry_far.wav", ShootPos - Up, 100, math.random(90, 110))
 			local Shell = ents.Create("ent_jack_gmod_ez40mmshell")
 			Shell:SetPos(SelfPos + Up * 36 + AimForward * 5)
 			Shell:SetAngles(AngleRand())
@@ -872,8 +879,8 @@ if(SERVER)then
 			local Dmg, Inacc = self.Damage, .06 / self.Accuracy
 			local Force = Dmg / 5
 			local ShootDir = (point - ShootPos):GetNormalized()
-			sound.Play("snds_jack_gmod/sentry_laser" .. math.random(1, 2) .. ".wav", SelfPos, 70, math.random(90, 110))
-			sound.Play("snds_jack_gmod/sentry_far.wav", SelfPos + Up, 100, math.random(90, 110))
+			sound.Play("snds_jack_gmod/sentry_laser" .. math.random(1, 2) .. ".wav", ShootPos, 70, math.random(90, 110))
+			sound.Play("snds_jack_gmod/sentry_far.wav", ShootPos - Up, 100, math.random(90, 110))
 			ShootDir = (ShootDir + VectorRand() * math.Rand(.05, 1) * Inacc):GetNormalized()
 			local Zap = EffectData()
 			Zap:SetOrigin(ShootPos)
@@ -938,7 +945,7 @@ if(SERVER)then
 			---
 			local ShootDir = (point - ShootPos):GetNormalized()
 
-			sound.Play("physics/surfaces/underwater_impact_bullet"..math.random(1, 3)..".wav", SelfPos + Up, 100, math.random(80, 100))
+			sound.Play("physics/surfaces/underwater_impact_bullet"..math.random(1, 3)..".wav", ShootPos - Up, 100, math.random(80, 100))
 			
 			local EntsToWet = ents.FindInSphere(point, 256)
 			for i = 1, #EntsToWet do
@@ -974,7 +981,7 @@ if(SERVER)then
 
 	function ENT:GetTargetAimOffset(point)
 		if not point then return 0, 0 end
-		local SelfPos = self:GetPos() + self:GetUp() * 35
+		local SelfPos = self:GetPos() - self:GetUp() * 16
 		local TargAng = self:WorldToLocalAngles((point - SelfPos):Angle())
 		local GoalPitch, GoalYaw = -TargAng.p, TargAng.y
 		local CurPitchOffset, CurYawOffset = self:GetAimPitch(), self:GetAimYaw()
@@ -1030,12 +1037,12 @@ if(SERVER)then
 		end
 
 		if yaw ~= nil then
-			if yaw > 60 then
-				yaw = 60
+			if yaw > self.StaticPerfSpecs.MaxYawTurn then
+				yaw = self.StaticPerfSpecs.MaxYawTurn
 			end
 
-			if yaw < -60 then
-				yaw = -60
+			if yaw < -self.StaticPerfSpecs.MaxYawTurn then
+				yaw = -self.StaticPerfSpecs.MaxYawTurn
 			end
 
 			self:SetAimYaw(yaw)
@@ -1083,16 +1090,16 @@ elseif(CLIENT)then
 		self.CurAimYaw = Lerp(FT * 3, self.CurAimYaw, AimYaw)
 
 		-- no snap-swing resets
-		if math.abs(self.CurAimPitch - AimPitch) > 45 then
+		--[[if math.abs(self.CurAimPitch - AimPitch) > 45 then
 			self.CurAimPitch = AimPitch
-		end
+		end--]]
 
-		if math.abs(self.CurAimYaw - AimYaw) > 90 then
+		--[[if math.abs(self.CurAimYaw - AimYaw) > 90 then
 			self.CurAimYaw = AimYaw
-		end
+		end--]]
 
 		---
-		local BasePos = SelfPos + Up * 32
+		local BasePos = SelfPos - Up * 16
 
 		local Obscured = util.TraceLine({
 			start = EyePos(),
@@ -1103,7 +1110,7 @@ elseif(CLIENT)then
 
 		local Closeness = LocalPlayer():GetFOV() * EyePos():Distance(SelfPos)
 		local DetailDraw = Closeness < 36000 -- cutoff point is 400 units when the fov is 90 degrees
-		if (not DetailDraw) and Obscured then return end -- if player is far and sentry is obscured, draw nothing
+		--if (not DetailDraw) and Obscured then return end -- if player is far and sentry is obscured, draw nothing
 
 		-- if obscured, at least disable details
 		if Obscured then
@@ -1136,12 +1143,12 @@ elseif(CLIENT)then
 		if self.RenderGun then
 			local GunMaxy = self:GetBoneMatrix(2)
 			local AimAngle = GunMaxy:GetAngles():GetCopy()
-			AimAngle:RotateAroundAxis(AimAngle:Forward(), -90)
-			AimAngle:RotateAroundAxis(AimAngle:Up(), -90)
+			AimAngle:RotateAroundAxis(AimAngle:Forward(), 180)
+			--AimAngle:RotateAroundAxis(AimAngle:Up(), -90)
 			local AimUp, AimRight, AimForward = AimAngle:Up(), AimAngle:Right(), AimAngle:Forward()
 			local GunPos = GunMaxy:GetTranslation()
 
-			JMod.RenderModel(self.MachineGun, GunPos - AimForward * (6 + self.VisualRecoil) - AimRight * 1.5, AimAngle, Vector(0.75, 0.75, 0.75))
+			JMod.RenderModel(self.MachineGun, GunPos + AimForward * (8 + self.VisualRecoil) - AimUp * 9.8, AimAngle, Vector(0.75, 0.75, 0.75))
 			CurPlateAng = 0
 			CurGunOut = 0
 		else
@@ -1157,11 +1164,11 @@ elseif(CLIENT)then
 		---
 		self.CurPlateAng = Lerp(FT * 3, self.CurPlateAng, PlateAng)
 		self.CurGunOut = Lerp(FT * 3, self.CurGunOut, GunOut)
-		self:ManipulateBoneAngles(4, Angle(self.CurPlateAng, 0, 0))
-		self:ManipulateBonePosition(3, Vector(0, 0, self.CurGunOut))
+		--self:ManipulateBoneAngles(4, Angle(self.CurPlateAng, 0, 0))
+		--self:ManipulateBonePosition(3, Vector(0, 0, self.CurGunOut))
 		---
-		self:ManipulateBoneAngles(2, Angle(0, 0, -self.CurAimPitch))
-		self:ManipulateBoneAngles(1, Angle(self.CurAimYaw, 0, 0))
+		--self:ManipulateBoneAngles(2, Angle(-self.CurAimPitch, 0, 0))
+		self:ManipulateBoneAngles(1, Angle(self.CurAimYaw, 0, -self.CurAimPitch))
 		---
 
 		if FirstFrame == true then
@@ -1173,11 +1180,12 @@ elseif(CLIENT)then
 			if (Closeness < 20000) and (State > 0) then
 				local LeftRightMaxy = self:GetBoneMatrix(1)
 				if not LeftRightMaxy then return end
-				local DisplayAng = LeftRightMaxy:GetAngles():GetCopy()
-				local DisplayPos = LeftRightMaxy:GetTranslation()
-				DisplayAng:RotateAroundAxis(DisplayAng:Right(), 85)
+				local DisplayAng = SelfAng
+				local DisplayPos = SelfPos - Forward * 2--LeftRightMaxy:GetTranslation()
+				DisplayAng:RotateAroundAxis(DisplayAng:Forward(), -90)
+				--DisplayAng:RotateAroundAxis(DisplayAng:Up(), 180)
 				local Opacity = math.random(50, 150)
-				cam.Start3D2D(DisplayPos + DisplayAng:Up() * 3 + DisplayAng:Forward() * 7 + DisplayAng:Right() * -7, DisplayAng, .075)
+				cam.Start3D2D(DisplayPos + DisplayAng:Up() * 5 + DisplayAng:Forward() * 4.5 + DisplayAng:Right() * -12, DisplayAng, .075)
 					surface.SetDrawColor(10, 10, 10, Opacity + 20)
 					surface.DrawRect(-100, -140, 128, 128)
 					JMod.StandardRankDisplay(Grade, -35, -75, 118, Opacity + 20)
@@ -1197,9 +1205,9 @@ elseif(CLIENT)then
 
 				cam.End3D2D()
 				---
-				DisplayAng:RotateAroundAxis(DisplayAng:Right(), 185)
+				DisplayAng:RotateAroundAxis(DisplayAng:Right(), 180)
 				---
-				cam.Start3D2D(DisplayPos + DisplayAng:Up() * 3 + DisplayAng:Forward() * -5 + DisplayAng:Right() * -12, DisplayAng, .075)
+				cam.Start3D2D(DisplayPos + DisplayAng:Up() * 4 + DisplayAng:Forward() * -4.5 + DisplayAng:Right() * -18, DisplayAng, .075)
 					draw.SimpleTextOutlined("POWER", "JMod-Display", 0, 0, Color(255, 255, 255, Opacity), TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP, 3, Color(0, 0, 0, Opacity))
 					local ElecFrac = self:GetElectricity() / self.MaxElectricity
 					local R, G, B = JMod.GoodBadColor(ElecFrac)
