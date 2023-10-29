@@ -172,7 +172,7 @@ hook.Add("RenderScreenspaceEffects", "JMODHL2_SCREENSPACE", function()
 		if Ply.EZautoDarken and Ply.EZautoDarken >= 0 then
 			DrawColorModify({
 				["$pp_colour_addr"] = 0,
-				["$pp_colour_addg"] = 0 + Ply.EZautoDarken * .3,
+				["$pp_colour_addg"] = 0 + Ply.EZautoDarken * .2,
 				["$pp_colour_addb"] = 0 + Ply.EZautoDarken * .03,
 				["$pp_colour_brightness"] = 0 - Ply.EZautoDarken * .7,
 				["$pp_colour_contrast"] = 1,

@@ -3,8 +3,8 @@ AddCSLuaFile()
 ENT.Type = "anim"
 ENT.Author = "Jackarunda"
 ENT.Information = "glhfggwpezpznore"
-ENT.PrintName = "EZ Jack-HAMMER"
-ENT.Category = "JMod - EZ HL2"
+ENT.PrintName = "EZ Ground-Pounder"
+ENT.Category = "JMod - EZ HL:2"
 ENT.Spawnable = true
 ENT.AdminOnly = false
 ENT.Base = "ent_jack_gmod_ezmachine_base"
@@ -12,7 +12,7 @@ ENT.Base = "ent_jack_gmod_ezmachine_base"
 ENT.Model = "models/hunter/blocks/cube05x1x05.mdl"
 ENT.Mass = 200
 ENT.SpawnHeight = 10
-ENT.JModPreferredCarryAngles = Angle(0, 0, -90)
+ENT.JModPreferredCarryAngles = Angle(0, 180, -90)
 ENT.EZupgradable = true
 --ENT.EZanchorage = 500
 ENT.StaticPerfSpecs = {
@@ -170,7 +170,7 @@ if(SERVER)then
 						self.DepositKey = JMod.GetDepositAtPos(self, SelfPos)
 					else
 						-- This is just the rate at which we drill
-						local drillRate = 0.2 * JMod.Config.ResourceEconomy.ExtractionSpeed
+						local drillRate = 0.1 * JMod.Config.ResourceEconomy.ExtractionSpeed
 						local amtLeft = JMod.NaturalResourceTable[self.DepositKey].amt
 
 						self:SetProgress(self:GetProgress() + drillRate)
@@ -183,7 +183,7 @@ if(SERVER)then
 					end
 				end
 				self:SetSlamDist(50 * PoundTr.Fraction)
-				self:ConsumeElectricity(0.4  * JMod.Config.ResourceEconomy.ExtractionSpeed)
+				self:ConsumeElectricity(0.2  * JMod.Config.ResourceEconomy.ExtractionSpeed)
 			end
 		end
 
@@ -301,13 +301,13 @@ elseif(CLIENT)then
 				DisplayAng:RotateAroundAxis(DisplayAng:Right(), -90)
 				local Opacity = math.random(50, 150)
 				cam.Start3D2D(SelfPos + Forward * 13 + Up * -37 + Right * 10, DisplayAng, .15)
-                    draw.SimpleTextOutlined("EXTRACTING","JMod-Display",250,-60,Color(255,255,255,Opacity),TEXT_ALIGN_CENTER,TEXT_ALIGN_TOP,3,Color(0,0,0,Opacity))
-                    local ExtractCol=Color(100,255,100,Opacity)
-                    draw.SimpleTextOutlined(string.upper(Typ) or "N/A","JMod-Display",250,-30,ExtractCol,TEXT_ALIGN_CENTER,TEXT_ALIGN_TOP,3,Color(0,0,0,Opacity))
-                    draw.SimpleTextOutlined("POWER","JMod-Display",250,0,Color(255,255,255,Opacity),TEXT_ALIGN_CENTER,TEXT_ALIGN_TOP,3,Color(0,0,0,Opacity))
+					draw.SimpleTextOutlined("POWER","JMod-Display",250,-60,Color(255,255,255,Opacity),TEXT_ALIGN_CENTER,TEXT_ALIGN_TOP,3,Color(0,0,0,Opacity))
                     local ElecFrac=self:GetElectricity()/200
                     local R,G,B = JMod.GoodBadColor(ElecFrac)
-                    draw.SimpleTextOutlined(tostring(math.Round(ElecFrac*100)).."%","JMod-Display",250,30,Color(R,G,B,Opacity),TEXT_ALIGN_CENTER,TEXT_ALIGN_TOP,3,Color(0,0,0,Opacity))
+                    draw.SimpleTextOutlined(tostring(math.Round(ElecFrac*100)).."%","JMod-Display",250,-30,Color(R,G,B,Opacity),TEXT_ALIGN_CENTER,TEXT_ALIGN_TOP,3,Color(0,0,0,Opacity))
+                    draw.SimpleTextOutlined("EXTRACTING","JMod-Display",250,0,Color(255,255,255,Opacity),TEXT_ALIGN_CENTER,TEXT_ALIGN_TOP,3,Color(0,0,0,Opacity))
+                    local ExtractCol=Color(100,255,100,Opacity)
+                    draw.SimpleTextOutlined(string.upper(Typ or "N/A"),"JMod-Display",250,30,ExtractCol,TEXT_ALIGN_CENTER,TEXT_ALIGN_TOP,3,Color(0,0,0,Opacity))
                     draw.SimpleTextOutlined("PROGRESS","JMod-Display",250,60,Color(255,255,255,Opacity),TEXT_ALIGN_CENTER,TEXT_ALIGN_TOP,3,Color(0,0,0,Opacity))
                     local ProgressFrac = self:GetProgress() / 100
 					local PR, PG, PB = JMod.GoodBadColor(ProgressFrac)
@@ -320,5 +320,5 @@ elseif(CLIENT)then
 			end
 		end
 	end
-	language.Add("ent_jack_gmod_ezpounder","EZ Jack-HAMMER")
+	language.Add("ent_aboot_gmod_ezpounder","EZ Ground-Pounder")
 end
