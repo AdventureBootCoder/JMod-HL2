@@ -361,6 +361,13 @@ elseif CLIENT then
 		end
 	end)
 
+	local BeamMat = CreateMaterial("xeno/beamgauss", "UnlitGeneric", {
+		["$basetexture"] = "sprites/spotlight",
+		["$additive"] = "1",
+		["$vertexcolor"] = "1",
+		["$vertexalpha"] = "1",
+	})
+
 	local GlowSprite, KnownSentrys, NextFloorSentryScan = Material("sprites/mat_jack_basicglow"), {}, 0
 	hook.Add("PostDrawTranslucentRenderables", "JMODHL2_POSTDRAWTRANSLUCENTRENDERABLES", function()
 		local Time = CurTime()
