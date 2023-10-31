@@ -54,7 +54,7 @@ if(SERVER)then
 
 		if (self:GetElectricity() > 0) then
 			self:SetState(STATE_RUNNING)
-			self.SoundLoop = CreateSound(self, "snds_jack_gmod/genny_start_loop.wav")
+			self.SoundLoop = CreateSound(self, "^snds_jack_gmod/genny_start_loop.wav")
 			self.SoundLoop:SetSoundLevel(80)
 			self.SoundLoop:Play()
 			self:SetProgress(0)
@@ -165,7 +165,7 @@ if(SERVER)then
 
 					JMod.EmitAIsound(self:GetPos(), 300, .5, 256)
 
-					if not JMod.NaturalResourceTable[self.DepositKey] then
+					--[[if not JMod.NaturalResourceTable[self.DepositKey] then
 						--self:SetResourceType("")
 						self.DepositKey = JMod.GetDepositAtPos(self, SelfPos)
 					else
@@ -177,6 +177,15 @@ if(SERVER)then
 
 						if self:GetProgress() >= 100 then
 							local amtToDrill = math.min(JMod.NaturalResourceTable[self.DepositKey].amt, 100)
+							self:ProduceResource()
+							JMod.DepleteNaturalResource(self.DepositKey, amtToDrill)
+						end
+					end--]]
+					if math.random(1, 100) == 1 then
+						self.DepositKey = JMod.GetDepositAtPos(self, SelfPos)
+						if JMod.NaturalResourceTable[self.DepositKey] then
+							local amtToDrill = math.min(JMod.NaturalResourceTable[self.DepositKey].amt, math.random(5, 10))
+							self:SetProgress(amtToDrill)
 							self:ProduceResource()
 							JMod.DepleteNaturalResource(self.DepositKey, amtToDrill)
 						end
@@ -222,7 +231,7 @@ if(SERVER)then
 
 		local pos = SelfPos
 		local spawnVec = self:WorldToLocal(SelfPos + Forward * 45)
-		JMod.MachineSpawnResource(self, self:GetResourceType(), amt, spawnVec, Angle(0, 0, -90), Right * 100, true, 200)
+		JMod.MachineSpawnResource(self, self:GetResourceType(), amt, spawnVec, Angle(0, 0, -90), Forward * 15, true, 200)
 		self:SetProgress(self:GetProgress() - amt)
 	end
 
@@ -300,22 +309,11 @@ elseif(CLIENT)then
 				DisplayAng:RotateAroundAxis(DisplayAng:Forward(), 180)
 				DisplayAng:RotateAroundAxis(DisplayAng:Right(), -90)
 				local Opacity = math.random(50, 150)
-				cam.Start3D2D(SelfPos + Forward * 13 + Up * -37 + Right * 10, DisplayAng, .15)
+				cam.Start3D2D(SelfPos + Forward * 13 + Up * -37 + Right * 9, DisplayAng, .15)
 					draw.SimpleTextOutlined("POWER","JMod-Display",250,-60,Color(255,255,255,Opacity),TEXT_ALIGN_CENTER,TEXT_ALIGN_TOP,3,Color(0,0,0,Opacity))
-                    local ElecFrac=self:GetElectricity()/200
-                    local R,G,B = JMod.GoodBadColor(ElecFrac)
-                    draw.SimpleTextOutlined(tostring(math.Round(ElecFrac*100)).."%","JMod-Display",250,-30,Color(R,G,B,Opacity),TEXT_ALIGN_CENTER,TEXT_ALIGN_TOP,3,Color(0,0,0,Opacity))
-                    draw.SimpleTextOutlined("EXTRACTING","JMod-Display",250,0,Color(255,255,255,Opacity),TEXT_ALIGN_CENTER,TEXT_ALIGN_TOP,3,Color(0,0,0,Opacity))
-                    local ExtractCol=Color(100,255,100,Opacity)
-                    draw.SimpleTextOutlined(string.upper(Typ or "N/A"),"JMod-Display",250,30,ExtractCol,TEXT_ALIGN_CENTER,TEXT_ALIGN_TOP,3,Color(0,0,0,Opacity))
-                    draw.SimpleTextOutlined("PROGRESS","JMod-Display",250,60,Color(255,255,255,Opacity),TEXT_ALIGN_CENTER,TEXT_ALIGN_TOP,3,Color(0,0,0,Opacity))
-                    local ProgressFrac = self:GetProgress() / 100
-					local PR, PG, PB = JMod.GoodBadColor(ProgressFrac)
-                    draw.SimpleTextOutlined(tostring(math.Round(ProgressFrac * 100)).."%", "JMod-Display", 250, 90, Color(PR, PG, PB, Opacity), TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP, 3, Color(0, 0, 0, Opacity))
-                    --local CoolFrac=self:GetCoolant()/100
-                    --draw.SimpleTextOutlined("COOLANT","JMod-Display",90,0,Color(255,255,255,Opacity),TEXT_ALIGN_CENTER,TEXT_ALIGN_TOP,3,Color(0,0,0,Opacity))
-                    --local R,G,B=JMod.GoodBadColor(CoolFrac)
-                    --draw.SimpleTextOutlined(tostring(math.Round(CoolFrac*100)).."%","JMod-Display",90,30,Color(R,G,B,Opacity),TEXT_ALIGN_CENTER,TEXT_ALIGN_TOP,3,Color(0,0,0,Opacity))
+					local ElecFrac=self:GetElectricity()/200
+					local R,G,B = JMod.GoodBadColor(ElecFrac)
+					draw.SimpleTextOutlined(tostring(math.Round(ElecFrac*100)).."%","JMod-Display",250,-30,Color(R,G,B,Opacity),TEXT_ALIGN_CENTER,TEXT_ALIGN_TOP,3,Color(0,0,0,Opacity))
 				cam.End3D2D()
 			end
 		end
