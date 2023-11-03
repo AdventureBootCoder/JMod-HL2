@@ -84,7 +84,7 @@ if SERVER then
 			end
 
 			if (data.Speed > 300) and (State == STATE_ARMED) then
-				jprint(data.HitEntity:GetClass())
+				--jprint(data.HitEntity:GetClass())
 				if JMod.ShouldAttack(self, data.HitEntity) or (table.HasValue(self.DetOnImpactEnts, data.HitEntity:GetClass())) then
 					self:Detonate()
 				else
@@ -95,7 +95,7 @@ if SERVER then
 			end
 
 			if State == STATE_COOKING then
-				jprint(data.HitEntity:GetClass())
+				--jprint(data.HitEntity:GetClass())
 				if JMod.ShouldAttack(self, data.HitEntity) or (IsValid(data.HitEntity) and table.HasValue(self.DetOnImpactEnts, data.HitEntity:GetClass())) then
 					self:Detonate()
 				end
