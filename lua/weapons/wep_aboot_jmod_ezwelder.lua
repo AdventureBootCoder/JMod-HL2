@@ -189,12 +189,12 @@ end
 function SWEP:DrawWorldModel()
 	self:SCKDrawWorldModel()
 	if self:GetWelding() then
-		local Ply = self.Owner
+		local Ply = LocalPlayer()
 		local Pos, Ang = Ply:GetBonePosition(Ply:LookupBone("ValveBiped.Bip01_R_Hand"))
 		Pos = Pos + Ang:Right()*2 - Ang:Up()*1
 		local Dir = Ply:GetAimVector()
 
-		local WeldingMask = not(Ply:ShouldDrawLocalPlayer()) and Ply.EZarmor and Ply.EZarmor.effects and Ply.EZarmor.effects.flashresistant
+		local WeldingMask = Ply.EZarmor and Ply.EZarmor.effects and Ply.EZarmor.effects.flashresistant
 		local dlight = DynamicLight(self:EntIndex())
 		if(dlight)then
 			dlight.MinLight=0

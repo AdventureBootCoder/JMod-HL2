@@ -140,34 +140,10 @@ JModHL2.AmmoTable = {
 table.Merge(JMod.AdditionalWeaponTable, JModHL2.WeaponTable)
 table.Merge(JMod.AdditionalAmmoTable, JModHL2.AmmoTable)
 
---[[function JModHL2.LoadAdditionalAmmo()
-	timer.Simple(0, function()
-		if JMod.AmmoTable then
-			table.Merge(JMod.AmmoTable, JMod.AdditionalAmmoTable)
-			JMod.LoadAmmoTable(JMod.AdditionalAmmoTable)
-		end
-	end)
-end
-hook.Add("Initialize", "JModHL2_LoadAdditionalAmmo", JModHL2.LoadAdditionalAmmo)
-
-function JModHL2.LoadAdditionalWeaponEntities()
-	timer.Simple(0, function()
-		if JMod.WeaponTable then
-			table.Merge(JMod.WeaponTable, JMod.AdditionalWeaponTable)
-			JMod.GenerateWeaponEntities(JMod.AdditionalWeaponTable)
-		end
-	end)
-end
-hook.Add("Initialize", "JModHL2_LoadAdditionalWeaponEntities", JModHL2.LoadAdditionalWeaponEntities)
-
-JModHL2.LoadAdditionalAmmo()
-JModHL2.LoadAdditionalWeaponEntities()--]]
 if JMod and JMod.LoadAdditionalAmmo and JMod.LoadAdditionalWeaponEntities then
 	JMod.LoadAdditionalAmmo()
 	JMod.LoadAdditionalWeaponEntities()
 end
---hook.Add("Initialize", "JModHL2_LoadAdditionalAmmo", JMod.LoadAdditionalAmmo)
---hook.Add("Initialize", "JModHL2_LoadAdditionalWeaponEntities", JMod.LoadAdditionalWeaponEntities)
 
 function JModHL2.GetAmmoSpecs(typ)
 	if JMod.GetAmmoSpecs and JMod.GetAmmoSpecs(typ) then return JMod.GetAmmoSpecs(typ) end
