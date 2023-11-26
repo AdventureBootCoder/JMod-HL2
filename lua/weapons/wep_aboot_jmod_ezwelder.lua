@@ -143,7 +143,9 @@ function SWEP:ViewModelDrawn()
 	self:SCKViewModelDrawn()
 	local Ply = LocalPlayer()
 	local VM = self.Owner:GetViewModel()
-	local Pos, Ang = VM:GetBonePosition(VM:LookupBone("ValveBiped.Grenade_body"))
+	local Bone = VM:LookupBone("ValveBiped.Grenade_body")
+	if not Bone then return end
+	local Pos, Ang = VM:GetBonePosition(Bone)
 	Ang:RotateAroundAxis(Ang:Up(), -10)
 	Pos = Pos - Ang:Up()*5
 	local Dir = self.Owner:GetAimVector()
