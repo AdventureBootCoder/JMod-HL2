@@ -130,7 +130,9 @@ local ExtraHeight = Vector(0, 0, 5)
 local function TablesEqual(tbl1, tbl2)
 	local SamePositions = true
 	for k, v in ipairs(tbl1) do
-		if v.pos ~= tbl2[k].pos then SamePositions = false break end
+		if k and v then
+			if v.pos ~= tbl2[k].pos then SamePositions = false break end
+		end
 	end
 	if table.IsEmpty(tbl1) then SamePositions = false end
 	return SamePositions
