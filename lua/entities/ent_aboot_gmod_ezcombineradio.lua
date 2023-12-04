@@ -142,3 +142,164 @@ elseif(CLIENT)then
 
 	language.Add("ent_aboot_gmod_ezcombineradio", "EZ Combine Radio")
 end
+
+local function FindEZradios() 
+	local Radios = {}
+	for _, v in ipairs(ents.GetAll()) do
+		if v.EZradio == true then
+			table.insert(Radios, v)
+		end
+	end
+
+	return Radios
+end
+
+local function NotifyAllRadios(stationID, msgID, direct)
+	local Station = JMod.EZ_RADIO_STATIONS[stationID]
+
+	for _, v in ipairs(FindEZradios()) do
+		if v:GetState() > 0 and v:GetOutpostID() == stationID then
+			if msgID then
+				if direct then
+					v:Speak(msgID)
+				else
+					if v.BFFd then
+						v:Speak(NotifyAllMsgs["bff"][msgID])
+					else
+						v:Speak(NotifyAllMsgs["normal"][msgID])
+					end
+				end
+			end
+
+			v:SetState(Station.state)
+		end
+	end
+end
+
+local ModelTable={
+	[1]="models/props_debris/concrete_chunk03a.mdl",
+	[2]="models/props_debris/concrete_chunk04a.mdl",
+	[3]="models/props_debris/concrete_chunk02a.mdl",
+	[4]="models/props_debris/concrete_chunk05g.mdl",
+}
+local MaterialTable={
+	[MAT_CONCRETE]="models/props_debris/plasterwall021a",
+	[MAT_DIRT]="models/props_foliage/tree_deciduous_01a_trunk",
+	[MAT_SAND]="models/props_foliage/tree_deciduous_01a_trunk"
+}
+local function ThrowStuff(Pod, Position, GroundType)
+	if(GroundType==MAT_METAL)then return end
+	local ChunkMaterial="models/props_debris/plasterwall021a"
+	if(MaterialTable[GroundType])then
+		ChunkMaterial=MaterialTable[GroundType]
+	end
+	for i=0,15 do
+		local Chunk=ents.Create("prop_physics")
+		Chunk:SetModel(ModelTable[math.random(1,4)])
+		Chunk:SetPos(Position)
+		Chunk:SetMaterial(ChunkMaterial)
+		Chunk:Spawn()
+		Chunk:Activate()
+		Chunk:GetPhysicsObject():SetMass(75)
+		Chunk:GetPhysicsObject():SetVelocity(Vector(0,0,math.Rand(100,1000))+VectorRand()*math.Rand(100,1000))
+		SafeRemoveEntityDelayed(Chunk,math.Rand(10,20))
+	end
+end
+
+hook.Add("JMod_OnRadioDeliver", "JMODHL2_CANNISTER_DELIVER", function(station, dropPos)
+	local Radio = station.lastCaller
+	if not(IsValid(station.lastCaller) and station.lastCaller:GetClass() == "ent_aboot_gmod_ezcombineradio") then return nil end
+	local Delay = 4
+	local YawIncrement = 20
+	local PitchIncrement = 10
+	--
+	local Tr = util.TraceLine({start = dropPos, endpos = dropPos + Vector(0, 0, -9e9), mask = MASK_SOLID_BRUSHONLY, filter = {Radio}})
+	local aBaseAngle = Tr.HitNormal:Angle()
+	local aBasePos = Tr.HitPos + station.outpostDirection * 100
+	local bScanning = true
+	local iPitch = 10
+	local iYaw =- 180
+	local iLoopLimit = 0
+	local iProcessedTotal = 0
+	local tValidHits = {}
+	while((bScanning == true)and(iLoopLimit < 500))do
+		iYaw=iYaw+YawIncrement
+		iProcessedTotal=iProcessedTotal+1
+		if(iYaw>=180)then
+			iYaw=-180
+			iPitch=iPitch-PitchIncrement
+		end
+		local tLoop = util.QuickTrace(aBasePos,(aBaseAngle + Angle(iPitch, iYaw, 0)):Forward() * 40000)
+		if(tLoop.HitSky)then
+			table.insert(tValidHits, tLoop)
+		end
+		if(iPitch <= -80)then
+			bScanning = false
+		end
+		iLoopLimit = iLoopLimit + 1
+	end
+	local iHits = table.Count(tValidHits)
+	if (iHits > 0) then
+		local iRand = math.random(1, iHits)
+		local tRand = tValidHits[iRand]
+		
+		local DeliveryItems = JMod.Config.RadioSpecs.AvailablePackages[station.deliveryType].results
+		timer.Simple(.9, function()
+			local Pod = ents.Create("env_headcrabcanister")
+			Pod:SetPos(aBasePos)
+			local RandomAngy = (tRand.HitPos-tRand.StartPos):Angle()
+			Pod:SetAngles(RandomAngy)
+			Pod:SetKeyValue("HeadcrabType", 2)
+			Pod:SetKeyValue("HeadcrabCount", 0)
+			Pod:SetKeyValue("FlightSpeed", 7500)
+			Pod:SetKeyValue("FlightTime", 4)
+			Pod:SetKeyValue("Damage", 75)
+			Pod:SetKeyValue("DamageRadius", 300)
+			Pod:SetKeyValue("SmokeLifetime", 10)
+			Pod:SetKeyValue("StartingHeight", 1500)
+			Pod:SetKeyValue("spawnflags", 8192)
+			Pod:Spawn()
+			Pod:Input("FireCanister",ply,ply)
+			local Explode = ents.Create("env_explosion")
+			Explode:SetOwner(Pod)
+			Explode:SetPos(aBasePos)
+			Explode:SetKeyValue("iMagnitude", "10")
+			Explode:Spawn()
+			Explode:Activate()
+			Explode:Fire("Explode", "", Delay)
+			timer.Simple(Delay, function()
+				if(IsValid(Pod))then
+					util.ScreenShake(aBasePos, 5000, 99, 5, 500)
+				end
+			end)
+			timer.Simple(Delay, function()
+				if(IsValid(Pod))then
+					ThrowStuff(Pod, aBasePos, Tr.MatType)
+				end
+			end)
+			timer.Simple(Delay + 0.5, function()
+				local Box = ents.Create("ent_jack_aidbox")
+				Box:SetPos(aBasePos + RandomAngy:Forward() * 200)
+				Box.InitialVel = Vector(0, 0, 0)
+				Box.Contents = DeliveryItems
+				Box.NoFadeIn = true
+				Box:SetDTBool(0, false)
+				Box:Spawn()
+				Box:SetPackageName(station.deliveryType)
+			end)
+			---
+
+			NotifyAllRadios(stationID, "good drop")
+		end)
+	else
+		station.nextReadyTime = CurTime() + (math.random(4, 8) * JMod.Config.RadioSpecs.DeliveryTimeMult)
+		NotifyAllRadios(stationID, "drop failed")
+	end
+	return true
+end)
+
+hook.Add("JMod_RadioDelivery", "JMODHL2_SPEEDYDELIVER", function(ply, transceiver, pkg, DeliveryTime, Pos)
+	local station = JMod.EZ_RADIO_STATIONS[transceiver:GetOutpostID()]
+	if not(IsValid(station.lastCaller) and station.lastCaller:GetClass() == "ent_aboot_gmod_ezcombineradio") then return nil end
+	return 5, Pos
+end)
