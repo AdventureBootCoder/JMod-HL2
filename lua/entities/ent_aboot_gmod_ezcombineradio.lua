@@ -258,6 +258,8 @@ hook.Add("JMod_OnRadioDeliver", "JMODHL2_CANNISTER_DELIVER", function(station, d
 			Pod:SetKeyValue("SmokeLifetime", 10)
 			Pod:SetKeyValue("StartingHeight", 1500)
 			Pod:SetKeyValue("spawnflags", 8192)
+			--Pod:SetKeyValue("spawnflags", 16384)
+			--Pod:SetKeyValue("spawnflags", 262144)
 			Pod:Spawn()
 			Pod:Input("FireCanister",ply,ply)
 			local Explode = ents.Create("env_explosion")
@@ -301,5 +303,5 @@ end)
 hook.Add("JMod_RadioDelivery", "JMODHL2_SPEEDYDELIVER", function(ply, transceiver, pkg, DeliveryTime, Pos)
 	local station = JMod.EZ_RADIO_STATIONS[transceiver:GetOutpostID()]
 	if not(IsValid(station.lastCaller) and station.lastCaller:GetClass() == "ent_aboot_gmod_ezcombineradio") then return nil end
-	return 5, Pos
+	return (DeliveryTime * .5), ply:GetEyeTrace().HitPos
 end)

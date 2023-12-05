@@ -41,7 +41,7 @@ end
 
 local FireCombineBall = function(ply, num)
 	if not SERVER then return end
-	ply:RemoveAmmo(1, "AR2AltFire")
+	--ply:RemoveAmmo(1, "AR2AltFire")
 	local cballspawner = ents.Create("point_combine_ball_launcher")
 	cballspawner:SetAngles(ply:GetAimVector():Angle())
 	cballspawner:SetPos(ply:GetShootPos() + ply:GetAimVector() * 30)
@@ -85,17 +85,20 @@ att.UBGL_Fire = function(wep, ubgl)
     if Ammo(wep) <= 0 then return end
 
     wep:SetNextSecondaryFire(CurTime() + 2)
-    local reserve = Ammo(wep)
+	timer.Simple(1, function()
+		if not IsValid(wep) then return end
+		local reserve = Ammo(wep)
 
-    reserve = reserve + wep:Clip2()
+		reserve = reserve + wep:Clip2()
 
-    local clip = 1
+		local clip = 1
 
-    local load = math.Clamp(clip, 0, reserve)
+		local load = math.Clamp(clip, 0, reserve)
 
-    wep.Owner:SetAmmo(reserve - load, "AR2AltFire")
-	
-    wep:SetClip2(load)
+		wep.Owner:SetAmmo(reserve - load, "AR2AltFire")
+		
+		wep:SetClip2(load)
+	end)
 end
 
 att.UBGL_Reload = function(wep, ubgl)

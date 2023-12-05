@@ -34,7 +34,7 @@ att.UBGL_RPM = 60
 att.UBGL_Recoil = 1
 att.UBGL_Capacity = 1
 
-local function Ammo(wep)
+local function GetSecAmmo(wep)
     return wep.Owner:GetAmmoCount("smg1_grenade")
 end
 
@@ -44,52 +44,27 @@ att.UBGL_Fire = function(wep, ubgl)
         return wep:EmitSound("weapons/arccw/dryfire.wav", 100)
     end
 	
-    wep.Owner:RemoveAmmo(1, "smg1_grenade")
-	
     wep:PlayAnimation("gl_fire")
 	wep:EmitSound("TFA_MMOD.SMG1.2")
     wep:FireRocket("arccw_aboot_smggrenade", 2000)
-
-    wep:SetClip2(wep:Clip2() - 1)
+	--wep:SetNextSecondaryFire(CurTime() + 2)
+	wep:SetClip2(wep:Clip2() - 1)
 
     wep:DoEffects()
 	
-    if wep:Clip2() >= 1 then return end
-
-    if Ammo(wep) <= 0 then return end
-
-    wep:SetNextSecondaryFire(CurTime() + 2)
-    local reserve = Ammo(wep)
-
-    reserve = reserve + wep:Clip2()
-
-    local clip = 1
-
-    local load = math.Clamp(clip, 0, reserve)
-
-    wep.Owner:SetAmmo(reserve - load, "20mm Grenade")
-	
-    wep:SetClip2(load)
-
+	timer.Simple(1, function()
+		wep:Reload()
+	end)
 end
 
 att.UBGL_Reload = function(wep, ubgl)
-    if wep:Clip2() >= 1 then return end
+	if wep:Clip2() >= 1 then return end
 
-    if Ammo(wep) <= 0 then return end
+	if GetSecAmmo(wep) <= 0 then return end
 
-    wep:SetNextSecondaryFire(CurTime() + 0.2)
-	wep:EmitSound("weapons/arccw/dryfire.wav", 100)
-	wep:PlayAnimation("gl_fire", 0.1)
-    local reserve = Ammo(wep)
-
-    reserve = reserve + wep:Clip2()
-
-    local clip = 1
-
-    local load = math.Clamp(clip, 0, reserve)
-
-    wep.Owner:SetAmmo(reserve - load, "20mm Grenade")
-	
-    wep:SetClip2(load)
+	wep:SetNextSecondaryFire(CurTime() + 0.2)
+	--wep:EmitSound("weapons/arccw/dryfire.wav", 100)
+	--wep:PlayAnimation("gl_fire", 0.2)
+	wep.Owner:RemoveAmmo(1, "smg1_grenade")
+	wep:SetClip2(1)
 end
