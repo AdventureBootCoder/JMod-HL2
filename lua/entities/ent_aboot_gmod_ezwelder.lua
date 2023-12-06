@@ -45,9 +45,10 @@ if SERVER then
 		self:SetUseType(SIMPLE_USE)
 
 		---
+		local Phys = self:GetPhysicsObject()
 		timer.Simple(.01, function()
-			self:GetPhysicsObject():SetMass(50)
-			self:GetPhysicsObject():Wake()
+			Phys:SetMass(50)
+			Phys:Wake()
 		end)
 		self.MaxElectricity = 100
 		self.MaxGas = 100
