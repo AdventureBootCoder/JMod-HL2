@@ -5,7 +5,7 @@ ENT.Author = "Jackarunda"
 ENT.Information = "glhfggwpezpznore"
 ENT.PrintName = "EZ Ground-Pounder"
 ENT.Category = "JMod - EZ HL:2"
-ENT.Spawnable = true
+ENT.Spawnable = false
 ENT.AdminOnly = false
 ENT.Base = "ent_jack_gmod_ezmachine_base"
 ---
@@ -30,7 +30,7 @@ local STATE_BROKEN, STATE_OFF, STATE_RUNNING = -1, 0, 1
 function ENT:CustomSetupDataTables()
 	self:NetworkVar("Float", 1, "Progress")
 	self:NetworkVar("Float", 2, "SlamDist")
-	self:NetworkVar("String", 0, "ResourceType")
+	self:NetworkVar("String", 0, "Message")
 end
 
 if(SERVER)then
@@ -65,7 +65,6 @@ if(SERVER)then
 	function ENT:TurnOff()
 		if (self:GetState() <= 0) then return end
 		self:SetState(STATE_OFF)
-		self:ProduceResource()
 
 		if self.SoundLoop then
 			self.SoundLoop:Stop()
@@ -85,18 +84,7 @@ if(SERVER)then
 		elseif State == STATE_OFF then
 			self:TurnOn(activator)
 		elseif State == STATE_RUNNING then
-			if alt then
-				self:ProduceResource()
-
-				return
-			end
 			self:TurnOff()
-		end
-	end
-
-	function ENT:ResourceLoaded(typ, accepted)
-		if typ == JMod.EZ_RESOURCE_TYPES.POWER and accepted >= 1 then
-			self:TurnOn(self.EZowner)
 		end
 	end
 	
@@ -112,7 +100,7 @@ if(SERVER)then
 		self:UpdateWireOutputs()
 
 		if (self.NextResourceThinkTime < Time) then
-			self.NextResourceThinkTime = Time + .2
+			self.NextResourceThinkTime = Time + .1
 			if State == STATE_BROKEN then
 				if self.SoundLoop then self.SoundLoop:Stop() end
 
@@ -123,115 +111,68 @@ if(SERVER)then
 				return
 			elseif State == STATE_RUNNING then
 
-				local PoundDir = Right * -50
-				local PoundStrgth = 400
+				local PoundDir = Right * -30
+				local CutDir = Up
+				local CutStrength = 10
 
 				local PoundTr = util.TraceHull({
-					start = SelfPos + PoundDir * .2,
+					start = SelfPos + PoundDir * .95,
 					endpos = SelfPos + PoundDir,
-					maxs = Vector(4, 4, 4),
-					mins = Vector(-4, -4, -4),
+					maxs = Vector(5, 5, 5),
+					mins = Vector(-5, -5, -5),
 					filter = self,
 					mask = MASK_SOLID,
 					ignoreworld = false
 				})
-				debugoverlay.Line(SelfPos + PoundDir * .2, PoundTr.HitPos, 1, Color(255, 0, 0), true)
+				local HitPos = PoundTr.HitPos
+				debugoverlay.Line(SelfPos + PoundDir * .2, HitPos, 1, Color(255, 0, 0), true)
 				
 				if (PoundTr.Hit) then
 					local Ent = PoundTr.Entity
 					if IsValid(Ent) then
 						local Dmg = DamageInfo()
-						Dmg:SetDamagePosition(PoundTr.HitPos)
-						Dmg:SetDamageForce(PoundDir * PoundStrgth)
-						Dmg:SetDamage(30)
-						Dmg:SetDamageType(DMG_CRUSH)
+						Dmg:SetDamagePosition(HitPos)
+						Dmg:SetDamageForce(PoundDir * CutStrength)
+						Dmg:SetDamage(5)
+						Dmg:SetDamageType(DMG_SLASH)
 						Dmg:SetInflictor(Ent)
 						Dmg:SetAttacker(JMod.GetEZowner(self))
 						Ent:TakeDamageInfo(Dmg)
 						if Ent:IsPlayer() then
-							Ent:SetVelocity(PoundDir * PoundStrgth / 10)
+							Ent:SetVelocity(PoundDir * CutStrength / 10)
 						else
-							Ent:GetPhysicsObject():ApplyForceOffset(PoundDir * PoundStrgth, PoundTr.HitPos)
+							Ent:GetPhysicsObject():ApplyForceOffset(PoundDir * CutStrength, HitPos + CutDir * CutStrength)
 						end
 					end
-					self:GetPhysicsObject():ApplyForceOffset(PoundDir * -PoundStrgth, PoundTr.HitPos)
+					self:GetPhysicsObject():ApplyForceOffset(PoundDir * -CutStrength, HitPos + CutDir * CutStrength)
 
-					self:EmitSound("Boulder.ImpactHard")
+					self:EmitSound(util.GetSurfaceData(PoundTr.SurfaceProps).impactSoftSound)
+					self:HitEffect(HitPos, 1)
 
-					if (math.random(1, 10) == 1) then
-						util.Decal("EZgroundHole", SelfPos, SelfPos + PoundDir * 2)
+					local Message = JMod.EZprogressTask(Ent, HitPos, self, "salvage", 0.01)
+					if not(Message) then
+						sound.Play("snds_jack_gmod/ez_dismantling/" .. math.random(1, 10) .. ".wav", HitPos, 65, math.random(90, 110))
 					end
-
-					JMod.EmitAIsound(self:GetPos(), 300, .5, 256)
-
-					--[[if not JMod.NaturalResourceTable[self.DepositKey] then
-						--self:SetResourceType("")
-						self.DepositKey = JMod.GetDepositAtPos(self, SelfPos)
-					else
-						-- This is just the rate at which we drill
-						local drillRate = 0.1 * JMod.Config.ResourceEconomy.ExtractionSpeed
-						local amtLeft = JMod.NaturalResourceTable[self.DepositKey].amt
-
-						self:SetProgress(self:GetProgress() + drillRate)
-
-						if self:GetProgress() >= 100 then
-							local amtToDrill = math.min(JMod.NaturalResourceTable[self.DepositKey].amt, 100)
-							self:ProduceResource()
-							JMod.DepleteNaturalResource(self.DepositKey, amtToDrill)
-						end
-					end--]]
-					if math.random(1, 100) == 1 then
-						self.DepositKey = JMod.GetDepositAtPos(self, SelfPos)
-						if JMod.NaturalResourceTable[self.DepositKey] then
-							local amtToDrill = math.min(JMod.NaturalResourceTable[self.DepositKey].amt, math.random(5, 10))
-							self:SetProgress(amtToDrill)
-							self:ProduceResource()
-							JMod.DepleteNaturalResource(self.DepositKey, amtToDrill)
-						end
-					end
+					self:SetMessage("")
 				end
 				self:SetSlamDist(50 * PoundTr.Fraction)
-				self:ConsumeElectricity(0.2  * JMod.Config.ResourceEconomy.ExtractionSpeed)
+				--self:ConsumeElectricity(0.2  * JMod.Config.ResourceEconomy.ExtractionSpeed)
 			end
 		end
-
-		--[[
-		if (self.NextOSHAthinkTime < Time) and (State == STATE_RUNNING) then
-			self.NextOSHAthinkTime = Time + .1
-			if math.random(0, 100) == 1 then
-				local Rock = ents.Create("prop_physics")
-				Rock:SetModel("models/props_junk/rock001a.mdl")
-				Rock:SetPos(SelfPos + Up * -90 * HullTr.Fraction)
-				Rock:Spawn()
-				Rock:Activate()
-
-				timer.Simple(0, function()
-					if IsValid(Rock) and IsValid(Rock:GetPhysicsObject()) then 
-						Rock:GetPhysicsObject():ApplyForceCenter(Vector(0, 0, 1200) + VectorRand() * 10000)-- Yeet
-					end
-				end)
-				timer.Simple(5, function() 
-					if IsValid(Rock) then
-						SafeRemoveEntity(Rock)
-					end
-				end)
-			end
-		end--]]
 
 		self:NextThink(CurTime() + .1)
 		return true
 	end
-	
-	function ENT:ProduceResource()
-		local SelfPos, Forward, Up, Right, Typ = self:GetPos(), self:GetForward(), self:GetUp(), self:GetRight(), self:GetResourceType()
-		local amt = math.Clamp(math.floor(self:GetProgress()), 0, 100)
 
-		if amt <= 0 then return end
-
-		local pos = SelfPos
-		local spawnVec = self:WorldToLocal(SelfPos + Forward * 45)
-		JMod.MachineSpawnResource(self, self:GetResourceType(), amt, spawnVec, Angle(0, 0, -90), Forward * 15, true, 200)
-		self:SetProgress(self:GetProgress() - amt)
+	function ENT:HitEffect(pos, scale)
+		scale = scale or 1
+		local effectdata = EffectData()
+		effectdata:SetOrigin(pos + VectorRand())
+		effectdata:SetNormal((VectorRand() + Vector(0, 0, 1)):GetNormalized())
+		effectdata:SetMagnitude(math.Rand(1, 2) * scale) --amount and shoot hardness
+		effectdata:SetScale(math.Rand(.5, 1.5) * scale) --length of strands
+		effectdata:SetRadius(math.Rand(2, 4) * scale) --thickness of strands
+		util.Effect("Sparks", effectdata, true, true)
 	end
 
 	function ENT:PostEntityPaste(ply, ent, createdEntities)
@@ -244,36 +185,36 @@ if(SERVER)then
 	end
 
 elseif(CLIENT)then
-
 	function ENT:CustomInit()
-		self.DrillPipe = JMod.MakeModel(self, "models/props_pipes/pipe03_straight01_long.mdl")
-		self.DrillPipeEnd = JMod.MakeModel(self, "models/props_c17/playgroundTick-tack-toe_block01a.mdl")
+		self.SawBlade = JMod.MakeModel(self, "models/props_junk/sawblade001a.mdl")
 		self.PowerBox = JMod.MakeModel(self, "models/props_lab/powerbox02b.mdl")
 		self.DrillMat = Material("mechanics/metal2")
-		self.CurDepth = 0
+		self.CurSpin = 0
+		self.MaxElectricity = 200
 	end
-
-	local MiningLazCol = Color(255, 0, 0)
 
 	function ENT:Draw()
 		--
 		--self:DrawModel()
 		--
-		local Up, Right, Forward, Typ, State, FT = self:GetUp(), self:GetRight(), self:GetForward(), self:GetResourceType(), self:GetState(), FrameTime()
+		local Up, Right, Forward, Message, State, FT = self:GetUp(), self:GetRight(), self:GetForward(), self:GetMessage(), self:GetState(), FrameTime()
 		local SelfPos, SelfAng = self:GetPos(), self:GetAngles()
 		local BoxPos = SelfPos + Right * 5 + Forward * 1
-		local PipePos = BoxPos + Right * (-self.CurDepth) + Forward * 4
-		local PounderPos = PipePos + Right * -22 - Forward * 4
+		local SawPos = BoxPos + Right * -28 + Forward * -1
 		--
 		--jprint(self:GetSlamDist())
 		if State == STATE_RUNNING then
-			local SlamDist = (math.sin(CurTime() * 30) / 2 + .5) * (self:GetSlamDist() / 2)
-			self.CurDepth = Lerp(math.ease.InOutExpo(6), self.CurDepth, SlamDist)
+			self.CurSpin = self.CurSpin + FT * 600
+			if self.CurSpin > 360 then
+				self.CurSpin = 0
+			elseif self.CurSpin < 0 then
+				self.CurSpin = 360
+			end
 		end
 		--
 		local PowerBoxAng = SelfAng:GetCopy()
 		PowerBoxAng:RotateAroundAxis(Forward, 90)
-		JMod.RenderModel(self.PowerBox, BoxPos, PowerBoxAng, Vector(2, 2.5, 1.5), nil, self.DrillMat)
+		JMod.RenderModel(self.PowerBox, BoxPos, PowerBoxAng, Vector(2, 2.5, 2.2), nil, self.DrillMat)
 		--
 
 		local Obscured = util.TraceLine({start = EyePos(), endpos = MotorPos, filter = {LocalPlayer(), self}, mask = MASK_OPAQUE}).Hit
@@ -286,14 +227,10 @@ elseif(CLIENT)then
 		end -- look incomplete to indicate damage, save on gpu comp too
 
 		if DrillDraw then
-			local PipeAng = SelfAng:GetCopy()
-			PipeAng:RotateAroundAxis(Right, 90)
-			--PipeAng:RotateAroundAxis(Up, 180)
-			JMod.RenderModel(self.DrillPipe, PipePos, PipeAng, Vector(.5, .4, .5), nil, self.DrillMat)
-			local PounderAng = SelfAng:GetCopy()
-			PounderAng:RotateAroundAxis(Right, 90)
-			PounderAng:RotateAroundAxis(Up, 90)
-			JMod.RenderModel(self.DrillPipeEnd, PounderPos, PounderAng, Vector(.8, .8, .8), nil, self.DrillMat)
+			local SawAng = SelfAng:GetCopy()
+			SawAng:RotateAroundAxis(Right, 90)
+			SawAng:RotateAroundAxis(Forward, self.CurSpin)
+			JMod.RenderModel(self.SawBlade, SawPos, SawAng, Vector(.8, .8, .8), nil, self.DrillMat)
 		end
 
 		if (not(DetailDraw)) and (Obscured) then return end -- if player is far and sentry is obscured, draw nothing
@@ -306,10 +243,11 @@ elseif(CLIENT)then
 				DisplayAng:RotateAroundAxis(DisplayAng:Right(), -90)
 				local Opacity = math.random(50, 150)
 				cam.Start3D2D(SelfPos + Forward * 13 + Up * -37 + Right * 9, DisplayAng, .15)
-					draw.SimpleTextOutlined("POWER","JMod-Display",250,-60,Color(255,255,255,Opacity),TEXT_ALIGN_CENTER,TEXT_ALIGN_TOP,3,Color(0,0,0,Opacity))
-					local ElecFrac=self:GetElectricity()/200
+					draw.SimpleTextOutlined("POWER", "JMod-Display",250,-60,Color(255,255,255,Opacity),TEXT_ALIGN_CENTER,TEXT_ALIGN_TOP,3,Color(0,0,0,Opacity))
+					local ElecFrac=self:GetElectricity()/self.MaxElectricity
 					local R,G,B = JMod.GoodBadColor(ElecFrac)
 					draw.SimpleTextOutlined(tostring(math.Round(ElecFrac*100)).."%","JMod-Display",250,-30,Color(R,G,B,Opacity),TEXT_ALIGN_CENTER,TEXT_ALIGN_TOP,3,Color(0,0,0,Opacity))
+					draw.SimpleTextOutlined(Message, "JMod-Display",250,0,Color(255,255,255,Opacity),TEXT_ALIGN_CENTER,TEXT_ALIGN_TOP,3,Color(0,0,0,Opacity))
 				cam.End3D2D()
 			end
 		end
