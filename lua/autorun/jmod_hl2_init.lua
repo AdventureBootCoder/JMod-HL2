@@ -272,7 +272,9 @@ if(SERVER)then
 		cballspawner:Fire("kill","",1)
 	end, nil, "Debug testing command")
 
-elseif CLIENT then 
+elseif CLIENT then
+
+	list.Set( "ContentCategoryIcons", "JMod - EZ HL:2", "jmod_icon_hl2.png" )
 
 	local simpleWeaponSelect = CreateConVar("aboot_simple_weapon_select", "1", FCVAR_ARCHIVE, "Enables a vey crude weapon select stand in for when you don't have an HEV suit. It's recomended you get a better one.")
 
