@@ -1,50 +1,3 @@
-local NotifyAllMsgs = {
-	["normal"] = {
-		["good drop"] = "good drop, package away, returning to base",
-		["drop failed"] = "drop failed, pilot could not locate a good drop position for the reported coordinates. Aircraft is RTB",
-		["drop soon"] = "be advised, aircraft on site, drop imminent",
-		["ready"] = "attention, this outpost is now ready to carry out delivery missions"
-	},
-	["bff"] = {
-		["good drop"] = "AIGHT we dropped it, watch out yo",
-		["drop failed"] = "yo WHERE THE DROP SITE AT THO soz i gotta get back to base",
-		["drop soon"] = "ay dudes watch yo head we abouta drop the box",
-		["ready"] = "aight we GOOD TO GO out here jus tell us whatchya need anytime"
-	}
-}
-
-local function FindEZradios() 
-	local Radios = {}
-	for _, v in ipairs(ents.GetAll()) do
-		if v.EZradio == true then
-			table.insert(Radios, v)
-		end
-	end
-
-	return Radios
-end
-
-local function NotifyAllRadios(stationID, msgID, direct)
-	local Station = JMod.EZ_RADIO_STATIONS[stationID]
-
-	for _, v in ipairs(FindEZradios()) do
-		if v:GetState() > 0 and v:GetOutpostID() == stationID then
-			if msgID then
-				if direct then
-					v:Speak(msgID)
-				else
-					if v.BFFd then
-						v:Speak(NotifyAllMsgs["bff"][msgID])
-					else
-						v:Speak(NotifyAllMsgs["normal"][msgID])
-					end
-				end
-			end
-
-			v:SetState(Station.state)
-		end
-	end
-end
 
 local ModelTable={
 	[1]="models/props_debris/concrete_chunk03a.mdl",
@@ -210,7 +163,7 @@ hook.Add("JMod_OnRadioDeliver", "JMODHL2_CANNISTER_DELIVER", function(station, d
 			Pod:SetKeyValue("StartingHeight", 1500)
 			Pod:SetKeyValue("spawnflags", 8192)
 			Pod:SetKeyValue("spawnflags", 16384)
-			--Pod:SetKeyValue("spawnflags", 262144)
+			Pod:SetKeyValue("spawnflags", 262144)
 			Pod:Spawn()
 			Pod:Input("FireCanister",ply,ply)
 			local Explode = ents.Create("env_explosion")
@@ -229,53 +182,20 @@ hook.Add("JMod_OnRadioDeliver", "JMODHL2_CANNISTER_DELIVER", function(station, d
 				if(IsValid(Pod))then
 					ThrowStuff(Pod, aBasePos, Tr.MatType)
 				end
-			end)
-			local CallBackToRemove
-			--[[local function OpenOnCollide(ent, data)
-				if data.Speed <= 25 then jprint(data.Speed) return end
-				local HitEnt = data.HitEntity
-				if not(IsValid(HitEnt) and HitEnt:IsPlayer()) then return end
-				ent:Input("OpenCanister", ply, ply)
-				ent:RemoveCallback("PhysicsCollide", CallBackToRemove)
-				timer.Simple(1, function()
-					SpawnContents(DeliveryItems, aBasePos + RandomAngy:Forward() * 150, game.GetWorld())
-				end)
-				timer.Simple(5, function() 
-					if not IsValid(ent) then return end
-					constraint.RemoveAll(ent)
-					ent:SetNotSolid(true)
-					ent:DrawShadow(false)
-					ent:GetPhysicsObject():EnableCollisions(false)
-					ent:GetPhysicsObject():EnableGravity(false)
-					for i = 1, 50 do
-						timer.Simple(.1 * i, function()
-							if i == 50 then
-								SafeRemoveEntity(ent)
-	
-								return
-							end
-							if IsValid(ent) then
-								ent:SetPos(ent:GetPos() + Vector(0, 0, -5))
-							end
-						end)
-					end
-				end)
-			end-]]
-			timer.Simple(Delay + 2, function()
-				--CallBackToRemove = Pod:AddCallback("PhysicsCollide", OpenOnCollide) -- Add Callback
-				Pod:SetTrigger(true)
-				Pod:UseTriggerBounds(true, 1)
-				Pod.StartTouch = function(self, ent)
-					jprint(self, ent)
-				end
+				local Spod = ents.Create("ent_aboot_cannister")
+				Spod:SetPos(aBasePos)
+				Spod:SetAngles(RandomAngy)
+				Spod.Contents = DeliveryItems
+				Spod:Spawn()
+				Spod:SetPackageName(station.deliveryType)
 			end)
 			---
 
-			NotifyAllRadios(stationID, "good drop")
+			JMod.NotifyAllRadios(stationID, "good drop")
 		end)
 	else
 		station.nextReadyTime = CurTime() + (math.random(4, 8) * JMod.Config.RadioSpecs.DeliveryTimeMult)
-		NotifyAllRadios(stationID, "drop failed")
+		JMod.NotifyAllRadios(stationID, "drop failed")
 	end
 	return true
 end)
