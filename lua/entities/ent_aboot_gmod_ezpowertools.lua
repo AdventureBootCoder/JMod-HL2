@@ -3,9 +3,9 @@ AddCSLuaFile()
 ENT.Type = "anim"
 ENT.Author = "Jackarunda"
 ENT.Information = "glhfggwpezpznore"
-ENT.PrintName = "EZ Ground-Pounder"
+ENT.PrintName = "EZ Grinder"
 ENT.Category = "JMod - EZ HL:2"
-ENT.Spawnable = false
+ENT.Spawnable = true
 ENT.AdminOnly = false
 ENT.Base = "ent_jack_gmod_ezmachine_base"
 ---
@@ -29,7 +29,6 @@ local STATE_BROKEN, STATE_OFF, STATE_RUNNING = -1, 0, 1
 ---
 function ENT:CustomSetupDataTables()
 	self:NetworkVar("Float", 1, "Progress")
-	self:NetworkVar("Float", 2, "SlamDist")
 	self:NetworkVar("String", 0, "Message")
 end
 
@@ -113,7 +112,7 @@ if(SERVER)then
 
 				local PoundDir = Right * -30
 				local CutDir = Up
-				local CutStrength = 10
+				local CutStrength = 100
 
 				local PoundTr = util.TraceHull({
 					start = SelfPos + PoundDir * .95,
@@ -133,30 +132,30 @@ if(SERVER)then
 						local Dmg = DamageInfo()
 						Dmg:SetDamagePosition(HitPos)
 						Dmg:SetDamageForce(PoundDir * CutStrength)
-						Dmg:SetDamage(5)
+						Dmg:SetDamage(3)
 						Dmg:SetDamageType(DMG_SLASH)
 						Dmg:SetInflictor(Ent)
 						Dmg:SetAttacker(JMod.GetEZowner(self))
 						Ent:TakeDamageInfo(Dmg)
 						if Ent:IsPlayer() then
 							Ent:SetVelocity(PoundDir * CutStrength / 10)
-						else
-							Ent:GetPhysicsObject():ApplyForceOffset(PoundDir * CutStrength, HitPos + CutDir * CutStrength)
+						elseif IsValid(Ent:GetPhysicsObject()) then
+							Ent:GetPhysicsObject():ApplyForceOffset(PoundDir * -CutStrength, HitPos + CutDir * CutStrength)
 						end
 					end
-					self:GetPhysicsObject():ApplyForceOffset(PoundDir * -CutStrength, HitPos + CutDir * CutStrength)
+					self:GetPhysicsObject():ApplyForceOffset(PoundDir * CutStrength, HitPos + CutDir * CutStrength)
 
 					self:EmitSound(util.GetSurfaceData(PoundTr.SurfaceProps).impactSoftSound)
 					self:HitEffect(HitPos, 1)
 
 					local Message = JMod.EZprogressTask(Ent, HitPos, self, "salvage", 0.01)
 					if not(Message) then
-						sound.Play("snds_jack_gmod/ez_dismantling/" .. math.random(1, 10) .. ".wav", HitPos, 65, math.random(90, 110))
+						sound.Play("snds_jack_gmod/ez_dismantling/1.wav", HitPos, 65, 110)--math.random(90, 110))
 					end
 					self:SetMessage("")
+					self:ConsumeElectricity(0.05  * JMod.Config.ResourceEconomy.ExtractionSpeed)
 				end
-				self:SetSlamDist(50 * PoundTr.Fraction)
-				--self:ConsumeElectricity(0.2  * JMod.Config.ResourceEconomy.ExtractionSpeed)
+				self:ConsumeElectricity(0.05  * JMod.Config.ResourceEconomy.ExtractionSpeed)
 			end
 		end
 
@@ -202,9 +201,8 @@ elseif(CLIENT)then
 		local BoxPos = SelfPos + Right * 5 + Forward * 1
 		local SawPos = BoxPos + Right * -28 + Forward * -1
 		--
-		--jprint(self:GetSlamDist())
 		if State == STATE_RUNNING then
-			self.CurSpin = self.CurSpin + FT * 600
+			self.CurSpin = self.CurSpin + FT * 10000
 			if self.CurSpin > 360 then
 				self.CurSpin = 0
 			elseif self.CurSpin < 0 then
@@ -214,7 +212,7 @@ elseif(CLIENT)then
 		--
 		local PowerBoxAng = SelfAng:GetCopy()
 		PowerBoxAng:RotateAroundAxis(Forward, 90)
-		JMod.RenderModel(self.PowerBox, BoxPos, PowerBoxAng, Vector(2, 2.5, 2.2), nil, self.DrillMat)
+		JMod.RenderModel(self.PowerBox, BoxPos, PowerBoxAng, Vector(2, 2.5, 2.2), nil)
 		--
 
 		local Obscured = util.TraceLine({start = EyePos(), endpos = MotorPos, filter = {LocalPlayer(), self}, mask = MASK_OPAQUE}).Hit
@@ -230,7 +228,7 @@ elseif(CLIENT)then
 			local SawAng = SelfAng:GetCopy()
 			SawAng:RotateAroundAxis(Right, 90)
 			SawAng:RotateAroundAxis(Forward, self.CurSpin)
-			JMod.RenderModel(self.SawBlade, SawPos, SawAng, Vector(.8, .8, .8), nil, self.DrillMat)
+			JMod.RenderModel(self.SawBlade, SawPos, SawAng, Vector(.8, .8, .8), nil)
 		end
 
 		if (not(DetailDraw)) and (Obscured) then return end -- if player is far and sentry is obscured, draw nothing
