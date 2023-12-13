@@ -87,7 +87,7 @@ function ENT:DoDetonation()
 	local attacker = IsValid(self:GetOwner()) and self:GetOwner() or self
 	local SelfPos = self:GetPos()
 	if self.EZfragment then
-		JMod.FragSplosion(self, SelfPos, 2000, 30, 2000, attacker, self:GetVelocity():GetNormalized(), .01)
+		JMod.FragSplosion(self, SelfPos, 500, 30, 2000, attacker, self:GetVelocity():GetNormalized(), .01)
 	end
 	util.BlastDamage(self, attacker, self:GetPos(), self.GrenadeRadius, self.GrenadeDamage or self.Damage or 0)
 	JMod.BlastDoors(attacker, SelfPos,  self.GrenadeDamage or self.Damage or 0, self.GrenadeRadius, false)
@@ -112,17 +112,13 @@ function ENT:Detonate()
     if self.ExplosionEffect then
         local effectdata = EffectData()
         effectdata:SetOrigin(self:GetPos())
+		effectdata:SetNormal(self:GetVelocity():GetNormalized())
 
         if self:WaterLevel() >= 1 then
             util.Effect("WaterSurfaceExplosion", effectdata)
             self:EmitSound("WaterExplosionEffect.Sound")
         else
-            -- util.Effect("Explosion", effectdata)
-
-            -- explosion_HE_m79_fas2
-            -- explosion_he_grenade_fas2
-            -- explosion_HE_claymore_fas2
-            -- explosion_grenade_fas2
+            --util.Effect("Explosion", effectdata)
 
             self:EmitSound("BaseExplosionEffect.Sound")
             ParticleEffect("hl2mmod_explosion_grenade", self:GetPos(), Angle(-90, 0, 0))

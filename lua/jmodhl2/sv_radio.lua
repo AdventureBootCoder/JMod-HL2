@@ -29,87 +29,6 @@ local function ThrowStuff(Pod, Position, GroundType)
 	end
 end
 
-local function SpawnItem(itemClass, pos, owner, resourceAmt)
-	local ItemNameParts = string.Explode(" ", itemClass)
-
-	if ItemNameParts and ItemNameParts[1] == "FUNC" then
-		if ItemNameParts[2] and JMod.LuaConfig.BuildFuncs[ItemNameParts[2]] then
-			JMod.LuaConfig.BuildFuncs[ItemNameParts[2]](owner, pos + Vector(0, 0, 5), Angle(0, 0, 0))
-		end
-	else
-		local Yay = ents.Create(itemClass)
-		Yay:SetPos(pos + VectorRand() * math.Rand(0, 30))
-		Yay:SetAngles(VectorRand():Angle())
-		Yay:Spawn()
-		Yay:Activate()
-
-		if resourceAmt then
-			Yay:SetResource(resourceAmt)
-		end
-
-		if IsValid(Yay) then
-			JMod.SetEZowner(Yay, owner)
-
-			-- this arrests overlap-ejection velocity so items don't thwack players
-			timer.Simple(.025, function()
-				if IsValid(Yay) then
-					Yay:GetPhysicsObject():SetVelocity(Vector(0, 0, 0))
-				end
-			end)
-
-			timer.Simple(.05, function()
-				if IsValid(Yay) then
-					Yay:GetPhysicsObject():SetVelocity(Vector(0, 0, 0))
-				end
-			end)
-
-			timer.Simple(.1, function()
-				if IsValid(Yay) then
-					Yay:GetPhysicsObject():SetVelocity(Vector(0, 0, 0))
-				end
-			end)
-		end
-	end
-end
-
-local function SpawnContents(contents, pos, owner)
-	local typ = type(contents)
-
-	if typ == "string" then
-		SpawnItem(contents, pos, owner)
-
-		return
-	end
-
-	if typ == "table" then
-		for k, v in pairs(contents) do
-			typ = type(v)
-
-			if typ == "string" then
-				SpawnItem(v, pos, owner)
-			elseif typ == "table" then
-				-- special case, this is a randomized table
-				if v[1] == "RAND" then
-					local Amt = v[#v]
-					local Items = {}
-
-					for i = 2, #v - 1 do
-						table.insert(Items, v[i])
-					end
-
-					for i = 1, Amt do
-						SpawnItem(table.Random(Items), pos, owner)
-					end
-				else -- the only other supported table contains a count as [2] and potentially a resourceAmt as [3]
-					for i = 1, v[2] or 1 do
-						SpawnItem(v[1], pos, owner, v[3] or nil)
-					end
-				end
-			end
-		end
-	end
-end
-
 hook.Add("JMod_OnRadioDeliver", "JMODHL2_CANNISTER_DELIVER", function(station, dropPos)
 	local Radio = station.lastCaller
 	if not(IsValid(station.lastCaller) and station.lastCaller:GetClass() == "ent_aboot_gmod_ezcombineradio") then return nil end
@@ -176,10 +95,6 @@ hook.Add("JMod_OnRadioDeliver", "JMODHL2_CANNISTER_DELIVER", function(station, d
 			timer.Simple(Delay, function()
 				if(IsValid(Pod))then
 					util.ScreenShake(aBasePos, 5000, 99, 5, 500)
-				end
-			end)
-			timer.Simple(Delay, function()
-				if(IsValid(Pod))then
 					ThrowStuff(Pod, aBasePos, Tr.MatType)
 				end
 				local Spod = ents.Create("ent_aboot_cannister")
@@ -190,9 +105,8 @@ hook.Add("JMod_OnRadioDeliver", "JMODHL2_CANNISTER_DELIVER", function(station, d
 				Spod:SetPackageName(station.deliveryType)
 			end)
 			---
-
-			JMod.NotifyAllRadios(stationID, "good drop")
 		end)
+		JMod.NotifyAllRadios(stationID, "good drop")
 	else
 		station.nextReadyTime = CurTime() + (math.random(4, 8) * JMod.Config.RadioSpecs.DeliveryTimeMult)
 		JMod.NotifyAllRadios(stationID, "drop failed")
@@ -203,5 +117,5 @@ end)
 hook.Add("JMod_RadioDelivery", "JMODHL2_SPEEDYDELIVER", function(ply, transceiver, pkg, DeliveryTime, Pos)
 	local station = JMod.EZ_RADIO_STATIONS[transceiver:GetOutpostID()]
 	if not(IsValid(station.lastCaller) and station.lastCaller:GetClass() == "ent_aboot_gmod_ezcombineradio") then return nil end
-	return (DeliveryTime * .1), ply:GetEyeTrace().HitPos
+	return (DeliveryTime * .1), ply:GetPos() + ((VectorRand() * 200) * Vector(1, 1, 0))--ply:GetEyeTrace().HitPos
 end)
