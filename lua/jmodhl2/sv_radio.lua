@@ -32,7 +32,7 @@ end
 hook.Add("JMod_OnRadioDeliver", "JMODHL2_CANNISTER_DELIVER", function(stationID, dropPos)
 	local station = JMod.EZ_RADIO_STATIONS[stationID]
 	local Radio = station.lastCaller
-	if not(IsValid(station.lastCaller) and station.lastCaller:GetClass() == "ent_aboot_gmod_ezcombineradio") then return nil end
+	if not(IsValid(Radio) and Radio:GetClass() == "ent_aboot_gmod_ezcombineradio") then return nil end
 	local Delay = 4
 	local YawIncrement = 20
 	local PitchIncrement = 10
