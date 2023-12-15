@@ -140,23 +140,28 @@ function ENT:SetMods(tbl, ammoType)
 	local OldAmmo = self:GetAmmoType()
 	self:SetAmmoType(ammoType)
 	if (OldAmmo~=ammoType) then
-		local AmmoTypeToSpawn = JMod.EZ_RESOURCE_TYPES.AMMO
-		if (OldAmmo == "HE Grenade") then
-			AmmoTypeToSpawn = JMod.EZ_RESOURCE_TYPES.MUNITIONS
-		elseif (OldAmmo == "Super Soaker") then
-			AmmoTypeToSpawn = JMod.EZ_RESOURCE_TYPES.WATER
+		local RefundInfo = self.AmmoRefundTable[OldAmmo]
+		local AmmoTypeToSpawn = RefundInfo.spawnType
+		local NetVarValueName = "Get" .. RefundInfo.varToRead
+		local NetVarValue = self[NetVarValueName](self)
+		local AmtToSpawn = NetVarValue * RefundInfo.conversionMult
+		if (OldAmmo == "Pulse Laser") then
+			// we were using Electricity as ammo, and now our MaxElectricity is about to change
+			// we're gonna kick our all our Electricity, so set ours to 0
+			// no exploit
+			self:SetElectricity(0)
 		end
-		JMod.MachineSpawnResource(self, AmmoTypeToSpawn, self:GetAmmo(), self:GetForward() * -50 + self:GetUp() * 50, Angle(0, 0, 0), self:GetForward(), true)
+		JMod.MachineSpawnResource(self, AmmoTypeToSpawn, AmtToSpawn, self:GetForward() * -50 + self:GetUp() * 50, Angle(0, 0, 0), self:GetForward(), true)
 	end
-	self:InitPerfSpecs(OldAmmo ~= ammoType)
+	self:InitPerfSpecs(OldAmmo~=ammoType)
 	if(ammoType == "Pulse Laser")then
-		self.EZconsumes={JMod.EZ_RESOURCE_TYPES.POWER, JMod.EZ_RESOURCE_TYPES.BASICPARTS, JMod.EZ_RESOURCE_TYPES.COOLANT}
+		self.EZconsumes={JMod.EZ_RESOURCE_TYPES.POWER,JMod.EZ_RESOURCE_TYPES.BASICPARTS,JMod.EZ_RESOURCE_TYPES.COOLANT}
 	elseif(ammoType == "HE Grenade")then
-		self.EZconsumes = {JMod.EZ_RESOURCE_TYPES.MUNITIONS, JMod.EZ_RESOURCE_TYPES.POWER, JMod.EZ_RESOURCE_TYPES.BASICPARTS, JMod.EZ_RESOURCE_TYPES.COOLANT}
+		self.EZconsumes={JMod.EZ_RESOURCE_TYPES.MUNITIONS,JMod.EZ_RESOURCE_TYPES.POWER,JMod.EZ_RESOURCE_TYPES.BASICPARTS,JMod.EZ_RESOURCE_TYPES.COOLANT}
 	elseif(ammoType == "Super Soaker")then
 		self.EZconsumes = {JMod.EZ_RESOURCE_TYPES.WATER, JMod.EZ_RESOURCE_TYPES.POWER, JMod.EZ_RESOURCE_TYPES.BASICPARTS, JMod.EZ_RESOURCE_TYPES.COOLANT}
 	else
-		self.EZconsumes = {JMod.EZ_RESOURCE_TYPES.AMMO, JMod.EZ_RESOURCE_TYPES.POWER, JMod.EZ_RESOURCE_TYPES.BASICPARTS, JMod.EZ_RESOURCE_TYPES.COOLANT}
+		self.EZconsumes={JMod.EZ_RESOURCE_TYPES.AMMO,JMod.EZ_RESOURCE_TYPES.POWER,JMod.EZ_RESOURCE_TYPES.BASICPARTS,JMod.EZ_RESOURCE_TYPES.COOLANT}
 	end
 end
 
@@ -380,7 +385,7 @@ if(SERVER)then
 		self:CreateNPCTarget()
 	end
 
-	function ENT:CanSee(ent)
+	function ENT:CanISee(ent)
 		if not IsValid(ent) then return false end
 		local TargPos, SelfPos = self:DetermineTargetAimPoint(ent), self:GetPos() - self:GetUp() * 16
 		local Dist = TargPos:Distance(SelfPos)

@@ -134,28 +134,66 @@ ENT.ModPerfSpecs = {
 	Cooling = 0
 }
 
+ENT.AmmoRefundTable = {
+	["Bullet"] = {
+		varToRead = "Ammo",
+		spawnType = JMod.EZ_RESOURCE_TYPES.AMMO,
+		conversionMult = 1
+	},
+	["Buckshot"] = {
+		varToRead = "Ammo",
+		spawnType = JMod.EZ_RESOURCE_TYPES.AMMO,
+		conversionMult = 1
+	},
+	["API Bullet"] = {
+		varToRead = "Ammo",
+		spawnType = JMod.EZ_RESOURCE_TYPES.AMMO,
+		conversionMult = 1
+	},
+	["HE Grenade"] = {
+		varToRead = "Ammo",
+		spawnType = JMod.EZ_RESOURCE_TYPES.MUNITIONS,
+		conversionMult = 1
+	},
+	["Pulse Laser"] = {
+		varToRead = "Electricity",
+		spawnType = JMod.EZ_RESOURCE_TYPES.POWER,
+		conversionMult = 1
+	},
+	["Super Soaker"] = {
+		varToRead = "Water",
+		spawnType = JMod.EZ_RESOURCE_TYPES.WATER,
+		conversionMult = 1
+	}
+}
+
 function ENT:SetMods(tbl, ammoType)
 	self.ModPerfSpecs = tbl
 	local OldAmmo = self:GetAmmoType()
 	self:SetAmmoType(ammoType)
 	if (OldAmmo~=ammoType) then
-		local AmmoTypeToSpawn = JMod.EZ_RESOURCE_TYPES.AMMO
-		if (OldAmmo == "HE Grenade") then
-			AmmoTypeToSpawn = JMod.EZ_RESOURCE_TYPES.MUNITIONS
-		elseif (OldAmmo == "Super Soaker") then
-			AmmoTypeToSpawn = JMod.EZ_RESOURCE_TYPES.WATER
+		local RefundInfo = self.AmmoRefundTable[OldAmmo]
+		local AmmoTypeToSpawn = RefundInfo.spawnType
+		local NetVarValueName = "Get" .. RefundInfo.varToRead
+		local NetVarValue = self[NetVarValueName](self)
+		local AmtToSpawn = NetVarValue * RefundInfo.conversionMult
+		if (OldAmmo == "Pulse Laser") then
+			// we were using Electricity as ammo, and now our MaxElectricity is about to change
+			// we're gonna kick our all our Electricity, so set ours to 0
+			// no exploit
+			self:SetElectricity(0)
 		end
-		JMod.MachineSpawnResource(self, AmmoTypeToSpawn, self:GetAmmo(), self:GetForward() * -50 + self:GetUp() * 50, Angle(0, 0, 0), self:GetForward(), true)
+		JMod.MachineSpawnResource(self, AmmoTypeToSpawn, AmtToSpawn, self:GetForward() * -50 + self:GetUp() * 50, Angle(0, 0, 0), self:GetForward(), true)
 	end
-	self:InitPerfSpecs(OldAmmo ~= ammoType)
+	self:InitPerfSpecs(OldAmmo~=ammoType)
 	if(ammoType == "Pulse Laser")then
-		self.EZconsumes={JMod.EZ_RESOURCE_TYPES.POWER, JMod.EZ_RESOURCE_TYPES.BASICPARTS, JMod.EZ_RESOURCE_TYPES.COOLANT}
+		self.EZconsumes={JMod.EZ_RESOURCE_TYPES.POWER,JMod.EZ_RESOURCE_TYPES.BASICPARTS,JMod.EZ_RESOURCE_TYPES.COOLANT}
 	elseif(ammoType == "HE Grenade")then
-		self.EZconsumes = {JMod.EZ_RESOURCE_TYPES.MUNITIONS, JMod.EZ_RESOURCE_TYPES.POWER, JMod.EZ_RESOURCE_TYPES.BASICPARTS, JMod.EZ_RESOURCE_TYPES.COOLANT}
+		self.EZconsumes={JMod.EZ_RESOURCE_TYPES.MUNITIONS,JMod.EZ_RESOURCE_TYPES.POWER,JMod.EZ_RESOURCE_TYPES.BASICPARTS,JMod.EZ_RESOURCE_TYPES.COOLANT}
 	elseif(ammoType == "Super Soaker")then
 		self.EZconsumes = {JMod.EZ_RESOURCE_TYPES.WATER, JMod.EZ_RESOURCE_TYPES.POWER, JMod.EZ_RESOURCE_TYPES.BASICPARTS, JMod.EZ_RESOURCE_TYPES.COOLANT}
 	else
-		self.EZconsumes = {JMod.EZ_RESOURCE_TYPES.AMMO, JMod.EZ_RESOURCE_TYPES.POWER, JMod.EZ_RESOURCE_TYPES.BASICPARTS, JMod.EZ_RESOURCE_TYPES.COOLANT}
+		self.EZconsumes={JMod.EZ_RESOURCE_TYPES.AMMO,JMod.EZ_RESOURCE_TYPES.POWER,JMod.EZ_RESOURCE_TYPES.BASICPARTS,JMod.EZ_RESOURCE_TYPES.COOLANT}
 	end
 end
 
@@ -427,7 +465,7 @@ if(SERVER)then
 		end
 	end
 
-	function ENT:CanSee(ent)
+	function ENT:CanISee(ent)
 		if not IsValid(ent) then return false end
 		local TargPos, SelfPos = self:DetermineTargetAimPoint(ent), self:GetPos() + self:GetUp() * 60
 		local Dist = TargPos:Distance(SelfPos)
@@ -458,9 +496,9 @@ if(SERVER)then
 		if ent == self.NPCTarget then return false end
 
 		if self:GetAmmoType() == "Super Soaker" then
-			return self:ShouldSoak(ent) and self:CanSee(ent)
+			return self:ShouldSoak(ent) and self:CanISee(ent)
 		else
-			return JMod.ShouldAttack(self, ent) and self:CanSee(ent)
+			return JMod.ShouldAttack(self, ent) and self:CanISee(ent)
 		end
 	end
 
