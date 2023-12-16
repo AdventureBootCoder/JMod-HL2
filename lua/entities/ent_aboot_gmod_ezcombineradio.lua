@@ -47,7 +47,7 @@ if(SERVER)then
 elseif(CLIENT)then
 	function ENT:CustomInit()
 		self.Dish = JMod.MakeModel(self,"models/props_rooftop/satellitedish02.mdl")
-		self.Headset = JMod.MakeModel(self,"models/lt_c/sci_fi/headset_2.mdl")
+		self.Headset = JMod.MakeModel(self,"models/jmod/props/items/sci_fi_headset.mdl")
 		self.MaxElectricity = 100
 		local Files, Folders = file.Find("sound/npc/combine_soldier/vo/*.wav","GAME")
 		self.Voices = Files
