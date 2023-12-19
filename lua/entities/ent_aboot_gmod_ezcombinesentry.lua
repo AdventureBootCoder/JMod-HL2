@@ -135,6 +135,11 @@ ENT.ModPerfSpecs = {
 }
 
 ENT.AmmoRefundTable = {
+	["Pulse Rifle"] = {
+		varToRead = "Ammo",
+		spawnType = JMod.EZ_RESOURCE_TYPES.AMMO,
+		conversionMult = 1
+	},
 	["Bullet"] = {
 		varToRead = "Ammo",
 		spawnType = JMod.EZ_RESOURCE_TYPES.AMMO,
