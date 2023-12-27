@@ -1,4 +1,6 @@
 
+local BallisticDelivery = CreateConVar("aboot_cannister_delivery", "1", FCVAR_ARCHIVE, "Causes the combine radio to delivery items by headcrab cannister instead of airplane", 0, 1)
+
 local ModelTable={
 	[1]="models/props_debris/concrete_chunk03a.mdl",
 	[2]="models/props_debris/concrete_chunk04a.mdl",
@@ -30,6 +32,7 @@ local function ThrowStuff(Pod, Position, GroundType)
 end
 
 hook.Add("JMod_OnRadioDeliver", "JMODHL2_CANNISTER_DELIVER", function(stationID, dropPos)
+	if not(BallisticDelivery:GetBool()) then return nil end
 	local station = JMod.EZ_RADIO_STATIONS[stationID]
 	local Radio = station.lastCaller
 	if not(IsValid(Radio) and Radio:GetClass() == "ent_aboot_gmod_ezcombineradio") then return nil end
@@ -116,8 +119,79 @@ hook.Add("JMod_OnRadioDeliver", "JMODHL2_CANNISTER_DELIVER", function(stationID,
 end)
 
 hook.Add("JMod_RadioDelivery", "JMODHL2_SPEEDYDELIVER", function(ply, transceiver, pkg, DeliveryTime, Pos)
+	if not(BallisticDelivery:GetBool()) then return nil end
 	local station = JMod.EZ_RADIO_STATIONS[transceiver:GetOutpostID()]
 	if not(IsValid(station.lastCaller) and station.lastCaller:GetClass() == "ent_aboot_gmod_ezcombineradio") then return nil end
 	local Tr = util.QuickTrace(ply:GetPos() + Vector(0, 0, 30), (VectorRand() * Vector(1, 1, 0)) * 300, {ply})
 	return (DeliveryTime * .1), Tr.HitPos--ply:GetEyeTrace().HitPos
 end)
+
+--[[
+hook.Add("JMod_RadioDelivery", "JMOD_AIRSTRIKE_START", function(ply, transceiver, pkg, DeliveryTime, Pos) 
+	local station = JMod.EZ_RADIO_STATIONS[transceiver:GetOutpostID()]
+	--local ExplodedString = string.Split(pkg, " ")
+	if pkg == "airstrike" then
+		station.airstrikeType = "rockets"
+	end
+	local StrikePos = ply:GetEyeTrace().HitPos
+	for k, nade in ipairs(ents.FindByClass("ent_jack_gmod_ezsignalnade")) do
+		print(nade, nade:GetState())
+		if (nade:GetState() == JMod.EZ_STATE_ARMED) then
+			StrikePos = nade:GetPos()
+		end
+	end
+	return DeliveryTime * 1, StrikePos
+end)
+
+hook.Add("JMod_OnRadioDeliver", "JMOD_AIRSTRIKE", function(stationID, dropPos) 
+	local station = JMod.EZ_RADIO_STATIONS[stationID]
+	if station.airstrikeType then
+		--
+		local DropVelocity = station.outpostDirection * 400
+		local Eff = EffectData()
+		Eff:SetOrigin(dropPos)
+		Eff:SetStart(DropVelocity)
+		util.Effect("eff_jack_gmod_jetflyby", Eff, true, true)
+		--
+		if station.airstrikeType == "bombs" then
+			local PlanePos = dropPos - station.outpostDirection * 800 - Vector(0, 0, 10)
+			for i = 1, 3 do
+				timer.Simple(i * .5, function()
+					local Bomb = ents.Create("ent_jack_gmod_ezsmallbomb")
+					Bomb:SetPos(PlanePos)
+					Bomb:SetAngles(station.outpostDirection:Angle())
+					Bomb:Spawn()
+					Bomb:Activate()
+					timer.Simple(0, function()
+						if IsValid(Bomb) then
+							Bomb:GetPhysicsObject():SetVelocity(DropVelocity)
+							Bomb:SetState(1)
+						end
+					end)
+					PlanePos = PlanePos + station.outpostDirection * 1000
+				end)
+			end
+		elseif station.airstrikeType == "rockets" then
+			for i = 1, 30 do
+				timer.Simple(math.Rand(.5, 10), function()
+					local Rocket = ents.Create("ent_jack_gmod_ezherocket")
+					Rocket:SetPos(dropPos + Vector(math.random(-1000, 1000), math.random(-1000, 1000), 0))
+					Rocket:SetAngles(station.outpostDirection:Angle())
+					Rocket:Spawn()
+					Rocket:Activate()
+					Rocket:SetState(1)
+					timer.Simple(2, function()
+						if IsValid(Rocket) then
+							Rocket:Launch()
+						end
+					end)
+				end)
+			end
+		end
+
+		station.airstrikeType = nil
+		JMod.NotifyAllRadios(stationID, "good drop")
+		return true
+	end
+end)
+--]]
