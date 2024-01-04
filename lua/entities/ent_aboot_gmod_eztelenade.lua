@@ -17,6 +17,7 @@ if SERVER then
 	end
 
 	function ENT:Arm()
+		if (self:GetState() == JMod.EZ_STATE_ARMED) then return end
 		self:SetState(JMod.EZ_STATE_ARMED)
 		if IsValid(self.TeleMarker) then 
 			self.TeleMarker:SetActivated(true)
@@ -44,6 +45,7 @@ if SERVER then
 	end
 
 	function ENT:Prime()
+		if (self:GetState() ~= JMod.EZ_STATE_OFF) then return end
 		self:SetState(JMod.EZ_STATE_PRIMED)
 		self:EmitSound("snd_jack_cloakon.wav", 60, 100)
 		self:SetBodygroup(1, 0)
@@ -125,7 +127,7 @@ if SERVER then
 							--[[timer.Simple(math.Rand(0.1, 0.5), function()
 								if IsValid(v) and v:GetPhysicsObject():IsPenetrating() then
 									local DisDmg = DamageInfo()
-									DisDmg:SetDamage(100000)
+									DisDmg:SetDamage(9e9)
 									DisDmg:SetDamageType(DMG_DISSOLVE)
 									DisDmg:SetInflictor(self or game.GetWorld())
 									DisDmg:SetAttacker(JMod.GetEZowner(self))

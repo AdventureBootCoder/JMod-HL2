@@ -13,25 +13,25 @@ ENT.HardThrowStr = 450
 ENT.SoftThrowStr = 320
 ENT.SpoonScale = 2
 ENT.DetTime = 1
+ENT.PinBodygroup = nil
+ENT.SpoonBodygroup = nil
+ENT.DetDelay = nil
 
 if(SERVER)then
 	function ENT:Prime()
+		if (self:GetState() ~= JMod.EZ_STATE_OFF) then return end
 		self:SetState(JMod.EZ_STATE_PRIMED)
 		self:EmitSound("weapons/pinpull.wav", 60, 100)
-		--self:SetBodygroup(3, 1)
 		self.LastSpeed = 0
 		self.Ticks = 0
 		self.NextTickTime = 0
 	end
 
 	function ENT:Arm()
-		--self:SetBodygroup(2, 1)
+		if (self:GetState() == JMod.EZ_STATE_ON) or (self:GetState() == JMod.EZ_STATE_ARMED) then return end
 		self:SetState(JMod.EZ_STATE_ON)
 		self:SpoonEffect()
 		self:EmitSound("weapons/grenade/tick1.wav", 100, math.random(90, 110), 1)
-		--timer.Simple(4, function()
-			--if(IsValid(self))then self:Detonate() end
-		--end)
 	end
 
 	function ENT:CustomThink(State, Time)
