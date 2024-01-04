@@ -295,7 +295,7 @@ if SERVER then
 					Box:SetResource(Given)
 					Box.NextLoad = CurTime() + 2
 					if IsValid(activator) and activator:Alive() then
-						activator:PickupObject(Box)
+						Box:Use(activator, activator)
 					end
 				end
 			end)
