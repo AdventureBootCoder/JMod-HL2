@@ -606,10 +606,11 @@ if CLIENT then
 		end
 	end)
 
-	hook.Add("RenderScreenspaceEffects", "JMODHL2_SCREENSPACE", function() 
-		local Ply = LocalPlayer()
-		if Ply.EZflashbanged and Ply.EZarmor and Ply.EZarmor.effects and Ply.EZarmor.effects.flashresistant then
-			Ply.EZflashbanged = nil
+	net.Receive("ABoot_StunStick", function(len)
+		local ply = net.ReadEntity()
+		local Stun = net.ReadFloat()
+		if IsValid(ply) and ply:Alive() then
+			ply.EZstun = (ply.EZstun or 0) + Stun
 		end
 	end)
 end

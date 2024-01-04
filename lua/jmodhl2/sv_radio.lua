@@ -131,63 +131,93 @@ hook.Add("JMod_RadioDelivery", "JMOD_AIRSTRIKE_START", function(ply, transceiver
 	local station = JMod.EZ_RADIO_STATIONS[transceiver:GetOutpostID()]
 	--local ExplodedString = string.Split(pkg, " ")
 	if pkg == "airstrike" then
-		station.airstrikeType = "rockets"
-	end
-	local StrikePos = ply:GetEyeTrace().HitPos
-	for k, nade in ipairs(ents.FindByClass("ent_jack_gmod_ezsignalnade")) do
-		print(nade, nade:GetState())
-		if (nade:GetState() == JMod.EZ_STATE_ARMED) then
-			StrikePos = nade:GetPos()
+
+		station.airstrikeType = "smallbombs"
+
+		local StrikePos = ply:GetEyeTrace().HitPos
+		for k, nade in ipairs(ents.FindByClass("ent_jack_gmod_ezsignalnade")) do
+			print(nade, nade:GetState())
+			if (nade:GetState() == JMod.EZ_STATE_ARMED) then
+				StrikePos = nade:GetPos()
+			end
 		end
+		return DeliveryTime * 1, StrikePos
 	end
-	return DeliveryTime * 1, StrikePos
 end)
 
 hook.Add("JMod_OnRadioDeliver", "JMOD_AIRSTRIKE", function(stationID, dropPos) 
 	local station = JMod.EZ_RADIO_STATIONS[stationID]
 	if station.airstrikeType then
 		--
-		local DropVelocity = station.outpostDirection * 400
+		local DropVelocity = station.outpostDirection * 1000
 		local Eff = EffectData()
 		Eff:SetOrigin(dropPos)
-		Eff:SetStart(DropVelocity)
+		Eff:SetStart(-DropVelocity * .4)
 		util.Effect("eff_jack_gmod_jetflyby", Eff, true, true)
 		--
-		if station.airstrikeType == "bombs" then
-			local PlanePos = dropPos - station.outpostDirection * 800 - Vector(0, 0, 10)
-			for i = 1, 3 do
-				timer.Simple(i * .5, function()
-					local Bomb = ents.Create("ent_jack_gmod_ezsmallbomb")
-					Bomb:SetPos(PlanePos)
-					Bomb:SetAngles(station.outpostDirection:Angle())
-					Bomb:Spawn()
-					Bomb:Activate()
-					timer.Simple(0, function()
-						if IsValid(Bomb) then
-							Bomb:GetPhysicsObject():SetVelocity(DropVelocity)
-							Bomb:SetState(1)
-						end
+		local StrikeType = station.airstrikeType
+		timer.Simple(.1, function()
+			if not(StrikeType) then return end
+			if StrikeType == "smallbombs" then
+				local delay = .5
+				local PlanePos = dropPos - (station.outpostDirection * 1500 * (5 * delay)) - Vector(0, 0, 10)
+				for i = 1, 5 do
+					timer.Simple(i * delay, function()
+						local Bomb = ents.Create("ent_jack_gmod_ezsmallbomb")
+						Bomb:SetPos(PlanePos)
+						Bomb:SetAngles(station.outpostDirection:Angle())
+						Bomb:Spawn()
+						Bomb:Activate()
+						timer.Simple(0, function()
+							if IsValid(Bomb) then
+								Bomb:GetPhysicsObject():SetVelocity(DropVelocity)
+								Bomb:GetPhysicsObject():SetMass(500)
+								Bomb:SetState(1)
+							end
+						end)
+						Bomb.DropOwner = game.GetWorld()
+						PlanePos = PlanePos + DropVelocity * delay
 					end)
-					PlanePos = PlanePos + station.outpostDirection * 1000
-				end)
-			end
-		elseif station.airstrikeType == "rockets" then
-			for i = 1, 30 do
-				timer.Simple(math.Rand(.5, 10), function()
-					local Rocket = ents.Create("ent_jack_gmod_ezherocket")
-					Rocket:SetPos(dropPos + Vector(math.random(-1000, 1000), math.random(-1000, 1000), 0))
-					Rocket:SetAngles(station.outpostDirection:Angle())
-					Rocket:Spawn()
-					Rocket:Activate()
-					Rocket:SetState(1)
-					timer.Simple(2, function()
-						if IsValid(Rocket) then
-							Rocket:Launch()
-						end
+				end
+			elseif StrikeType == "bombs" then
+					local PlanePos = dropPos - station.outpostDirection * 800 - Vector(0, 0, 10)
+					for i = 1, 1 do
+						timer.Simple(i * .5, function()
+							local Bomb = ents.Create("ent_jack_gmod_ezbomb")
+							Bomb:SetPos(PlanePos)
+							Bomb:SetAngles(station.outpostDirection:Angle())
+							Bomb:Spawn()
+							Bomb:Activate()
+							timer.Simple(0, function()
+								if IsValid(Bomb) then
+									Bomb:GetPhysicsObject():SetVelocity(DropVelocity)
+									Bomb:GetPhysicsObject():SetMass(500)
+									Bomb:SetState(1)
+								end
+							end)
+							Bomb.DropOwner = game.GetWorld()
+							PlanePos = PlanePos + station.outpostDirection * 1000
+						end)
+					end
+			elseif StrikeType == "rockets" then
+				for i = 1, 25 do
+					timer.Simple(math.Rand(.5, 10), function()
+						local Rocket = ents.Create("ent_jack_gmod_ezherocket")
+						local AreaRadius = 500
+						Rocket:SetPos(dropPos + Vector(math.random(-AreaRadius, AreaRadius), math.random(-AreaRadius, AreaRadius), 0))
+						Rocket:SetAngles(Angle(0, 0, -90))
+						Rocket:Spawn()
+						Rocket:Activate()
+						Rocket:SetState(1)
+						timer.Simple(.1, function()
+							if IsValid(Rocket) then
+								Rocket:Launch()
+							end
+						end)
 					end)
-				end)
+				end
 			end
-		end
+		end)
 
 		station.airstrikeType = nil
 		JMod.NotifyAllRadios(stationID, "good drop")

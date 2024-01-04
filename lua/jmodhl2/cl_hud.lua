@@ -169,7 +169,7 @@ end)
 hook.Add("RenderScreenspaceEffects", "JMODHL2_SCREENSPACE", function() 
 	local Ply, FT, SelfPos, Time, W, H = LocalPlayer(), FrameTime(), EyePos(), CurTime(), ScrW(), ScrH()
 	local AimVec, FirstPerson = Ply:GetAimVector(), not Ply:ShouldDrawLocalPlayer()
-	local WeldingMask = not(Ply:ShouldDrawLocalPlayer()) and Ply.EZarmor and Ply.EZarmor.effects and Ply.EZarmor.effects.flashresistant
+	local WeldingMask = not(Ply:ShouldDrawLocalPlayer()) and JMod.PlyHasArmorEff(Ply, "flashresistant")
 	if WeldingMask then 
 		if Ply.EZautoDarken and Ply.EZautoDarken >= 0 then
 			DrawColorModify({
@@ -187,6 +187,24 @@ hook.Add("RenderScreenspaceEffects", "JMODHL2_SCREENSPACE", function()
 		Ply.EZautoDarken = (Ply.EZautoDarken and math.Clamp(Ply.EZautoDarken - 2 * FT, 0, 1)) or 0
 	else
 		Ply.EZautoDarken = 0
+	end
+	if Ply.EZstun then
+		if Ply.EZstun > 0 then
+			DrawColorModify({
+				["$pp_colour_addr"] = 0,
+				["$pp_colour_addg"] = 0,
+				["$pp_colour_addb"] = 0 + Ply.EZstun * .05,
+				["$pp_colour_brightness"] = 0 + Ply.EZstun * .5,
+				["$pp_colour_contrast"] = 1,
+				["$pp_colour_colour"] = 1,
+				["$pp_colour_mulr"] = 0,
+				["$pp_colour_mulg"] = 0,
+				["$pp_colour_mulb"] = 0
+			})
+			Ply.EZstun = math.Clamp(Ply.EZstun - 2 * FT, 0, 2)
+		else
+			Ply.EZstun = nil
+		end
 	end
 end)
 

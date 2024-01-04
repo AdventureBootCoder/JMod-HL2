@@ -46,6 +46,7 @@ if(SERVER)then
 	util.AddNetworkString("ABoot_ContainerMenu")
 	util.AddNetworkString("ABoot_VolumeContainerMenu")
 	util.AddNetworkString("ABoot_JumpmodParticles")
+	util.AddNetworkString("ABoot_StunStick")
 	local defaultHEVdisable = CreateConVar("aboot_disable_hev", "0", FCVAR_ARCHIVE, "Removes the HEV suit from players on spawn and when it's destroyed. \nNo more running around with an invisible HEV suit")
 	local noPowerDraw = CreateConVar("aboot_infinite_power", "0", FCVAR_ARCHIVE, "Disables jump/jet modules drawing internal power, effectivly making their charge infinite")
 	local EZammoPickup = CreateConVar("aboot_ez_ammopickup", "0", FCVAR_ARCHIVE, "Turns HL2 ammo pickups into EZ ammo pickups for the weapon you are holding")
@@ -278,14 +279,6 @@ elseif CLIENT then
 
 	local simpleWeaponSelect = CreateConVar("aboot_simple_weapon_select", "1", FCVAR_ARCHIVE, "Enables a vey crude weapon select stand in for when you don't have an HEV suit. It's recomended you get a better one.")
 
-	--hook.Remove("RenderScreenspaceEffects", "HL2CombineBinoculars")
-	--[[hook.Add( "RenderScreenspaceEffects", "HL2CombineBinoculars", function()
-		playa = LocalPlayer()
-		if playa:KeyDown(IN_ZOOM) and playa:IsSuitEquipped() then
-			DrawMaterialOverlay( "effects/combine_binocoverlay.vtf", -0.06 )
-		end
-	end)]]--
-
 	-- Since weapons aren't guranteed to be in proper order, we have to do it ourselves
 	--[[local function OrderWeaponList(WeaponList) 
 		print("------------ \nOld weapon list:")
@@ -312,8 +305,6 @@ elseif CLIENT then
 	end]]--
 
 	local WeaponSwitchTime, WeaponIndex = 0, 0
-	--hook.Remove("InputMouseApply", "ABootSimpleWeaponSelect")
-
 	hook.Add("InputMouseApply", "ABootSimpleWeaponSelect", function(cmd, x, y, ang)
 		if not(simpleWeaponSelect:GetBool()) then return end
 		local MouseWheel, Time, Ply = cmd:GetMouseWheel(), CurTime(), LocalPlayer()
@@ -417,8 +408,8 @@ elseif CLIENT then
 	end)
 end
 
-hook.Remove("OnEntityCreated", "PacifistNPCs")
-hook.Remove("EntityTakeDamage", "WhatdYouJustSay")
+--hook.Remove("OnEntityCreated", "PacifistNPCs")
+--hook.Remove("EntityTakeDamage", "WhatdYouJustSay")
 --[[
 hook.Add("OnEntityCreated", "PacifistNPCs", function(ent)
 	if not SERVER then return end

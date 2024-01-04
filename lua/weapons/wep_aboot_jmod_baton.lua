@@ -119,6 +119,10 @@ SWEP.Hook_PostBash = function(wep, data)
 			Ent.EZNPCincapacitate = (Ent.EZNPCincapacitate or CurTime()) + math.Rand(2, 3)
 		elseif Ent:IsPlayer() then
 			Ent:ViewPunch(Angle(math.random(-40, 2), math.random(-20, 20), math.random(-2, 2)))
+			net.Start("ABoot_StunStick")
+				net.WriteEntity(Ent)
+				net.WriteFloat(.5)
+			net.Send(Ent)
 		end
 	end
 end
