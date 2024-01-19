@@ -1,14 +1,9 @@
-SWEP.Base = "arccw_base"
+SWEP.Base = "wep_jack_gmod_gunbase"
 SWEP.Spawnable = false
 SWEP.Category = "ArcCW - Half-Life" -- edit this if you like
 SWEP.AdminOnly = false
-
-SWEP.PrintName = "BFSR"
-
+SWEP.PrintName = "APISR"
 SWEP.Slot = 3
-
-SWEP.UseHands = true
-
 SWEP.ViewModel = "models/weapons/sniper/c_sniper.mdl"
 SWEP.WorldModel = "models/weapons/sniper/w_sniper.mdl"
 SWEP.ViewModelFOV = 70
@@ -19,14 +14,15 @@ SWEP.WorldModelOffset = {
 }
 
 SWEP.DefaultBodygroups = "00000000000"
+JModHL2.ApplyAmmoSpecs(SWEP, "Heavy Rifle Round", 1.5)
+SWEP.CustomToggleCustomizeHUD = false
 
-SWEP.Damage = 100
-SWEP.DamageMin = 80
+SWEP.BodyHolsterSlot = "back"
+SWEP.BodyHolsterAng = Angle(-10, 0, 0)
+SWEP.BodyHolsterAngL = Angle(-10, 10, 180)
+SWEP.BodyHolsterPos = Vector(4, -10, -6)
+SWEP.BodyHolsterPosL = Vector(4, -10, 4)
 
-SWEP.Range = 150 -- in METRES
-SWEP.RangeMin = 50
-SWEP.Penetration = 24
-SWEP.DamageType = DMG_BULLET
 SWEP.ShootEntity = nil -- entity to fire, if any
 SWEP.MuzzleVelocity = 1050 -- projectile or phys bullet muzzle velocity
 -- IN M/S
@@ -36,7 +32,6 @@ SWEP.ExtendedClipSize = 1
 SWEP.ReducedClipSize = 1
 
 SWEP.PhysBulletMuzzleVelocity = 700
-
 
 SWEP.Recoil = 1.5
 SWEP.RecoilSide = 0.3
@@ -67,11 +62,10 @@ SWEP.Primary.DefaultClip = -1
 
 SWEP.AccuracyMOA = 0 -- accuracy in Minutes of Angle. There are 60 MOA in a degree.
 SWEP.HipDispersion = 800 -- inaccuracy added by hip firing.
-SWEP.MoveDispersion = 50
+SWEP.MoveDispersion = 100
 SWEP.SightsDispersion = 0
 SWEP.JumpDispersion = 500
 
-SWEP.Primary.Ammo = "SniperPenetratedRound" -- what ammo type the gun uses
 SWEP.MagID = "Sniper" -- the magazine pool this gun draws from
 
 SWEP.ShootVol = 90 -- volume of shoot sound
@@ -83,8 +77,7 @@ SWEP.DistantShootSound = "Weapon_SniperRifle.NPC"
 SWEP.MirrorVMWM = false -- Copy the viewmodel, along with all its attachments, to the worldmodel. Super convenient!
 SWEP.MirrorWorldModel = true -- Use this to set the mirrored viewmodel to a different model, without any floating speedloaders or cartridges you may have. Needs MirrorVMWM
 
-
-SWEP.MuzzleEffect = ""
+SWEP.MuzzleEffect = "muzzle_center_M82"
 SWEP.ShellModel = "models/shells/shell_338mag.mdl"
 SWEP.ShellScale = 3
 SWEP.ShellMaterial = nil
@@ -94,7 +87,6 @@ SWEP.ShellRotate = 80
 SWEP.ShellPhysScale = 1
 SWEP.ShellPitch = 60
 SWEP.NoFlash = true
-
 
 SWEP.MuzzleEffectAttachment = 0 -- which attachment to put the muzzle on
 SWEP.CaseEffectAttachment = 1 -- which attachment to put the case effect on
@@ -112,7 +104,6 @@ SWEP.TracerFinalMag = 0 -- the last X bullets in a magazine are all tracers
 SWEP.Tracer = "arccw_tracer" -- override tracer (hitscan) effect
 SWEP.HullSize = 1 -- HullSize used by FireBullets
 
-
 SWEP.IronSightStruct = {
     Pos = Vector( -2, 0, 2 ),
     Ang = Angle( 2, 0, 0 ),
@@ -120,10 +111,6 @@ SWEP.IronSightStruct = {
     SwitchToSound = "", -- sound that plays when switching to this sight
     CrosshairInSights = true
 }
-
-SWEP.BodyDamageMults = {
-    [HITGROUP_HEAD] = 2,
- }
 
 SWEP.HoldtypeHolstered = "passive"
 SWEP.HoldtypeActive = "crossbow"
