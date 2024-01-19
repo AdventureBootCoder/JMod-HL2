@@ -1,0 +1,8 @@
+VertexLitGeneric
+{
+	// Original shader: VertexLitTexture
+	"$basetexture" "models/Weapons/V_sniper/sniper_lens_lens"
+	"$bumpmap" "models/weapons/v_sniper/sniper_lens_normal"
+	"$envmap" "env_cubemap"
+	$envmaptint 		"[1 0.4 0.4]"
+}

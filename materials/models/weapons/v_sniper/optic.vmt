@@ -1,0 +1,13 @@
+VertexLitGeneric
+{
+	"$basetexture" "models/Weapons/V_sniper/sniper_scope_diff"
+	"$bumpmap" "models/weapons/v_sniper/sniper_optic_normal" 
+	"$phong"  				"1"
+	"$phongexponent" 		"48"
+	"$phongboost" 			"1"
+	"$phongfresnelranges"	"[1 2 3]"
+	"$phongtint" 			"[0.6 0.8 1]"
+	"$phongalbedotint" 		"1"	
+	$selfillum 1
+
+}
