@@ -1,0 +1,12 @@
+"VertexLitGeneric"
+{
+	"$basetexture"				"models/weapons/aboot/combine_sniper/cisr"
+	"$bumpmap"					"models/weapons/aboot/combine_sniper/cisr_normal"
+	"$model" 					"1"
+	
+	"$phong" 					"1"
+	"$phongboost" 				"2"
+	"$phongexponenttexture" 	"models/weapons/aboot/combine_sniper/cisr_normal"
+	"$phongalbedotint" 			"1"								
+	"$phongfresnelranges"		"[.5 1 2]"
+}

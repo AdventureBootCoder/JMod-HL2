@@ -1,0 +1,8 @@
+"UnlitGeneric"
+{
+	"$basetexture" "models/weapons/aboot/combine_sniper/nothin"
+	"$ignorez"1
+	"$vertexcolor" 1
+	"$vertexalpha" 1
+	"$nolod" "1"
+}

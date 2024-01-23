@@ -2,7 +2,7 @@ SWEP.Base = "wep_jack_gmod_gunbase"
 SWEP.Spawnable = false
 SWEP.Category = "ArcCW - Half-Life" -- edit this if you like
 SWEP.AdminOnly = false
-SWEP.PrintName = "APISR"
+SWEP.PrintName = "API-SR"
 SWEP.Slot = 3
 SWEP.ViewModel = "models/weapons/sniper/c_sniper.mdl"
 SWEP.WorldModel = "models/weapons/sniper/w_sniper.mdl"
@@ -12,6 +12,7 @@ SWEP.WorldModelOffset = {
     pos = Vector(-2, 0, 1),
     ang = Angle(0, 184, 180)
 }
+SWEP.NoHideLeftHandInCustomization = true
 
 SWEP.DefaultBodygroups = "00000000000"
 JModHL2.ApplyAmmoSpecs(SWEP, "Heavy Rifle Round", 1.5)
@@ -144,7 +145,21 @@ SWEP.AttachmentElements = {
 SWEP.ExtraSightDist = 10
 
 SWEP.Attachments = {
-
+	{
+		PrintName = "Optic", -- print name
+		DefaultAttName = "Iron Sights",
+		Slot = {"optic", "optic_sniper", "optic_lp", "reb_optic"}, -- what kind of attachments can fit here, can be string or table
+		Bone = "gun", -- relevant bone any attachments will be mostly referring to
+		Offset = {
+			vpos = Vector(0, 0, 5),
+			vang = Angle(0, 180, 0),
+			wpos = Vector(0, 0, 0),
+			wang = Angle(0, 0, 180)
+		},
+		CorrectivePos = Vector(0, 0, 0),
+		CorrectiveAng = Angle(0, 0, 0),
+		Installed = "optic_aboot_scope_reb"
+	},
 }
 
 SWEP.Animations = {
