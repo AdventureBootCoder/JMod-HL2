@@ -385,7 +385,7 @@ if(SERVER)then
 	end
 
 	function ENT:Use(activator)
-		if activator:IsPlayer() then
+		if IsValid(activator) and activator:IsPlayer() then
 			local State, Alt = self:GetState(), activator:KeyDown(JMod.Config.General.AltFunctionKey)
 
 			if Alt then
@@ -404,6 +404,7 @@ if(SERVER)then
 			else
 				if self:GetElectricity() > 0 then
 					self:TurnOn(activator)
+					JMod.SetEZowner(self, activator, false)
 					JMod.Hint(activator, "sentry friends")
 				else
 					JMod.Hint(activator, "nopower")
@@ -427,7 +428,6 @@ if(SERVER)then
 	function ENT:TurnOn(activator)
 		if self:GetState() > STATE_OFF then return end
 		local OldOwner = self.EZowner
-		JMod.SetEZowner(self, activator, false)
 		self:SetState(STATE_WATCHING)
 		self:EmitSound("snds_jack_gmod/ezsentry_startup.wav", 65, 100)
 		self:ResetMemory()
