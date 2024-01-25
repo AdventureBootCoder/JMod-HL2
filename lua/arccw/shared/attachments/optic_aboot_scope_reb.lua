@@ -1,7 +1,7 @@
 ﻿att.PrintName = "APISR Scope"
 att.Icon = Material("entities/acwatt_optic_magnus.png")
 att.Description = "A precision manufactured scope for the APISR."
-att.SortOrder = 5
+att.SortOrder = 4.5
 
 att.Desc_Pros = {"+ Precision sight picture", "+ Zoom",}
 

@@ -17,6 +17,43 @@ SWEP.NoHideLeftHandInCustomization = true
 SWEP.DefaultBodygroups = "00000000000"
 JModHL2.ApplyAmmoSpecs(SWEP, "Heavy Rifle Round", 1.5)
 SWEP.CustomToggleCustomizeHUD = false
+SWEP.RicPenShotData = {150, false, false, 1}
+SWEP.RicPenShotCallback = function(att, tr, dmg)
+	local ent = tr.Entity
+	local Poof = EffectData()
+	Poof:SetOrigin(tr.HitPos)
+	Poof:SetScale(1)
+	Poof:SetNormal(tr.HitNormal)
+	util.Effect("eff_jack_gmod_incbullet", Poof, true, true)
+	---
+	local DmgI = DamageInfo()
+	DmgI:SetDamage(dmg:GetDamage() / 2)
+	DmgI:SetDamageType(DMG_BURN)
+	DmgI:SetDamageForce(dmg:GetDamageForce())
+	DmgI:SetAttacker(dmg:GetAttacker())
+	DmgI:SetInflictor(dmg:GetInflictor())
+	DmgI:SetDamagePosition(dmg:GetDamagePosition())
+
+	if ent.TakeDamageInfo then
+		ent:TakeDamageInfo(DmgI)
+	end
+
+	---
+	if not ent:IsWorld() and ent.GetPhysicsObject then
+		local Mass = 100
+		local Phys = ent:GetPhysicsObject()
+
+		if IsValid(Phys) and Phys.GetMass then
+			Mass = Phys:GetMass()
+		end
+
+		local Chance = (dmg:GetDamage() / Mass) * 2
+
+		if math.Rand(0, 1) < Chance then
+			ent:Ignite(math.Rand(1, 2))
+		end
+	end
+end
 
 SWEP.BodyHolsterSlot = "back"
 SWEP.BodyHolsterAng = Angle(-10, 0, 0)
@@ -45,7 +82,7 @@ SWEP.RecoilPunchBackMaxSights = nil -- may clip with scopes
 SWEP.RecoilVMShake = 8 -- random viewmodel offset when shooty
 
 SWEP.Delay = 60 / 90 -- 60 / RPM.
-SWEP.Num = 1 -- number of shots per trigger pull.
+SWEP.Num = 0 -- number of shots per trigger pull.
 SWEP.Firemodes = {
     {
         Mode = 1,
