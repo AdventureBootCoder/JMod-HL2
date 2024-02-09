@@ -16,6 +16,8 @@ SWEP.ViewModel = "models/weapons/aboot/combsr/c_combsr.mdl"
 SWEP.WorldModel = "models/weapons/aboot/combsr/w_combinesniper_e2.mdl"
 SWEP.ViewModelFOV = 50
 
+SWEP.CustomToggleCustomizeHUD = false
+
 SWEP.ShootEntity = nil -- entity to fire, if any
 SWEP.MuzzleVelocity = 6000 -- projectile or phys bullet muzzle velocity
 -- IN M/S
@@ -114,56 +116,50 @@ SWEP.AttachmentElements = {
 	}
 }
 
+--[[SWEP.Lasers = {
+	{
+		LaserStrength = 1,
+		LaserBone = "body",--"laser",
+		Color = Color(0, 225, 255)
+	}
+}--]]
+
 SWEP.ExtraSightDist = 5
 
 SWEP.Attachments = {
 	{
 		PrintName = "Optic", -- print name
 		DefaultAttName = "Iron Sights",
-		Slot = {"optic", "optic_sniper", "optic_lp"}, -- what kind of attachments can fit here, can be string or table
-		Bone = "body", -- relevant bone any attachments will be mostly referring to
+		Slot = {"optic", "optic_sniper", "optic_lp", "optic_combsr", "ez_optic"}, -- what kind of attachments can fit here, can be string or table
+		Bone = "v_weapon.g3sg1_Parent", -- relevant bone any attachments will be mostly referring to
 		Offset = {
-			vpos = Vector(2.5, 0, 6),
-			vang = Angle(52, 0, 0),
+			vpos = Vector(0.1, -8.5, 0.5),
+			vang = Angle(-90, 0, -90),
 			wpos = Vector(8, 0.899, -6.401),
 			wang = Angle(-10.52, 0, 180)
 		},
-		InstalledEles = {"nors"},
-		CorrectivePos = Vector(0, 0, 0),
-		CorrectiveAng = Angle(0, 0, 0)
-	},
-	{
-		PrintName = "Backup Optic", -- print name
-		Slot = "backup", -- what kind of attachments can fit here, can be string or table
-		Bone = "body", -- relevant bone any attachments will be mostly referring to
-		Offset = {
-			vpos = Vector(2.5, -1.3, 6),
-			vang = Angle(52, 0, 0),
-			wpos = Vector(8, 0.899, -6.401),
-			wang = Angle(-10.52, 0, 180)
-		},
+		--InstalledEles = {"nors"},
 		CorrectivePos = Vector(0, 0, 0),
 		CorrectiveAng = Angle(0, 0, 0),
-		KeepBaseIrons = true,
+		Installed = "optic_aboot_scope_combsr"
 	},
 	{
 		PrintName = "Muzzle",
 		DefaultAttName = "Standard Muzzle",
 		Slot = "muzzle",
-		Bone = "body",
+		Bone = "v_weapon.g3sg1_Parent",
 		Offset = {
 			vpos = Vector(32.5,0,40), -- offset that the attachment will be relative to the bone
 			vang = Angle(53,0,0),
 			wpos = Vector(50, 1.2, -15.3),
 			wang = Angle(-10,-3, 0)
 		},
-		InstalledEles = {"nobrake"},
+		--InstalledEles = {"nobrake"},
 	},
-
 	{
 		PrintName = "Tactical",
 		Slot = "tac",
-		Bone = "body",
+		Bone = "v_weapon.g3sg1_Parent",
 		Offset = {
 			vpos = Vector(0,1,0), -- offset that the attachment will be relative to the bone
 			vang = Angle(53,0.6,90),
@@ -275,13 +271,13 @@ sound.Add({name = "deploy_com",
 
 if CLIENT then
 	function SWEP:ShouldDrawBeam()
-		return CurTime() > self:GetNextPrimaryFire() and self:Clip1() > 0 and not(self.GetInReload and self:GetInReload()) and (self.GetInZoom and self:GetInZoom())
+		return CurTime() > self:GetNextPrimaryFire() and self:Clip1() > 0
 	end
 
 	local beam = Material("effects/bluelaser1")
 	local sprite = Material("effects/blueflare1")
 
-	function SWEP:DrawHUDBackground()
+	--[[function SWEP:DrawHUDBackground()
 		if not false then
 			return
 		end
@@ -328,9 +324,9 @@ if CLIENT then
 			surface.DrawLine(lead.x - w, lead.y, lead.x, lead.y + w)
 			surface.DrawLine(lead.x, lead.y + w, lead.x + w, lead.y)
 		end
-	end
+	end--]]
 
-	local function CombinePreDrawViewModel(vm, ply, wep)
+	--[[local function CombinePreDrawViewModel(vm, ply, wep)
 		if not false then return end
 		wep.ViewModelFOV = 54 + (54 - ply:GetFOV()) * 0.6
 
@@ -356,7 +352,7 @@ if CLIENT then
 		if not false then return end
 		cam.IgnoreZ(false)
 	end
-	hook.Add("PostDrawViewModel", "CombinePostDrawViewModel", CombinePostDrawViewModel)
+	hook.Add("PostDrawViewModel", "CombinePostDrawViewModel", CombinePostDrawViewModel)--]]
 
 	function SWEP:PostDrawTranslucentRenderables()
 		local ply = self:GetOwner()
@@ -381,5 +377,5 @@ if CLIENT then
 			render.SetMaterial(sprite)
 			render.DrawSprite(tr.HitPos, 2, 2, Color(50, 190, 255))
 		end
-	end
+	end--]]
 end

@@ -6,7 +6,7 @@ SWEP.PrintName = "API-SR"
 SWEP.Slot = 3
 SWEP.ViewModel = "models/weapons/sniper/c_sniper.mdl"
 SWEP.WorldModel = "models/weapons/sniper/w_sniper.mdl"
-SWEP.ViewModelFOV = 70
+SWEP.ViewModelFOV = 75
 SWEP.MirrorVMWM = true
 SWEP.WorldModelOffset = {
     pos = Vector(-2, 0, 1),
@@ -17,7 +17,8 @@ SWEP.NoHideLeftHandInCustomization = true
 SWEP.DefaultBodygroups = "00000000000"
 JModHL2.ApplyAmmoSpecs(SWEP, "Heavy Rifle Round", 1.5)
 SWEP.CustomToggleCustomizeHUD = false
-SWEP.RicPenShotData = {150, false, false, 1}
+--
+SWEP.RicPenShotData = {150, true, false, 1}
 SWEP.RicPenShotCallback = function(att, tr, dmg)
 	local ent = tr.Entity
 	local Poof = EffectData()
@@ -185,7 +186,7 @@ SWEP.Attachments = {
 	{
 		PrintName = "Optic", -- print name
 		DefaultAttName = "Iron Sights",
-		Slot = {"optic", "optic_sniper", "optic_lp", "reb_optic"}, -- what kind of attachments can fit here, can be string or table
+		Slot = {"optic", "optic_sniper", "optic_lp", "reb_optic", "ez_optic"}, -- what kind of attachments can fit here, can be string or table
 		Bone = "gun", -- relevant bone any attachments will be mostly referring to
 		Offset = {
 			vpos = Vector(0, 0, 5),
