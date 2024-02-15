@@ -59,7 +59,7 @@ if(SERVER)then
 		local Dude = mactivator or activatorAgain
 		local Time = CurTime()
 		local State = self:GetState()
-		if State < 0 then
+		if (State < STATE_OFF) then
 			return
 		elseif (State == STATE_OFF) then
 			if(tobool(onOff))then -- we got pressed
@@ -82,6 +82,7 @@ if(SERVER)then
 	function ENT:Think()
 		local Time = CurTime()
 		local State = self:GetState()
+		if State == STATE_BROKEN then return end
 		if State == STATE_CHARGIN then
 
 			if((IsValid(self.User))and(self.User:Alive())and(self.User:Health() < 100)and(self:GetSupplies() > 0))then

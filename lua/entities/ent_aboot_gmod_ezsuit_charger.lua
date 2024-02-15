@@ -16,6 +16,7 @@ ENT.Mat = "models/aboot/suit_charger002_sheet"
 ENT.JModPreferredCarryAngles = Angle(0, 180, 0)
 ENT.EZconsumes = {JMod.EZ_RESOURCE_TYPES.BASICPARTS, JMod.EZ_RESOURCE_TYPES.POWER}
 ENT.EZupgradable = false
+ENT.EZpowerPlug = Vector(0, 0, -1)
 
 local STATE_BROKEN, STATE_OFF, STATE_CHARGIN = -1, 0, 1
 
@@ -51,7 +52,7 @@ if(SERVER)then
 		local Dude = activator or activatorAgain
 		local Time = CurTime()
 		local State = self:GetState()
-		if(State<0)then
+		if(State < STATE_OFF)then
 			return
 		elseif State == STATE_OFF then
 			if tobool(onOff) then -- we got pressed
@@ -71,6 +72,7 @@ if(SERVER)then
 	function ENT:Think()
 		local Time = CurTime()
 		local State = self:GetState()
+		if State == STATE_BROKEN then return end
 		if State == STATE_CHARGIN then
 			if (IsValid(self.User)) and (self.User:Alive()) and (self.User:Armor() < 100) and (self.User:IsSuitEquipped()) and (self:GetElectricity()>0) then
 				local Tr=self.User:GetEyeTrace()
