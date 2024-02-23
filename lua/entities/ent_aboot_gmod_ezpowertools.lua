@@ -21,9 +21,6 @@ ENT.StaticPerfSpecs = {
 ENT.DynamicPerfSpecs = {
 	Armor = 1
 }
---
---ENT.WhitelistedResources = {}
-ENT.BlacklistedResources = {JMod.EZ_RESOURCE_TYPES.WATER, JMod.EZ_RESOURCE_TYPES.OIL, "geothermal"}
 
 local STATE_BROKEN, STATE_OFF, STATE_RUNNING = -1, 0, 1
 ---
@@ -35,11 +32,9 @@ end
 if(SERVER)then
 	function ENT:CustomInit()
 		self:SetProgress(0)
-		self.DepositKey = 0
 		self.NextResourceThinkTime = 0
 		self.NextEffectThinkTime = 0
 		self.NextOSHAthinkTime = 0
-		self.NextHoleThinkTime = 0
         timer.Simple(5, function()
             if IsValid(self) then
             JMod.Hint(self.EZowner, "ore scan")
@@ -145,7 +140,9 @@ if(SERVER)then
 					end
 					self:GetPhysicsObject():ApplyForceOffset(PoundDir * CutStrength, HitPos + CutDir * CutStrength)
 
-					self:EmitSound(util.GetSurfaceData(PoundTr.SurfaceProps).impactSoftSound)
+					if PoundTr.SurfaceProps > 0 then
+						self:EmitSound(util.GetSurfaceData(PoundTr.SurfaceProps).impactSoftSound)
+					end
 					self:HitEffect(HitPos, 1)
 
 					local Message = JMod.EZprogressTask(Ent, HitPos, self, "salvage", 0.01)

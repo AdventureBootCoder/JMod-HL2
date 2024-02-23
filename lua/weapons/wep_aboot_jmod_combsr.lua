@@ -1,5 +1,5 @@
 SWEP.Base = "wep_jack_gmod_gunbase"
-SWEP.Spawnable = true -- this obviously has to be set to true
+SWEP.Spawnable = false -- this obviously has to be set to true
 SWEP.Category = "ArcCW - Half Life" -- edit this if you like
 SWEP.AdminOnly = false
 SWEP.PrintName = "CO-SR"
