@@ -256,16 +256,12 @@ elseif(CLIENT)then
 	local MiningLazCol = Color(255, 0, 0)
 
 	function ENT:Draw()
-		--
-		--self:DrawModel()
-		--
-		local Up, Right, Forward, Typ, State, FT = self:GetUp(), self:GetRight(), self:GetForward(), self:GetResourceType(), self:GetState(), FrameTime()
+		local Up, Right, Forward, Typ, State = self:GetUp(), self:GetRight(), self:GetForward(), self:GetResourceType(), self:GetState()
 		local SelfPos, SelfAng = self:GetPos(), self:GetAngles()
 		local BoxPos = SelfPos + Right * 5 + Forward * 1
 		local PipePos = BoxPos + Right * (-self.CurDepth) + Forward * 4
 		local PounderPos = PipePos + Right * -22 - Forward * 4
 		--
-		--jprint(self:GetSlamDist())
 		if State == STATE_RUNNING then
 			local SlamDist = (math.sin(CurTime() * 30) / 2 + .5) * (self:GetSlamDist() / 2)
 			self.CurDepth = Lerp(math.ease.InOutExpo(6), self.CurDepth, SlamDist)

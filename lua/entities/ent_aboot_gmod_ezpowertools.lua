@@ -189,15 +189,8 @@ elseif(CLIENT)then
 		self.MaxElectricity = 200
 	end
 
-	function ENT:Draw()
-		--
-		--self:DrawModel()
-		--
-		local Up, Right, Forward, Message, State, FT = self:GetUp(), self:GetRight(), self:GetForward(), self:GetMessage(), self:GetState(), FrameTime()
-		local SelfPos, SelfAng = self:GetPos(), self:GetAngles()
-		local BoxPos = SelfPos + Right * 5 + Forward * 1
-		local SawPos = BoxPos + Right * -28 + Forward * -1
-		--
+	function ENT:Think()
+		local State, FT = self:GetState(), FrameTime()
 		if State == STATE_RUNNING then
 			self.CurSpin = self.CurSpin + FT * 10000
 			if self.CurSpin > 360 then
@@ -206,6 +199,13 @@ elseif(CLIENT)then
 				self.CurSpin = 360
 			end
 		end
+	end
+
+	function ENT:Draw()
+		local Up, Right, Forward, Message, State = self:GetUp(), self:GetRight(), self:GetForward(), self:GetMessage(), self:GetState()
+		local SelfPos, SelfAng = self:GetPos(), self:GetAngles()
+		local BoxPos = SelfPos + Right * 5 + Forward * 1
+		local SawPos = BoxPos + Right * -28 + Forward * -1
 		--
 		local PowerBoxAng = SelfAng:GetCopy()
 		PowerBoxAng:RotateAroundAxis(Forward, 90)
