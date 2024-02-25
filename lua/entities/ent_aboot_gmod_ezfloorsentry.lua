@@ -339,52 +339,6 @@ if(SERVER)then
 		self:RemoveNPCTarget()
 	end
 
-	function ENT:Use(activator)
-		if IsValid(activator) and activator:IsPlayer() then
-			local State, Alt = self:GetState(), activator:KeyDown(JMod.Config.General.AltFunctionKey)
-
-			if Alt then
-				activator:PickupObject(self)
-				
-				return
-			end
-			if State == STATE_BROKEN then
-				JMod.Hint(activator, "destroyed")
-
-				return
-			end
-
-			if (State > 0) and not(IsValid(self.Target) and activator == self.Target) then
-				self:TurnOff()
-			else
-				if self:GetElectricity() > 0 then
-					self:TurnOn(activator)
-					JMod.SetEZowner(self, activator, false)
-					JMod.Hint(activator, "sentry friends")
-				else
-					JMod.Hint(activator, "nopower")
-				end
-			end
-		end
-	end
-
-	function ENT:TurnOff(autoReactivate)
-		if (self:GetState() <= 0) then return end
-		self:SetState(STATE_OFF)
-		self:EmitSound("npc/turret_floor/die.wav", 65, 100)
-		self:ResetMemory()
-		self:RemoveNPCTarget()
-	end
-
-	function ENT:TurnOn(activator)
-		if self:GetState() > STATE_OFF then return end
-		local OldOwner = self.EZowner
-		self:SetState(STATE_WATCHING)
-		self:EmitSound("snds_jack_gmod/ezsentry_startup.wav", 65, 100)
-		self:ResetMemory()
-		self:CreateNPCTarget()
-	end
-
 	function ENT:CanISee(ent)
 		if not IsValid(ent) then return false end
 		local TargPos, SelfPos = self:DetermineTargetAimPoint(ent), self:GetPos() - self:GetUp() * 16

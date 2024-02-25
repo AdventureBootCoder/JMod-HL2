@@ -46,6 +46,7 @@ if(SERVER)then
 		if self:GetState() ~= STATE_OFF then return end
 
 		if (self:GetElectricity() > 0) then
+			if IsValid(activator) then self.EZstayOn = true end
 			self:SetState(STATE_RUNNING)
 			self.SoundLoop = CreateSound(self, "^snds_jack_gmod/genny_start_loop.wav")
 			self.SoundLoop:SetSoundLevel(80)
@@ -56,8 +57,9 @@ if(SERVER)then
 		end
 	end
 	
-	function ENT:TurnOff()
+	function ENT:TurnOff(activator)
 		if (self:GetState() <= 0) then return end
+		if IsValid(activator) then self.EZstayOn = nil end
 		self:SetState(STATE_OFF)
 
 		if self.SoundLoop then
@@ -78,7 +80,7 @@ if(SERVER)then
 		elseif State == STATE_OFF then
 			self:TurnOn(activator)
 		elseif State == STATE_RUNNING then
-			self:TurnOff()
+			self:TurnOff(activator)
 		end
 	end
 	

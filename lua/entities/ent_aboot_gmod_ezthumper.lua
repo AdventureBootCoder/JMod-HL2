@@ -81,7 +81,7 @@ if(SERVER)then
 				self:TurnOn(self.EZowner)
 			else
 				if self:GetState() > STATE_OFF then
-					self:TurnOff()
+					self:TurnOff(self.EZowner)
 				end
 				JMod.Hint(self.EZowner, "machine mounting problem")
 			end
@@ -97,6 +97,7 @@ if(SERVER)then
 				self:EmitSound("ambient/machines/thumper_startup1.wav", 100)
 				timer.Simple(2.8, function()
 					if not(IsValid(self)) or not(self.EZinstalled) then return end
+					if IsValid(activator) then self.EZstayOn = true end
 					self:SetState(STATE_RUNNING)
 					self.SoundLoop = CreateSound(self, "ambient/machines/thumper_amb.wav")
 					self.SoundLoop:SetSoundLevel(65)
@@ -111,8 +112,9 @@ if(SERVER)then
 		end
 	end
 
-	function ENT:TurnOff()
+	function ENT:TurnOff(activator)
 		if (self:GetState() <= 0) then return end
+		if IsValid(activator) then self.EZstayOn = nil end
 		self:SetState(STATE_OFF)
 		self:ProduceResource()
 

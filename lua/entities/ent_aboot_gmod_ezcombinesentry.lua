@@ -400,7 +400,7 @@ if(SERVER)then
 			end
 
 			if (State > 0) and not(IsValid(self.Target) and activator == self.Target) then
-				self:TurnOff()
+				self:TurnOff(activator)
 			else
 				if self:GetElectricity() > 0 then
 					self:TurnOn(activator)
@@ -413,25 +413,27 @@ if(SERVER)then
 		end
 	end
 
-	function ENT:TurnOff(autoReactivate)
+	function ENT:TurnOff(activator)
 		if (self:GetState() <= 0) then return end
+		if IsValid(activator) then self.EZstayOn = nil end
 		self:SetState(STATE_OFF)
 		self:EmitSound("npc/turret_floor/die.wav", 65, 100)
 		self:ResetMemory()
 		self:RemoveNPCTarget()
 	end
 
-	function ENT:OnRemove()
-		self:RemoveNPCTarget()
-	end
-
 	function ENT:TurnOn(activator)
 		if self:GetState() > STATE_OFF then return end
+		if IsValid(activator) then self.EZstayOn = true end
 		local OldOwner = self.EZowner
 		self:SetState(STATE_WATCHING)
 		self:EmitSound("snds_jack_gmod/ezsentry_startup.wav", 65, 100)
 		self:ResetMemory()
 		self:CreateNPCTarget()
+	end
+
+	function ENT:OnRemove()
+		self:RemoveNPCTarget()
 	end
 
 	function ENT:DetermineTargetAimPoint(ent)

@@ -52,6 +52,7 @@ if(SERVER)then
 		if self:GetState() ~= STATE_OFF then return end
 
 		if (self:GetElectricity() > 0) then
+			if IsValid(activator) then self.EZstayOn = true end
 			self:SetState(STATE_RUNNING)
 			self.SoundLoop = CreateSound(self, "^snds_jack_gmod/genny_start_loop.wav")
 			self.SoundLoop:SetSoundLevel(80)
@@ -62,8 +63,9 @@ if(SERVER)then
 		end
 	end
 	
-	function ENT:TurnOff()
+	function ENT:TurnOff(activator)
 		if (self:GetState() <= 0) then return end
+		if IsValid(activator) then self.EZstayOn = nil end
 		self:SetState(STATE_OFF)
 		self:ProduceResource()
 
@@ -75,7 +77,7 @@ if(SERVER)then
 	function ENT:Use(activator)
 		local State = self:GetState()
 		local OldOwner = self.EZowner
-		local alt = activator:KeyDown(JMod.Config.General.AltFunctionKey)
+		local Alt = activator:KeyDown(JMod.Config.General.AltFunctionKey)
 		JMod.SetEZowner(self, activator, true)
 
 		if State == STATE_BROKEN then
@@ -85,20 +87,13 @@ if(SERVER)then
 		elseif State == STATE_OFF then
 			self:TurnOn(activator)
 		elseif State == STATE_RUNNING then
-			if alt then
+			if Alt then
 				self:ProduceResource()
-
-				return
+			else
+				self:TurnOff(activator)
 			end
-			self:TurnOff()
 		end
 	end
-
-	--[[function ENT:ResourceLoaded(typ, accepted)
-		if typ == JMod.EZ_RESOURCE_TYPES.POWER and accepted >= 1 then
-			self:TurnOn(self.EZowner)
-		end
-	end--]]
 	
 	function ENT:OnRemove()
 		if(self.SoundLoop)then self.SoundLoop:Stop() end
