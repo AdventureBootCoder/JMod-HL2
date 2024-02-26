@@ -14,16 +14,16 @@ ENT.Model = "models/props_combine/health_charger001.mdl"
 ENT.Mat = nil
 ----
 ENT.JModPreferredCarryAngles = Angle(0, 180, 0)
-ENT.EZconsumes = {JMod.EZ_RESOURCE_TYPES.BASICPARTS, JMod.EZ_RESOURCE_TYPES.POWER, JMod.EZ_RESOURCE_TYPES.MEDICALSUPPLIES}
+ENT.EZconsumes = {JMod.EZ_RESOURCE_TYPES.BASICPARTS, JMod.EZ_RESOURCE_TYPES.MEDICALSUPPLIES}
 ENT.EZupgradable = false
 ENT.StaticPerfSpecs = {
 	MaxSupplies = 100
 }
 
-local STATE_BROKEN,STATE_OFF,STATE_CHARGIN = -1,0,1
+local STATE_BROKEN, STATE_OFF, STATE_CHARGIN = -1, 0, 1
 
-function ENT:CustomSetupDataTables()
-	self:NetworkVar("Int", 2, "Supplies")
+function ENT:SetupDataTables()
+	self:NetworkVar("Int", 1, "Supplies")
 end
 
 if(SERVER)then
@@ -45,8 +45,8 @@ if(SERVER)then
 	function ENT:CustomInit()
 		self:DrawShadow(false)
 		self:SetUseType(ONOFF_USE)
-		self.User=nil
-		self.ChargeSound=CreateSound(self,"items/medcharge4.wav")
+		self.User = nil
+		self.ChargeSound = CreateSound(self, "items/medcharge4.wav")
 		self:SetSubMaterial(1, "models/aboot/health_charger002")
 		if self.SpawnFull then
 			self:SetSupplies(self.MaxSupplies)
