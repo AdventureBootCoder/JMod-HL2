@@ -74,12 +74,11 @@ if SERVER then
 		self.EZconsumes = {JMod.EZ_RESOURCE_TYPES.AMMO, JMod.EZ_RESOURCE_TYPES.MUNITIONS}
 		self.LastOpenTime = 0
 
-		--[[for k, v in pairs(JMod.EZ_RESOURCE_TYPES) do
-			table.insert(self.EZconsumes, v)
-		end]]--
-
 		self.NextLoad = 0
-
+		---
+		if istable(WireLib) then
+			self.Outputs = WireLib.CreateOutputs(self, {"Type [STRING]", "Amount Left [NORMAL]"}, {"Will be 'generic' by default", "Amount of resources left in the crate"})
+		end
 		---
 		timer.Simple(.01, function()
 			self:CalcWeight()
@@ -99,7 +98,10 @@ if SERVER then
 		local Frac = self:GetResource() / self.MaxResource
 		self:GetPhysicsObject():SetMass(150 + Frac * 300)
 		self:GetPhysicsObject():Wake()
-
+		if (WireLib) then
+			WireLib.TriggerOutput(self, "Type", self:GetResourceType())
+			WireLib.TriggerOutput(self, "Amount Left", self:GetResource())
+		end
 		if self:GetResource() > 0 then
 			self:SetBodygroup(1, 2)
 
