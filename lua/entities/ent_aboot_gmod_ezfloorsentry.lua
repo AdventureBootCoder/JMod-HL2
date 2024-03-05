@@ -10,12 +10,7 @@ ENT.NoSitAllowed = true
 ENT.Spawnable = true
 ENT.AdminSpawnable = true
 ENT.SpawnHeight = 15
-ENT.EZconsumes = {
-    JMod.EZ_RESOURCE_TYPES.AMMO,
-    JMod.EZ_RESOURCE_TYPES.POWER,
-    JMod.EZ_RESOURCE_TYPES.BASICPARTS,
-    JMod.EZ_RESOURCE_TYPES.COOLANT
-}
+ENT.EZconsumes = nil
 ENT.EZscannerDanger=true
 ENT.JModPreferredCarryAngles=Angle(0,0,180)
 ENT.EZupgradable=true
@@ -120,101 +115,6 @@ ENT.DynamicPerfSpecs={
 	TargetLockTime = 5,
 	Cooling = 1.1
 }
-ENT.DynamicPerfSpecExp=1.2
--- All moddable attributes
--- Each mod selected for it is +1, against it is -1
-ENT.ModPerfSpecs = {
-	MaxAmmo = 0,
-	TurnSpeed = 0,
-	TargetingRadius = 0,
-	Armor = 0,
-	FireRate = 0,
-	Damage = 0,
-	Accuracy = 0,
-	SearchSpeed = 0,
-	Cooling = 0
-}
-
-function ENT:SetMods(tbl, ammoType)
-	self.ModPerfSpecs = tbl
-	local OldAmmo = self:GetAmmoType()
-	self:SetAmmoType(ammoType)
-	if (OldAmmo~=ammoType) then
-		local RefundInfo = self.AmmoRefundTable[OldAmmo]
-		local AmmoTypeToSpawn = RefundInfo.spawnType
-		local NetVarValueName = "Get" .. RefundInfo.varToRead
-		local NetVarValue = self[NetVarValueName](self)
-		local AmtToSpawn = NetVarValue * RefundInfo.conversionMult
-		if (OldAmmo == "Pulse Laser") then
-			// we were using Electricity as ammo, and now our MaxElectricity is about to change
-			// we're gonna kick our all our Electricity, so set ours to 0
-			// no exploit
-			self:SetElectricity(0)
-		end
-		JMod.MachineSpawnResource(self, AmmoTypeToSpawn, AmtToSpawn, self:GetForward() * -50 + self:GetUp() * 50, Angle(0, 0, 0), self:GetForward(), true)
-	end
-	self:InitPerfSpecs(OldAmmo~=ammoType)
-	if(ammoType == "Pulse Laser")then
-		self.EZconsumes={JMod.EZ_RESOURCE_TYPES.POWER,JMod.EZ_RESOURCE_TYPES.BASICPARTS,JMod.EZ_RESOURCE_TYPES.COOLANT}
-	elseif(ammoType == "HE Grenade")then
-		self.EZconsumes={JMod.EZ_RESOURCE_TYPES.MUNITIONS,JMod.EZ_RESOURCE_TYPES.POWER,JMod.EZ_RESOURCE_TYPES.BASICPARTS,JMod.EZ_RESOURCE_TYPES.COOLANT}
-	elseif(ammoType == "Super Soaker")then
-		self.EZconsumes = {JMod.EZ_RESOURCE_TYPES.WATER, JMod.EZ_RESOURCE_TYPES.POWER, JMod.EZ_RESOURCE_TYPES.BASICPARTS, JMod.EZ_RESOURCE_TYPES.COOLANT}
-	else
-		self.EZconsumes={JMod.EZ_RESOURCE_TYPES.AMMO,JMod.EZ_RESOURCE_TYPES.POWER,JMod.EZ_RESOURCE_TYPES.BASICPARTS,JMod.EZ_RESOURCE_TYPES.COOLANT}
-	end
-end
-
-function ENT:InitPerfSpecs(removeAmmo)
-	self.ModPerfSpecs.BaseClass = nil
-	self.AmmoTypes.BaseClass = nil
-	local PerfMult=self:GetPerfMult() or 1
-	local Grade=self:GetGrade()
-	for specName,value in pairs(self.StaticPerfSpecs)do self[specName]=value end
-	for specName,value in pairs(self.DynamicPerfSpecs)do self[specName]=value*PerfMult*JMod.EZ_GRADE_BUFFS[Grade]^self.DynamicPerfSpecExp end
-	self.MaxAmmo=math.Round(self.MaxAmmo/100)*100 -- a sight for sore eyes, ey jack?-titanicjames
-	self.TargetingRadius=self.TargetingRadius*52.493 -- convert meters to source units
-	
-	local MaxValue=10
-	--PrintTable(self.ModPerfSpecs)
-	for attrib, value in pairs(self.ModPerfSpecs) do
-		--jprint(value)
-		local oldVal=self[attrib]
-		if value > 0 then
-			local ratio = (math.abs(value / MaxValue) + 1) ^ 1.5
-			self[attrib] = self[attrib] * ratio
-			--print(attrib.." "..value.." ----- "..oldVal.." -> "..self[attrib])
-		elseif value < 0 then
-			local ratio = (math.abs(value / MaxValue) + 1) ^ 3
-			self[attrib] = self[attrib] / ratio
-		end
-		--print(attrib.." "..value.." ----- "..oldVal.." -> "..self[attrib])
-	end
-
-	-- Finally apply AmmoType attributes
-	if self.AmmoTypes[self:GetAmmoType()] then
-		--PrintTable(self.AmmoTypes[self:GetAmmoType()])
-		self.AmmoTypes[self:GetAmmoType()].BaseClass = nil
-		for attrib, mult in pairs(self.AmmoTypes[self:GetAmmoType()]) do
-			--mult.BaseClass = nil
-			--print("applying AmmoType multiplier of "..mult .." to "..attrib..": "..self[attrib].." -> "..self[attrib]*mult)
-			self[attrib] = self[attrib] * mult
-		end
-	end
-
-	if self:GetAmmoType() == "Super Soaker" then
-		self.MaxWater = self.MaxAmmo
-	end
-
-	if self:GetAmmoType() ~= "Pulse Laser" then
-		-- no juking the ammo capacity, fag
-		self:SetAmmo((removeAmmo and 0) or math.min(self:GetAmmo(), self.MaxAmmo))
-	else
-		-- except for lasers cause they don't use ammo
-		self:SetAmmo(self.MaxAmmo)
-		self.MaxElectricity = self.MaxAmmo / 1.5
-	end
-end
 
 ----
 local STATE_BROKEN,STATE_OFF,STATE_WATCHING,STATE_SEARCHING,STATE_ENGAGING,STATE_WHINING,STATE_OVERHEATED = -1,0,1,2,3,4,5
@@ -939,6 +839,7 @@ if(SERVER)then
 	end
 
 	function ENT:GetTargetAimOffset(point)
+		if self.AimOverride then point = self.AimOverride end
 		if not point then return 0, 0 end
 		local SelfPos = self:GetPos() - self:GetUp() * 16
 		local TargAng = self:WorldToLocalAngles((point - SelfPos):Angle())
@@ -946,13 +847,6 @@ if(SERVER)then
 		local CurPitchOffset, CurYawOffset = self:GetAimPitch(), self:GetAimYaw()
 
 		return -(CurPitchOffset - GoalPitch), CurYawOffset - GoalYaw
-	end
-
-	function ENT:RandomMove()
-		local X, Y = self:GetAimYaw(), self:GetAimPitch()
-		self:Point(Y + math.Rand(-1, 1) * self.TurnSpeed / 8, X + math.Rand(-1, 1) * self.TurnSpeed / 4)
-		self:ConsumeElectricity()
-		-- todo, find a use for this
 	end
 
 	function ENT:ReturnToForward()

@@ -42,7 +42,9 @@ if SERVER then
 		self.SoundLoop:SetSoundLevel(120)
 		self.NextThrust = 0
 		local SelfOwner = self.Owner
-		self.OwnerTr = util.QuickTrace(SelfOwner:GetShootPos(), SelfOwner:GetAimVector() * 9e9, {self, SelfOwner})
+		if IsValid(SelfOwner) and SelfOwner.GetShootPos then
+			self.OwnerTr = util.QuickTrace(SelfOwner:GetShootPos(), SelfOwner:GetAimVector() * 9e9, {self, SelfOwner})
+		end
 		self:Think()
 	end
 
@@ -100,10 +102,12 @@ if SERVER then
 	local LastTime = 0
 
 	function ENT:Think()
-		local Time, Pos, Dir, Speed, SelfOwner = CurTime(), self:GetPos(), self.CurVel:GetNormalized(), self.CurVel:Length(), self.Owner
-		local Wep = SelfOwner:GetActiveWeapon()
-		if IsValid(Wep) and Wep.EZrocket and Wep.EZrocket == self then
-			self.OwnerTr = util.QuickTrace(SelfOwner:GetShootPos(), SelfOwner:GetAimVector() * 9e9, {self, SelfOwner})
+		local Time, SelfPos, Dir, Speed, SelfOwner = CurTime(), self:GetPos(), self.CurVel:GetNormalized(), self.CurVel:Length(), self.Owner
+		if IsValid(SelfOwner) and SelfOwner.GetActiveWeapon then
+			local Wep = SelfOwner:GetActiveWeapon()
+			if IsValid(Wep) and Wep.EZrocket and Wep.EZrocket == self then
+				self.OwnerTr = util.QuickTrace(SelfOwner:GetShootPos(), SelfOwner:GetAimVector() * 9e9, {self, SelfOwner})
+			end
 		end
 
 		local Tr
@@ -114,7 +118,7 @@ if SERVER then
 			local Filter = {self}
 
 			table.insert(Filter, SelfOwner)
-			--Tr=util.TraceLine({start=Pos,endpos=Pos+self.CurVel/ThinkRate,filter=Filter})
+			--Tr=util.TraceLine({start=SelfPos,endpos=SelfPos+self.CurVel/ThinkRate,filter=Filter})
 			local Mask, HitWater, HitChainLink = MASK_SHOT, false, true
 
 			if HitWater then
@@ -126,8 +130,8 @@ if SERVER then
 			end
 
 			Tr = util.TraceHull({
-				start = Pos,
-				endpos = Pos + self.CurVel / ThinkRate,
+				start = SelfPos,
+				endpos = SelfPos + self.CurVel / ThinkRate,
 				filter = Filter,
 				mins = Vector(-3, -3, -3),
 				maxs = Vector(3, 3, 3),
@@ -144,14 +148,20 @@ if SERVER then
 
 			self:Detonate(Tr)
 		else
-			self:SetPos(Pos + self.CurVel / ThinkRate)
+			self:SetPos(SelfPos + self.CurVel / ThinkRate)
 			--local AngleToBe = self.CurVel:GetNormalized():Angle()
-			local AngleToBe = (self.OwnerTr.HitPos - self:GetPos()):GetNormalized():Angle()
+			local AimPos = (self.OwnerTr and self.OwnerTr.HitPos) or self.Owner.GuidePos
+			if not AimPos or (AimPos:Distance(self:GetPos()) < 10) then
+				self:Detonate()
+
+				return
+			end
+			local AngleToBe = (AimPos - self:GetPos()):GetNormalized():Angle()
 			AngleToBe:RotateAroundAxis(AngleToBe:Up(), -90)
 			self:SetAngles(AngleToBe)
 			local RandomDir = VectorRand() * 2000
 			if self.Guided then
-				--local NewDir = (self.OwnerTr.HitPos - self:GetPos()):GetNormalized() * 600
+				--local NewDir = (AimPos - self:GetPos()):GetNormalized() * 600
 				local NewDir = AngleToBe:Right() * -60000
 				self.CurVel = NewDir / ThinkRate
 			else
@@ -200,6 +210,12 @@ elseif CLIENT then
 		self.Mdl:SetNoDraw(true)
 		self.RenderPos = self:GetPos()
 		self.NextRender = CurTime() + .05
+	end
+
+	function ENT:Remove()
+		if IsValid(self.Mdl) then
+			self.Mdl:Remove()
+		end
 	end
 
 	function ENT:Think()
