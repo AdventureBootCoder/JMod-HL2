@@ -200,7 +200,7 @@ function ENT:SetMods(tbl, ammoType)
 		elseif (OldAmmo == "Super Soaker") then
 			self:SetWater(0)
 		end
-		JMod.MachineSpawnResource(self, AmmoTypeToSpawn, AmtToSpawn, self:GetForward() * -50 + self:GetUp() * 50, Angle(0, 0, 0), self:GetForward(), true)
+		JMod.MachineSpawnResource(self, AmmoTypeToSpawn, AmtToSpawn, Vector(0, -30, 50), Angle(0, 0, 0), self:GetForward(), true)
 	end
 	self:InitPerfSpecs((OldAmmo~=ammoType)or((self.ModPerfSpecs.MaxAmmo<OldMaxAmmoSpec)))
 	if(ammoType == "Pulse Laser")then
@@ -243,8 +243,12 @@ function ENT:InitPerfSpecs(removeAmmo)
 	-- Finally apply AmmoType attributes
 	if self.AmmoTypes[self:GetAmmoType()] then
 		for attrib, mult in pairs(self.AmmoTypes[self:GetAmmoType()]) do
-			--print("applying AmmoType multiplier of "..mult .." to "..attrib..": "..self[attrib].." -> "..self[attrib]*mult)
-			self[attrib] = self[attrib] * mult
+			if istable(mult) then
+				mult = nil
+			else
+				--print("applying AmmoType multiplier of "..mult .." to "..attrib..": "..self[attrib].." -> "..self[attrib]*mult)
+				self[attrib] = self[attrib] * mult
+			end
 		end
 	end
 
@@ -622,6 +626,7 @@ if(SERVER)then
 	end
 
 	function ENT:CanEngage(ent)
+		if self.EngageOverride then return true end
 		if not IsValid(ent) then return false end
 		if ent == self.NPCTarget then return false end
 
@@ -891,7 +896,7 @@ if(SERVER)then
 			self.Heat = math.Clamp(self.Heat - CoolinAmt, 0, 100)
 		end
 
-		if self.Firing then
+		if self.Firing or self.FireOverride then
 			if self.NextFire < Time then
 				self.NextFire = Time + 1 / self.FireRate --  (1/self.FireRate^1.2+0.05) 
 				self:FireAtPoint(self.SearchData.LastKnownPos, self.SearchData.LastKnownVel or Vector(0, 0, 0))
@@ -1161,7 +1166,9 @@ if(SERVER)then
 			Rocket.Owner = self
 			Rocket.Damage = Dmg
 			Rocket.CurVel = self:GetVelocity() + ShootDir * Speed
-			Rocket.Guided = true
+			if self.SearchData.LastKnownPos then
+				--Rocket.Guided = true
+			end
 			Rocket:Spawn()
 			Rocket:Activate()
 
@@ -1359,6 +1366,7 @@ if(SERVER)then
 elseif(CLIENT)then
 	function ENT:CustomInit()
 		self.MachineGun=JMod.MakeModel(self,"models/jmod/ez/sentrygun.mdl")
+		self.MissileLauncher=JMod.MakeModel(self,"models/weapons/w_rocket_jauncher.mdl")
 		---
 		self.CurAimPitch = 0
 		self.CurAimYaw = 0
@@ -1440,7 +1448,7 @@ elseif(CLIENT)then
 				self.MachineGun = JMod.MakeModel(self, "models/jmod/ez/sentrygun.mdl")
 			end
 			self.MachineGun:SetBodygroup(0, AmmoBGs[AmmoType])
-			if (AmmoType == "Pulse Rifle") or (AmmoType == "Missile Launcher") then
+			if (AmmoType == "Pulse Rifle") then
 				self.RenderGun = false
 
 				return
@@ -1452,12 +1460,17 @@ elseif(CLIENT)then
 		if self.RenderGun then
 			local GunMaxy = self:GetBoneMatrix(2)
 			local AimAngle = GunMaxy:GetAngles():GetCopy()
-			AimAngle:RotateAroundAxis(AimAngle:Forward(), -90)
-			AimAngle:RotateAroundAxis(AimAngle:Up(), -90)
-			local AimUp, AimRight, AimForward = AimAngle:Up(), AimAngle:Right(), AimAngle:Forward()
 			local GunPos = GunMaxy:GetTranslation()
 
-			JMod.RenderModel(self.MachineGun, GunPos - AimForward * (6 + self.VisualRecoil) - AimRight * 1.5, AimAngle, Vector(0.75, 0.75, 0.75))
+			if AmmoType == "Missile Launcher" then
+				AimAngle:RotateAroundAxis(AimAngle:Right(), -90)
+				JMod.RenderModel(self.MissileLauncher, GunPos - AimAngle:Forward() * 10 - AimAngle:Right() * 2 - AimAngle:Up() * 0.1, AimAngle, Vector(1, 1, 1))
+			else
+				AimAngle:RotateAroundAxis(AimAngle:Forward(), -90)
+				AimAngle:RotateAroundAxis(AimAngle:Up(), -90)
+				local AimUp, AimRight, AimForward = AimAngle:Up(), AimAngle:Right(), AimAngle:Forward()
+				JMod.RenderModel(self.MachineGun, GunPos - AimForward * (6 + self.VisualRecoil) - AimRight * 1.5, AimAngle, Vector(0.75, 0.75, 0.75))
+			end
 			CurPlateAng = 0
 			CurGunOut = 0
 		else

@@ -44,6 +44,8 @@ if SERVER then
 		local SelfOwner = self.Owner
 		if IsValid(SelfOwner) and SelfOwner.GetShootPos then
 			self.OwnerTr = util.QuickTrace(SelfOwner:GetShootPos(), SelfOwner:GetAimVector() * 9e9, {self, SelfOwner})
+		elseif not self.Guided then
+			self.OwnerTr = util.QuickTrace(self:GetPos(), self:GetForward() * 9e9, {self, SelfOwner})
 		end
 		self:Think()
 	end
@@ -151,7 +153,7 @@ if SERVER then
 			self:SetPos(SelfPos + self.CurVel / ThinkRate)
 			--local AngleToBe = self.CurVel:GetNormalized():Angle()
 			local AimPos = (self.OwnerTr and self.OwnerTr.HitPos) or self.Owner.GuidePos
-			if not AimPos or (AimPos:Distance(self:GetPos()) < 10) then
+			if self.Guided and (not(AimPos) or (AimPos:Distance(self:GetPos()) < 10)) then
 				self:Detonate()
 
 				return

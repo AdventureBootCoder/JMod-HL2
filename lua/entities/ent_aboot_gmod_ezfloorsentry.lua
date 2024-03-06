@@ -57,6 +57,15 @@ ENT.AmmoTypes = {
 		Accuracy = .8,
 		BarrelLength = .75
 	}, -- explosive projectile
+	["Missile Launcher"] = {
+		MaxAmmo = .20,
+		FireRate = .05,
+		Damage = 10,
+		Accuracy = .8,
+		BarrelLength = 2,
+		TargetingRadius = 2,
+		SearchSpeed = 0.6
+	}, -- explosive projectile
 	["Pulse Laser"] = {
 		Accuracy = 3,
 		Damage = .4,
@@ -128,59 +137,90 @@ function ENT:CustomSetupDataTables()
 end
 
 if(SERVER)then
-	function ENT:CustomInit()
-		local phys=self.Entity:GetPhysicsObject()
-		if phys:IsValid()then
-			phys:SetBuoyancyRatio(.3)
-		end
-
-		---
-		self:SetAmmoType("Pulse Rifle")
-		--JMod.Colorify(self)
-		self:SetPerfMult(JMod.Config.Machines.Sentry.PerformanceMult)
-		self:InitPerfSpecs()
-		---
-		self:Point(0, 0)
-		self.SearchStageTime = self.SearchTime / 2
-		self.NextWhine=0
-		self.Heat=0
-		self:ResetMemory()
-		self:CreateNPCTarget()
-		---
-		if self.SpawnFull then
-			self:SetAmmo(self.MaxAmmo)
-			self:SetCoolant(self.MaxCoolant)
-		else
-			self:SetAmmo(0)
-			self:SetCoolant(0)
-		end
-	end
-
-	function ENT:ResetMemory()
-		self.NextFire = 0
-		self.NextRealThink = 0
-		self.Firing = false
-		self.NextTargetSearch = 0
-		self.Target = nil
-		self.NextTargetReSearch = 0
-		self.NextFixTime = 0
-		self.NextUseTime = 0
-		self.NextPingTime = 0
-		self.NextEndPanicTime = 0
-		if self.AlertSound then
-			self.AlertSound:Stop()
-		end
-
-		self.SearchData = {
-			LastKnownTarg = nil,
-			LastKnownPos = nil,
-			LastKnownVel = nil,
-			NextDeEsc = 0, -- next de-escalation to the watching state
-			NextSearchChange = 0, -- time to move on to the next phase of searching
-			State = 0 -- 0=not searching, 1=aiming at last known point, 2=aiming at predicted point
+	--- Wire stuff
+	function ENT:SetupWire()
+		if not(istable(WireLib)) then return end
+		local WireInputs = {
+			"Toggle [NORMAL]", 
+			"On-Off [NORMAL]", 
+			"Engage [ENTITY]", 
+			"AimAt [VECTOR]", 
+			"Shoot [NORMAL]",
+			"Reset [NORMAL]"
 		}
+		local WireInputDesc = {
+			"Greater than 1 toggles machine on and off", 
+			"1 turns on, 0 turns off", 
+			"Entity to get angry at",
+			"Vector to aim at",
+			"Fires sentry",
+			"Resets sentry memory"
+		}
+		self.Inputs = WireLib.CreateInputs(self, WireInputs, WireInputDesc)
+		--
+		local WireOutputs = {"State [NORMAL]", "Grade [NORMAL]"}
+		local WireOutputDesc = {"The state of the machine \n-1 is broken \n0 is off \n1 is on", "The machine grade"}
+		for _, typ in ipairs(self.EZconsumes) do
+			if typ == JMod.EZ_RESOURCE_TYPES.BASICPARTS then typ = "Durability" end
+			local ResourceName = string.Replace(typ, " ", "")
+			local ResourceDesc = "Amount of "..ResourceName.." left"
+			--
+			local OutResourceName = string.gsub(ResourceName, "^%l", string.upper).." [NORMAL]"
+			table.insert(WireOutputs, OutResourceName)
+			table.insert(WireOutputDesc, ResourceDesc)
+		end
+		self.Outputs = WireLib.CreateOutputs(self, WireOutputs, WireOutputDesc)
 	end
 
+	function ENT:TriggerInput(iname, value)
+		local State, Owner = self:GetState(), JMod.GetEZowner(self)
+		if State < 0 then return end
+		if iname == "On-Off" then
+			if value == 1 then
+				self:TurnOn(Owner)
+			elseif value == 0 then
+				self:TurnOff(Owner)
+			end
+		elseif iname == "Toggle" then
+			if value > 0 then
+				if State == 0 then
+					self:TurnOn(Owner)
+				elseif State > 0 then
+					self:TurnOff(Owner)
+				end
+			end
+		elseif iname == "Engage" then
+			if IsValid(value) then
+				self.EngageOverride = true
+				self:Engage(value)
+			else
+				self.EngageOverride = false
+			end
+		elseif iname == "AimAt" then
+			if value == Vector(0, 0, 0) then
+				self.AimOverride = nil
+			else
+				self.AimOverride = value
+				local NeedTurnPitch, NeedTurnYaw = self:GetTargetAimOffset(value)
+
+				if (math.abs(NeedTurnPitch) > 0) or (math.abs(NeedTurnYaw) > 0) then
+					self:Turn(NeedTurnPitch, NeedTurnYaw)
+				end
+			end
+		elseif iname == "Shoot" then
+			if value > 0 then
+				self.FireOverride = true
+			else
+				self.FireOverride = false
+			end
+		elseif iname == "Reset" then
+			if value > 0 then
+				self:ResetMemory()
+			end
+		end
+	end
+	--- End wire stuff
+	
 	function ENT:CreateNPCTarget()
 		if not IsValid(self.NPCTarget) then
 			self.NPCTarget = ents.Create("npc_bullseye")
@@ -233,10 +273,6 @@ if(SERVER)then
 			end
 		end
 		return Mult
-	end
-
-	function ENT:OnBreak()
-		self:RemoveNPCTarget()
 	end
 
 	function ENT:CanISee(ent)
@@ -306,23 +342,6 @@ if(SERVER)then
 		self:SetState(STATE_ENGAGING)
 		self:EmitSound("npc/turret_floor/active.wav", 75, 100)
 		JMod.Hint(self.EZowner, "sentry upgrade")
-	end
-
-	function ENT:Disengage()
-		local Time = CurTime()
-		self.SearchData.State = 1
-		self.SearchData.NextSearchChange = Time + self.SearchStageTime
-		self.SearchData.NextDeEsc = Time + self.SearchTime
-		self:SetState(STATE_SEARCHING)
-		self:EmitSound("npc/turret_floor/ping.wav", 65, 100)
-	end
-
-	function ENT:StandDown()
-		self.Target = nil
-		self.SearchData.State = 0
-		self:SetState(STATE_WATCHING)
-		self:EmitSound("npc/turret_floor/retract.wav", 65, 100)
-		JMod.Hint(self.EZowner, "sentry modify")
 	end
 
 	function ENT:Think()
@@ -494,7 +513,7 @@ if(SERVER)then
 			self.Heat = math.Clamp(self.Heat - CoolinAmt, 0, 100)
 		end
 
-		if self.Firing then
+		if self.Firing or self.FireOverride then
 			if self.NextFire < Time then
 				self.NextFire = Time + 1 / self.FireRate --  (1/self.FireRate^1.2+0.05) 
 				self:FireAtPoint(self.SearchData.LastKnownPos, self.SearchData.LastKnownVel or Vector(0, 0, 0))
@@ -792,6 +811,51 @@ if(SERVER)then
 			Heat = Heat * 3
 			AmmoConsume = 0
 			ElecConsume = .025 * Dmg
+		elseif ProjType == "Missile Launcher" then
+			local Dmg, Inacc = self.Damage * 15, .06 / self.Accuracy
+			AmmoConsume = 5
+			sound.Play("snds_jack_gmod/sentry_gl.wav", SelfPos, 70, math.random(90, 110))
+			ParticleEffect("muzzleflash_m79", ShootPos, AimAng, self)
+			sound.Play("snds_jack_gmod/sentry_far.wav", SelfPos + Up, 100, math.random(90, 110))
+			-- leading calcs --
+			local Speed = 4000
+			local ShootDir = (point - ShootPos):GetNormalized()
+			local ShootAng = ShootDir:Angle()
+			ShootAng:RotateAroundAxis(ShootAng:Right(), -1)
+			ShootDir = ShootAng:Forward()
+			--
+			ShootDir = (ShootDir + VectorRand() * math.Rand(.05, 1) * Inacc):GetNormalized()
+			local Rocket = ents.Create("ent_aboot_gmod_ezhl2rocket")
+			Rocket:SetPos(ShootPos + Up * 100)
+			ShootAng:RotateAroundAxis(ShootAng:Up(), -90)
+			Rocket:SetAngles(ShootAng)
+			JMod.SetEZowner(Rocket, JMod.GetEZowner(self) or self)
+			Rocket.Owner = self
+			Rocket.Damage = Dmg
+			Rocket.CurVel = self:GetVelocity() + ShootDir * Speed
+			if self.SearchData.LastKnownPos then
+				Rocket.Guided = true
+			end
+			Rocket:Spawn()
+			Rocket:Activate()
+
+			-- Backblast code copied from the weapon base --
+			self.BackBlast = 1
+			local RPos, RDir = ShootPos + ShootAng:Right() * 100, -ShootAng:Right()
+			local Dist = 200
+
+			if SERVER then
+				local FooF = EffectData()
+				FooF:SetOrigin(RPos)
+				FooF:SetScale(self.BackBlast)
+				FooF:SetNormal(RDir)
+				util.Effect("eff_jack_gmod_smalldustshock", FooF, true, true)
+				local Ploom = EffectData()
+				Ploom:SetOrigin(RPos)
+				Ploom:SetScale(self.BackBlast)
+				Ploom:SetNormal(RDir)
+				util.Effect("eff_jack_gmod_ezbackblast", Ploom, true, true)
+			end
 		elseif ProjType == "Super Soaker" then
 			local ShellAng = AimAng:GetCopy()
 			--ShellAng:RotateAroundAxis(ShellAng:Up(), 0)
@@ -904,6 +968,7 @@ if(SERVER)then
 elseif(CLIENT)then
 	function ENT:CustomInit()
 		self.MachineGun=JMod.MakeModel(self,"models/jmod/ez/sentrygun.mdl")
+		self.MissileLauncher=JMod.MakeModel(self,"models/weapons/w_rocket_jauncher.mdl")
 		---
 		self.CurAimPitch = 0
 		self.CurAimYaw = 0
@@ -911,6 +976,7 @@ elseif(CLIENT)then
 		self.CurGunOut = 0
 		self.VisualRecoil = 0
 		---
+		self.ModPerfSpecs = {}
 		self.LastAmmoType = ""
 		self.RenderGun = true
 	end
@@ -929,6 +995,7 @@ elseif(CLIENT)then
 		["API Bullet"] = 0,
 		["Buckshot"] = 1,
 		["HE Grenade"] = 2,
+		["Missile Launcher"] = 2,
 		["Pulse Laser"] = 3,
 		["Super Soaker"] = 0
 	}
@@ -983,6 +1050,9 @@ elseif(CLIENT)then
 			if not IsValid(self.MachineGun) then
 				self.MachineGun = JMod.MakeModel(self, "models/jmod/ez/sentrygun.mdl")
 			end
+			if not IsValid(self.MissileLauncher) then
+				self.MissileLauncher = JMod.MakeModel(self, "models/weapons/w_rocket_jauncher.mdl")
+			end
 			self.MachineGun:SetBodygroup(0, AmmoBGs[AmmoType])
 			if AmmoType == "Pulse Rifle" then
 				self.RenderGun = false
@@ -996,12 +1066,16 @@ elseif(CLIENT)then
 		if self.RenderGun then
 			local GunMaxy = self:GetBoneMatrix(2)
 			local AimAngle = GunMaxy:GetAngles():GetCopy()
-			AimAngle:RotateAroundAxis(AimAngle:Forward(), 180)
-			--AimAngle:RotateAroundAxis(AimAngle:Up(), -90)
-			local AimUp, AimRight, AimForward = AimAngle:Up(), AimAngle:Right(), AimAngle:Forward()
-			local GunPos = GunMaxy:GetTranslation()
 
-			JMod.RenderModel(self.MachineGun, GunPos + AimForward * (8 + self.VisualRecoil) - AimUp * 9.8, AimAngle, Vector(0.75, 0.75, 0.75))
+			local GunPos = GunMaxy:GetTranslation()
+			if AmmoType == "Missile Launcher" then
+				AimAngle:RotateAroundAxis(AimAngle:Right(), 180)
+				JMod.RenderModel(self.MissileLauncher, GunPos - AimAngle:Forward() * 25 - AimAngle:Up() * 8 - AimAngle:Up() * 0.1, AimAngle, Vector(1, 1, 1))
+			else
+				AimAngle:RotateAroundAxis(AimAngle:Forward(), 180)
+				local AimUp, AimRight, AimForward = AimAngle:Up(), AimAngle:Right(), AimAngle:Forward()
+				JMod.RenderModel(self.MachineGun, GunPos + AimForward * (8 + self.VisualRecoil) - AimUp * 9.8, AimAngle, Vector(0.75, 0.75, 0.75))
+			end
 			CurPlateAng = 0
 			CurGunOut = 0
 		else
