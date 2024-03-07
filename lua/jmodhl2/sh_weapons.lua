@@ -94,7 +94,7 @@ JModHL2.WeaponTable = {
 		Category = "JMod - EZ HL:2"
 	},
 	["API-SR"] = {
-		mdl = "models/weapons/sniper/w_sniper.mdl",
+		mdl = "models/weapons/aboot/sniper/w_sniper.mdl",
 		swep = "wep_aboot_jmod_apisr",
 		ent = "ent_aboot_jmod_ezweapon_apisr",
 		Category = "JMod - EZ HL:2"
