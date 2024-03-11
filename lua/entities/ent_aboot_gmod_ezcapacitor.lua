@@ -9,11 +9,12 @@ ENT.Spawnable = true
 ENT.AdminOnly = false
 ENT.Base = "ent_jack_gmod_ezmachine_base"
 ---
-ENT.Model = "models/props_lab/powerbox02b.mdl"
+ENT.Model = "models/props_lab/powerbox02d.mdl"
 ENT.Mass = 50
 ENT.SpawnHeight = 10
 ENT.JModPreferredCarryAngles = Angle(0, 0, 0)
 ENT.EZupgradable = false
+ENT.EZcolorable = false
 ENT.StaticPerfSpecs = {
 	MaxDurability = 100,
 	MaxElectricity = 100
@@ -29,7 +30,7 @@ local STATE_BROKEN, STATE_OFF, STATE_ON = -1, 0, 1
 
 if(SERVER)then
 	function ENT:CustomInit()
-		self.ElecticalCallbacks = {}
+		self.ElectricalCallbacks = {}
 	end
 
 	function ENT:TurnOn(activator)
@@ -39,7 +40,6 @@ if(SERVER)then
 			if IsValid(activator) then self.EZstayOn = true end
 			self:SetState(STATE_ON)
 			self:CheckForConnection()
-			jprint("turning on")
 		else
 			JMod.Hint(activator, "nopower")
 		end
@@ -49,6 +49,10 @@ if(SERVER)then
 		if (self:GetState() <= 0) then return end
 		if IsValid(activator) then self.EZstayOn = nil end
 		self:SetState(STATE_OFF)
+		for k, v in pairs(self.ElectricalCallbacks) do
+			Entity(k):RemoveCallback("PhysicsCollide", v)
+			self.ElectricalCallbacks[k] = nil
+		end
 	end
 
 	function ENT:Use(activator)
@@ -80,32 +84,97 @@ if(SERVER)then
 		return true
 	end
 
-	local Shockables = {MAT_METAL, MAT_DEFAULT, MAT_GRATE, MAT_FLESH, MAT_ALIENFLESH}
+	local Shockables = {MAT_METAL, MAT_VENT, MAT_DEFAULT, MAT_GRATE, MAT_FLESH, MAT_ALIENFLESH}
 
-	function ENT:CheckForConnection(shocker)
-		for _, Ent in pairs(constraint.GetAllConstrainedEntities(self)) do
-			if IsValid(shocker) then
-				if Ent == shocker then
+	local function IsConnectableEnt(ent1, ent2)
+		if (ent2:IsValid()) and (ent2:GetClass() == "prop_physics") and (table.HasValue(Shockables, ent2:GetMaterialType())) then
+			if IsValid(ent1) then
+				local Rad1, Rad2 = ent1:BoundingRadius() + 10, ent2:BoundingRadius() + 10
+				local Dist = ent1:LocalToWorld(ent1:OBBCenter()):Distance(ent2:LocalToWorld(ent2:OBBCenter()))
+
+				return (Dist <= (Rad1 + Rad2))
+			else
+				return true
+			end
+		end
+
+		return false
+	end
+
+	local function FindNextConnection(ent, entToFind, depth, connected)
+		depth = depth or 0
+		depth = depth + 1
+		--print("Depth: " .. tostring(depth), "Seeker: " .. tostring(ent), "Target: " .. tostring(entToFind))
+		if depth >= 5 then 
+			if IsValid(entToFind) then 
+				
+				return false 
+			else 
+				
+				return {} 
+			end 
+		end
+		local FoundEnts = connected or {}
+		for _, Weld in pairs(constraint.FindConstraints(ent, "Weld")) do
+			local EntToCheck = Weld.Ent1
+			if not(EntToCheck ~= ent) then
+				EntToCheck == Weld.Ent2
+			end
+			table.insert(FoundEnts, EntToCheck)
+			
+			if IsConnectableEnt(ent, EntToCheck) and not(table.HasValue(FoundEnts, EntToCheck)) then
+				table.Add(FoundEnts, FindNextConnection(EntToCheck, nil, depth, FoundEnts))
+			end
+		end
+		--print("Connected: " .. tostring(#FoundEnts))
+		if IsValid(entToFind) then
+			for _, CEnt in pairs(FoundEnts) do
+				if CEnt == entToFind then
 
 					return true
+				else
+					local DeeperSearch = FindNextConnection(CEnt, entToFind, depth)
+					if DeeperSearch then
+
+						return DeeperSearch
+					end
 				end
-			else
+			end
+		end
+		
+		return FoundEnts
+	end
+
+	function ENT:CheckForConnection(shocker)
+		if IsValid(shocker) then
+			if FindNextConnection(self, shocker) then
+
+				return true
+			end
+		else
+			local AllConnected = FindNextConnection(self, nil, 0)
+			--print(#AllConnected)
+			for _, Ent in pairs(AllConnected) do
+				--print("Found: " .. tostring(Ent))
 				local EntID = Ent:EntIndex()
-				if (Ent:GetClass() == "prop_physics") and (table.HasValue(Shockables, Ent:GetMaterialType())) and not(self.ElecticalCallbacks[EntID]) then
+				if not(self.ElectricalCallbacks[EntID]) then
+					-- Here's where we do the callback thing
 					local ShockCallback = Ent:AddCallback("PhysicsCollide", function(ent, data)
-						if not(IsValid(ent)) or not(IsValid(data.HitEntity)) then return end
-						if data.DeltaTime > 0.3 then
+						if not(IsValid(ent)) or not(IsValid(data.HitEntity)) or (data.HitEntity == self) then return end
+						if data.DeltaTime > 0.2 then
 							timer.Simple(0, function()
 								if not(IsValid(Ent)) or not(IsValid(data.HitEntity)) then return end
 								if IsValid(self) then
-									self:Shock(Ent, data) 
-								else
+									self:Shock(Ent, data)
+								elseif ShockCallback then
 									Ent:RemoveCallback("PhysicsCollide", ShockCallback)
 								end
 							end)
 						end
 					end)
-					self.ElecticalCallbacks[EntID] = ShockCallback
+					if ShockCallback then
+						self.ElectricalCallbacks[EntID] = ShockCallback
+					end
 				end
 			end
 		end
@@ -116,14 +185,17 @@ if(SERVER)then
 	function ENT:Shock(shocker, shockedData)
 		if self:GetState() == STATE_ON then
 			local ShockEnt = shockedData.HitEntity
-			if self:GetPos():Distance(ShockEnt:GetPos()) <= self.ShockDistance then
+			if (ShockEnt ~= self) and not(self.ElectricalCallbacks[ShockEnt:EntIndex()]) and (self:GetPos():Distance(shockedData.HitPos) <= self.ShockDistance) then
 				local Connected = self:CheckForConnection(shocker)
 				if Connected then
-					if ShockEnt:IsPlayer() or ShockEnt:IsNPC() or table.HasValue(Shockables, ShockEnt:GetMaterialType()) then
-						local Damage, Force = 1, 500 -- Adjust damage and force factors as desired
+					if (ShockEnt:IsPlayer() or ShockEnt:IsNPC()) or table.HasValue(Shockables, ShockEnt:GetMaterialType()) then
+						--[[if ShockEnt:GetGroundEntity() != NULL then
+							print("Ground Entity: ", ShockEnt:GetGroundEntity())
+						end--]]
+						local Damage, Force = math.random(1, 3), 500 -- Adjust damage and force factors as desired
 						local Zap = DamageInfo()
 						Zap:SetDamage(Damage)
-						Zap:SetDamageForce(shockedData.HitNormal * -Force)
+						Zap:SetDamageForce(-shockedData.HitNormal * Force)
 						Zap:SetDamagePosition(shockedData.HitPos)
 						Zap:SetAttacker(JMod.GetEZowner(self))
 						Zap:SetInflictor(shocker)
@@ -141,15 +213,24 @@ if(SERVER)then
 						shocker:EmitSound("snd_jack_turretfizzle.wav", 70, 100)
 						-- Reduce power
 						self:ConsumeElectricity(1)
-						JMod.EZimmobilize(ShockEnt, 1.5, self)
+						if ShockEnt:IsPlayer() then
+							JMod.EZimmobilize(ShockEnt, 1.5, self)
+							ShockEnt:SetGroundEntity(nil)
+							local vec = (shockedData.HitPos - ShockEnt:GetPos()):GetNormalized()
+							ShockEnt:SetVelocity(vec * 100)
+						end
 					end
 				end
+			else
+				jprint(tostring(shocker) .. " Not connected!")
+				shocker:RemoveCallback("PhysicsCollide", self.ElectricalCallbacks[shocker:EntIndex()])
+				self.ElectricalCallbacks[shocker:EntIndex()] = nil
 			end
 		end
 	end
 
 	function ENT:OnRemove()
-		for k, v in pairs(self.ElecticalCallbacks) do
+		for k, v in pairs(self.ElectricalCallbacks) do
 			Entity(k):RemoveCallback("PhysicsCollide", v)
 		end
 	end
@@ -172,6 +253,8 @@ elseif(CLIENT)then
 		end
 	end
 
+	local GlowSprite = Material("sprites/mat_jack_basicglow")
+
 	function ENT:Draw()
 		local Up, Right, Forward, State = self:GetUp(), self:GetRight(), self:GetForward(), self:GetState()
 		local SelfPos, SelfAng = self:GetPos(), self:GetAngles()
@@ -180,22 +263,31 @@ elseif(CLIENT)then
 		local Closeness = LocalPlayer():GetFOV() * (EyePos():Distance(SelfPos))
 		local DetailDraw = Closeness < 36000 -- cutoff point is 400 units when the fov is 90 degrees
 		if State == STATE_BROKEN then DetailDraw = false end -- look incomplete to indicate damage, save on gpu comp too
-		if Obscured then DetailDraw = false end -- if obscured, at least disable details
+		--if Obscured then DetailDraw = false end -- if obscured, at least disable details
 		--
 		self:DrawModel()
 		--
 		if DetailDraw then
-			if (Closeness < 40000) and (State >= STATE_ON) then
+			if State >= STATE_ON then
 				local Opacity = math.random(50, 150)
 				local DisplayAng = SelfAng:GetCopy()
+				DisplayAng:RotateAroundAxis(DisplayAng:Up(), 90)
+				DisplayAng:RotateAroundAxis(DisplayAng:Forward(), 90)
 
-				cam.Start3D2D(SelfPos + Forward * 1 + Up * 1 + Right * 1, DisplayAng, .15)
-					draw.SimpleTextOutlined("POWER", "JMod-Display",250,-60,Color(255,255,255,Opacity),TEXT_ALIGN_CENTER,TEXT_ALIGN_TOP,3,Color(0,0,0,Opacity))
+				cam.Start3D2D(SelfPos + Forward * 5 + Up * 0, DisplayAng, .05)
+					draw.SimpleTextOutlined("POWER", "JMod-Display",0,-30,Color(255,255,255,Opacity),TEXT_ALIGN_CENTER,TEXT_ALIGN_TOP,3,Color(0,0,0,Opacity))
 					local ElecFrac=self:GetElectricity()/self.MaxElectricity
 					local R,G,B = JMod.GoodBadColor(ElecFrac)
-					draw.SimpleTextOutlined(tostring(math.Round(ElecFrac*100)).."%","JMod-Display",250,-30,Color(R,G,B,Opacity),TEXT_ALIGN_CENTER,TEXT_ALIGN_TOP,3,Color(0,0,0,Opacity))
+					draw.SimpleTextOutlined(tostring(math.Round(ElecFrac*100)).."%","JMod-Display",0,0,Color(R,G,B,Opacity),TEXT_ALIGN_CENTER,TEXT_ALIGN_TOP,3,Color(0,0,0,Opacity))
 				cam.End3D2D()
 			end
+		end
+		if State == STATE_ON then
+			render.SetMaterial(GlowSprite)
+			local SpritePos = SelfPos + Forward * 5 + Right * 0 + Up * 3
+			local Vec = (SpritePos - EyePos()):GetNormalized()
+			render.DrawSprite(SpritePos - Vec * 5, 20, 20, Color(255, 0, 0))
+			render.DrawSprite(SpritePos - Vec * 5, 10, 10, Color(255, 255, 255, 150))
 		end
 	end
 	language.Add("ent_aboot_gmod_ezpounder","EZ Ground-Pounder")
