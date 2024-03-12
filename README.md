@@ -1,4 +1,4 @@
 # JMod-HL2
-This mod aims to recreate, and create new, Half Life 2 entities to work with JMod.
+This mod aims to add Half Life themed entities to JMod.
 
 JMod (Required for this to work): https://github.com/Jackarunda/gmod
