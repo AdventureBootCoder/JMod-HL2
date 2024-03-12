@@ -29,8 +29,73 @@ local STATE_BROKEN, STATE_OFF, STATE_ON = -1, 0, 1
 ---
 
 if(SERVER)then
+	function ENT:SetupWire()
+		if not(istable(WireLib)) then return end
+		local WireInputs = {"Toggle [NORMAL]", "On-Off [NORMAL]", "Shock [ENTITY]"}
+		local WireInputDesc = {"Greater than 1 toggles machine on and off", "1 turns on, 0 turns off", "Attempts to shock nearby entity"}
+		self.Inputs = WireLib.CreateInputs(self, WireInputs, WireInputDesc)
+		--
+		local WireOutputs = {"State [NORMAL]", "LastShocked [ENTITY]"}
+		local WireOutputDesc = {"The state of the machine \n-1 is broken \n0 is off \n1 is on", "The last entity to be shocked"}
+		for _, typ in ipairs(self.EZconsumes) do
+			if typ == JMod.EZ_RESOURCE_TYPES.BASICPARTS then typ = "Durability" end
+			local ResourceName = string.Replace(typ, " ", "")
+			local ResourceDesc = "Amount of "..ResourceName.." left"
+			--
+			local OutResourceName = string.gsub(ResourceName, "^%l", string.upper).." [NORMAL]"
+			table.insert(WireOutputs, OutResourceName)
+			table.insert(WireOutputDesc, ResourceDesc)
+		end
+		self.Outputs = WireLib.CreateOutputs(self, WireOutputs, WireOutputDesc)
+	end
+
+	function ENT:UpdateWireOutputs()
+		if not istable(WireLib) then return end
+		WireLib.TriggerOutput(self, "State", self:GetState())
+		WireLib.TriggerOutput(self, "LastShocked", self.LastShockedEnt)
+		for _, typ in ipairs(self.EZconsumes) do
+			if typ == JMod.EZ_RESOURCE_TYPES.BASICPARTS then
+				WireLib.TriggerOutput(self, "Durability", self.Durability)
+			else
+				local MethodName = JMod.EZ_RESOURCE_TYPE_METHODS[typ]
+				if MethodName then
+					local ResourceGetMethod = self["Get"..MethodName]
+					if ResourceGetMethod then
+						local ResourceName = string.Replace(typ, " ", "")
+						WireLib.TriggerOutput(self, string.gsub(ResourceName, "^%l", string.upper), ResourceGetMethod(self))
+					end
+				end
+			end
+		end
+	end
+
+	function ENT:TriggerInput(iname, value)
+		local State, Owner = self:GetState(), JMod.GetEZowner(self)
+		if State < 0 then return end
+		if iname == "On-Off" then
+			if value == 1 then
+				self:TurnOn(Owner)
+			elseif value == 0 then
+				self:TurnOff(Owner)
+			end
+		elseif iname == "Toggle" then
+			if value > 0 then
+				if State == 0 then
+					self:TurnOn(Owner)
+				elseif State > 0 then
+					self:TurnOff(Owner)
+				end
+			end
+		elseif iname == "Shock" then
+			if IsValid(value) then
+				--self:Shock(self, {HitEntity = value, HitPos = value:GetPos(), HitNormal = (value:GetPos() - self:GetPos()):GetNormalized()})
+			end
+		end
+	end
+
 	function ENT:CustomInit()
 		self.ElectricalCallbacks = {}
+		self.LastShockedEnt = nil
 	end
 
 	function ENT:TurnOn(activator)
@@ -77,6 +142,7 @@ if(SERVER)then
 		--local SelfPos, Up, Right, Forward = self:GetPos(), self:GetUp(), self:GetRight(), self:GetForward()
 
 		self:UpdateWireOutputs()
+		self.LastShockedEnt = nil
 
 		self:ConsumeElectricity(math.Rand(0.02, 0.05))
 
@@ -89,7 +155,7 @@ if(SERVER)then
 	local function IsConnectableEnt(ent1, ent2)
 		if (ent2:IsValid()) and (ent2:GetClass() == "prop_physics") and (table.HasValue(Shockables, ent2:GetMaterialType())) then
 			if IsValid(ent1) then
-				local Rad1, Rad2 = ent1:BoundingRadius() + 10, ent2:BoundingRadius() + 10
+				local Rad1, Rad2 = ent1:BoundingRadius() + 5, ent2:BoundingRadius() + 5
 				local Dist = ent1:LocalToWorld(ent1:OBBCenter()):Distance(ent2:LocalToWorld(ent2:OBBCenter()))
 
 				return (Dist <= (Rad1 + Rad2))
@@ -101,11 +167,10 @@ if(SERVER)then
 		return false
 	end
 
-	local function FindNextConnection(ent, entToFind, depth, connected)
-		depth = depth or 0
-		depth = depth + 1
-		--print("Depth: " .. tostring(depth), "Seeker: " .. tostring(ent), "Target: " .. tostring(entToFind))
-		if depth >= 5 then 
+	local function FindNextConnection(ent, entToFind, currentDepth, connected)
+		currentDepth = currentDepth or 0
+		currentDepth = currentDepth + 1
+		if currentDepth >= 5 then 
 			if IsValid(entToFind) then 
 				
 				return false 
@@ -118,22 +183,20 @@ if(SERVER)then
 		for _, Weld in pairs(constraint.FindConstraints(ent, "Weld")) do
 			local EntToCheck = Weld.Ent1
 			if not(EntToCheck ~= ent) then
-				EntToCheck == Weld.Ent2
+				EntToCheck = Weld.Ent2
 			end
-			table.insert(FoundEnts, EntToCheck)
-			
 			if IsConnectableEnt(ent, EntToCheck) and not(table.HasValue(FoundEnts, EntToCheck)) then
-				table.Add(FoundEnts, FindNextConnection(EntToCheck, nil, depth, FoundEnts))
+				table.insert(FoundEnts, EntToCheck)
+				table.Add(FoundEnts, FindNextConnection(EntToCheck, nil, currentDepth, FoundEnts))
 			end
 		end
-		--print("Connected: " .. tostring(#FoundEnts))
 		if IsValid(entToFind) then
 			for _, CEnt in pairs(FoundEnts) do
 				if CEnt == entToFind then
 
 					return true
 				else
-					local DeeperSearch = FindNextConnection(CEnt, entToFind, depth)
+					local DeeperSearch = FindNextConnection(CEnt, entToFind, currentDepth)
 					if DeeperSearch then
 
 						return DeeperSearch
@@ -153,9 +216,7 @@ if(SERVER)then
 			end
 		else
 			local AllConnected = FindNextConnection(self, nil, 0)
-			--print(#AllConnected)
 			for _, Ent in pairs(AllConnected) do
-				--print("Found: " .. tostring(Ent))
 				local EntID = Ent:EntIndex()
 				if not(self.ElectricalCallbacks[EntID]) then
 					-- Here's where we do the callback thing
@@ -192,7 +253,8 @@ if(SERVER)then
 						--[[if ShockEnt:GetGroundEntity() != NULL then
 							print("Ground Entity: ", ShockEnt:GetGroundEntity())
 						end--]]
-						local Damage, Force = math.random(1, 3), 500 -- Adjust damage and force factors as desired
+						DropEntityIfHeld(ShockEnt)
+						local Damage, Force = math.random(1, 10), 500 -- Adjust damage and force factors as desired
 						local Zap = DamageInfo()
 						Zap:SetDamage(Damage)
 						Zap:SetDamageForce(-shockedData.HitNormal * Force)
@@ -210,7 +272,7 @@ if(SERVER)then
 						ZapEff:SetRadius(math.Rand(2, 4)) --thickness of strands
 						util.Effect("Sparks", ZapEff, true, true)
 						-- Electrical sound
-						shocker:EmitSound("snd_jack_turretfizzle.wav", 70, 100)
+						shocker:EmitSound("snd_jack_turretfizzle.wav", 70, 90)
 						-- Reduce power
 						self:ConsumeElectricity(1)
 						if ShockEnt:IsPlayer() then
@@ -219,10 +281,10 @@ if(SERVER)then
 							local vec = (shockedData.HitPos - ShockEnt:GetPos()):GetNormalized()
 							ShockEnt:SetVelocity(vec * 100)
 						end
+						self.LastShockedEnt = ShockEnt
 					end
 				end
 			else
-				jprint(tostring(shocker) .. " Not connected!")
 				shocker:RemoveCallback("PhysicsCollide", self.ElectricalCallbacks[shocker:EntIndex()])
 				self.ElectricalCallbacks[shocker:EntIndex()] = nil
 			end
@@ -231,7 +293,9 @@ if(SERVER)then
 
 	function ENT:OnRemove()
 		for k, v in pairs(self.ElectricalCallbacks) do
-			Entity(k):RemoveCallback("PhysicsCollide", v)
+			if (IsValid(Entity(k))) then
+				Entity(k):RemoveCallback("PhysicsCollide", v)
+			end
 		end
 	end
 
