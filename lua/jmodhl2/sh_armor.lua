@@ -586,7 +586,7 @@ if CLIENT then
 	local GlowSprite = Material("mat_jack_gmod_glowsprite")
 
 	hook.Add("PostDrawTranslucentRenderables", "JMODHL2_POSTDRAWTRNASLUCENT", function(bDrawD, bDrawingSky, isDraw3dSky) 
-		for _, ply in ipairs(player.GetAll()) do
+		for _, ply in player.Iterator() do
 			if not(IsValid(ply) and ply:Alive()) or not(ply:ShouldDrawLocalPlayer()) then return end
 			if ply.EZarmor and ply.EZarmor.effects and ply.EZarmor.effects.jetmod and ply.EZjetting then
 				local Matty = ply:GetBoneMatrix(ply:LookupBone("ValveBiped.Bip01_Spine2"))

@@ -16,7 +16,7 @@ ENT.JModPreferredCarryAngles = Angle(0, 0, 0)
 ENT.EZupgradable = false
 ENT.EZcolorable = false
 ENT.StaticPerfSpecs = {
-	MaxDurability = 100,
+	MaxDurability = 50,
 	MaxElectricity = 100
 }
 ENT.DynamicPerfSpecs = {

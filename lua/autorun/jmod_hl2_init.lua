@@ -95,7 +95,7 @@ if(SERVER)then
 		if NextMainThink > Time then return end
 		NextMainThink = Time + 0.2
 
-		for _, ply in ipairs(player.GetAll()) do
+		for _, ply in player.Iterator() do
 			if ply.EZarmor and ply.EZarmor.effects then
 				if ply.EZarmor.effects.HEVsuit then
 					local TrackedMachine = ply:GetNW2Entity("EZmachineTracking", nil)
@@ -420,7 +420,7 @@ hook.Add("OnEntityCreated", "PacifistNPCs", function(ent)
 		
 			--ent:SetActivity(ACT_BIG_FLINCH)
 			--ent:SetSchedule(SCHED_AMBUSH)
-			for k, v in pairs(player.GetAll()) do
+			for k, v in player.Iterator() do
 				ent:AddEntityRelationship(v, D_NU, 99)
 				jprint(ent:Disposition(v))
 			end
