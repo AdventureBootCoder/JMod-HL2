@@ -93,7 +93,7 @@ JModHL2.WeaponTable = {
 		ent = "ent_aboot_jmod_ezweapon_smg2",
 		Category = "JMod - EZ HL:2"
 	},
-	["API-SR"] = {
+	--[[["API-SR"] = {
 		mdl = "models/weapons/aboot/sniper/w_sniper.mdl",
 		swep = "wep_aboot_jmod_apisr",
 		ent = "ent_aboot_jmod_ezweapon_apisr",
@@ -104,7 +104,7 @@ JModHL2.WeaponTable = {
 		swep = "wep_aboot_jmod_combsr",
 		ent = "ent_aboot_jmod_ezweapon_combsr",
 		Category = "JMod - EZ HL:2"
-	},
+	},--]]
 }
 
 JModHL2.AmmoTable = {

@@ -159,27 +159,12 @@ if(SERVER)then
 
 					JMod.EmitAIsound(self:GetPos(), 300, .5, 256)
 
-					--[[if not JMod.NaturalResourceTable[self.DepositKey] then
-						--self:SetResourceType("")
-						self.DepositKey = JMod.GetDepositAtPos(self, SelfPos)
-					else
-						-- This is just the rate at which we drill
-						local drillRate = 0.1 * JMod.Config.ResourceEconomy.ExtractionSpeed
-						local amtLeft = JMod.NaturalResourceTable[self.DepositKey].amt
-
-						self:SetProgress(self:GetProgress() + drillRate)
-
-						if self:GetProgress() >= 100 then
-							local amtToDrill = math.min(JMod.NaturalResourceTable[self.DepositKey].amt, 100)
-							self:ProduceResource()
-							JMod.DepleteNaturalResource(self.DepositKey, amtToDrill)
-						end
-					end--]]
 					if math.random(1, 100) == 1 then
 						self.DepositKey = JMod.GetDepositAtPos(self, SelfPos)
 						if JMod.NaturalResourceTable[self.DepositKey] then
 							local amtToDrill = math.min(JMod.NaturalResourceTable[self.DepositKey].amt, math.random(5, 10))
 							self:SetProgress(amtToDrill)
+							self:SetResourceType(JMod.NaturalResourceTable[self.DepositKey].typ)
 							self:ProduceResource()
 							JMod.DepleteNaturalResource(self.DepositKey, amtToDrill)
 						end
@@ -189,29 +174,6 @@ if(SERVER)then
 				self:ConsumeElectricity(0.2  * JMod.Config.ResourceEconomy.ExtractionSpeed)
 			end
 		end
-
-		--[[
-		if (self.NextOSHAthinkTime < Time) and (State == STATE_RUNNING) then
-			self.NextOSHAthinkTime = Time + .1
-			if math.random(0, 100) == 1 then
-				local Rock = ents.Create("prop_physics")
-				Rock:SetModel("models/props_junk/rock001a.mdl")
-				Rock:SetPos(SelfPos + Up * -90 * HullTr.Fraction)
-				Rock:Spawn()
-				Rock:Activate()
-
-				timer.Simple(0, function()
-					if IsValid(Rock) and IsValid(Rock:GetPhysicsObject()) then 
-						Rock:GetPhysicsObject():ApplyForceCenter(Vector(0, 0, 1200) + VectorRand() * 10000)-- Yeet
-					end
-				end)
-				timer.Simple(5, function() 
-					if IsValid(Rock) then
-						SafeRemoveEntity(Rock)
-					end
-				end)
-			end
-		end--]]
 
 		self:NextThink(CurTime() + .1)
 		return true
@@ -225,7 +187,7 @@ if(SERVER)then
 
 		local pos = SelfPos
 		local spawnVec = self:WorldToLocal(SelfPos + Forward * 45)
-		JMod.MachineSpawnResource(self, self:GetResourceType(), amt, spawnVec, Angle(0, 0, -90), Forward * 15, true, 200)
+		JMod.MachineSpawnResource(self, Typ, amt, spawnVec, Angle(0, 0, -90), Forward * 15, true, 200)
 		self:SetProgress(self:GetProgress() - amt)
 	end
 
@@ -267,7 +229,7 @@ elseif(CLIENT)then
 		JMod.RenderModel(self.PowerBox, BoxPos, PowerBoxAng, Vector(2, 2.5, 1.5), nil, self.DrillMat)
 		--
 
-		local Obscured = util.TraceLine({start = EyePos(), endpos = MotorPos, filter = {LocalPlayer(), self}, mask = MASK_OPAQUE}).Hit
+		local Obscured = util.TraceLine({start = EyePos(), endpos = SelfPos, filter = {LocalPlayer(), self}, mask = MASK_OPAQUE}).Hit
 		local Closeness = LocalPlayer():GetFOV() * (EyePos():Distance(SelfPos))
 		local DetailDraw = Closeness < 36000 -- cutoff point is 400 units when the fov is 90 degrees
 		local DrillDraw = true
@@ -296,7 +258,7 @@ elseif(CLIENT)then
 				DisplayAng:RotateAroundAxis(DisplayAng:Forward(), 180)
 				DisplayAng:RotateAroundAxis(DisplayAng:Right(), -90)
 				local Opacity = math.random(50, 150)
-				cam.Start3D2D(SelfPos + Forward * 13 + Up * -37 + Right * 9, DisplayAng, .15)
+				cam.Start3D2D(SelfPos + Forward * 12.5 + Up * -37 + Right * 8, DisplayAng, .15)
 					draw.SimpleTextOutlined("POWER","JMod-Display",250,-60,Color(255,255,255,Opacity),TEXT_ALIGN_CENTER,TEXT_ALIGN_TOP,3,Color(0,0,0,Opacity))
 					local ElecFrac=self:GetElectricity()/200
 					local R,G,B = JMod.GoodBadColor(ElecFrac)
