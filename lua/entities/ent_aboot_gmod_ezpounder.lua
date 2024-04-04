@@ -187,8 +187,8 @@ if(SERVER)then
 
 		local pos = SelfPos
 		local spawnVec = self:WorldToLocal(SelfPos + Forward * 45)
-		JMod.MachineSpawnResource(self, Typ, amt, spawnVec, Angle(0, 0, -90), Forward * 15, true, 200)
 		self:SetProgress(self:GetProgress() - amt)
+		JMod.MachineSpawnResource(self, Typ, amt, spawnVec, Angle(0, 0, -90), Forward * 15, true, 200)
 	end
 
 	function ENT:PostEntityPaste(ply, ent, createdEntities)
