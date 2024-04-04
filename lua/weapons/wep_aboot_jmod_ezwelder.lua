@@ -117,20 +117,6 @@ function SWEP:Initialize()
 	self.Snd2 = CreateSound(self, "snds_jack_gmod/plasmaloop_reversed1.wav")
 	self:Deploy()
 
-	if SERVER then
-		self.Craftables = {}
-
-		for name, info in pairs(JMod.Config.Craftables) do
-			if info.craftingType == "toolbox" then
-				-- we store this here for client transmission later
-				-- because we can't rely on the client having the config
-				local infoCopy = table.FullCopy(info)
-				infoCopy.name = name
-				self.Craftables[name] = info
-			end
-		end
-	end
-
 	self:SetGas(0)
 	self:SetElectricity(0)
 end
@@ -150,7 +136,7 @@ function SWEP:ViewModelDrawn()
 	Pos = Pos - Ang:Up()*5
 	local Dir = self.Owner:GetAimVector()
 
-	local ShootPos = self.Owner:GetShootPos() + self.Owner:GetRight() * 2 - self.Owner:GetUp()
+	local ShootPos = self.Owner:GetShootPos() + self.Owner:GetRight() * 1 - self.Owner:GetUp()
 	local Tracey = util.QuickTrace(ShootPos, Dir * 100, {self, Ply})
 	if Tracey.Hit then
 		local HitAngy = Dir:Angle()
@@ -167,7 +153,7 @@ function SWEP:ViewModelDrawn()
 		effectdata:SetScale(0.5)
 		util.Effect( "MuzzleEffect", effectdata, true, true )
 
-		local WeldingMask = Ply.EZarmor and Ply.EZarmor.effects and Ply.EZarmor.effects.flashresistant
+		local WeldingMask = JMod.PlyHasArmorEff(Ply, "flashresistant")
 		local dlight = DynamicLight(self:EntIndex())
 		if(dlight)then
 			dlight.MinLight=0
@@ -192,11 +178,11 @@ function SWEP:DrawWorldModel()
 	self:SCKDrawWorldModel()
 	if self:GetWelding() then
 		local Ply = LocalPlayer()
-		local Pos, Ang = Ply:GetBonePosition(Ply:LookupBone("ValveBiped.Bip01_R_Hand"))
+		local Pos, Ang = self.Owner:GetBonePosition(self.Owner:LookupBone("ValveBiped.Bip01_R_Hand"))
 		Pos = Pos + Ang:Right()*2 - Ang:Up()*1
-		local Dir = Ply:GetAimVector()
+		local Dir = self.Owner:GetAimVector()
 
-		local WeldingMask = Ply.EZarmor and Ply.EZarmor.effects and Ply.EZarmor.effects.flashresistant
+		local WeldingMask = JMod.PlyHasArmorEff(Ply, "flashresistant")
 		local dlight = DynamicLight(self:EntIndex())
 		if(dlight)then
 			dlight.MinLight=0
@@ -210,8 +196,8 @@ function SWEP:DrawWorldModel()
 			dlight.DieTime = CurTime() + .2
 			dlight.Style = 0
 		end--]]
-		if WeldingMask then
-			Ply.EZautoDarken = 1
+		if (EyePos():Distance(Pos) < 200) and WeldingMask then
+			Ply.EZautoDarken = 200 / EyePos():Distance(Pos)
 		end
 	end
 end
@@ -520,7 +506,7 @@ function SWEP:Think()
 							end
 						end
 					end
-					local WeldingMask = Ply.EZarmor and Ply.EZarmor.effects and Ply.EZarmor.effects.flashresistant
+					local WeldingMask = JMod.PlyHasArmorEff(Ply, "flashresistant")
 					if not(WeldingMask) and (math.random(1, 5) == 1) then
 						self:WeldBurn(Ply, Ply:GetShootPos())
 						local plooie = EffectData()
