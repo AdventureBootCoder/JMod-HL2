@@ -200,7 +200,7 @@ function ENT:SetMods(tbl, ammoType)
 		elseif (OldAmmo == "Super Soaker") then
 			self:SetWater(0)
 		end
-		JMod.MachineSpawnResource(self, AmmoTypeToSpawn, AmtToSpawn, Vector(0, -30, 50), Angle(0, 0, 0), self:GetForward(), true)
+		JMod.MachineSpawnResource(self, AmmoTypeToSpawn, AmtToSpawn, Vector(0, -30, 50), Angle(0, 0, 0), self:GetForward(), false)
 	end
 	self:InitPerfSpecs((OldAmmo~=ammoType)or((self.ModPerfSpecs.MaxAmmo<OldMaxAmmoSpec)))
 	if(ammoType == "Pulse Laser")then

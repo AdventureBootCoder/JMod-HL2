@@ -200,7 +200,7 @@ function ENT:SetMods(tbl, ammoType)
 		elseif (OldAmmo == "Super Soaker") then
 			self:SetWater(0)
 		end
-		JMod.MachineSpawnResource(self, AmmoTypeToSpawn, AmtToSpawn, Vector(0, -30, 50), Angle(0, 0, 0), self:GetForward(), true)
+		JMod.MachineSpawnResource(self, AmmoTypeToSpawn, AmtToSpawn, Vector(0, -30, 50), Angle(0, 0, 0), self:GetForward(), 200)
 	end
 	self:InitPerfSpecs((OldAmmo~=ammoType)or((self.ModPerfSpecs.MaxAmmo<OldMaxAmmoSpec)))
 	if(ammoType == "Pulse Laser")then
@@ -377,6 +377,7 @@ if(SERVER)then
 		if phys:IsValid()then
 			phys:SetBuoyancyRatio(.3)
 		end
+		if self.AmmoTypes.BaseClass then self.AmmoTypes.BaseClass = nil end
 		self.EZconsumes = {
 			JMod.EZ_RESOURCE_TYPES.AMMO,
 			JMod.EZ_RESOURCE_TYPES.POWER,

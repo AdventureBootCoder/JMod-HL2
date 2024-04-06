@@ -263,7 +263,7 @@ if(SERVER)then
 
 		local spawnVec = self:WorldToLocal(Vector(SelfPos) + Up * 135 + Right * 80)
 		self:SetProgress(self:GetProgress() - amt)
-		JMod.MachineSpawnResource(self, self:GetResourceType(), amt, spawnVec, Angle(0, 0, 0), Forward*100, true, 200)
+		JMod.MachineSpawnResource(self, self:GetResourceType(), amt, spawnVec, Angle(0, 0, 0), Forward*100, 200)
 	end
 
 elseif(CLIENT)then
