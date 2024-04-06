@@ -308,6 +308,7 @@ if(SERVER)then
 
 elseif(CLIENT)then
 	function ENT:CustomInit()
+		self.LightMdl = JMod.MakeModel(self, "models/MaxOfS2D/light_tubular.mdl")
 		self.MaxElectricity = 100
 	end
 
@@ -323,7 +324,7 @@ elseif(CLIENT)then
 		local Up, Right, Forward, State = self:GetUp(), self:GetRight(), self:GetForward(), self:GetState()
 		local SelfPos, SelfAng = self:GetPos(), self:GetAngles()
 		--
-		local Obscured = util.TraceLine({start = EyePos(), endpos = MotorPos, filter = {LocalPlayer(), self}, mask = MASK_OPAQUE}).Hit
+		local Obscured = util.TraceLine({start = EyePos(), endpos = SelfPos, filter = {LocalPlayer(), self}, mask = MASK_OPAQUE}).Hit
 		local Closeness = LocalPlayer():GetFOV() * (EyePos():Distance(SelfPos))
 		local DetailDraw = Closeness < 36000 -- cutoff point is 400 units when the fov is 90 degrees
 		if State == STATE_BROKEN then DetailDraw = false end -- look incomplete to indicate damage, save on gpu comp too
@@ -332,13 +333,16 @@ elseif(CLIENT)then
 		self:DrawModel()
 		--
 		if DetailDraw then
+			local LightAng = SelfAng:GetCopy()
+			LightAng:RotateAroundAxis(LightAng:Right(), 180)
+			JMod.RenderModel(self.LightMdl, SelfPos + Up * 7 + Forward * -2, LightAng, nil, Vector(1, 1, 1), Color(255, 0, 0, 255))
 			if State >= STATE_ON then
 				local Opacity = math.random(50, 150)
 				local DisplayAng = SelfAng:GetCopy()
 				DisplayAng:RotateAroundAxis(DisplayAng:Up(), 90)
 				DisplayAng:RotateAroundAxis(DisplayAng:Forward(), 90)
 
-				cam.Start3D2D(SelfPos + Forward * 5 + Up * 0, DisplayAng, .05)
+				cam.Start3D2D(SelfPos + Forward * 5, DisplayAng, .05)
 					draw.SimpleTextOutlined("POWER", "JMod-Display",0,-30,Color(255,255,255,Opacity),TEXT_ALIGN_CENTER,TEXT_ALIGN_TOP,3,Color(0,0,0,Opacity))
 					local ElecFrac=self:GetElectricity()/self.MaxElectricity
 					local R,G,B = JMod.GoodBadColor(ElecFrac)
@@ -348,7 +352,7 @@ elseif(CLIENT)then
 		end
 		if State == STATE_ON then
 			render.SetMaterial(GlowSprite)
-			local SpritePos = SelfPos + Forward * 5 + Right * 0 + Up * 3
+			local SpritePos = SelfPos + Forward * -2 + Up * 10
 			local Vec = (SpritePos - EyePos()):GetNormalized()
 			render.DrawSprite(SpritePos - Vec * 5, 20, 20, Color(255, 0, 0))
 			render.DrawSprite(SpritePos - Vec * 5, 10, 10, Color(255, 255, 255, 150))

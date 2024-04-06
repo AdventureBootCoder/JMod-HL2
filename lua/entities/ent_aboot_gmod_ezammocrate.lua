@@ -122,7 +122,7 @@ if SERVER then
 
 		local Attacker = dmginfo:GetAttacker()
 		local HL2Ammo = {"AR2", "Pistol", "XBowBolt", "SMG1", "357", "Buckshot", "RPG_Round", "slam", "Grenade", "AlyxGun", "SniperRound"}
-		if (IsValid(Attacker) and Attacker:IsPlayer()) and (Attacker:GetActiveWeapon():GetClass() == "weapon_crowbar") then
+		if (IsValid(Attacker) and Attacker:IsPlayer()) and IsValid(Attacker:GetActiveWeapon()) and (Attacker:GetActiveWeapon():GetClass() == "weapon_crowbar") then
 			for k, v in ipairs(HL2Ammo) do
 				self:Open(true)
 				timer.Simple(1, function()
