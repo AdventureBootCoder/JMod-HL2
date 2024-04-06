@@ -9,9 +9,10 @@ ENT.Spawnable = true
 ENT.AdminOnly = false
 ENT.Base = "ent_jack_gmod_ezmachine_base"
 ---
-ENT.Model = "models/hunter/blocks/cube05x1x05.mdl"
+ENT.Model = "models/aboot/ezgrinder01.mdl"
 ENT.Mass = 200
 ENT.SpawnHeight = 10
+ENT.EZcolorable = false
 ENT.JModPreferredCarryAngles = Angle(0, 180, -90)
 ENT.EZupgradable = false
 ENT.StaticPerfSpecs = {
@@ -107,15 +108,15 @@ if(SERVER)then
 				return
 			elseif State == STATE_RUNNING then
 
-				local PoundDir = Right * -30
+				local PoundDir = Up * -30
 				local CutDir = Up
 				local CutStrength = 100
 
 				local PoundTr = util.TraceHull({
 					start = SelfPos + PoundDir * .95,
 					endpos = SelfPos + PoundDir,
-					maxs = Vector(5, 5, 5),
-					mins = Vector(-5, -5, -5),
+					maxs = Vector(10, 10, 10),
+					mins = Vector(-10, -10, -10),
 					filter = self,
 					mask = MASK_SOLID,
 					ignoreworld = false
@@ -185,33 +186,34 @@ if(SERVER)then
 elseif(CLIENT)then
 	function ENT:CustomInit()
 		self.SawBlade = JMod.MakeModel(self, "models/props_junk/sawblade001a.mdl")
-		self.PowerBox = JMod.MakeModel(self, "models/props_lab/powerbox02b.mdl")
 		self.DrillMat = Material("mechanics/metal2")
 		self.CurSpin = 0
+		self.CurSpeed = 0
 		self.MaxElectricity = 200
 	end
 
 	function ENT:Think()
 		local State, FT = self:GetState(), FrameTime()
 		if State == STATE_RUNNING then
-			self.CurSpin = self.CurSpin + FT * 10000
-			if self.CurSpin > 360 then
-				self.CurSpin = 0
-			elseif self.CurSpin < 0 then
-				self.CurSpin = 360
-			end
+			self.CurSpin = self.CurSpin - FT * self.CurSpeed
+			self.CurSpeed = math.min(self.CurSpeed + FT * 200, 1000)
+		elseif self.CurSpin > 0 then
+			self.CurSpin = self.CurSpin - FT * self.CurSpeed
+			self.CurSpeed = math.max(self.CurSpeed - FT * 100, 0)
+		end
+		if self.CurSpin > 360 then
+			self.CurSpin = 0
+		elseif self.CurSpin < 0 then
+			self.CurSpin = 360
 		end
 	end
 
 	function ENT:Draw()
-		local Up, Right, Forward, Message, State = self:GetUp(), self:GetRight(), self:GetForward(), self:GetMessage(), self:GetState()
+		local Up, Right, Forward, State = self:GetUp(), self:GetRight(), self:GetForward(), self:GetState()
 		local SelfPos, SelfAng = self:GetPos(), self:GetAngles()
-		local BoxPos = SelfPos + Right * 5 + Forward * 1
-		local SawPos = BoxPos + Right * -28 + Forward * -1
+		local SawPos = SelfPos + Up * -16
 		--
-		local PowerBoxAng = SelfAng:GetCopy()
-		PowerBoxAng:RotateAroundAxis(Forward, 90)
-		JMod.RenderModel(self.PowerBox, BoxPos, PowerBoxAng, Vector(2, 2.5, 2.2), nil)
+		self:DrawModel()
 		--
 
 		local Obscured = util.TraceLine({start = EyePos(), endpos = MotorPos, filter = {LocalPlayer(), self}, mask = MASK_OPAQUE}).Hit
@@ -223,12 +225,14 @@ elseif(CLIENT)then
 			DrillDraw = false 
 		end -- look incomplete to indicate damage, save on gpu comp too
 
-		if DrillDraw then
+		--[[if DrillDraw then
 			local SawAng = SelfAng:GetCopy()
 			SawAng:RotateAroundAxis(Right, 90)
 			SawAng:RotateAroundAxis(Forward, self.CurSpin)
 			JMod.RenderModel(self.SawBlade, SawPos, SawAng, Vector(.8, .8, .8), nil)
-		end
+		end--]]
+		self:ManipulateBoneAngles(self:LookupBone("start"), Angle(self.CurSpin, 0, 0))
+		self:ManipulateBoneAngles(self:LookupBone("end"), Angle(self.CurSpin, 0, 0))
 
 		if (not(DetailDraw)) and (Obscured) then return end -- if player is far and sentry is obscured, draw nothing
 		if Obscured then DetailDraw = false end -- if obscured, at least disable details
@@ -236,15 +240,14 @@ elseif(CLIENT)then
 		if DetailDraw then
 			if (Closeness < 40000) and (State == STATE_RUNNING) then
 				local DisplayAng = SelfAng:GetCopy()
-				DisplayAng:RotateAroundAxis(DisplayAng:Forward(), 180)
-				DisplayAng:RotateAroundAxis(DisplayAng:Right(), -90)
+				DisplayAng:RotateAroundAxis(DisplayAng:Forward(), 90)
+				DisplayAng:RotateAroundAxis(DisplayAng:Up(), 180)
 				local Opacity = math.random(50, 150)
-				cam.Start3D2D(SelfPos + Forward * 13 + Up * -37 + Right * 9, DisplayAng, .15)
-					draw.SimpleTextOutlined("POWER", "JMod-Display",250,-60,Color(255,255,255,Opacity),TEXT_ALIGN_CENTER,TEXT_ALIGN_TOP,3,Color(0,0,0,Opacity))
+				cam.Start3D2D(SelfPos + Up * 25 + Right * 15, DisplayAng, .15)
+					draw.SimpleTextOutlined("POWER", "JMod-Display",0,0,Color(255,255,255,Opacity),TEXT_ALIGN_CENTER,TEXT_ALIGN_TOP,3,Color(0,0,0,Opacity))
 					local ElecFrac=self:GetElectricity()/self.MaxElectricity
 					local R,G,B = JMod.GoodBadColor(ElecFrac)
-					draw.SimpleTextOutlined(tostring(math.Round(ElecFrac*100)).."%","JMod-Display",250,-30,Color(R,G,B,Opacity),TEXT_ALIGN_CENTER,TEXT_ALIGN_TOP,3,Color(0,0,0,Opacity))
-					draw.SimpleTextOutlined(Message, "JMod-Display",250,0,Color(255,255,255,Opacity),TEXT_ALIGN_CENTER,TEXT_ALIGN_TOP,3,Color(0,0,0,Opacity))
+					draw.SimpleTextOutlined(tostring(math.Round(ElecFrac*100)).."%","JMod-Display",0,-30,Color(R,G,B,Opacity),TEXT_ALIGN_CENTER,TEXT_ALIGN_TOP,3,Color(0,0,0,Opacity))
 				cam.End3D2D()
 			end
 		end
