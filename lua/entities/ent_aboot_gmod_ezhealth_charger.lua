@@ -22,8 +22,8 @@ ENT.StaticPerfSpecs = {
 
 local STATE_BROKEN, STATE_OFF, STATE_CHARGIN = -1, 0, 1
 
-function ENT:SetupDataTables()
-	self:NetworkVar("Int", 1, "Supplies")
+function ENT:CustomSetupDataTables()
+	self:NetworkVar("Float", 1, "Supplies")
 end
 
 if(SERVER)then
@@ -142,7 +142,9 @@ if(SERVER)then
 	end
 
 	function ENT:OnRemove()
-		self.ChargeSound:Stop()
+		if IsValid(self.ChargeSound) then
+			self.ChargeSound:Stop()
+		end
 	end
 
 elseif(CLIENT)then
