@@ -32,14 +32,14 @@ SWEP.Secondary.Automatic = true
 SWEP.Secondary.Ammo = "none"
 SWEP.ShowWorldModel = false
 SWEP.EZaccepts = {JMod.EZ_RESOURCE_TYPES.POWER, JMod.EZ_RESOURCE_TYPES.GAS}
-SWEP.EZmaxElectricity = 100
-SWEP.EZmaxGas = 100
+SWEP.MaxElectricity = 100
+SWEP.MaxGas = 100
 ---
 SWEP.MaxRange = 150
 
 --[[function SWEP:FrontSight()
 	local Flicker = math.Rand(.5,1)
-	if(self:GetElectricity() < self.EZmaxElectricity * .01) or (self:GetGas() < self.EZmaxGas * .01) then Flicker = math.Rand(0,.5) end
+	if(self:GetElectricity() < self.MaxElectricity * .01) or (self:GetGas() < self.MaxGas * .01) then Flicker = math.Rand(0,.5) end
 	surface.DrawCircle(0, 0, 80, Color(255,255,255,150*Flicker))
 end--]]
 
@@ -261,7 +261,22 @@ end
 function SWEP:Reload()
 	if SERVER then
 		local Time = CurTime()
-		--
+		local Ent = self:WhomIlookinAt()
+		
+		if IsValid(Ent) and Ent.GetEZsupplies then
+			for typ, amt in pairs(Ent:GetEZsupplies()) do
+				if table.HasValue(self.EZaccepts, typ) and (amt > 0) then
+					local CurAmt = self:GetEZsupplies(typ) or 0
+					local Take = math.min(amt, 100 - CurAmt)
+					
+					Ent:SetEZsupplies(typ, amt - Take, self.Owner)
+					self:SetEZsupplies(typ, CurAmt + Take)
+					if Take > 0 then
+						sound.Play("items/ammo_pickup.wav", self:GetPos(), 65, math.random(90, 110))
+					end
+				end
+			end
+		end
 	end
 end
 

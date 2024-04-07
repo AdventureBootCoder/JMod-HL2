@@ -10,9 +10,9 @@ ENT.AdminOnly = false
 ENT.Base = "ent_jack_gmod_ezmachine_base"
 ---
 ENT.Model = "models/props_lab/powerbox02d.mdl"
-ENT.Mass = 50
+ENT.Mass = 30
 ENT.SpawnHeight = 10
-ENT.JModPreferredCarryAngles = Angle(0, 0, 0)
+ENT.JModPreferredCarryAngles = Angle(0, 180, 0)
 ENT.EZupgradable = false
 ENT.EZcolorable = false
 ENT.StaticPerfSpecs = {
@@ -94,8 +94,12 @@ if(SERVER)then
 	end
 
 	function ENT:CustomInit()
+		self:SetUseType(ONOFF_USE)
 		self.ElectricalCallbacks = {}
 		self.LastShockedEnt = nil
+		self.StuckStick = nil
+		self.StuckTo = nil
+		self.NextStick = 0
 	end
 
 	function ENT:TurnOn(activator)
@@ -120,20 +124,63 @@ if(SERVER)then
 		end
 	end
 
-	function ENT:Use(activator)
-		local State = self:GetState()
-		local OldOwner = self.EZowner
-		local alt = activator:KeyDown(JMod.Config.General.AltFunctionKey)
-		JMod.SetEZowner(self, activator, true)
+	function ENT:Use(activator, activatorAgain, onOff)
+		local Dude = activator or activatorAgain
+		local Time = CurTime()
 
-		if State == STATE_BROKEN then
-			JMod.Hint(activator, "destroyed", self)
+		if tobool(onOff) then
+			local State = self:GetState()
+			local Alt = Dude:KeyDown(JMod.Config.General.AltFunctionKey)
+			JMod.SetEZowner(self, Dude, true)
 
-			return
-		elseif State == STATE_OFF then
-			self:TurnOn(activator)
-		elseif State >= STATE_ON then
-			self:TurnOff(activator)
+			if State == STATE_BROKEN then
+				JMod.Hint(Dude, "destroyed", self)
+
+				return
+			elseif State == STATE_OFF then
+				if Alt then
+					self:TurnOn(Dude)
+					self:EmitSound("snd_jack_minearm.wav", 60, 100)
+				else
+					constraint.RemoveAll(self)
+					self.StuckStick = nil
+					self.StuckTo = nil
+					Dude:PickupObject(self)
+					self.NextStick = Time + .5
+					JMod.Hint(Dude, "sticky")
+				end
+			elseif State == STATE_ON then
+				self:EmitSound("snd_jack_minearm.wav", 60, 70)
+				self:TurnOff(Dude)
+			end
+		else
+			if self:IsPlayerHolding() and (self.NextStick < Time) then
+				local Tr = util.QuickTrace(Dude:GetShootPos(), Dude:GetAimVector() * 80, {self, Dude})
+
+				if Tr.Hit and IsValid(Tr.Entity:GetPhysicsObject()) and not Tr.Entity:IsNPC() and not Tr.Entity:IsPlayer() then
+					self.NextStick = Time + .5
+					local Ang = Tr.HitNormal:Angle()
+					Ang:RotateAroundAxis(Ang:Right(), 0)
+					Ang:RotateAroundAxis(Ang:Up(), 0)
+					self:SetAngles(Ang)
+					self:SetPos(Tr.HitPos + Tr.HitNormal * 5)
+
+					-- crash prevention
+					if Tr.Entity:GetClass() == "func_breakable" then
+						timer.Simple(0, function()
+							self:GetPhysicsObject():Sleep()
+						end)
+					else
+						local Weld = constraint.Weld(self, Tr.Entity, 0, Tr.PhysicsBone, 3000, false, false)
+						self.StuckTo = Tr.Entity
+						self.StuckStick = Weld
+					end
+
+					self:EmitSound("snd_jack_claythunk.wav", 65, math.random(80, 120))
+					Dude:DropObject()
+					JMod.Hint(Dude, "arm")
+				end
+			end
 		end
 	end
 	
@@ -306,6 +353,7 @@ if(SERVER)then
 		JMod.SetEZowner(self, ply, true)
 		ent.NextRefillTime = Time + math.Rand(0, 3)
 		ent.NextResourceThinkTime = 0
+		ent.NextStick = 0
 	end
 
 elseif(CLIENT)then
