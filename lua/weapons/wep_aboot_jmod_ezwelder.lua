@@ -455,6 +455,17 @@ function SWEP:Think()
 						self:WeldEffect(Tress)
 					else
 						--self:SetWelding(false)
+						--[[local FireVec = (self:GetVelocity() / 1000 + self.Owner:GetAimVector()):GetNormalized()
+						local Flame = ents.Create("ent_jack_gmod_eznapalm")
+						Flame:SetPos(self.Owner:GetShootPos() + FireVec)
+						Flame:SetAngles(FireVec:Angle())
+						Flame:SetOwner(JMod.GetEZowner(self))
+						JMod.SetEZowner(Flame, self.EZowner or self)
+						Flame.SpeedMul = 5
+						Flame.Creator = self.Owner
+						Flame.HighVisuals = math.random(1, 5) == 1
+						Flame:Spawn()
+						Flame:Activate()--]]
 					end
 				end
 				self:SetElectricity(math.max(self:GetElectricity() - .05, 0))
