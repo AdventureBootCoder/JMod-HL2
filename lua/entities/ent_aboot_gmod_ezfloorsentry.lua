@@ -968,7 +968,7 @@ if(SERVER)then
 elseif(CLIENT)then
 	function ENT:CustomInit()
 		self.MachineGun=JMod.MakeModel(self,"models/jmod/ez/sentrygun.mdl")
-		self.MissileLauncher=JMod.MakeModel(self,"models/weapons/w_rocket_jauncher.mdl")
+		self.MissileLauncher=JMod.MakeModel(self,"models/weapons/w_rocket_launcher.mdl")
 		---
 		self.CurAimPitch = 0
 		self.CurAimYaw = 0

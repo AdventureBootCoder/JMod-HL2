@@ -3,7 +3,7 @@ AddCSLuaFile()
 ENT.Type = "anim"
 ENT.Author = "Jackarunda"
 ENT.Information = "glhfggwpezpznore"
-ENT.PrintName = "EZ Capactior"
+ENT.PrintName = "EZ Capacitor"
 ENT.Category = "JMod - EZ HL:2"
 ENT.Spawnable = true
 ENT.AdminOnly = false
@@ -292,9 +292,11 @@ if(SERVER)then
 	end
 
 	function ENT:OnRemove()
-		for k, v in pairs(self.ElectricalCallbacks) do
-			if (IsValid(Entity(k))) then
-				Entity(k):RemoveCallback("PhysicsCollide", v)
+		if self.ElectricalCallbacks then
+			for k, v in pairs(self.ElectricalCallbacks) do
+				if (IsValid(Entity(k))) then
+					Entity(k):RemoveCallback("PhysicsCollide", v)
+				end
 			end
 		end
 	end
