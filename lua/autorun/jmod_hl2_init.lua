@@ -70,7 +70,7 @@ if(SERVER)then
 	end)
 
 	hook.Add("JModHookEZArmorSync", "ABootHL2ArmorCheck", function(playa)
-		local PlyEff = playa.EZarmor.effects
+		local PlyEff = JMod.PlyHasArmorEff(playa)
 		if PlyEff and PlyEff.HEVsuit then
 			if not(playa:IsSuitEquipped()) then
 				playa:EquipSuit()

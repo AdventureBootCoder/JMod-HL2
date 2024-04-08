@@ -290,13 +290,15 @@ if(SERVER)then
 		return false
 	end
 
+	local ShockBlacklist = {"ent_aboot_gmod_ezcapacitor"}
+
 	function ENT:Shock(shocker, shockedData)
 		if self:GetState() == STATE_ON then
 			local ShockEnt = shockedData.HitEntity
 			if (ShockEnt ~= self) and not(self.ElectricalCallbacks[ShockEnt:EntIndex()]) and (self:GetPos():Distance(shockedData.HitPos) <= self.ShockDistance) then
 				local Connected = self:CheckForConnection(shocker)
 				if Connected then
-					if (ShockEnt:IsPlayer() or ShockEnt:IsNPC()) or table.HasValue(Shockables, ShockEnt:GetMaterialType()) then
+					if (ShockEnt:IsPlayer() or ShockEnt:IsNPC()) or (table.HasValue(Shockables, ShockEnt:GetMaterialType()) and not(table.HasValue(ShockBlacklist, ShockEnt:GetClass()))) then
 						--[[if ShockEnt:GetGroundEntity() != NULL then
 							print("Ground Entity: ", ShockEnt:GetGroundEntity())
 						end--]]
@@ -327,6 +329,11 @@ if(SERVER)then
 							ShockEnt:SetGroundEntity(nil)
 							local vec = (shockedData.HitPos - ShockEnt:GetPos()):GetNormalized()
 							ShockEnt:SetVelocity(vec * 100)
+							ShockEnt:ViewPunch(Angle(math.random(-40, 2), math.random(-20, 20), math.random(-2, 2)))
+							net.Start("ABoot_StunStick")
+								net.WriteEntity(ShockEnt)
+								net.WriteFloat(.5)
+							net.Send(ShockEnt)
 						end
 						self.LastShockedEnt = ShockEnt
 					end
