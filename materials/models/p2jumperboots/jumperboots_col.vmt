@@ -1,0 +1,35 @@
+vertexlitgeneric
+{
+$basetexture "models/p2jumperboots/jumperboots_diffuse"
+$bumpmap "models/p2jumperboots/jumperboots_normals"
+$phong 1
+$phongboost "3.5"
+$phongexponent "8"
+
+
+$phongtint "[.85 .85 1]"
+$phongfresnelranges "[.2 .5 5]"
+$nodecal 1
+$ambientocclusion 1
+$halflambert 1
+$diffuseexp "1.5"
+$rimlight 1
+$rimlightboost 3
+$rimlightexponent 6
+$surfaceprop flesh
+$blendtintbybasealpha 1
+$blendtintcoloroverbase 0
+$nocull 1
+
+	// --- Test values. Comment the PlayerColor proxy to use one of these.
+	// "$color2" "{0 0 0}" // Black
+	// "$color2" "{255 0 0}" //Blue (default)
+	// "$color2" "{59 121 160}" // Blue (TF2)
+	// "$color2" "{180 52 41}" // Red (TF2)
+	// "$color2" "{100 72 58}" // Brown
+	// "$color2" "{140 208 112}" // Green
+	// "$color2" "{248 166 202}" // Pink
+	// "$color2" "{160 100 140}" // Purple
+	// "$color2" "{242 168 96}" // Yellow (gold-ish)
+	
+	"$PhongBrightnessScalar" "0.5" // see below. "0.5" will get overwritten.

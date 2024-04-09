@@ -375,7 +375,28 @@ JModHL2.ArmorTable = {
 		dur = 50,
 		mskmat="mats_aboot_gmod_sprites/weldingmask_vignette.png",
 		ent = "ent_aboot_gmod_ezarmor_weldingmask"
-	}
+	},
+	["Longfall-Boots"] = {
+		PrintName = "Longfall Boots",
+		Category = "JMod - EZ HL:2",
+		mdl = "models/items/jumperboots.mdl",
+		slots = {
+			rightcalf = .7,
+			leftcalf = .7
+		},
+		eff = {
+			fallProtect = true
+		},
+		def = NonArmorProtectionProfile,
+		bon = "ValveBiped.Bip01_Pelvis",
+		merge = true,
+		siz = Vector(1.3, 1.3, 1.1),
+		pos = Vector(38, 0, 0),
+		ang = Angle(0, -90, -90),
+		wgt = 5,
+		dur = 100,
+		ent = "ent_aboot_gmod_ezarmor_longfallboots"
+	},
 }
 
 local function HL2LoadAdditionalArmor()
@@ -580,6 +601,12 @@ hook.Add("OnPlayerHitGround", "JMOD_HL2_HITGROUND", function(ply, water, float, 
 	timer.Stop(ply:Nick().."jumpmod_timer")
 	ply.played_sound = false
 end)
+
+hook.Add( "EntityTakeDamage", "EntityDamageExample", function( target, dmginfo )
+	if (target:IsPlayer() and dmginfo:IsFallDamage()) and JMod.PlyHasArmorEff(target, "fallProtect") then
+		dmginfo:ScaleDamage(0)
+	end
+end )
 
 if CLIENT then
 
