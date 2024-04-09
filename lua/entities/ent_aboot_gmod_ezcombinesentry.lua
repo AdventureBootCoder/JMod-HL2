@@ -623,6 +623,7 @@ if(SERVER)then
 		if not IsValid(ent) then return false end
 		if ent == self then return false end
 		if ent:IsOnFire() then return true end
+		if ent:GetClass() == "ent_jack_gmod_ezfirehazard" then return true end
 		if ent.TryLoadResource and ent.GetWater and (ent:GetWater() < 100) then return true end
 	end
 
@@ -1262,17 +1263,21 @@ if(SERVER)then
 
 			sound.Play("physics/surfaces/underwater_impact_bullet"..math.random(1, 3)..".wav", SelfPos + Up, 100, math.random(80, 100))
 			
-			local EntsToWet = ents.FindInSphere(point, 256)
+			local EntsToWet = ents.FindInSphere(point, 100)
 			for i = 1, #EntsToWet do
 				local Ent = EntsToWet[i]
-				if Ent:IsOnFire() then
-					Ent:Extinguish()
+				if self:ShouldSoak(Ent) then
+					if Ent:IsOnFire() then
+						Ent:Extinguish()
 
-					break
-				elseif Ent.GetWater and Ent:GetWater() < 100 then
-					Ent:SetWater(math.Clamp(Ent:GetWater() + 1, 0, 100))
+						break
+					elseif Ent.GetWater and Ent:GetWater() < 100 then
+						Ent:SetWater(math.Clamp(Ent:GetWater() + 1, 0, 100))
 
-					break
+						break
+					else
+						Ent:Remove() -- Must be a fire entity
+					end
 				end
 			end
 			Heat = 0
