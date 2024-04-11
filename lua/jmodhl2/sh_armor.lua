@@ -376,7 +376,7 @@ JModHL2.ArmorTable = {
 		mskmat="mats_aboot_gmod_sprites/weldingmask_vignette.png",
 		ent = "ent_aboot_gmod_ezarmor_weldingmask"
 	},
-	["Longfall-Boots"] = {
+	["Longfall Boots"] = {
 		PrintName = "Longfall Boots",
 		Category = "JMod - EZ HL:2",
 		mdl = "models/items/jumperboots.mdl",
@@ -607,6 +607,12 @@ hook.Add( "EntityTakeDamage", "EntityDamageExample", function( target, dmginfo )
 		dmginfo:ScaleDamage(0)
 	end
 end )
+
+hook.Add("PlayerFootstep", "JMOD_HL2_FOOTSTEP", function(ply, pos, foot, sound, volume, filter)
+	if (ply.EZarmor and ply.EZarmor.effects and ply.EZarmor.effects.fallProtect) then
+		ply:EmitSound("player/footsteps/metal"..tostring(foot + 1)..".wav", 60, math.random(110, 120), volume * 0.5, CHAN_BODY)
+	end
+end)
 
 if CLIENT then
 
