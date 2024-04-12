@@ -134,7 +134,7 @@ if(SERVER)then
 		if self.NextUseTime > Time then return end
 		self.NextUseTime = Time + 2
 		local State = self:GetState()
-		local OldOwner = self.EZowner
+		local OldOwner = JMod.GetEZowner(self)
 		local alt = activator:KeyDown(JMod.Config.General.AltFunctionKey)
 		JMod.SetEZowner(self, activator)
 
