@@ -3,7 +3,7 @@ SWEP.Spawnable = false -- this obviously has to be set to true
 SWEP.Category = "ArcCW - Half Life" -- edit this if you like
 SWEP.AdminOnly = false
 SWEP.PrintName = "CO-SR"
-SWEP.TrueName = "csnp"
+SWEP.TrueName = "Combine Sniper Rifle"
 SWEP.Trivia_Class = "Heavy sniper rifle"
 SWEP.Trivia_Desc = ""
 SWEP.Trivia_Manufacturer = "combine"
@@ -11,7 +11,7 @@ SWEP.Trivia_Calibre = "??"
 SWEP.Trivia_Mechanism = "??"
 SWEP.Trivia_Country = "??"
 SWEP.Trivia_Year = "??"
-SWEP.Slot = 2
+SWEP.Slot = 3
 SWEP.ViewModel = "models/weapons/aboot/combsr/c_combsr.mdl"
 SWEP.WorldModel = "models/weapons/aboot/combsr/w_combinesniper_e2.mdl"
 SWEP.ViewModelFOV = 50
@@ -20,6 +20,7 @@ SWEP.CustomToggleCustomizeHUD = false
 
 SWEP.ShootEntity = nil -- entity to fire, if any
 SWEP.MuzzleVelocity = 6000 -- projectile or phys bullet muzzle velocity
+JMod.ApplyAmmoSpecs(SWEP, "Heavy Pulse Ammo-Armor Piercing", 1)
 -- IN M/S
 SWEP.ChamberSize = 1 -- how many rounds can be chambered.
 SWEP.Primary.ClipSize = 1 -- DefaultClip is automatically set.
@@ -48,9 +49,9 @@ SWEP.AccuracyMOA = 1 -- accuracy in Minutes of Angle. There are 60 MOA in a degr
 SWEP.HipDispersion = 1000 -- inaccuracy added by hip firing.
 SWEP.MoveDispersion = 200
 
-SWEP.MagID = "ar2" -- the magazine pool this gun draws from
+SWEP.MagID = "cosr" -- the magazine pool this gun draws from
 
-SWEP.ShootVol = 145 -- volume of shoot sound
+SWEP.ShootVol = 100 -- volume of shoot sound
 SWEP.ShootPitch = 100 -- pitch of shoot sound
 
 SWEP.ShootSound = "weapons/ar2/fire1.wav"

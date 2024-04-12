@@ -93,7 +93,7 @@ JModHL2.WeaponTable = {
 		ent = "ent_aboot_jmod_ezweapon_smg2",
 		Category = "JMod - EZ HL:2"
 	},
-	--[[["API-SR"] = {
+	["API-SR"] = {
 		mdl = "models/weapons/aboot/sniper/w_sniper.mdl",
 		swep = "wep_aboot_jmod_apisr",
 		ent = "ent_aboot_jmod_ezweapon_apisr",
@@ -104,7 +104,13 @@ JModHL2.WeaponTable = {
 		swep = "wep_aboot_jmod_combsr",
 		ent = "ent_aboot_jmod_ezweapon_combsr",
 		Category = "JMod - EZ HL:2"
-	},--]]
+	},
+	--[[["Combine Flamethrower"] = {
+		mdl = "",
+		swep = "wep_aboot_jmod_comflamethrower",
+		ent = "ent_aboot_jmod_ezweapon_comflamethrower",
+		Category = "JMod - EZ HL:2"
+	}--]]
 }
 
 JModHL2.AmmoTable = {
@@ -127,6 +133,15 @@ JModHL2.AmmoTable = {
 		penetration = 45,
 		tracer = "tfa_mmod_tracer_ar3",
 		dmgtype = DMG_AIRBOAT
+	},
+	["Heavy Pulse Ammo-Armor Piercing"] = {
+		carrylimit = 200,
+		basedmg = 35,
+		effrange = 100,
+		terminaldmg = 35,
+		armorpiercing = .2,
+		penetration = 70,
+		ammoboxEnt = "ent_aboot_gmod_ezammobox_hpaap"
 	},
 	["25mm Grenade"] = {
 		resourcetype = "munitions",
