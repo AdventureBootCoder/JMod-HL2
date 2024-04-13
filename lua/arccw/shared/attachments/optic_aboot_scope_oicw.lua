@@ -8,7 +8,7 @@ att.Desc_Pros = {"+ Precision sight picture", "+ Zoom",}
 att.Desc_Cons = {"- Visible scope glint",}
 
 att.AutoStats = true
-att.Slot = "oicw_optic"
+att.Slot = "ez_optic_combine"
 att.Model = "models/weapons/arccw/atts/oicw_scope.mdl"
 
 att.EZNVscope = true

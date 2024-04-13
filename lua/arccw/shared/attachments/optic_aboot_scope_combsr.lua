@@ -8,88 +8,11 @@ att.Desc_Pros = {"+ Precision sight picture", "+ Zoom",}
 att.Desc_Cons = {"- Visible scope glint",}
 
 att.AutoStats = true
-att.Slot = "optic_combsr"
+att.Slot = "ez_optic_combine"
 att.Model = "models/weapons/arccw/atts/combsr_scope.mdl"
-
---att.EZNVscope = true
-
---[[local thermalmodify = {
-	["$pp_colour_addr"] = 0,
-	["$pp_colour_addg"] = 0,
-	["$pp_colour_addb"] = 0,
-	["$pp_colour_brightness"] = 0,
-	["$pp_colour_contrast"] = .2,
-	["$pp_colour_colour"] = 1,
-	["$pp_colour_mulr"] = 0,
-	["$pp_colour_mulg"] = 0,
-	["$pp_colour_mulb"] = 0
-}--]]
 
 local colormod = Material("pp/colour")
 local TextColor = Color(0, 238, 255)
-
---[[local TrackingScopeFunction = function(tex)
-	--local asight = self:GetActiveSights()
-	local ply = LocalPlayer()
-	local orig = colormod:GetTexture("$fbtexture")
-	local ActiveWep = ply:GetActiveWeapon()
-
-	if tex then
-		colormod:SetTexture("$fbtexture", tex)
-	end
-
-	render.PushRenderTarget(tex)
-
-	ActiveWep.PixVis = ActiveWep.PixVis or {}
-	ActiveWep.LeadVelocity = ActiveWep.LeadVelocity or {}
-
-	cam.Start2D()
-		for _, target in pairs(ents.GetAll()) do
-			if not IsValid(target) or not (target:IsNPC() or target:IsPlayer()) then
-				continue
-			end
-
-			if target == ply or target:Health() <= 0 then
-				continue
-			end
-
-			local tpos = target:LocalToWorld(target:OBBCenter())
-
-			ActiveWep.PixVis[target] = ActiveWep.PixVis[target] or util.GetPixelVisibleHandle()
-
-			local vis = util.PixelVisible(tpos, target:GetModelRadius(), ActiveWep.PixVis[target])
-
-			if vis == 0 then
-				--continue
-			end
-
-			local time = 0--ActiveWep:GetTimeToTarget(tpos)
-
-			ActiveWep.LeadVelocity[target] = LerpVector(FrameTime(), ActiveWep.LeadVelocity[target] or Vector(), target:GetVelocity())
-
-			local lead = (tpos + (target:GetVelocity() * time)):ToScreen()
-			local tpos2 = tpos:ToScreen()
-
-			local w = 10
-			local color = Vector(0, 0, 1)
-
-			surface.SetDrawColor(color.x * 255, color.y * 255, color.z * 255)
-
-			surface.DrawLine(tpos2.x, tpos2.y, lead.x, lead.y)
-
-			surface.DrawLine(lead.x - w, lead.y, lead.x, lead.y - w)
-			surface.DrawLine(lead.x, lead.y - w, lead.x + w, lead.y)
-			surface.DrawLine(lead.x - w, lead.y, lead.x, lead.y + w)
-			surface.DrawLine(lead.x, lead.y + w, lead.x + w, lead.y)
-		end
-	cam.End2D()
-	
-	render.PopRenderTarget(tex)
-
-	if orig then
-		colormod:SetTexture("$fbtexture", orig)
-	end
-end--]]
 
 local visionMat = Material( 'vgui/black' )
 local maxDist = 3000
@@ -221,7 +144,7 @@ att.AdditionalSights = {
 }--]]
 
 att.ModelOffset = Vector(0, 0, 0.85)
-att.OffsetAng = Angle(180, 0, 0)
+--att.OffsetAng = Angle(180, 0, 0)
 
 att.ScopeGlint = false -- lmao
 att.Holosight = true
@@ -236,3 +159,4 @@ att.Colorable = false
 att.HolosightMagnification = 3 -- this is the scope magnification
 att.HolosightBlackbox = false
 att.Mult_SightTime = 1.2
+att.Mult_SightsDispersion = 0.01

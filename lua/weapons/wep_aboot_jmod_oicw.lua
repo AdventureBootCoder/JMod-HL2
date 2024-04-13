@@ -117,7 +117,7 @@ SWEP.IronSightStruct = {
 }
 
 SWEP.HoldtypeHolstered = "passive"
-SWEP.HoldtypeActive = "ar2"
+SWEP.HoldtypeActive = "shotgun"
 SWEP.HoldtypeSights = "ar2"
 
 SWEP.AnimShoot = ACT_HL2MP_GESTURE_RANGE_ATTACK_AR2
@@ -144,7 +144,7 @@ SWEP.Attachments = {
 	{
 		PrintName = "Optic",
 		DefaultAttName = "No Scope",
-		Slot = {"ez_optic", "oicw_optic"},
+		Slot = {"ez_optic", "ez_optic_combine"},
 		Bone = "OICW_weapon",
 		Offset = {
 			vang = Angle(0, 180, 90),

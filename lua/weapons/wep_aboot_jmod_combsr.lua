@@ -52,18 +52,18 @@ SWEP.Firemodes = {
 SWEP.NPCWeaponType = {"weapon_ar2", "weapon_crossbow"}
 SWEP.NPCWeight = 10
 
-SWEP.AccuracyMOA = 0 -- accuracy in Minutes of Angle. There are 60 MOA in a degree.
-SWEP.HipDispersion = 1000 -- inaccuracy added by hip firing.
-SWEP.MoveDispersion = 200
+SWEP.AccuracyMOA = 10 -- accuracy in Minutes of Angle. There are 60 MOA in a degree.
+SWEP.HipDispersion = 200 -- inaccuracy added by hip firing.
+SWEP.MoveDispersion = 500
 
 SWEP.MagID = "cosr" -- the magazine pool this gun draws from
 
-SWEP.ShootVol = 100 -- volume of shoot sound
+SWEP.ShootVol = 200 -- volume of shoot sound
 SWEP.ShootPitch = 100 -- pitch of shoot sound
 
-SWEP.ShootSound = "weapons/ar2/fire1.wav"
+SWEP.ShootSound = "npc/sniper/sniper1.wav" --"weapons/ar2/fire1.wav"
 SWEP.ShootSoundSilenced = "weapons/arccw/m4a1/m4a1_01.wav"
-SWEP.DistantShootSound = "weapons/ar2/fire1.wav"
+SWEP.DistantShootSound = "npc/sniper/echo1.wav" --"weapons/ar2/fire1.wav"
 
 SWEP.MuzzleEffect = "muzzleflash_5"
 SWEP.ShellModel = nil--"models/shells/shell_338mag.mdl"
@@ -74,8 +74,8 @@ SWEP.MuzzleEffectAttachment = 1 -- which attachment to put the muzzle on
 SWEP.CaseEffectAttachment = 2 -- which attachment to put the case effect on
 
 SWEP.SightTime = 0.25
-SWEP.SpeedMult = 1
-SWEP.SightedSpeedMult = 1
+SWEP.SpeedMult = 0.9
+SWEP.SightedSpeedMult = 0.9
 
 SWEP.BulletBones = { -- the bone that represents bullets in gun/mag
 	-- [0] = "bulletchamber",
@@ -88,7 +88,7 @@ SWEP.ProceduralIronFire = true
 SWEP.CaseBones = {}
 
 SWEP.IronSightStruct = {
-	Pos = Vector(-5.829, -11.055, 1.35),
+	Pos = Vector(-6.15, -11.055, 1.35),
 	Ang = Angle(0.792, 0.017, 0),
 	Magnification = 1.1,
 }
@@ -124,27 +124,19 @@ SWEP.AttachmentElements = {
 	}
 }
 
---[[SWEP.Lasers = {
-	{
-		LaserStrength = 1,
-		LaserBone = "body",--"laser",
-		Color = Color(0, 225, 255)
-	}
-}--]]
-
 SWEP.ExtraSightDist = 5
 
 SWEP.Attachments = {
 	{
 		PrintName = "Optic", -- print name
 		DefaultAttName = "Iron Sights",
-		Slot = {"optic", "optic_sniper", "optic_lp", "optic_combsr", "ez_optic"}, -- what kind of attachments can fit here, can be string or table
+		Slot = {"optic", "optic_sniper", "optic_lp", "ez_optic_combine", "ez_optic"}, -- what kind of attachments can fit here, can be string or table
 		Bone = "v_weapon.g3sg1_Parent", -- relevant bone any attachments will be mostly referring to
 		Offset = {
 			vpos = Vector(0.1, -8.5, 0.5),
 			vang = Angle(-90, 0, -90),
-			wpos = Vector(8, 0.899, -6.401),
-			wang = Angle(-10.52, 0, 180)
+			wpos = Vector(0, 0, -7),
+			wang = Angle(-15, 0, 180)
 		},
 		--InstalledEles = {"nors"},
 		CorrectivePos = Vector(0, 0, 0),
