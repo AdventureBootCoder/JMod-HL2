@@ -140,7 +140,7 @@ JModHL2.AmmoTable = {
 		effrange = 100,
 		terminaldmg = 35,
 		armorpiercing = .2,
-		penetration = 70,
+		penetration = 60,
 		ammoboxEnt = "ent_aboot_gmod_ezammobox_hpaap"
 	},
 	["25mm Grenade"] = {

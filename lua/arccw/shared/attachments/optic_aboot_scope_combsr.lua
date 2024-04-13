@@ -28,7 +28,7 @@ att.Model = "models/weapons/arccw/atts/combsr_scope.mdl"
 local colormod = Material("pp/colour")
 local TextColor = Color(0, 238, 255)
 
-local TrackingScopeFunction = function(tex)
+--[[local TrackingScopeFunction = function(tex)
 	--local asight = self:GetActiveSights()
 	local ply = LocalPlayer()
 	local orig = colormod:GetTexture("$fbtexture")
@@ -40,23 +40,6 @@ local TrackingScopeFunction = function(tex)
 
 	render.PushRenderTarget(tex)
 
-	--[[if IsValid(ActiveWep) then
-		JModHL2.EZ_NightVisionScreenSpaceEffect(nil)
-		DrawColorModify({
-			["$pp_colour_addr"] = 0,
-			["$pp_colour_addg"] = 0,
-			["$pp_colour_addb"] = 0,
-			["$pp_colour_brightness"] = 0,
-			["$pp_colour_contrast"] = 1.2,
-			["$pp_colour_colour"] = 0,
-			["$pp_colour_mulr"] = 0,
-			["$pp_colour_mulg"] = 0,
-			["$pp_colour_mulb"] = 0
-		})
-		--if ply and not ply.EZflashbanged then
-			--DrawMotionBlur(FrameTime() * 50, .8, .01)
-		--end
-	end--]]
 	ActiveWep.PixVis = ActiveWep.PixVis or {}
 	ActiveWep.LeadVelocity = ActiveWep.LeadVelocity or {}
 
@@ -106,6 +89,84 @@ local TrackingScopeFunction = function(tex)
 	if orig then
 		colormod:SetTexture("$fbtexture", orig)
 	end
+end--]]
+
+local visionMat = Material( 'vgui/black' )
+local maxDist = 3000
+
+local scanAnim = 1
+local scanAnimMove = -1
+
+local mat_viewBeam	= Material( "effects/lamp_beam" )
+local mat_viewGlow	= Material( "sprites/light_ignorez" )
+
+local function XrayScopeFunction(tex)
+	local ply = LocalPlayer()
+	local orig = colormod:GetTexture("$fbtexture")
+	local ActiveWep = ply:GetActiveWeapon()
+
+	render.PushRenderTarget(tex)
+
+	-- STENCIL OPERATION START
+	cam.Start3D()
+		if tex then
+			colormod:SetTexture("$fbtexture", tex)
+		else
+			colormod:SetTexture("$fbtexture", render.GetScreenEffectTexture())
+		end
+
+		cam.IgnoreZ( true )
+		render.SetStencilEnable( true )
+			render.SetStencilWriteMask( 1 )
+			render.SetStencilTestMask( 1 )
+			render.SetStencilReferenceValue( 1 )
+			render.SetStencilFailOperation( STENCIL_KEEP )
+			render.SetStencilZFailOperation( STENCIL_KEEP )
+			for _, ent in pairs(ents.GetAll()) do
+				render.ClearStencil()
+				if not IsValid( ent ) || ent == LocalPlayer() || ( not ent:IsNPC() && not ent:IsPlayer() && ent:GetClass() ~= 'prop_physics' && ent.Base ~= 'base_nextbot' ) then continue end
+				if ent.Health && ent:Health() <= 0 then continue end
+				local dist = ent:GetPos():Distance( EyePos() )
+				local frac = 1 - math.Clamp( ( dist - 300 ) / maxDist, 0, 1 )
+				render.SetBlend( math.min( frac, 0.99 ) )
+				render.SetStencilCompareFunction( STENCIL_ALWAYS )
+				render.SetStencilPassOperation( STENCIL_REPLACE )
+				ent:DrawModel()
+				if ( ent:IsNPC() || ent:IsPlayer() ) && IsValid( ent:GetActiveWeapon() ) then
+					ent:GetActiveWeapon():DrawModel()
+				end
+				render.SetStencilCompareFunction( STENCIL_EQUAL )
+				render.SetStencilPassOperation( STENCIL_KEEP )
+				--START 
+				cam.Start2D()
+					if ent:IsNPC() || ent.Base == 'base_nextbot' || ent:IsPlayer() then
+						surface.SetDrawColor( 195, 195, 195, 250 * frac * scanAnim )
+					end
+					surface.DrawRect( 0, 0, ScrW(), ScrH() )
+				cam.End2D()
+				--END
+				if ent:IsNPC() || ent:IsPlayer() then
+					render.SetStencilCompareFunction( STENCIL_ALWAYS )
+					local head = ent:LookupBone( 'ValveBiped.Bip01_Head1' )
+					if head then
+						local p, a = ent:GetBonePosition( head )
+						p = p + Vector( 0, 0, 5 )
+						local nrm = a:Right() + Vector( 0, 0, 0.15 )
+						local view_nrm = ( p - EyePos() ):GetNormalized()
+						local view_dot = 1 - math.abs( view_nrm:Dot( nrm ) )								
+						local spr_size_w, spr_size_h = 256, 128
+						render.SetMaterial( mat_viewGlow )
+					end
+				end
+			end
+		render.SetStencilEnable( false )
+		cam.IgnoreZ( false )
+
+		colormod:SetTexture("$fbtexture", render.GetScreenEffectTexture())
+	cam.End3D()
+	-- STENCIL OPERATION END
+
+	render.PopRenderTarget()
 end
 
 att.AdditionalSights = {
@@ -118,7 +179,7 @@ att.AdditionalSights = {
 		IgnoreExtra = true,
 		SwitchToSound = "snds_jack_gmod/ez_weapons/handling/aim1.wav",
 		SwitchFromSound = "snds_jack_gmod/ez_weapons/handling/aim_out.wav",
-		SpecialScopeFunction = TrackingScopeFunction
+		SpecialScopeFunction = XrayScopeFunction--TrackingScopeFunction
 	}
 }
 

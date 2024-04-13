@@ -18,10 +18,9 @@ SWEP.ViewModelFOV = 52
 
 SWEP.CustomToggleCustomizeHUD = false
 
-SWEP.ShootEntity = nil -- entity to fire, if any
-SWEP.MuzzleVelocity = 6000 -- projectile or phys bullet muzzle velocity
 JMod.ApplyAmmoSpecs(SWEP, "Heavy Pulse Ammo-Armor Piercing", 1)
-
+-- IN M/S
+SWEP.MuzzleVelocity = 1000 -- projectile or phys bullet muzzle velocity
 --
 SWEP.AimSwayFactor = .1
 
@@ -30,8 +29,6 @@ SWEP.ReloadInSights_CloseIn = 0.25
 SWEP.ReloadInSights_FOVMult = 0.875
 SWEP.LockSightsInReload = false
 --
-
--- IN M/S
 SWEP.ChamberSize = 0 -- how many rounds can be chambered.
 SWEP.Primary.ClipSize = 1 -- DefaultClip is automatically set.
 SWEP.ExtendedClipSize = 1
