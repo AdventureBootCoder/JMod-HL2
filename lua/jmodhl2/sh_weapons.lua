@@ -135,8 +135,8 @@ JModHL2.AmmoTable = {
 		dmgtype = DMG_AIRBOAT
 	},
 	["Heavy Pulse Ammo-Armor Piercing"] = {
-		carrylimit = 200,
-		basedmg = 35,
+		carrylimit = 50,
+		basedmg = 100,
 		effrange = 100,
 		terminaldmg = 35,
 		armorpiercing = .2,

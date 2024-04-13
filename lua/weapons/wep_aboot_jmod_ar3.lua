@@ -34,7 +34,7 @@ SWEP.BottomlessClip = true
 SWEP.PhysBulletMuzzleVelocity = 700
 
 
-SWEP.Recoil = 0.3
+SWEP.Recoil = -0.3
 SWEP.RecoilSide = 0.4
 SWEP.RecoilRise = 0.3
 SWEP.MaxRecoilBlowback = 3

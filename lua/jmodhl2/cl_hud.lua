@@ -71,19 +71,6 @@ hook.Add("HUDPaint", "JMOD_HL2_HUDPAINT", function()
 			else
 				draw.DrawText("CHARGE", "HudDefault", x + (SCR_W * (BAR_WIDTH + MARGIN) * 3.2), y - (SCR_H * BAR_HEIGHT) + 50, BAR_COL_EMPTY, TEXT_ALIGN_LEFT)
 			end
-			-- There's a lot of work done here:
-			--[[local Aim = Ply:GetAimVector():Angle() 
-			for i = -90, 90 do
-				local distance = math.abs(i - Aim.p)
-				local alphaValue = math.max((distance*-100 + 200), 0)
-				local DrawPosY = ((SCR_H / 2) + i * 18) + (SCR_H / 60) * -Aim.p
-				local AHcolor = Color(255, 255, 255, alphaValue)
-				surface.SetDrawColor(AHcolor)
-				surface.DrawRect((SCR_W / 2) + 40, DrawPosY, 40, 2)
-				surface.DrawRect((SCR_W / 2) - 80, DrawPosY, 40, 2)
-				draw.DrawText(tostring(math.Round(-i)), "HudDefault", (SCR_W / 2) + 100, DrawPosY - 10, AHcolor, TEXT_ALIGN_LEFT)
-			end]]--
-			--draw.DrawText(tostring(math.Round(-Aim.p)), "HudDefault", (SCR_W / 2) + 100, (SCR_H / 2) - 10, AHcolor, TEXT_ALIGN_LEFT)
 		elseif Ply.EZarmor.effects.jetmod then
 			charge = Lerp(FrameTime() * 4.5, charge, PlyCharge + 0.01)
 			if PlyCharge - charge < 0 then

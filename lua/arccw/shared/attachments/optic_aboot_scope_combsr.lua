@@ -70,24 +70,24 @@ local TrackingScopeFunction = function(tex)
 				continue
 			end
 
-			local tpos = target:WorldSpaceCenter()
+			local tpos = target:LocalToWorld(target:OBBCenter())
 
 			ActiveWep.PixVis[target] = ActiveWep.PixVis[target] or util.GetPixelVisibleHandle()
 
 			local vis = util.PixelVisible(tpos, target:GetModelRadius(), ActiveWep.PixVis[target])
 
 			if vis == 0 then
-				continue
+				--continue
 			end
 
-			local time = 1--ActiveWep:GetTimeToTarget(tpos)
+			local time = 0--ActiveWep:GetTimeToTarget(tpos)
 
 			ActiveWep.LeadVelocity[target] = LerpVector(FrameTime(), ActiveWep.LeadVelocity[target] or Vector(), target:GetVelocity())
 
 			local lead = (tpos + (target:GetVelocity() * time)):ToScreen()
 			local tpos2 = tpos:ToScreen()
 
-			local w = 5
+			local w = 10
 			local color = Vector(0, 0, 1)
 
 			surface.SetDrawColor(color.x * 255, color.y * 255, color.z * 255)
@@ -166,7 +166,7 @@ att.ScopeGlint = false -- lmao
 att.Holosight = true
 att.HolosightReticle = Material("holosights/sniper_scope_ret.png")
 att.HolosightNoFlare = true
-att.HolosightSize = 10
+att.HolosightSize = 8
 att.HolosightBone = "holosight"
 att.HolosightPiece = "models/weapons/arccw/atts/combsr_scope_hsp.mdl"
 att.HolosightConstDist = false

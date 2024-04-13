@@ -61,6 +61,7 @@ SWEP.BodyHolsterAng = Angle(-10, 0, 0)
 SWEP.BodyHolsterAngL = Angle(-10, 10, 180)
 SWEP.BodyHolsterPos = Vector(4, -10, -6)
 SWEP.BodyHolsterPosL = Vector(4, -10, 4)
+SWEP.BodyHolsterScale = .75
 
 SWEP.ShootEntity = nil -- entity to fire, if any
 SWEP.MuzzleVelocity = 1050 -- projectile or phys bullet muzzle velocity

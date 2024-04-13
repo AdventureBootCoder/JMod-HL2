@@ -602,7 +602,15 @@ hook.Add("OnPlayerHitGround", "JMOD_HL2_HITGROUND", function(ply, water, float, 
 	ply.played_sound = false
 end)
 
-hook.Add( "EntityTakeDamage", "EntityDamageExample", function( target, dmginfo )
+hook.Add( "GetFallDamage", "JMOD_HL2_FALLDAMAGEPROTECT", function(ply, speed)
+	if ply:IsPlayer() and JMod.PlyHasArmorEff(ply, "fallProtect") then
+		ply:EmitSound("physics/metal/metal_box_impact_hard"..tostring(math.random(1, 3))..".wav", 60, math.random(110, 120), 0.5, CHAN_AUTO)
+
+		return 0
+	end
+end)
+
+hook.Add( "EntityTakeDamage", "JMOD_HL2_FALLDAMAGEPROTECT", function(target, dmginfo)
 	if (target:IsPlayer() and dmginfo:IsFallDamage()) and JMod.PlyHasArmorEff(target, "fallProtect") then
 		dmginfo:ScaleDamage(0)
 	end
@@ -610,7 +618,7 @@ end )
 
 hook.Add("PlayerFootstep", "JMOD_HL2_FOOTSTEP", function(ply, pos, foot, sound, volume, filter)
 	if (ply.EZarmor and ply.EZarmor.effects and ply.EZarmor.effects.fallProtect) then
-		ply:EmitSound("player/footsteps/metal"..tostring(foot + 1)..".wav", 60, math.random(110, 120), volume * 0.5, CHAN_BODY)
+		ply:EmitSound("player/footsteps/metal"..tostring(foot + 1)..".wav", 60, math.random(110, 120), volume * 0.5, CHAN_AUTO)
 	end
 end)
 

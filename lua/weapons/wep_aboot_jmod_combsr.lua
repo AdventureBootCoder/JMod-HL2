@@ -14,20 +14,30 @@ SWEP.Trivia_Year = "??"
 SWEP.Slot = 3
 SWEP.ViewModel = "models/weapons/aboot/combsr/c_combsr.mdl"
 SWEP.WorldModel = "models/weapons/aboot/combsr/w_combinesniper_e2.mdl"
-SWEP.ViewModelFOV = 50
+SWEP.ViewModelFOV = 52
 
 SWEP.CustomToggleCustomizeHUD = false
 
 SWEP.ShootEntity = nil -- entity to fire, if any
 SWEP.MuzzleVelocity = 6000 -- projectile or phys bullet muzzle velocity
 JMod.ApplyAmmoSpecs(SWEP, "Heavy Pulse Ammo-Armor Piercing", 1)
+
+--
+SWEP.AimSwayFactor = .1
+
+SWEP.ReloadInSights = true
+SWEP.ReloadInSights_CloseIn = 0.25
+SWEP.ReloadInSights_FOVMult = 0.875
+SWEP.LockSightsInReload = false
+--
+
 -- IN M/S
-SWEP.ChamberSize = 1 -- how many rounds can be chambered.
+SWEP.ChamberSize = 0 -- how many rounds can be chambered.
 SWEP.Primary.ClipSize = 1 -- DefaultClip is automatically set.
 SWEP.ExtendedClipSize = 1
 SWEP.ReducedClipSize = 1
 
-SWEP.Recoil = 3
+SWEP.Recoil = -3
 SWEP.RecoilSide = 1
 SWEP.MaxRecoilBlowback = 1
 
@@ -45,7 +55,7 @@ SWEP.Firemodes = {
 SWEP.NPCWeaponType = {"weapon_ar2", "weapon_crossbow"}
 SWEP.NPCWeight = 10
 
-SWEP.AccuracyMOA = 1 -- accuracy in Minutes of Angle. There are 60 MOA in a degree.
+SWEP.AccuracyMOA = 0 -- accuracy in Minutes of Angle. There are 60 MOA in a degree.
 SWEP.HipDispersion = 1000 -- inaccuracy added by hip firing.
 SWEP.MoveDispersion = 200
 
@@ -220,10 +230,10 @@ SWEP.Animations = {
 		LHIKIn = 0.15,
 		LHIKOut = 0.15,
 	},--]]
-	["reload"] = {
+	--[[["reload"] = {
 		Source = "reload",
-		Time = 3,
-		TPAnim = ACT_HL2MP_GESTURE_RELOAD_AR2,
+		Time = 2,
+		TPAnim = ACT_HL2MP_GESTURE_RELOAD_SMG1,
 		Checkpoints = {24, 33, 51},
 		FrameRate = 30,
 		LHIK = true,
@@ -232,62 +242,104 @@ SWEP.Animations = {
 	},
 	["reload_empty"] = {
 		Source = "reload",
-		Time = 3,
-		TPAnim = ACT_HL2MP_GESTURE_RELOAD_AR2,
+		Time = 2,
+		TPAnim = ACT_HL2MP_GESTURE_RELOAD_SMG1,
 		Checkpoints = {24, 33, 51},
 		FrameRate = 30,
 		LHIK = true,
 		LHIKIn = 0.5,
 		LHIKOut = 0.5,
+	},--]]
+	["reload"] = {
+		Source = "idle1",
+		SoundTable = {
+			{
+				s = "npc/sniper/reload1.wav", -- sound; can be string or table
+				p = 100, -- pitch
+				v = 75, -- volume
+				t = 0, -- time at which to play relative to Animations.Time
+				c = CHAN_ITEM, -- channel to play the sound
+			}
+		},
+		Time = 2,
+		TPAnim = ACT_HL2MP_GESTURE_RELOAD_AR2,
+		--Checkpoints = {24, 33, 51},
+		FrameRate = 30,
+		--LHIK = true,
+		--LHIKIn = 0.5,
+		--LHIKOut = 0.5,
 	},
+	["reload_empty"] = {
+		Source = "idle1",
+		SoundTable = {
+			{
+				s = "npc/sniper/reload1.wav", -- sound; can be string or table
+				p = 100, -- pitch
+				v = 75, -- volume
+				t = 0, -- time at which to play relative to Animations.Time
+				c = CHAN_ITEM, -- channel to play the sound
+			}
+		},
+		Time = 2,
+		TPAnim = ACT_HL2MP_GESTURE_RELOAD_AR2,
+		--Checkpoints = {24, 33, 51},
+		FrameRate = 30,
+		--LHIK = true,
+		--LHIKIn = 0.5,
+		--LHIKOut = 0.5,
+	},--]]
 }
 
 sound.Add({name = "clipout_com",
-	channel = CHAN_STATIC,
+	channel = CHAN_WEAPON,
 	volume = 1.0,
 	soundlevel = 80,
 	sound = "sniper/magout.wav"
 })
 
 sound.Add({name = "clipin_com",
-	channel = CHAN_STATIC,
+	channel = CHAN_WEAPON,
 	volume = 1.0,
 	soundlevel = 80,
 	sound = "sniper/magin.wav"
 })
 
 sound.Add({name = "boltpull_com",
-	channel = CHAN_STATIC,
+	channel = CHAN_WEAPON,
 	volume = 1.0,
 	soundlevel = 80,
 	sound = "npc/sniper/reload1.wav"
 })
 
 sound.Add({name = "deploy_com",
-	channel = CHAN_STATIC,
+	channel = CHAN_WEAPON,
 	volume = 1.0,
 	soundlevel = 80,
 	sound = "sniper/foley.wav"
 })
 
+function SWEP:GetAimTrace()
+	local Owner = self:GetOwner()
+	local Attach = self:GetAttachment(self:LookupAttachment("muzzle"))
+	local Tr = util.QuickTrace(Attach.Pos, Attach.Ang:Forward() * 40000, Owner)
+	return Owner:GetEyeTrace()--Tr
+end
+
 if CLIENT then
 	function SWEP:ShouldDrawBeam()
-		return CurTime() > self:GetNextPrimaryFire() and self:Clip1() > 0
+		return CurTime() > self:GetNextPrimaryFire() and (self:Clip1() > 0) and (self:GetState() ~= ArcCW.STATE_SPRINT) and (self:GetState() ~= ArcCW.STATE_CUSTOMIZE) and (self:GetFireMode() ~= 2)
 	end
 
 	local beam = Material("effects/bluelaser1")
 	local sprite = Material("effects/blueflare1")
 
-	--[[function SWEP:DrawHUDBackground()
-		if not false then
-			return
-		end
-
+	function SWEP:DrawHUDBackground()
+		if true then return end
 		if not(self.GetInZoom and self:GetInZoom()) then
-			return
+			--return
 		end
 
-		for _, target in pairs(ents.GetAll()) do
+		for _, target in ents.Iterator() do
 			if not IsValid(target) or not (target:IsNPC() or target:IsPlayer()) then
 				continue
 			end
@@ -303,10 +355,10 @@ if CLIENT then
 			local vis = util.PixelVisible(tpos, target:GetModelRadius(), self.PixVis[target])
 
 			if vis == 0 then
-				continue
+				--continue
 			end
 
-			local time = self:GetTimeToTarget(tpos)
+			local time = 0--self:GetTimeToTarget(tpos)
 
 			self.LeadVelocity[target] = LerpVector(FrameTime(), self.LeadVelocity[target] or Vector(), target:GetVelocity())
 
@@ -327,16 +379,21 @@ if CLIENT then
 		end
 	end--]]
 
-	--[[local function CombinePreDrawViewModel(vm, ply, wep)
-		if not false then return end
-		wep.ViewModelFOV = 54 + (54 - ply:GetFOV()) * 0.6
+	local function CombinePreDrawViewModel(vm, ply, wep)
+		if wep:GetClass() ~= "wep_aboot_jmod_combsr" then return end
+		wep.ViewModelFOV = 54 + (54 - ply:GetFOV()) * 0.1
 
 		if wep:ShouldDrawBeam() then
 			cam.Start3D(nil, nil, ply:GetFOV())
 				cam.IgnoreZ(true)
 
-				local pos = vm:GetAttachment(1).Pos
-				local tr = wep:GetAimTrace()
+				local Attach = vm:GetAttachment(2)
+				local pos = Attach.Pos
+				local tr = util.TraceLine({
+					start = pos,
+					endpos = pos + Attach.Ang:Up() * 10000,
+					filter = ply
+				})--wep:GetAimTrace()
 
 				render.SetMaterial(beam)
 				render.DrawBeam(pos, tr.HitPos, 1, 0, tr.Fraction * 10, Color(255, 0, 0))
@@ -348,35 +405,41 @@ if CLIENT then
 		cam.IgnoreZ(true)
 	end
 	hook.Add("PreDrawViewModel", "CombinePreDrawViewModel", CombinePreDrawViewModel)
+	--hook.Remove("PreDrawViewModel", "CombinePreDrawViewModel")
 
-	local function CombinePostDrawViewModel(vm, ply, wep)
-		if not false then return end
-		cam.IgnoreZ(false)
-	end
-	hook.Add("PostDrawViewModel", "CombinePostDrawViewModel", CombinePostDrawViewModel)--]]
+	hook.Add("PostDrawTranslucentRenderables", "JMOD_COMBSR_DRAW", function(bDepth, bSkybox)
+		--local ply, Time = LocalPlayer(), CurTime()
+		--local ply = self:GetOwner()
 
-	function SWEP:PostDrawTranslucentRenderables()
-		local ply = self:GetOwner()
+		for _, ply in player.Iterator() do
+			if not ply:Alive() then continue end
+			local Sniper = ply:GetActiveWeapon()
 
-		if not IsValid(ply) then
-			return
+			if not IsValid(Sniper) or Sniper:GetClass() ~= "wep_aboot_jmod_combsr" then
+				continue
+			end
+
+			if ply == LocalPlayer() and LocalPlayer():GetViewEntity() == LocalPlayer() and not ply:ShouldDrawLocalPlayer() then
+				continue
+			end
+
+			if ply:InVehicle() then continue end
+			if ply:GetNoDraw() then continue end
+
+			if Sniper:ShouldDrawBeam() then
+				local Attach = Sniper:GetAttachment(2)
+				local pos = Attach.Pos
+				local tr = util.TraceLine({
+					start = pos,
+					endpos = pos + ply:GetAimVector() * 10000,
+					filter = ply
+				})
+
+				render.SetMaterial(beam)
+				render.DrawBeam(pos, tr.HitPos, 1, 0, tr.Fraction * 10, Color(255, 0, 0))
+				render.SetMaterial(sprite)
+				render.DrawSprite(tr.HitPos, 2, 2, Color(50, 190, 255))
+			end
 		end
-
-		if ply == LocalPlayer() and LocalPlayer():GetViewEntity() == LocalPlayer() and not hook.Run("ShouldDrawLocalPlayer", ply) then
-			return
-		end
-
-		if ply:InVehicle() then return end
-		if ply:GetNoDraw() then return end
-
-		if self:ShouldDrawBeam() then
-			local pos = self:GetAttachment(1).Pos
-			local tr = self:GetAimTrace()
-
-			render.SetMaterial(beam)
-			render.DrawBeam(pos, tr.HitPos, 1, 0, tr.Fraction * 10, Color(255, 0, 0))
-			render.SetMaterial(sprite)
-			render.DrawSprite(tr.HitPos, 2, 2, Color(50, 190, 255))
-		end
-	end--]]
+	end)--]]
 end
