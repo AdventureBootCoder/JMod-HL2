@@ -3,7 +3,7 @@ AddCSLuaFile()
 SWEP.PrintName = "EZ OSINC"
 SWEP.Author = "Jackarunda, AdventureBoots"
 SWEP.Purpose = ""
-JMod.SetWepSelectIcon(SWEP, "entities/ent_jack_gmod_eztoolbox")
+JMod.SetWepSelectIcon(SWEP, "entities/ent_aboot_gmod_ezosinc")
 SWEP.Spawnable = false
 SWEP.UseHands = true
 SWEP.DrawAmmo = false
@@ -304,22 +304,27 @@ function SWEP:PrimaryAttack()
 				local Spread = 35
 				for i = 1, 10 do
 					local RandAng = AngleRand(-Spread, Spread)
-					local Tracer = util.QuickTrace(FirePos, FireAng:Forward() * 250 + RandAng:Forward() * Spread * 2, self.Owner)
+					local Tracer = util.QuickTrace(self.Owner:GetShootPos(), FireAng:Forward() * 250 + RandAng:Forward() * Spread * 2, self.Owner)
 					local Ents = ents.FindInSphere(Tracer.HitPos, 20)
 					for _, Ent in ipairs(Ents) do
 						if Ent ~= self.Owner then
 							local DmgInfo = DamageInfo()
 							DmgInfo:SetAttacker(self.Owner)
 							DmgInfo:SetInflictor(self)
-							DmgInfo:SetDamage(math.random(2, 5))
+							DmgInfo:SetDamage(math.random(1, 3))
 							DmgInfo:SetDamageType(DMG_BURN)
 							Ent:TakeDamageInfo(DmgInfo)
-							if not(Ent:IsOnFire()) and (math.random(1, 5) == 1) then Ent:Ignite(math.random(5, 10), 50) end
+							if (math.random(1, 5) == 1) then Ent:Ignite(math.random(5, 10), 50) end
 						end
 					end
 					
 					if math.random(1, 20) == 1 then
 						util.Decal("Scorch", Tracer.HitPos + Tracer.HitNormal, Tracer.HitPos - Tracer.HitNormal)
+					end
+
+					if math.random(1, 10) == 1 then
+						JMod.WreckBuildings(self, Tracer.HitPos, 1, 10, false)
+						--JMod.BlastDoors(self, Tracer.HitPos, 1, 10, false)
 					end
 				end
 			end
@@ -409,7 +414,7 @@ end
 
 --
 function SWEP:OnDrop()
-	local Pack = ents.Create("ent_jack_gmod_ezosinc")
+	local Pack = ents.Create("ent_aboot_gmod_ezosinc")
 	Pack:SetPos(self:GetPos())
 	Pack:SetAngles(self:GetAngles())
 	Pack:Spawn()

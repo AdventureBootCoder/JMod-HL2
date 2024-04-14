@@ -2,7 +2,7 @@
 AddCSLuaFile()
 ENT.Type = "anim"
 ENT.Author = "Jackarunda"
-ENT.Category = "JMod - EZ Misc."
+ENT.Category = "JMod - EZ HL:2"
 ENT.Information = "glhfggwpezpznore"
 ENT.PrintName = "EZ OSINC"--"EZ Overwatch Standard Issue Necrotics Containment"
 ENT.NoSitAllowed = true
