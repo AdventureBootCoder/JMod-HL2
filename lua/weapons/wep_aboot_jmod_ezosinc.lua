@@ -300,11 +300,11 @@ function SWEP:PrimaryAttack()
 
 			if (State == STATE_FLAMIN) and (math.Rand(0, 1) > .3) then
 				self:Pawnch()
-				self.Owner:ViewPunch(AngleRand() * .002)
-				local Spread = 35
+				self.Owner:ViewPunch(AngleRand(-.2, .2))
+				local Spread = 20
 				for i = 1, 10 do
 					local RandAng = AngleRand(-Spread, Spread)
-					local Tracer = util.QuickTrace(self.Owner:GetShootPos(), FireAng:Forward() * 250 + RandAng:Forward() * Spread * 2, self.Owner)
+					local Tracer = util.QuickTrace(self.Owner:GetShootPos(), self.Owner:GetAimVector() * 250 + RandAng:Forward() * Spread * 2, self.Owner)
 					local Ents = ents.FindInSphere(Tracer.HitPos, 20)
 					for _, Ent in ipairs(Ents) do
 						if Ent ~= self.Owner then
@@ -320,11 +320,6 @@ function SWEP:PrimaryAttack()
 					
 					if math.random(1, 20) == 1 then
 						util.Decal("Scorch", Tracer.HitPos + Tracer.HitNormal, Tracer.HitPos - Tracer.HitNormal)
-					end
-
-					if math.random(1, 10) == 1 then
-						JMod.WreckBuildings(self, Tracer.HitPos, 1, 10, false)
-						--JMod.BlastDoors(self, Tracer.HitPos, 1, 10, false)
 					end
 				end
 			end
