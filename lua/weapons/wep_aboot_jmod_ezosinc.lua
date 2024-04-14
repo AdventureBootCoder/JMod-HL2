@@ -11,7 +11,7 @@ SWEP.DrawCrosshair = false
 SWEP.EZdroppable = true
 SWEP.ViewModel	= "models/weapons/c_physcannon.mdl"
 SWEP.WorldModel	= "models/aboot/weapons/w_nc1.mdl"
-SWEP.BodyHolsterModel = "models/vuthakral/weapons/w_nc1.mdl"
+SWEP.BodyHolsterModel = "models/aboot/weapons/w_nc1.mdl"
 SWEP.BodyHolsterSlot = "back"
 SWEP.BodyHolsterAng = Angle(-70, 0, 200)
 SWEP.BodyHolsterAngL = Angle(-70, 0, 200)
@@ -32,8 +32,8 @@ SWEP.Secondary.Automatic = true
 SWEP.Secondary.Ammo = "none"
 SWEP.ShowWorldModel = true
 
-SWEP.EZaccepts = {JMod.EZ_RESOURCE_TYPES.GAS}
-SWEP.MaxGas = 100
+SWEP.EZaccepts = {JMod.EZ_RESOURCE_TYPES.FUEL}
+SWEP.MaxFuel = 50
 
 SWEP.VElements = {
 	["OSINC"] = {
@@ -84,6 +84,7 @@ SWEP.NextSwitch = 0
 
 SWEP.NextExtinguish = 0
 SWEP.NextIgniteTry = 0
+SWEP.EffectiveRange = 300
 
 local STATE_NOTHIN, STATE_IGNITIN, STATE_FLAMIN = 0, 1, 2
 
@@ -93,7 +94,7 @@ function SWEP:Initialize()
 	self.NextIdle = 0
 	self:Deploy()
 
-	self:SetGas(0)
+	self:SetFuel(0)
 end
 
 function SWEP:PreDrawViewModel(vm, wep, ply)
@@ -105,6 +106,7 @@ local GlowSprite = Material("mat_jack_gmod_glowsprite")
 function SWEP:ViewModelDrawn()
 	self:SCKViewModelDrawn()
 
+	if self:GetFuel() <= 0 then return end
 	local State = self:GetState()
 	render.SetMaterial(GlowSprite)
 	local FlamePos, FlameAng = self:GetNozzle()
@@ -143,9 +145,10 @@ end
 function SWEP:DrawWorldModel()
 	self:SCKDrawWorldModel()
 
+	if self:GetFuel() <= 0 then return end
 	local State = self:GetState()
 	render.SetMaterial(GlowSprite)
-	local Dir = self:GetAttachment(1).Ang:Forward()--self.Owner:GetAimVector()
+	local Dir = self:GetAttachment(1).Ang:Forward()
 	local Pos = self:GetAttachment(1).Pos
 
 	if (State == STATE_FLAMIN) then
@@ -205,7 +208,7 @@ function SWEP:GetViewModelPosition(pos, ang)
 end
 
 function SWEP:SetupDataTables()
-	self:NetworkVar("Float", 0, "Gas")
+	self:NetworkVar("Float", 0, "Fuel")
 	self:NetworkVar("Int", 0, "State")
 end
 
@@ -217,7 +220,7 @@ end
 
 function SWEP:GetEZsupplies(resourceType)
 	local AvaliableResources = {
-		[JMod.EZ_RESOURCE_TYPES.GAS] = self:GetGas()
+		[JMod.EZ_RESOURCE_TYPES.FUEL] = self:GetFuel()
 	}
 	if resourceType then
 		if AvaliableResources[resourceType] and AvaliableResources[resourceType] > 0 then
@@ -274,12 +277,12 @@ function SWEP:PrimaryAttack()
 	self:SetNextPrimaryFire(Time + NextAttackTime)
 
 	if SERVER then
-		local Gas, State = self:GetGas(), self:GetState()
-		local HasFuel = (Gas > 0)
+		local Fuel, State = self:GetFuel(), self:GetState()
+		local HasFuel = (Fuel > 0)
 
 		if not(HasFuel) then
 			self:Cease()
-			self:Msg("Out of gas!\nPress Reload on resource container to refill.")
+			self:Msg("Out of fuel!\nPress Reload on resource container to refill.")
 		else
 			local FirePos, FireAng, AimVec = self:GetNozzle()
 			if (State == STATE_NOTHIN) or (State == STATE_IGNITIN) then
@@ -304,7 +307,7 @@ function SWEP:PrimaryAttack()
 				local Spread = 20
 				for i = 1, 10 do
 					local RandAng = AngleRand(-Spread, Spread)
-					local Tracer = util.QuickTrace(self.Owner:GetShootPos(), self.Owner:GetAimVector() * 250 + RandAng:Forward() * Spread * 2, self.Owner)
+					local Tracer = util.QuickTrace(self.Owner:GetShootPos(), self.Owner:GetAimVector() * self.EffectiveRange + RandAng:Forward() * Spread * 2, self.Owner)
 					local Ents = ents.FindInSphere(Tracer.HitPos, 20)
 					for _, Ent in ipairs(Ents) do
 						if Ent ~= self.Owner then
@@ -322,6 +325,7 @@ function SWEP:PrimaryAttack()
 						util.Decal("Scorch", Tracer.HitPos + Tracer.HitNormal, Tracer.HitPos - Tracer.HitNormal)
 					end
 				end
+				self:SetEZsupplies(JMod.EZ_RESOURCE_TYPES.FUEL, Fuel - 0.5)
 			end
 			self.NextExtinguishTime = Time + NextAttackTime * 2
 		end
@@ -334,6 +338,7 @@ function SWEP:SecondaryAttack()
 	self:SetNextSecondaryFire(CurTime() + NextAttackTime)
 	if self.Owner:IsPlayer() and (self.Owner:IsSprinting() or self.Owner:KeyDown(IN_ZOOM)) then return end
 	if (State == STATE_FLAMIN) then return end
+	if self:GetFuel() <= 0 then return end
 	
 	if SERVER then
 		local State = self:GetState()
@@ -381,7 +386,7 @@ function SWEP:Reload()
 			for typ, amt in pairs(Ent:GetEZsupplies()) do
 				if table.HasValue(self.EZaccepts, typ) and (amt > 0) then
 					local CurAmt = self:GetEZsupplies(typ) or 0
-					local Take = math.min(amt, 100 - CurAmt)
+					local Take = math.min(amt, self.MaxFuel - CurAmt)
 					
 					if Take > 0 then
 						Ent:SetEZsupplies(typ, amt - Take, self.Owner)
@@ -415,7 +420,7 @@ function SWEP:OnDrop()
 	Pack:Spawn()
 	Pack:Activate()
 
-	Pack:SetGas(self:GetGas())
+	Pack:SetFuel(self:GetFuel())
 
 	local Phys = Pack:GetPhysicsObject()
 
@@ -540,7 +545,7 @@ function SWEP:DrawHUD()
 	if Ply:ShouldDrawLocalPlayer() then return end
 	local W, H = ScrW(), ScrH()
 
-	draw.SimpleTextOutlined("Gas: "..math.floor(self:GetGas()), "Trebuchet24", W * .1, H * .5 + 30, Color(255, 255, 255, 100), TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP, 3, Color(0, 0, 0, 50))
+	draw.SimpleTextOutlined("Fuel: "..math.floor(self:GetFuel()), "Trebuchet24", W * .1, H * .5 + 30, Color(255, 255, 255, 100), TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP, 3, Color(0, 0, 0, 50))
 end
 
 ----------------- sck -------------------

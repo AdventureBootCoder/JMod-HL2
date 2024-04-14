@@ -95,7 +95,7 @@ end
 att.AdditionalSights = {
 	{
 		Pos = Vector(0, 7, -0.85),
-		Ang = Angle(0, 180, 0),
+		Ang = Angle(0, 0, 0),
 		ViewModelFOV = 30,
 		Magnification = 1, -- this is how much your eyes zoom into the scope, not scope magnification
 		ScrollFunc = ArcCW.SCROLL_NONE,
@@ -144,7 +144,7 @@ att.AdditionalSights = {
 }--]]
 
 att.ModelOffset = Vector(0, 0, 0.85)
-att.OffsetAng = Angle(180, 0, 0)
+--att.OffsetAng = Angle(180, 0, 0)
 
 att.ScopeGlint = false -- lmao
 att.Holosight = true

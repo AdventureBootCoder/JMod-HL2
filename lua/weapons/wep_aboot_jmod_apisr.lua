@@ -187,17 +187,32 @@ SWEP.Attachments = {
 	{
 		PrintName = "Optic", -- print name
 		DefaultAttName = "Iron Sights",
-		Slot = {"optic", "optic_sniper", "optic_lp", "reb_optic", "ez_optic"}, -- what kind of attachments can fit here, can be string or table
+		Slot = {"optic_sniper", "reb_optic", "ez_optic"}, -- what kind of attachments can fit here, can be string or table
 		Bone = "gun", -- relevant bone any attachments will be mostly referring to
 		Offset = {
 			vpos = Vector(0, 0, 5),
 			vang = Angle(0, 180, 0),
 			wpos = Vector(0, 0, 0),
-			wang = Angle(0, 0, 180)
+			wang = Angle(0, 0, 0)
 		},
 		CorrectivePos = Vector(0, 0, 0),
 		CorrectiveAng = Angle(0, 0, 0),
 		Installed = "optic_aboot_scope_reb"
+	},
+	{
+		PrintName = "Forward Grip",
+		DefaultAttName = "No Attachment",
+		Slot = {"ez_bipod"},
+		Bone = "gun",
+		Offset = {
+			vpos = Vector(-18.15, 0.5, 1.1),
+			vang = Angle(0, 180, 0),
+			wpos = Vector(31.5, 0.6, -9.6),
+			wang = Angle(-15, 0, 180)
+		},
+		--Installed = "underbarrel_aboot_gr9_bipod",
+		--Hidden = true, -- attachment cannot be seen in customize menu
+		--Integral = true
 	},
 }
 

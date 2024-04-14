@@ -14,7 +14,7 @@ ENT.DamageThreshold = 80
 ENT.JModEZstorable = true
 
 function ENT:SetupDataTables() 
-	self:NetworkVar("Float", 0, "Gas")
+	self:NetworkVar("Float", 0, "Fuel")
 end
 
 if SERVER then
@@ -47,9 +47,9 @@ if SERVER then
 			Phys:SetMass(50)
 			Phys:Wake()
 		end)
-		self.MaxGas = 100
+		self.MaxFuel = 50
 		if self.SpawnFull then
-			self:SetGas(self.MaxGas)
+			self:SetFuel(self.MaxFuel)
 		end
 	end
 
@@ -82,7 +82,7 @@ if SERVER then
 			activator:SelectWeapon(SwepToGive)
 
 			local ToolBox = activator:GetWeapon(SwepToGive)
-			ToolBox:SetEZsupplies(JMod.EZ_RESOURCE_TYPES.GAS, self:GetGas())
+			ToolBox:SetEZsupplies(JMod.EZ_RESOURCE_TYPES.FUEL, self:GetFuel())
 
 			self:Remove()
 		else
@@ -92,14 +92,14 @@ if SERVER then
 
 elseif CLIENT then
 	function ENT:Initialize()
-		self.MaxGas = 100
+		self.MaxFuel = 100
 	end
 	function ENT:Draw()
 		self:DrawModel()
 		local Opacity = math.random(50, 200)
-		local GasFrac = self:GetGas()/self.MaxGas
+		local FuelFrac = self:GetFuel()/self.MaxFuel
 		JMod.HoloGraphicDisplay(self, Vector(2.5, 5, 10), Angle(0, 0, 90), .05, 300, function()
-			draw.SimpleTextOutlined("GAS "..math.Round(GasFrac*100).."%","JMod-Display",0,10,JMod.GoodBadColor(GasFrac, true, Opacity),TEXT_ALIGN_CENTER,TEXT_ALIGN_TOP,3,Color(0,0,0,Opacity))
+			draw.SimpleTextOutlined("FUEL "..math.Round(FuelFrac*100).."%","JMod-Display",0,10,JMod.GoodBadColor(FuelFrac, true, Opacity),TEXT_ALIGN_CENTER,TEXT_ALIGN_TOP,3,Color(0,0,0,Opacity))
 		end)
 	end
 

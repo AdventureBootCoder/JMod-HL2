@@ -18,7 +18,7 @@ SWEP.ViewModelFOV = 52
 
 SWEP.CustomToggleCustomizeHUD = false
 
-JMod.ApplyAmmoSpecs(SWEP, "Heavy Pulse Ammo-Armor Piercing", 1)
+JMod.ApplyAmmoSpecs(SWEP, "Heavy Pulse Ammo", 1)
 -- IN M/S
 SWEP.MuzzleVelocity = 1000 -- projectile or phys bullet muzzle velocity
 --
@@ -278,6 +278,20 @@ SWEP.Animations = {
 		--LHIKOut = 0.5,
 	},--]]
 }
+
+SWEP.Hook_Think = function(self)
+	if not SERVER then return end
+	if self.Primary.Ammo ~= "Heavy Pulse Ammo" then self.NextRechargeTime = nil return end
+	local Time = CurTime()
+	local SelfAmmo, MaxAmmo = self.Owner:GetAmmoCount("Heavy Pulse Ammo"), game.GetAmmoMax(game.GetAmmoID("Heavy Pulse Ammo")) * JMod.Config.Weapons.AmmoCarryLimitMult
+
+	self.NextRechargeTime = self.NextRechargeTime or 0
+	if (self.NextRechargeTime < Time) and (Time > self:GetNextPrimaryFire() + 1) and (SelfAmmo < MaxAmmo) then
+		self.NextRechargeTime = Time + 2
+		self.Owner:GiveAmmo(math.min(MaxAmmo - SelfAmmo, 1), "Heavy Pulse Ammo", true)
+		self:EmitSound("npc/sniper/reload1.wav", 65, 50)
+	end
+end
 
 sound.Add({name = "clipout_com",
 	channel = CHAN_WEAPON,
