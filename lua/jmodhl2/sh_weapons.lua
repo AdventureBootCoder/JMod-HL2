@@ -104,12 +104,6 @@ JModHL2.WeaponTable = {
 		swep = "wep_aboot_jmod_combsr",
 		ent = "ent_aboot_jmod_ezweapon_combsr",
 		Category = "JMod - EZ HL:2"
-	},
-	--[[["Combine Flamethrower"] = {
-		mdl = "",
-		swep = "wep_aboot_jmod_comflamethrower",
-		ent = "ent_aboot_jmod_ezweapon_comflamethrower",
-		Category = "JMod - EZ HL:2"
 	}--]]
 }
 

@@ -144,7 +144,7 @@ att.AdditionalSights = {
 }--]]
 
 att.ModelOffset = Vector(0, 0, 0.85)
---att.OffsetAng = Angle(180, 0, 0)
+att.OffsetAng = Angle(180, 0, 0)
 
 att.ScopeGlint = false -- lmao
 att.Holosight = true
