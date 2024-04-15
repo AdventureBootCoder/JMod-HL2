@@ -23,6 +23,19 @@ local scanAnimMove = -1
 local mat_viewBeam	= Material( "effects/lamp_beam" )
 local mat_viewGlow	= Material( "sprites/light_ignorez" )
 
+local function ShouldDraw(ent)
+	if not IsValid(ent) then return false end
+	local ply = LocalPlayer()
+
+	if not IsValid(ply) then return false end
+	if ent == ply then return false end
+	if ent:IsPlayer() or ent:IsNPC() or ent:IsNextBot() or ent.EZscannerDanger then
+		if ent.Health and (ent:Health() <= 0) then return false end
+		
+		return true
+	end
+end
+
 local function XrayScopeFunction(tex)
 	local ply = LocalPlayer()
 	local orig = colormod:GetTexture("$fbtexture")
@@ -47,39 +60,40 @@ local function XrayScopeFunction(tex)
 			render.SetStencilZFailOperation( STENCIL_KEEP )
 			for _, ent in pairs(ents.GetAll()) do
 				render.ClearStencil()
-				if not IsValid( ent ) or ent == LocalPlayer() or ( not ent:IsNPC() and not ent:IsPlayer() and ent:GetClass() ~= 'prop_physics' and ent.Base ~= 'base_nextbot' ) then continue end
-				if ent.Health and ent:Health() <= 0 then continue end
-				local dist = ent:GetPos():Distance( EyePos() )
-				local frac = 1 - math.Clamp( ( dist - 300 ) / maxDist, 0, 1 )
-				render.SetBlend( math.min( frac, 0.99 ) )
-				render.SetStencilCompareFunction( STENCIL_ALWAYS )
-				render.SetStencilPassOperation( STENCIL_REPLACE )
-				ent:DrawModel()
-				if ( ent:IsNPC() or ent:IsPlayer() ) and IsValid( ent:GetActiveWeapon() ) then
-					ent:GetActiveWeapon():DrawModel()
-				end
-				render.SetStencilCompareFunction( STENCIL_EQUAL )
-				render.SetStencilPassOperation( STENCIL_KEEP )
-				--START 
-				cam.Start2D()
-					if ent:IsNPC() or ent.Base == 'base_nextbot' or ent:IsPlayer() then
-						surface.SetDrawColor( 195, 195, 195, 250 * frac * scanAnim )
-					end
-					surface.DrawRect( 0, 0, ScrW(), ScrH() )
-				cam.End2D()
-				--END
-				if ent:IsNPC() || ent:IsPlayer() then
+				local AimVec = ply:GetAimVector()
+				if ShouldDraw(ent) and ((ent:GetPos() - ply:GetPos()):GetNormalized():Dot(AimVec) > 0) then 
+					local dist = ent:GetPos():Distance( EyePos() )
+					local frac = 1 - math.Clamp( ( dist - 300 ) / maxDist, 0, 1 )
+					render.SetBlend( math.min( frac, 0.5 ) )
 					render.SetStencilCompareFunction( STENCIL_ALWAYS )
-					local head = ent:LookupBone( 'ValveBiped.Bip01_Head1' )
-					if head then
-						local p, a = ent:GetBonePosition( head )
-						p = p + Vector( 0, 0, 5 )
-						local nrm = a:Right() + Vector( 0, 0, 0.15 )
-						local view_nrm = ( p - EyePos() ):GetNormalized()
-						local view_dot = 1 - math.abs( view_nrm:Dot( nrm ) )								
-						local spr_size_w, spr_size_h = 256, 128
-						render.SetMaterial( mat_viewGlow )
+					render.SetStencilPassOperation( STENCIL_REPLACE )
+					ent:DrawModel()
+					if ( ent:IsNPC() or ent:IsPlayer() ) and IsValid( ent:GetActiveWeapon() ) then
+						ent:GetActiveWeapon():DrawModel()
 					end
+					render.SetStencilCompareFunction( STENCIL_EQUAL )
+					render.SetStencilPassOperation( STENCIL_KEEP )
+					--START 
+					cam.Start2D()
+						--if ent:IsNPC() or ent:IsNextBot() or ent:IsPlayer() then
+							surface.SetDrawColor( 167, 193, 196, 250 * frac * scanAnim )
+						--end
+						surface.DrawRect( 0, 0, ScrW(), ScrH() )
+					cam.End2D()
+					--END
+					--[[if ent:IsNPC() or ent:IsPlayer() then
+						render.SetStencilCompareFunction( STENCIL_ALWAYS )
+						local head = ent:LookupBone( 'ValveBiped.Bip01_Head1' )
+						if head then
+							local p, a = ent:GetBonePosition( head )
+							p = p + Vector( 0, 0, 5 )
+							local nrm = a:Right() + Vector( 0, 0, 0.15 )
+							local view_nrm = ( p - EyePos() ):GetNormalized()
+							local view_dot = 1 - math.abs( view_nrm:Dot( nrm ) )								
+							local spr_size_w, spr_size_h = 256, 128
+							render.SetMaterial( mat_viewGlow )
+						end
+					end--]]
 				end
 			end
 		render.SetStencilEnable( false )
