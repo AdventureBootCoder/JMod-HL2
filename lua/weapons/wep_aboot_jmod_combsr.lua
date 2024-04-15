@@ -18,9 +18,9 @@ SWEP.ViewModelFOV = 52
 
 SWEP.CustomToggleCustomizeHUD = false
 
-JMod.ApplyAmmoSpecs(SWEP, "Heavy Pulse Ammo", 1)
+JMod.ApplyAmmoSpecs(SWEP, "Heavy Pulse Ammo", 1.5)
 -- IN M/S
-SWEP.MuzzleVelocity = 1000 -- projectile or phys bullet muzzle velocity
+SWEP.MuzzleVelocity = 700 -- projectile or phys bullet muzzle velocity
 --
 SWEP.AimSwayFactor = .1
 

@@ -10,7 +10,7 @@ SWEP.ViewModelFOV = 75
 SWEP.MirrorVMWM = true
 SWEP.WorldModelOffset = {
     pos = Vector(-2, 0, 1),
-    ang = Angle(0, 184, 180)
+    ang = Angle(180, 0, 0),--Angle(0, 184, 180)
 }
 SWEP.NoHideLeftHandInCustomization = true
 

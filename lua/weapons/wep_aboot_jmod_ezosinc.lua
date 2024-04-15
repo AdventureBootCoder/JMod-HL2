@@ -285,7 +285,7 @@ function SWEP:PrimaryAttack()
 			self:Msg("Out of fuel!\nPress Reload on resource container to refill.")
 		else
 			local FirePos, FireAng, AimVec = self:GetNozzle()
-			if (State == STATE_NOTHIN) or (State == STATE_IGNITIN) then
+			if ((State == STATE_NOTHIN) or (State == STATE_IGNITIN)) and not(self.Owner:IsPlayer() and self.Owner:IsSprinting()) then
 				self:SetState(STATE_FLAMIN)
 				if self.SoundLoop then self.SoundLoop:Stop() end
 				self.SoundLoop = CreateSound(self, "snds_jack_gmod/flamethrower_loop.wav")
@@ -302,6 +302,7 @@ function SWEP:PrimaryAttack()
 			end
 
 			if (State == STATE_FLAMIN) and (math.Rand(0, 1) > .3) then
+				if self.Owner:IsPlayer() then self.Owner:LagCompensation(true) end
 				self:Pawnch()
 				self.Owner:ViewPunch(AngleRand(-.2, .2))
 				local Spread = 20
@@ -325,6 +326,7 @@ function SWEP:PrimaryAttack()
 						util.Decal("Scorch", Tracer.HitPos + Tracer.HitNormal, Tracer.HitPos - Tracer.HitNormal)
 					end
 				end
+				if self.Owner:IsPlayer() then self.Owner:LagCompensation(false) end
 				self:SetEZsupplies(JMod.EZ_RESOURCE_TYPES.FUEL, Fuel - 0.5)
 			end
 			self.NextExtinguishTime = Time + NextAttackTime * 2

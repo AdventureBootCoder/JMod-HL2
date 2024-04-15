@@ -15,7 +15,7 @@ local colormod = Material("pp/colour")
 local TextColor = Color(0, 238, 255)
 
 local visionMat = Material( 'vgui/black' )
-local maxDist = 3000
+local maxDist = 2500
 
 local scanAnim = 1
 local scanAnimMove = -1
@@ -47,22 +47,22 @@ local function XrayScopeFunction(tex)
 			render.SetStencilZFailOperation( STENCIL_KEEP )
 			for _, ent in pairs(ents.GetAll()) do
 				render.ClearStencil()
-				if not IsValid( ent ) || ent == LocalPlayer() || ( not ent:IsNPC() && not ent:IsPlayer() && ent:GetClass() ~= 'prop_physics' && ent.Base ~= 'base_nextbot' ) then continue end
-				if ent.Health && ent:Health() <= 0 then continue end
+				if not IsValid( ent ) or ent == LocalPlayer() or ( not ent:IsNPC() and not ent:IsPlayer() and ent:GetClass() ~= 'prop_physics' and ent.Base ~= 'base_nextbot' ) then continue end
+				if ent.Health and ent:Health() <= 0 then continue end
 				local dist = ent:GetPos():Distance( EyePos() )
 				local frac = 1 - math.Clamp( ( dist - 300 ) / maxDist, 0, 1 )
 				render.SetBlend( math.min( frac, 0.99 ) )
 				render.SetStencilCompareFunction( STENCIL_ALWAYS )
 				render.SetStencilPassOperation( STENCIL_REPLACE )
 				ent:DrawModel()
-				if ( ent:IsNPC() || ent:IsPlayer() ) && IsValid( ent:GetActiveWeapon() ) then
+				if ( ent:IsNPC() or ent:IsPlayer() ) and IsValid( ent:GetActiveWeapon() ) then
 					ent:GetActiveWeapon():DrawModel()
 				end
 				render.SetStencilCompareFunction( STENCIL_EQUAL )
 				render.SetStencilPassOperation( STENCIL_KEEP )
 				--START 
 				cam.Start2D()
-					if ent:IsNPC() || ent.Base == 'base_nextbot' || ent:IsPlayer() then
+					if ent:IsNPC() or ent.Base == 'base_nextbot' or ent:IsPlayer() then
 						surface.SetDrawColor( 195, 195, 195, 250 * frac * scanAnim )
 					end
 					surface.DrawRect( 0, 0, ScrW(), ScrH() )
