@@ -13,6 +13,17 @@ att.Model = "models/weapons/arccw/atts/combsr_scope.mdl"
 
 local colormod = Material("pp/colour")
 local TextColor = Color(0, 238, 255)
+local ColorModTbl = {
+	["$pp_colour_addr"] = 0,
+	["$pp_colour_addg"] = 0,
+	["$pp_colour_addb"] = 5,
+	["$pp_colour_brightness"] = .1,
+	["$pp_colour_contrast"] = 1.2,
+	["$pp_colour_colour"] = 1,
+	["$pp_colour_mulr"] = 1.01,
+	["$pp_colour_mulg"] = 0,
+	["$pp_colour_mulb"] = 1.5
+}
 
 local visionMat = Material( 'vgui/black' )
 local maxDist = 2500
@@ -36,6 +47,30 @@ local function ShouldDraw(ent)
 	end
 end
 
+local function TextFunc(tex)
+	local ply = LocalPlayer()
+	local orig = colormod:GetTexture("$fbtexture")
+	local ActiveWep = ply:GetActiveWeapon()
+
+	if tex then
+		colormod:SetTexture("$fbtexture", tex)
+	end
+
+	render.PushRenderTarget(tex)
+	
+	cam.Start2D()
+		local FOV = ((GetConVar("arccw_cheapscopes"):GetBool() and GetConVar("arccw_cheapscopesv2_ratio"):GetFloat()) or .5) * 20
+		--draw.DrawText("DET TIME: " .. tostring(math.Round(ActiveWep:GetNW2Float("EZfuseTime", 1), 2)), "JMod-Display-XS", (ScrW() * 0.55) - FOV, (ScrH() * 0.42) - FOV , TextColor, TEXT_ALIGN_LEFT)
+		draw.DrawText("DIST: " .. tostring(math.Round((ply:GetEyeTrace().Fraction * 32768) * 0.0254, 1)), "JMod-Display-XS", (ScrW() * 0.55) - FOV, (ScrH() * 0.43) - FOV, TextColor, TEXT_ALIGN_LEFT)
+	cam.End2D()
+
+	render.PopRenderTarget(tex)
+
+	if orig then
+		colormod:SetTexture("$fbtexture", orig)
+	end
+end
+
 local function XrayScopeFunction(tex)
 	local ply = LocalPlayer()
 	local orig = colormod:GetTexture("$fbtexture")
@@ -53,55 +88,69 @@ local function XrayScopeFunction(tex)
 
 		cam.IgnoreZ( true )
 		render.SetStencilEnable( true )
-			render.SetStencilWriteMask( 1 )
-			render.SetStencilTestMask( 1 )
-			render.SetStencilReferenceValue( 1 )
-			render.SetStencilFailOperation( STENCIL_KEEP )
-			render.SetStencilZFailOperation( STENCIL_KEEP )
-			for _, ent in pairs(ents.GetAll()) do
+		for _, ent in ipairs(ents.FindInSphere(EyePos(), maxDist)) do
+			local AimVec = ply:GetAimVector()
+			if ShouldDraw(ent) and ((ent:GetPos() - EyePos()):GetNormalized():Dot(AimVec) > 0) then
 				render.ClearStencil()
-				local AimVec = ply:GetAimVector()
-				if ShouldDraw(ent) and ((ent:GetPos() - ply:GetPos()):GetNormalized():Dot(AimVec) > 0) then 
-					local dist = ent:GetPos():Distance( EyePos() )
-					local frac = 1 - math.Clamp( ( dist - 300 ) / maxDist, 0, 1 )
-					render.SetBlend( math.min( frac, 0.5 ) )
-					render.SetStencilCompareFunction( STENCIL_ALWAYS )
-					render.SetStencilPassOperation( STENCIL_REPLACE )
-					ent:DrawModel()
-					if ( ent:IsNPC() or ent:IsPlayer() ) and IsValid( ent:GetActiveWeapon() ) then
-						ent:GetActiveWeapon():DrawModel()
-					end
-					render.SetStencilCompareFunction( STENCIL_EQUAL )
-					render.SetStencilPassOperation( STENCIL_KEEP )
-					--START 
-					cam.Start2D()
-						--if ent:IsNPC() or ent:IsNextBot() or ent:IsPlayer() then
-							surface.SetDrawColor( 167, 193, 196, 250 * frac * scanAnim )
-						--end
-						surface.DrawRect( 0, 0, ScrW(), ScrH() )
-					cam.End2D()
-					--END
-					--[[if ent:IsNPC() or ent:IsPlayer() then
-						render.SetStencilCompareFunction( STENCIL_ALWAYS )
-						local head = ent:LookupBone( 'ValveBiped.Bip01_Head1' )
-						if head then
-							local p, a = ent:GetBonePosition( head )
-							p = p + Vector( 0, 0, 5 )
-							local nrm = a:Right() + Vector( 0, 0, 0.15 )
-							local view_nrm = ( p - EyePos() ):GetNormalized()
-							local view_dot = 1 - math.abs( view_nrm:Dot( nrm ) )								
-							local spr_size_w, spr_size_h = 256, 128
-							render.SetMaterial( mat_viewGlow )
-						end
-					end--]]
+				--
+				render.SetStencilTestMask( 255 )
+				render.SetStencilWriteMask( 255 )
+				render.SetStencilReferenceValue( 1 )
+				--
+				render.SetStencilFailOperation( STENCILOPERATION_KEEP )
+				render.SetStencilPassOperation( STENCILOPERATION_REPLACE )
+				render.SetStencilZFailOperation( STENCILOPERATION_KEEP )
+				--
+				render.SetStencilCompareFunction( STENCILCOMPARISONFUNCTION_ALWAYS )
+				--
+				local dist = ent:GetPos():Distance( EyePos() )
+				local frac = 1 - math.Clamp( ( dist - 300 ) / maxDist, 0, 1 )
+				render.SetBlend( math.min( frac, 0.5 ) )
+				ent:DrawModel()
+				if ( ent:IsNPC() or ent:IsPlayer() ) and IsValid( ent:GetActiveWeapon() ) then
+					ent:GetActiveWeapon():DrawModel()
 				end
+				--
+				render.SetStencilCompareFunction( STENCILCOMPARISONFUNCTION_EQUAL )
+				render.SetStencilPassOperation( STENCILOPERATION_KEEP )
+				--START 
+				cam.Start2D()
+					surface.SetDrawColor( 167, 193, 196, 250 * frac * scanAnim )
+					surface.DrawRect( 0, 0, ScrW(), ScrH() )
+				cam.End2D()
+				--END
+				if ent:IsNPC() or ent:IsPlayer() then
+					render.SetStencilCompareFunction( STENCILCOMPARISONFUNCTION_ALWAYS )
+					local head = ent:LookupBone( 'ValveBiped.Bip01_Spine2' )
+					if head then
+						local p, a = ent:GetBonePosition( head )
+						p = p + a:Forward() * 4 + a:Right() * -3
+						local nrm = a:Right() + Vector( 0, 0, 0.15 )
+						local view_nrm = ( p - EyePos() ):GetNormalized()
+						local view_dot = 1 - math.abs( view_nrm:Dot( nrm ) )								
+						local spr_size_w, spr_size_h = 32, 32
+						render.SetMaterial( mat_viewGlow )
+						render.DrawSprite( p + nrm, spr_size_w, spr_size_h, Color( 255, 255, 255, 255 * frac * scanAnim ) )
+					end
+				end--]]
 			end
+		end
 		render.SetStencilEnable( false )
 		cam.IgnoreZ( false )
 
 		colormod:SetTexture("$fbtexture", render.GetScreenEffectTexture())
 	cam.End3D()
 	-- STENCIL OPERATION END
+
+	cam.Start2D()
+		local FOV = ((GetConVar("arccw_cheapscopes"):GetBool() and GetConVar("arccw_cheapscopesv2_ratio"):GetFloat()) or .5) * 20
+		--draw.DrawText("DET TIME: " .. tostring(math.Round(ActiveWep:GetNW2Float("EZfuseTime", 1), 2)), "JMod-Display-XS", (ScrW() * 0.55) - FOV, (ScrH() * 0.42) - FOV , TextColor, TEXT_ALIGN_LEFT)
+		draw.DrawText("DIST: " .. tostring(math.Round((ply:GetEyeTrace().Fraction * 32768) * 0.0254, 1)), "JMod-Display-XS", (ScrW() * 0.55) - FOV, (ScrH() * 0.43) - FOV, TextColor, TEXT_ALIGN_LEFT)
+	cam.End2D()
+	DrawColorModify(ColorModTbl)
+	--if ply and not ply.EZflashbanged then
+	--	DrawMotionBlur(FrameTime() * 50, .8, .01)
+	--end
 
 	render.PopRenderTarget()
 end
@@ -120,45 +169,45 @@ att.AdditionalSights = {
 	}
 }
 
---[[att.ToggleStats = {
+att.ToggleStats = {
 	{
-		PrintName = "Tracking",
+		PrintName = "SCANNING",
 		AutoStatName = "On",
 		NoAutoStat = false,
 		AdditionalSights = {
 			{
-				Pos = Vector(0, 0, -1.489),
-				Ang = Angle(0, 0, -1),
+				Pos = Vector(0, 7, -0.85),
+				Ang = Angle(0, 0, 0),
 				ViewModelFOV = 30,
-				Magnification = 2, -- this is how much your eyes zoom into the scope, not scope magnification
+				Magnification = 1, -- this is how much your eyes zoom into the scope, not scope magnification
 				ScrollFunc = ArcCW.SCROLL_NONE,
 				IgnoreExtra = true,
 				SwitchToSound = "snds_jack_gmod/ez_weapons/handling/aim1.wav",
 				SwitchFromSound = "snds_jack_gmod/ez_weapons/handling/aim_out.wav",
-				SpecialScopeFunction = TrackingScopeFunction
+				SpecialScopeFunction = XrayScopeFunction
 			}
 		}
 	},
 	{
-		PrintName = "Off",
+		PrintName = "OFF",
 		AutoStatName = "Off",
 		AdditionalSights = {
 			{
-				Pos = Vector(0, 0, -1.489),
-				Ang = Angle(0, 0, -1),
+				Pos = Vector(0, 7, -0.85),
+				Ang = Angle(0, 0, 0),
 				ViewModelFOV = 30,
-				Magnification = 2, -- this is how much your eyes zoom into the scope, not scope magnification
+				Magnification = 1, -- this is how much your eyes zoom into the scope, not scope magnification
 				ScrollFunc = ArcCW.SCROLL_NONE,
 				IgnoreExtra = true,
 				SwitchToSound = "snds_jack_gmod/ez_weapons/handling/aim1.wav",
-				SwitchFromSound = "snds_jack_gmod/ez_weapons/handling/aim_out.wav"
+				SwitchFromSound = "snds_jack_gmod/ez_weapons/handling/aim_out.wav",
+				SpecialScopeFunction = TextFunc
 			}
 		}
 	}
 }--]]
 
 att.ModelOffset = Vector(0, 0, 0.85)
---att.OffsetAng = Angle(180, 0, 0)
 
 att.ScopeGlint = false -- lmao
 att.Holosight = true

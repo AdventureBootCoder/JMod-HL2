@@ -18,9 +18,17 @@ SWEP.ViewModelFOV = 52
 
 SWEP.CustomToggleCustomizeHUD = false
 
-JMod.ApplyAmmoSpecs(SWEP, "Heavy Pulse Ammo", 2)
+JMod.ApplyAmmoSpecs(SWEP, "Sniper Pulse Ammo", 1)
 -- IN M/S
-SWEP.MuzzleVelocity = 700 -- projectile or phys bullet muzzle velocity
+SWEP.MuzzleVelocity = 500 -- projectile or phys bullet muzzle velocity
+SWEP.AlwaysPhysBullet = true
+SWEP.NeverPhysBullet = false
+SWEP.PhysBullets = true
+SWEP.PhysBulletMuzzleVelocity = 120 * 2 -- override phys bullet muzzle velocity
+SWEP.PhysBulletDrag = 0.2
+SWEP.PhysBulletGravity = 0.3
+SWEP.PhysBulletDontInheritPlayerVelocity = true
+SWEP.PhysTracerProfile = 6
 --
 SWEP.AimSwayFactor = .1
 
@@ -34,7 +42,7 @@ SWEP.Primary.ClipSize = 1 -- DefaultClip is automatically set.
 SWEP.ExtendedClipSize = 1
 SWEP.ReducedClipSize = 1
 
-SWEP.Recoil = -3
+SWEP.Recoil = -2
 SWEP.RecoilSide = 1
 SWEP.MaxRecoilBlowback = 1
 
@@ -52,13 +60,13 @@ SWEP.Firemodes = {
 SWEP.NPCWeaponType = {"weapon_ar2", "weapon_crossbow"}
 SWEP.NPCWeight = 10
 
-SWEP.AccuracyMOA = 10 -- accuracy in Minutes of Angle. There are 60 MOA in a degree.
+SWEP.AccuracyMOA = 9 -- accuracy in Minutes of Angle. There are 60 MOA in a degree.
 SWEP.HipDispersion = 200 -- inaccuracy added by hip firing.
 SWEP.MoveDispersion = 500
 
 SWEP.MagID = "cosr" -- the magazine pool this gun draws from
 
-SWEP.ShootVol = 200 -- volume of shoot sound
+SWEP.ShootVol = 100 -- volume of shoot sound
 SWEP.ShootPitch = 100 -- pitch of shoot sound
 
 SWEP.ShootSound = "npc/sniper/sniper1.wav" --"weapons/ar2/fire1.wav"
@@ -74,8 +82,8 @@ SWEP.MuzzleEffectAttachment = 1 -- which attachment to put the muzzle on
 SWEP.CaseEffectAttachment = 2 -- which attachment to put the case effect on
 
 SWEP.SightTime = 0.25
-SWEP.SpeedMult = 0.9
-SWEP.SightedSpeedMult = 0.9
+SWEP.SpeedMult = 0.8
+SWEP.SightedSpeedMult = 0.5
 
 SWEP.BulletBones = { -- the bone that represents bullets in gun/mag
 	-- [0] = "bulletchamber",
@@ -281,14 +289,14 @@ SWEP.Animations = {
 
 SWEP.Hook_Think = function(self)
 	if not SERVER then return end
-	if self.Primary.Ammo ~= "Heavy Pulse Ammo" then self.NextRechargeTime = nil return end
+	if self.Primary.Ammo ~= "Sniper Pulse Ammo" then self.NextRechargeTime = nil return end
 	local Time = CurTime()
-	local SelfAmmo, MaxAmmo = self.Owner:GetAmmoCount("Heavy Pulse Ammo"), game.GetAmmoMax(game.GetAmmoID("Heavy Pulse Ammo")) * JMod.Config.Weapons.AmmoCarryLimitMult
+	local SelfAmmo, MaxAmmo = self.Owner:GetAmmoCount("Sniper Pulse Ammo"), game.GetAmmoMax(game.GetAmmoID("Sniper Pulse Ammo")) * JMod.Config.Weapons.AmmoCarryLimitMult
 
 	self.NextRechargeTime = self.NextRechargeTime or 0
 	if (self.NextRechargeTime < Time) and (Time > self:GetNextPrimaryFire() + 1) and (SelfAmmo < MaxAmmo) then
-		self.NextRechargeTime = Time + 2
-		self.Owner:GiveAmmo(math.min(MaxAmmo - SelfAmmo, 1), "Heavy Pulse Ammo", true)
+		self.NextRechargeTime = Time + 3
+		self.Owner:GiveAmmo(math.min(MaxAmmo - SelfAmmo, 1), "Sniper Pulse Ammo", true)
 		self:EmitSound("npc/sniper/reload1.wav", 65, 50)
 	end
 end

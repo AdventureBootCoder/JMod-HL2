@@ -115,7 +115,7 @@ JModHL2.AmmoTable = {
 		basedmg = 30,
 		effrange = 90,
 		terminaldmg = 5,
-		penetration = 35,
+		penetration = 25,
 		tracer = "tfa_mmod_tracer_ar2"
 	},
 	["Heavy Pulse Ammo"] = {
@@ -124,18 +124,19 @@ JModHL2.AmmoTable = {
 		basedmg = 25,
 		effrange = 95,
 		terminaldmg = 10,
-		penetration = 45,
+		penetration = 25,
 		tracer = "tfa_mmod_tracer_ar3",
 		dmgtype = DMG_AIRBOAT
 	},
-	["Heavy Pulse Ammo-Armor Piercing"] = {
+	["Sniper Pulse Ammo"] = {
+		resourcetype = false,
 		carrylimit = 50,
-		basedmg = 100,
-		effrange = 100,
-		terminaldmg = 35,
-		armorpiercing = .2,
-		penetration = 60,
-		ammoboxEnt = "ent_aboot_gmod_ezammobox_hpaap"
+		basedmg = 50,
+		effrange = 200,
+		terminaldmg = 20,
+		penetration = 25,
+		tracer = "tfa_mmod_tracer_ar3",
+		dmgtype = DMG_SNIPER
 	},
 	["25mm Grenade"] = {
 		resourcetype = "munitions",
