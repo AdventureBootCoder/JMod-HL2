@@ -32,6 +32,10 @@ SWEP.PhysTracerProfile = 6
 --
 SWEP.AimSwayFactor = .1
 
+SWEP.Bipod_Integral = true -- Integral bipod (ie, weapon model has one)
+SWEP.BipodDispersion = 0.5 -- Bipod dispersion for Integral bipods
+SWEP.BipodRecoil = 0.1 -- Bipod recoil for Integral bipods
+
 SWEP.ReloadInSights = true
 SWEP.ReloadInSights_CloseIn = 0.25
 SWEP.ReloadInSights_FOVMult = 0.875
@@ -165,22 +169,6 @@ SWEP.Attachments = {
 		--InstalledEles = {"nobrake"},
 	},
 	{
-		PrintName = "Tactical",
-		Slot = "tac",
-		Bone = "v_weapon.g3sg1_Parent",
-		Offset = {
-			vpos = Vector(0,1,0), -- offset that the attachment will be relative to the bone
-			vang = Angle(53,0.6,90),
-			wpos = Vector(19.6, 2, -10),
-			wang = Angle(-10, -0.5, 90)
-		},
-	},
-	{
-		PrintName = "Grip",
-		Slot = "grip",
-		DefaultAttName = "Standard Grip"
-	},
-	{
 		PrintName = "Stock",
 		Slot = "stock",
 		DefaultAttName = "Standard Stock"
@@ -297,7 +285,7 @@ SWEP.Hook_Think = function(self)
 	if (self.NextRechargeTime < Time) and (Time > self:GetNextPrimaryFire() + 1) and (SelfAmmo < MaxAmmo) then
 		self.NextRechargeTime = Time + 3
 		self.Owner:GiveAmmo(math.min(MaxAmmo - SelfAmmo, 1), "Sniper Pulse Ammo", true)
-		self:EmitSound("npc/sniper/reload1.wav", 65, 50)
+		--self:EmitSound("npc/sniper/reload1.wav", 65, 50)
 	end
 end
 
