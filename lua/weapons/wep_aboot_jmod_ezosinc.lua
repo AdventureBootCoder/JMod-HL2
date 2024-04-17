@@ -247,6 +247,7 @@ function SWEP:Cease()
 end
 
 function SWEP:GetNozzle()
+	if not(IsValid(self.Owner) and self.Owner:IsPlayer()) then return end
 	local AimVec = self.Owner:GetAimVector()
 	local FirePos, FireAng
 	

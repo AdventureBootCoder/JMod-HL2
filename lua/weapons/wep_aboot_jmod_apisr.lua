@@ -56,6 +56,10 @@ SWEP.RicPenShotCallback = function(att, tr, dmg)
 	end
 end
 
+SWEP.Bipod_Integral = true -- Integral bipod (ie, weapon model has one)
+SWEP.BipodDispersion = 1 -- Bipod dispersion for Integral bipods
+SWEP.BipodRecoil = 1 -- Bipod recoil for Integral bipods
+
 SWEP.BodyHolsterSlot = "back"
 SWEP.BodyHolsterAng = Angle(-10, 0, 0)
 SWEP.BodyHolsterAngL = Angle(-10, 10, 180)
@@ -199,7 +203,7 @@ SWEP.Attachments = {
 		CorrectiveAng = Angle(0, 0, 0),
 		Installed = "optic_aboot_scope_reb"
 	},
-	{
+	--[[{
 		PrintName = "Forward Grip",
 		DefaultAttName = "No Attachment",
 		Slot = {"ez_bipod"},
@@ -213,7 +217,7 @@ SWEP.Attachments = {
 		--Installed = "underbarrel_aboot_gr9_bipod",
 		--Hidden = true, -- attachment cannot be seen in customize menu
 		--Integral = true
-	},
+	},--]]
 }
 
 SWEP.Animations = {

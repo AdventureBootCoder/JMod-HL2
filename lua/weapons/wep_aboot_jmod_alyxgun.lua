@@ -1,48 +1,35 @@
-SWEP.Base = "arccw_base"
+SWEP.Base = "wep_jack_gmod_gunbase"
 SWEP.Spawnable = false
 SWEP.Category = "ArcCW - Half-Life" -- edit this if you like
 SWEP.AdminOnly = false
-
 SWEP.PrintName = "Alyx Gun"
-
 SWEP.Slot = 1
-
 SWEP.UseHands = true
 
 SWEP.ViewModel = "models/weapons/alyxgun/c_alyx_gun.mdl"
-SWEP.WorldModel = "models/weapons/alyxgun/w_alyx_gun.mdl"
+SWEP.WorldModel = "models/weapons/alyxgun/alyxgun.mdl"
 SWEP.ViewModelFOV = 70
 SWEP.MirrorVMWM = true
 SWEP.WorldModelOffset = {
-    pos = Vector(6, 2, -5),
-    ang = Angle(-10, 180, 180)
+    pos = Vector(5, 1, -2.25),
+    ang = Angle(0, -5, 180)
 }
-
 SWEP.DefaultBodygroups = "00000000000"
 
-SWEP.Damage = 10
-SWEP.DamageMin = 4
+JModHL2.ApplyAmmoSpecs(SWEP, "Pistol Round", 1)
 
-SWEP.BodyDamageMults = {
-    [HITGROUP_HEAD] = 1.1,
- }
- 
 SWEP.Range = 50 -- in METRES
 SWEP.RangeMin = 20
-SWEP.Penetration = 4
-SWEP.DamageType = DMG_BULLET
-SWEP.ShootEntity = nil -- entity to fire, if any
-SWEP.MuzzleVelocity = 1050 -- projectile or phys bullet muzzle velocity
+SWEP.MuzzleVelocity = 700 -- projectile or phys bullet muzzle velocity
 -- IN M/S
 SWEP.ChamberSize = 0 -- how many rounds can be chambered.
-SWEP.Primary.ClipSize = 25 -- DefaultClip is automatically set.
-SWEP.ExtendedClipSize = 35
+SWEP.Primary.ClipSize = 21 -- DefaultClip is automatically set.
+SWEP.ExtendedClipSize = 36
 SWEP.ReducedClipSize = 15
 
 SWEP.PhysBulletMuzzleVelocity = 700
 
-
-SWEP.Recoil = 0.15
+SWEP.Recoil = 0.2
 SWEP.RecoilSide = 0.3
 SWEP.RecoilRise = 0.2
 SWEP.MaxRecoilBlowback = -1
@@ -80,12 +67,10 @@ SWEP.HipDispersion = 400 -- inaccuracy added by hip firing.
 SWEP.MoveDispersion = 200
 SWEP.SightsDispersion = 50
 
-SWEP.Primary.Ammo = "pistol" -- what ammo type the gun uses
 SWEP.MagID = "alyxgun" -- the magazine pool this gun draws from
 
 SWEP.ShootVol = 80 -- volume of shoot sound
 SWEP.ShootPitch = 100 -- pitch of shoot sound
-
 SWEP.ShootSound = "Weapon_Alyxgun.Fire"
 SWEP.DistantShootSound = "Weapon_Alyxgun.NPC_Fire"
 
@@ -217,28 +202,28 @@ sound.Add({
 sound.Add({
 	name = "Weapon_Alyxgun.Mag_Out",
 	channel = CHAN_STATIC,
-	volume = 0.5,
+	volume = 1,
 	level = 60,
-	sound = "weapon/pistol/handling/pistol_mag_out_01.wav"
+	sound = "snds_jack_gmod/ez_weapons/pistol/out.wav"--"weapon/pistol/handling/pistol_mag_out_01.wav"
 })
 sound.Add({
 	name = "Weapon_Alyxgun.Mag_Futz",
 	channel = CHAN_STATIC,
-	volume = 0.5,
+	volume = 1,
 	level = 60,
-	sound = "weapon/pistol/handling/pistol_mag_futz_01.wav"
+	sound = "snds_jack_gmod/ez_weapons/pistol/tap.wav"--"weapon/pistol/handling/pistol_mag_futz_01.wav"
 })
 sound.Add({
 	name = "Weapon_Alyxgun.Mag_In",
 	channel = CHAN_STATIC,
-	volume = 0.5,
+	volume = 1,
 	level = 60,
-	sound = "weapon/pistol/handling/pistol_mag_in_01.wav"
+	sound = "snds_jack_gmod/ez_weapons/pistol/in.wav"--"weapon/pistol/handling/pistol_mag_in_01.wav"
 })
 sound.Add({
 	name = "Weapon_Alyxgun.Slide_Release",
 	channel = CHAN_STATIC,
-	volume = 0.5,
+	volume = 1,
 	level = 60,
-	sound = "weapon/pistol/handling/pistol_slide_release_01.wav"
+	sound = "snds_jack_gmod/ez_weapons/pistol/release.wav"--"weapon/pistol/handling/pistol_slide_release_01.wav"
 })

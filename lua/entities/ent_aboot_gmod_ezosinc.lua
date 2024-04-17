@@ -92,14 +92,14 @@ if SERVER then
 
 elseif CLIENT then
 	function ENT:Initialize()
-		self.MaxFuel = 100
+		self.MaxFuel = 50
 	end
 	function ENT:Draw()
 		self:DrawModel()
 		local Opacity = math.random(50, 200)
 		local FuelFrac = self:GetFuel()/self.MaxFuel
 		JMod.HoloGraphicDisplay(self, Vector(2.5, 5, 10), Angle(0, 0, 90), .05, 300, function()
-			draw.SimpleTextOutlined("FUEL "..math.Round(FuelFrac*100).."%","JMod-Display",0,10,JMod.GoodBadColor(FuelFrac, true, Opacity),TEXT_ALIGN_CENTER,TEXT_ALIGN_TOP,3,Color(0,0,0,Opacity))
+			draw.SimpleTextOutlined("FUEL "..math.Round(FuelFrac*self.MaxFuel).."%","JMod-Display",0,10,JMod.GoodBadColor(FuelFrac, true, Opacity),TEXT_ALIGN_CENTER,TEXT_ALIGN_TOP,3,Color(0,0,0,Opacity))
 		end)
 	end
 

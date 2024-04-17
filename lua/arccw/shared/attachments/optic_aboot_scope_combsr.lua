@@ -115,7 +115,7 @@ local function XrayScopeFunction(tex)
 				render.SetStencilPassOperation( STENCILOPERATION_KEEP )
 				--START 
 				cam.Start2D()
-					surface.SetDrawColor( 167, 193, 196, 250 * frac * scanAnim )
+					surface.SetDrawColor( 196, 167, 167, 250 * frac * scanAnim )
 					surface.DrawRect( 0, 0, ScrW(), ScrH() )
 				cam.End2D()
 				--END

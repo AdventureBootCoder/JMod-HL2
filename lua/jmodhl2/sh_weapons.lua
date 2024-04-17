@@ -104,6 +104,12 @@ JModHL2.WeaponTable = {
 		swep = "wep_aboot_jmod_combsr",
 		ent = "ent_aboot_jmod_ezweapon_combsr",
 		Category = "JMod - EZ HL:2"
+	},
+	["Alyx Gun"] = {
+		mdl = "models/weapons/alyxgun/alyxgun.mdl",
+		swep = "wep_aboot_jmod_alyxgun",
+		ent = "ent_aboot_jmod_ezweapon_alyxgun",
+		Category = "JMod - EZ HL:2"
 	}--]]
 }
 
@@ -131,7 +137,7 @@ JModHL2.AmmoTable = {
 	["Sniper Pulse Ammo"] = {
 		resourcetype = false,
 		carrylimit = 50,
-		basedmg = 50,
+		basedmg = 80,
 		effrange = 200,
 		terminaldmg = 20,
 		penetration = 25,
