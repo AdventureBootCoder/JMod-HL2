@@ -22,7 +22,7 @@ ENT.EZcolorable = false
 ENT.AmmoTypes = {
 	["Bullet"] = {TargetingRadius = 1.2}, -- Simple pew pew
 	["Pulse Rifle"] = {
-		FireRate = 1.2,
+		FireRate = 1.8,
 		Damage = .35,
 		Accuracy = .8,
 		BarrelLength = .9,
@@ -652,29 +652,20 @@ if(SERVER)then
 		self:ConsumeElectricity(.02)
 		self.NextTargetSearch = Time + (.5 / self.SearchSpeed) -- limit searching cause it's expensive
 		local SelfPos = self:GetPos()
-		local Objects, PotentialTargets = ents.FindInSphere(SelfPos, self.TargetingRadius), {}
+		local Objects, ClosestTarget, ClosestDist = ents.FindInSphere(SelfPos, self.TargetingRadius), nil, 9e9
 
 		for k, PotentialTarget in pairs(Objects) do
 			if self:CanEngage(PotentialTarget) then
-				table.insert(PotentialTargets, PotentialTarget)
+				self:MakeHostileToMe(PotentialTarget)
+				local DistToTarg = PotentialTarget:GetPos():Distance(SelfPos)
+				if not(ClosestTarget) or (DistToTarg < ClosestDist) then
+					ClosestTarget = PotentialTarget
+					ClosestDist = DistToTarg
+				end
 			end
 		end
 
-		if #PotentialTargets > 0 then
-			table.sort(PotentialTargets, function(a, b)
-				local DistA, DistB = a:GetPos():Distance(SelfPos), b:GetPos():Distance(SelfPos)
-
-				return DistA < DistB
-			end)
-
-			for k, v in pairs(PotentialTargets) do
-				self:MakeHostileToMe(v)
-			end
-
-			return PotentialTargets[1]
-		end
-
-		return nil
+		return ClosestTarget
 	end
 
 	function ENT:Engage(target)
