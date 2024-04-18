@@ -12,7 +12,7 @@ ENT.CollisionGroup = COLLISION_GROUP_PROJECTILE
 
 -- Intentionally not ENT.Damage since ArcCW base overwrites it with weapon damage (for some reason)
 ENT.GrenadeDamage = 120
-ENT.GrenadeRadius = 300
+ENT.GrenadeRadius = 200
 ENT.DragCoefficient = 1
 ENT.DetonateOnImpact = true
 
@@ -44,12 +44,6 @@ if SERVER then
 
         self.SpawnTime = CurTime()
 		self.EZfuseTime = 1
-		--[[timer.Simple(0.1, function()
-			jprint(self.EZlauncher)
-			if IsValid(self) and IsValid(self.EZlauncher) and self.EZlauncher.EZfuseTime then
-				self.EZfuseTime = self.EZlauncher.EZfuseTime
-			end
-		end)]]--
     end
 end
 function ENT:Think()
@@ -88,9 +82,20 @@ function ENT:DoDetonation()
 	local SelfPos = self:GetPos()
 	if self.EZfragment then
 		JMod.FragSplosion(self, SelfPos, 500, 30, 2000, attacker, self:GetVelocity():GetNormalized(), .01)
+		local Dmg = DamageInfo()
+		Dmg:SetAttacker(attacker)
+		Dmg:SetInflictor(self)
+		Dmg:SetDamage(self.GrenadeDamage or self.Damage or 0)
+		Dmg:SetDamageType(DMG_BULLET)
+		Dmg:SetDamagePosition(SelfPos)
+		Dmg:SetDamageForce(self:GetVelocity():GetNormalized() * 500)
+		for _, ent in ipairs(ents.FindInCone(SelfPos, self.GrenadeDir, self.GrenadeRadius * 1.5, 0.5)) do
+			if IsValid(ent) and (ent ~= self) and JMod.VisCheck(SelfPos, ent:GetPos(), self) then
+				ent:TakeDamageInfo(Dmg)
+			end
+		end
 	end
-	util.BlastDamage(self, attacker, self:GetPos(), self.GrenadeRadius, self.GrenadeDamage or self.Damage or 0)
-	JMod.BlastDoors(attacker, SelfPos,  self.GrenadeDamage or self.Damage or 0, self.GrenadeRadius, false)
+	JMod.Sploom(attacker, SelfPos, self.GrenadeDamage or self.Damage or 0, self.GrenadeRadius)
 end
 
 function ENT:DoImpact(ent)
@@ -106,50 +111,50 @@ function ENT:DoImpact(ent)
 end
 
 function ENT:Detonate()
-    if not IsValid(self) or self.BOOM then return end
-    self.BOOM = true
+	if not IsValid(self) or self.BOOM then return end
+	self.BOOM = true
 
-    if self.ExplosionEffect then
-        local effectdata = EffectData()
-        effectdata:SetOrigin(self:GetPos())
+	if self.ExplosionEffect then
+		local effectdata = EffectData()
+		effectdata:SetOrigin(self:GetPos())
 		effectdata:SetNormal(self:GetVelocity():GetNormalized())
 
-        if self:WaterLevel() >= 1 then
-            util.Effect("WaterSurfaceExplosion", effectdata)
-            self:EmitSound("WaterExplosionEffect.Sound")
-        else
-            --util.Effect("Explosion", effectdata)
+		if self:WaterLevel() >= 1 then
+			util.Effect("WaterSurfaceExplosion", effectdata)
+			self:EmitSound("WaterExplosionEffect.Sound")
+		else
+			--util.Effect("Explosion", effectdata)
 
-            self:EmitSound("BaseExplosionEffect.Sound")
-            ParticleEffect("hl2mmod_explosion_grenade", self:GetPos(), Angle(-90, 0, 0))
-        end
+			self:EmitSound("BaseExplosionEffect.Sound")
+			--ParticleEffect("hl2mmod_explosion_grenade", self:GetPos(), Angle(-90, 0, 0))
+		end
 
-        util.ScreenShake(self:GetPos(), 25, 4, 0.75, self.GrenadeRadius * 4)
+		util.ScreenShake(self:GetPos(), 25, 4, 0.75, self.GrenadeRadius * 4)
 
-        if self.GrenadePos == nil then
-            self.GrenadePos = self:GetPos()
-        end
-        if self.GrenadeDir == nil then
-            self.GrenadeDir = self:GetVelocity():GetNormalized()
-        end
+		if self.GrenadePos == nil then
+			self.GrenadePos = self:GetPos()
+		end
+		if self.GrenadeDir == nil then
+			self.GrenadeDir = self:GetVelocity():GetNormalized()
+		end
 
-        local trace = util.TraceLine({
-            start = self.GrenadePos,
-            endpos = self.GrenadePos + self.GrenadeDir * 4,
-            mask = MASK_SOLID_BRUSHONLY
-        })
-        if trace.Hit then
-            self:EmitSound(self.DebrisSounds[math.random(1,#self.DebrisSounds)], 90, 100, 1, CHAN_AUTO)
-        end
-    end
+		local trace = util.TraceLine({
+			start = self.GrenadePos,
+			endpos = self.GrenadePos + self.GrenadeDir * 4,
+			mask = MASK_SOLID_BRUSHONLY
+		})
+		if trace.Hit then
+			self:EmitSound(self.DebrisSounds[math.random(1,#self.DebrisSounds)], 90, 100, 1, CHAN_AUTO)
+		end
+	end
 
-    self:DoDetonation()
+	self:DoDetonation()
 
-    if self.Scorch then
-        util.Decal(self.Scorch, self.GrenadePos, self.GrenadePos + self.GrenadeDir * 4, self)
-    end
+	if self.Scorch then
+		util.Decal(self.Scorch, self.GrenadePos, self.GrenadePos + self.GrenadeDir * 4, self)
+	end
 
-    self:Remove()
+	self:Remove()
 end
 
 function ENT:PhysicsCollide(colData, collider)
