@@ -121,15 +121,18 @@ if SERVER then
 		self:TakePhysicsDamage(dmginfo)
 
 		local Attacker = dmginfo:GetAttacker()
-		local HL2Ammo = {"AR2", "Pistol", "XBowBolt", "SMG1", "357", "Buckshot", "RPG_Round", "slam", "Grenade", "AlyxGun", "SniperRound"}
-		if (IsValid(Attacker) and Attacker:IsPlayer()) and IsValid(Attacker:GetActiveWeapon()) and (Attacker:GetActiveWeapon():GetClass() == "weapon_crowbar") then
-			for k, v in ipairs(HL2Ammo) do
-				self:Open(true)
-				timer.Simple(1, function()
-					if IsValid(self) and IsValid(activator) then
-						self:GivePlyAmmo(activator, true)
-					end
-				end)
+		if (IsValid(Attacker) and Attacker:IsPlayer()) then
+			local Wep = Attacker:GetActiveWeapon()
+			if IsValid(Wep) and (Wep:GetClass() == "weapon_crowbar") then
+				local HL2Ammo = {"AR2", "Pistol", "XBowBolt", "SMG1", "357", "Buckshot", "RPG_Round", "slam", "Grenade", "AlyxGun", "SniperRound"}
+				for k, v in ipairs(HL2Ammo) do
+					self:Open(true)
+					timer.Simple(1, function()
+						if IsValid(self) and IsValid(activator) then
+							self:GivePlyAmmo(activator, true, v)
+						end
+					end)
+				end
 			end
 		end
 

@@ -97,8 +97,8 @@ if SERVER then
 	function ENT:PhysicsCollide(data, physobj)
 		if data.DeltaTime > 0.2 then
 			if data.Speed > 100 then
-				self.Entity:EmitSound("Metal_Box.ImpactSoft")
-				self.Entity:EmitSound("Metal_Box.ImpactHard")
+				self:EmitSound("Metal_Box.ImpactSoft")
+				self:EmitSound("Metal_Box.ImpactHard")
 			end
 		end
 	end
@@ -116,7 +116,7 @@ if SERVER then
 	end
 
 	function ENT:OnTakeDamage(dmginfo)
-		self.Entity:TakePhysicsDamage(dmginfo)
+		self:TakePhysicsDamage(dmginfo)
 
 		if dmginfo:GetDamage() > self.DamageThreshold then
 			local Pos = self:GetPos()

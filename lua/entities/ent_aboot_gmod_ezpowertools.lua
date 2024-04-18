@@ -194,6 +194,7 @@ elseif(CLIENT)then
 
 	function ENT:Think()
 		local State, FT = self:GetState(), FrameTime()
+		self.CurSpin = self.CurSpin or 0
 		if State == STATE_RUNNING then
 			self.CurSpin = self.CurSpin - FT * self.CurSpeed
 			self.CurSpeed = math.min(self.CurSpeed + FT * 200, 1000)
