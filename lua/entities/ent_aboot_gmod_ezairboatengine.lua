@@ -10,8 +10,10 @@ ENT.Spawnable = true
 ENT.AdminSpawnable = true
 --
 ENT.JModPreferredCarryAngles = Angle(0, 0, 0)
-ENT.Model = "models/airboat_engine.mdl"
+ENT.Model = "models/aboot/airboat_engine.mdl"
 ENT.Mass = 45
+ENT.IdleSounds = {"vehicles/airboat/fan_blade_idle_loop1.wav", "vehicles/airboat/fan_motor_idle_loop1.wav"}
+ENT.FullThrottleSounds = {"vehicles/airboat/fan_blade_fullthrottle_loop1.wav", "vehicles/airboat/fan_motor_fullthrottle_loop1.wav"}
 --
 ENT.StaticPerfSpecs={ 
 	MaxElectricity = 100,
@@ -23,7 +25,7 @@ function ENT:CustomSetupDataTables()
 	self:NetworkVar("Float", 1, "BladeSpeed")
 end
 
-local STATE_BROKEN, STATE_OFF, STATE_IDLING, STATE_SPINNING = -1, 0, 1, 2
+local STATE_BROKEN, STATE_OFF, STATE_SPINNING = -1, 0, 1
 --
 if SERVER then
 	function ENT:SetupWire()
@@ -89,51 +91,55 @@ if SERVER then
 		self.MaxBladeSpeed = 100
 		self.DesiredBladeSpeed = 0
 		self:SetBladeSpeed(0)
-		self.FanSoundLoop = CreateSound(self, "vehicles/airboat/fan_blade_idle_loop1.wav")
-		self.EngineSoundLoop = CreateSound(self, "vehicles/airboat/fan_motor_idle_loop1.wav")
+		self.FanSoundLoop = CreateSound(self, self.IdleSounds[1])
+		self.EngineSoundLoop = CreateSound(self, self.IdleSounds[2])
 	end
 
 	function ENT:TurnOn()
 		local State = self:GetState()
 		if State < STATE_OFF then return end
-		self.DesiredBladeSpeed = self.MaxBladeSpeed * 0.1
 		self:EmitSound("vehicles/airboat/fan_motor_start1.wav", 60, 100)
 		timer.Simple(1, function()
 			if not IsValid(self) or (State < STATE_OFF) then return end
-			self:SetState(STATE_IDLING)
-			self:StartSound()
+			self:SetState(STATE_SPINNING)
+			self:SetThrottle(self.MaxBladeSpeed * 0.1)
+			--self:StartSound()
 		end)
 	end
 
 	function ENT:TurnOff()
-		if self:GetState() < STATE_IDLING then return end
+		if self:GetState() < STATE_SPINNING then return end
 		self:SetState(STATE_OFF)
-		self.DesiredBladeSpeed = 0
+		self:SetThrottle(0)
 		self:EmitSound("vehicles/airboat/fan_motor_shut_off1.wav", 60, 100)
 		self:EndSound()
 	end
 
 	function ENT:SetThrottle(val)
-		if self:GetState() < STATE_IDLING then return end
+		if self:GetState() < STATE_SPINNING then return end
 		self.DesiredBladeSpeed = math.Clamp(val, -self.MaxBladeSpeed, self.MaxBladeSpeed)
-		self:EndSound()
-		if (val > self.MaxBladeSpeed * 0.1) or (val < -self.MaxBladeSpeed * 0.1) then
-			self.FanSoundLoop = CreateSound(self, "vehicles/airboat/fan_blade_fullthrottle_loop1.wav")
-			self.EngineSoundLoop = CreateSound(self, "vehicles/airboat/fan_motor_fullthrottle_loop1.wav")
-			self:SetState(STATE_SPINNING)
-		else
-			self:SetState(STATE_IDLING)
+		if self.EngineSoundLoop then
+			self.EngineSoundLoop:Stop()
 		end
-		self:StartSound()
+		if val > 50 then
+			self.EngineSoundLoop = CreateSound(self, self.FullThrottleSounds[2])
+		else
+			self.EngineSoundLoop = CreateSound(self, self.IdleSounds[2])
+		end
+		if val ~= self:GetBladeSpeed() then
+			self.EngineSoundLoop:Play()
+		end
 	end
 
 	function ENT:StartSound()
-		if not self.FanSoundLoop or not self.EngineSoundLoop then
-			self.FanSoundLoop = CreateSound(self, "vehicles/airboat/fan_blade_idle_loop1.wav")
-			self.EngineSoundLoop = CreateSound(self, "vehicles/airboat/fan_motor_idle_loop1.wav")
+		if not self.FanSoundLoop then
+			self.FanSoundLoop = CreateSound(self, self.IdleSounds[1])
+			self.FanSoundLoop:Play()
+		end 
+		if self.EngineSoundLoop then
+			self.EngineSoundLoop = CreateSound(self, self.IdleSounds[2])
+			self.EngineSoundLoop:Play()
 		end
-		self.FanSoundLoop:Play()
-		self.EngineSoundLoop:Play()
 	end
 
 	function ENT:EndSound()
@@ -189,40 +195,29 @@ if SERVER then
 		end
 		local CurSpeed = self:GetBladeSpeed()
 
+		--jprint("cur: " .. tostring(CurSpeed) .. " desired: " .. tostring(self.DesiredBladeSpeed))
+		if CurSpeed ~= self.DesiredBladeSpeed then
+			CurSpeed = (math.Approach(math.Clamp(CurSpeed, -self.MaxBladeSpeed, self.MaxBladeSpeed), self.DesiredBladeSpeed, 15 / ThinkRate))
+		end
+
+		self:SetBladeSpeed(CurSpeed)
+
 		if State == STATE_SPINNING then
-			if math.abs(CurSpeed) < 10 then
-				self:SetState(STATE_IDLING)
-			end
 			local Phys = self:GetPhysicsObject()
 
 			if IsValid(Phys) then
-				Phys:ApplyForceCenter(self:GetRight() * CurSpeed * 500 / ThinkRate)
+				--Phys:ApplyForceCenter(self:GetRight() * (CurSpeed^2 / self.MaxBladeSpeed) * 500 / ThinkRate)
+				Phys:ApplyForceCenter(self:GetRight() * CurSpeed * 1500 / ThinkRate)
 			end
-		elseif State == STATE_IDLING then
-			if math.abs(CurSpeed) > 10 then
-				self:SetState(STATE_SPINNING)
-			end
-		end
 
-		if State ~= STATE_OFF then
-			if self.DesiredBladeSpeed ~= CurSpeed then
-				self:SetBladeSpeed(math.Approach(math.Clamp(CurSpeed, -self.MaxBladeSpeed, self.MaxBladeSpeed), self.DesiredBladeSpeed, (self.DesiredBladeSpeed - CurSpeed) * 10 * FrameTime()))
-				if math.abs(CurSpeed) < 50 then
-					if self.FanSoundLoop then
-						self.FanSoundLoop:Stop()
-					end
-					if math.abs(CurSpeed) > 5 then
-						self.FanSoundLoop = CreateSound(self, "vehicles/airboat/fan_blade_idle_loop1.wav")
-						self.FanSoundLoop:Play()
-					end
-				else
-					if self.FanSoundLoop then
-						self.FanSoundLoop:Stop()
-					end
-					self.FanSoundLoop = CreateSound(self, "vehicles/airboat/fan_blade_fullthrottle_loop1.wav")
-					self.FanSoundLoop:Play()
-				end
+			if (math.abs(CurSpeed) < 80) then
+				if self.FanSoundLoop then self.FanSoundLoop:Stop() end
+				self.FanSoundLoop = CreateSound(self, self.IdleSounds[1])
+			elseif (math.abs(CurSpeed) > 80) then
+				if self.FanSoundLoop then self.FanSoundLoop:Stop() end
+				self.FanSoundLoop = CreateSound(self, self.FullThrottleSounds[1])
 			end
+
 			self:UpdateWireOutputs()
 		end
 
@@ -245,7 +240,7 @@ if SERVER then
 elseif CLIENT then
 	function ENT:CustomInit()
 		self:DrawShadow(true)
-		self.Blade = JMod.MakeModel(self, "models/airboat_propeller.mdl")
+		self.Blade = JMod.MakeModel(self, "models/aboot/airboat_propeller.mdl")
 		self.BladeTurn = 0
 	end
 
@@ -254,7 +249,7 @@ elseif CLIENT then
 		local Time, State, BladeSpeed = CurTime(), self:GetState(), self:GetBladeSpeed()
 		local FT = FrameTime()
 
-		if State == STATE_SPINNING or State == STATE_IDLING then
+		if State == STATE_SPINNING then
 			self.BladeTurn = self.BladeTurn + BladeSpeed * 100 * FT
 		end
 
@@ -286,9 +281,9 @@ elseif CLIENT then
 		---
 		if DetailDraw then
 			local WheelAng = SelfAng:GetCopy()
-			WheelAng:RotateAroundAxis(WheelAng:Right(), self.BladeTurn)
+			WheelAng:RotateAroundAxis(WheelAng:Right(), -self.BladeTurn)
 			WheelAng:RotateAroundAxis(WheelAng:Forward(), 90)
-			JMod.RenderModel(self.Blade, BasePos + Right * -22 + Up * -4.3 + Forward * 0.2, WheelAng, Vector(1, 1, 1))
+			JMod.RenderModel(self.Blade, BasePos + Right * -23 + Up * -4.3 + Forward * 0.2, WheelAng, Vector(1, 1, 1))
 			if Closeness < 20000 and State > JMod.EZ_STATE_OFF then
 				local DisplayAng = SelfAng:GetCopy()
 				DisplayAng:RotateAroundAxis(DisplayAng:Right(), -90)

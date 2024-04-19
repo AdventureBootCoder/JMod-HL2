@@ -85,12 +85,12 @@ function ENT:DoDetonation()
 		local Dmg = DamageInfo()
 		Dmg:SetAttacker(attacker)
 		Dmg:SetInflictor(self)
-		Dmg:SetDamage(self.GrenadeDamage or self.Damage or 0)
 		Dmg:SetDamageType(DMG_BULLET)
 		Dmg:SetDamagePosition(SelfPos)
 		Dmg:SetDamageForce(self:GetVelocity():GetNormalized() * 500)
 		for _, ent in ipairs(ents.FindInCone(SelfPos, self.GrenadeDir, self.GrenadeRadius * 1.5, 0.5)) do
 			if IsValid(ent) and (ent ~= self) and JMod.VisCheck(SelfPos, ent:GetPos(), self) then
+				Dmg:SetDamage((self.GrenadeDamage or self.Damage or 10) / (SelfPos:Distance(ent:GetPos()) / 1000))
 				ent:TakeDamageInfo(Dmg)
 			end
 		end
