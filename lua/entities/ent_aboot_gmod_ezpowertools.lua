@@ -108,12 +108,12 @@ if(SERVER)then
 				return
 			elseif State == STATE_RUNNING then
 
-				local PoundDir = Up * -30
+				local PoundDir = Up * -35
 				local CutDir = Up
 				local CutStrength = 100
 
 				local PoundTr = util.TraceHull({
-					start = SelfPos + PoundDir * .95,
+					start = SelfPos + PoundDir * .7,
 					endpos = SelfPos + PoundDir,
 					maxs = Vector(10, 10, 10),
 					mins = Vector(-10, -10, -10),
@@ -122,7 +122,7 @@ if(SERVER)then
 					ignoreworld = false
 				})
 				local HitPos = PoundTr.HitPos
-				debugoverlay.Line(SelfPos + PoundDir * .2, HitPos, 1, Color(255, 0, 0), true)
+				debugoverlay.Line(SelfPos + PoundDir * .7, HitPos, 1, Color(255, 0, 0), true)
 				
 				if (PoundTr.Hit) then
 					local Ent = PoundTr.Entity
@@ -185,8 +185,7 @@ if(SERVER)then
 
 elseif(CLIENT)then
 	function ENT:CustomInit()
-		self.SawBlade = JMod.MakeModel(self, "models/props_junk/sawblade001a.mdl")
-		self.DrillMat = Material("mechanics/metal2")
+		--self.SawBlade = JMod.MakeModel(self, "models/props_junk/sawblade001a.mdl")
 		self.CurSpin = 0
 		self.CurSpeed = 0
 		self.MaxElectricity = 200

@@ -20,6 +20,10 @@ ENT.StaticPerfSpecs={
 	MaxDurability = 100,
 	Armor = 1.5
 }
+ENT.EZconsumes = {
+	JMod.EZ_RESOURCE_TYPES.BASICPARTS,
+	JMod.EZ_RESOURCE_TYPES.FUEL
+}
 
 function ENT:CustomSetupDataTables()
 	self:NetworkVar("Float", 0, "Fuel")
@@ -104,7 +108,7 @@ if SERVER then
 			if not IsValid(self) or (State < STATE_OFF) then return end
 			self:SetState(STATE_SPINNING)
 			self:SetThrottle(self.MaxBladeSpeed * 0.1)
-			--self:StartSound()
+			self:StartSound()
 		end)
 	end
 
@@ -204,10 +208,15 @@ if SERVER then
 		self:SetBladeSpeed(CurSpeed)
 
 		if State == STATE_SPINNING then
+			if self:GetFuel() <= 0 then
+				self:TurnOff()
+
+				return
+			end
+
 			local Phys = self:GetPhysicsObject()
 
 			if IsValid(Phys) then
-				--Phys:ApplyForceCenter(self:GetRight() * (CurSpeed^2 / self.MaxBladeSpeed) * 500 / ThinkRate)
 				Phys:ApplyForceCenter(self:GetRight() * CurSpeed * 1500 / ThinkRate)
 			end
 
@@ -219,11 +228,20 @@ if SERVER then
 				self.FanSoundLoop = CreateSound(self, self.FullThrottleSounds[1])
 			end
 
+			self:ConsumeFuel(0.001 * CurSpeed / ThinkRate)
+
 			self:UpdateWireOutputs()
 		end
 
 		self:NextThink(Time + (1 / ThinkRate))
 		return true
+	end
+
+	function ENT:ConsumeFuel(amount)
+		self:SetFuel(math.max(0, self:GetFuel() - amount))
+		if self:GetFuel() <= 0 then
+			self:TurnOff()
+		end
 	end
 
 	function ENT:OnPostEntityPaste(ply, Ent, CreatedEntities)
