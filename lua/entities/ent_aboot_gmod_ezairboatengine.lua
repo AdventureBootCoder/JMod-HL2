@@ -16,12 +16,13 @@ ENT.IdleSounds = {"vehicles/airboat/fan_blade_idle_loop1.wav", "vehicles/airboat
 ENT.FullThrottleSounds = {"vehicles/airboat/fan_blade_fullthrottle_loop1.wav", "vehicles/airboat/fan_motor_fullthrottle_loop1.wav"}
 --
 ENT.StaticPerfSpecs={ 
-	MaxElectricity = 100,
+	MaxFuel = 100,
 	MaxDurability = 100,
 	Armor = 1.5
 }
 
 function ENT:CustomSetupDataTables()
+	self:NetworkVar("Float", 0, "Fuel")
 	self:NetworkVar("Float", 1, "BladeSpeed")
 end
 
@@ -241,6 +242,7 @@ elseif CLIENT then
 	function ENT:CustomInit()
 		self:DrawShadow(true)
 		self.Blade = JMod.MakeModel(self, "models/aboot/airboat_propeller.mdl")
+		self.Tank = JMod.MakeModel(self, "models/airboat_nose.mdl")
 		self.BladeTurn = 0
 	end
 
@@ -283,18 +285,18 @@ elseif CLIENT then
 			local WheelAng = SelfAng:GetCopy()
 			WheelAng:RotateAroundAxis(WheelAng:Right(), -self.BladeTurn)
 			WheelAng:RotateAroundAxis(WheelAng:Forward(), 90)
-			JMod.RenderModel(self.Blade, BasePos + Right * -23 + Up * -4.3 + Forward * 0.2, WheelAng, Vector(1, 1, 1))
+			JMod.RenderModel(self.Blade, BasePos + Right * -23 + Up * -4.3 + Forward * 0.2, WheelAng)
+			JMod.RenderModel(self.Tank, BasePos + Right * 28 + Up * -2, SelfAng)
 			if Closeness < 20000 and State > JMod.EZ_STATE_OFF then
 				local DisplayAng = SelfAng:GetCopy()
-				DisplayAng:RotateAroundAxis(DisplayAng:Right(), -90)
-				DisplayAng:RotateAroundAxis(DisplayAng:Up(), 90)
+				DisplayAng:RotateAroundAxis(DisplayAng:Forward(), 30)
 				local Opacity = math.random(50, 150)
-				local Elec = self:GetElectricity()
-				local R, G, B = JMod.GoodBadColor(Elec / self.MaxElectricity)
+				local Elec = self:GetFuel()
+				local R, G, B = JMod.GoodBadColor(Elec / self.MaxFuel)
 
-				cam.Start3D2D(SelfPos + Forward * 8 + Up * 1, DisplayAng, .08)
-				draw.SimpleTextOutlined("POWER", "JMod-Display", 0, 0, Color(200, 255, 255, Opacity), TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP, 3, Color(0, 0, 0, Opacity))
-				draw.SimpleTextOutlined(tostring(math.Round(Elec)) .. "/" .. tostring(math.Round(self.MaxElectricity)), "JMod-Display", 0, 30, Color(R, G, B, Opacity), TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP, 3, Color(0, 0, 0, Opacity))
+				cam.Start3D2D(SelfPos + Up * 3 + Right * 28, DisplayAng, .08)
+				draw.SimpleTextOutlined("FUEL", "JMod-Display", 0, 0, Color(200, 255, 255, Opacity), TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP, 3, Color(0, 0, 0, Opacity))
+				draw.SimpleTextOutlined(tostring(math.Round(Elec)) .. "/" .. tostring(math.Round(self.MaxFuel)), "JMod-Display", 0, 30, Color(R, G, B, Opacity), TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP, 3, Color(0, 0, 0, Opacity))
 				cam.End3D2D()
 			end
 		end
