@@ -10,7 +10,7 @@ ENT.Spawnable = true
 ENT.AdminSpawnable = true
 --
 ENT.JModPreferredCarryAngles = Angle(0, 0, 0)
-ENT.Model = "models/aboot/airboat_engine.mdl"
+ENT.Model = "models/aboot/ez_airboat_engine.mdl"
 ENT.Mass = 45
 ENT.IdleSounds = {"vehicles/airboat/fan_blade_idle_loop1.wav", "vehicles/airboat/fan_motor_idle_loop1.wav"}
 ENT.FullThrottleSounds = {"vehicles/airboat/fan_blade_fullthrottle_loop1.wav", "vehicles/airboat/fan_motor_fullthrottle_loop1.wav"}
@@ -260,7 +260,6 @@ elseif CLIENT then
 	function ENT:CustomInit()
 		self:DrawShadow(true)
 		self.Blade = JMod.MakeModel(self, "models/aboot/airboat_propeller.mdl")
-		self.Tank = JMod.MakeModel(self, "models/airboat_nose.mdl")
 		self.BladeTurn = 0
 	end
 
@@ -304,7 +303,6 @@ elseif CLIENT then
 			WheelAng:RotateAroundAxis(WheelAng:Right(), -self.BladeTurn)
 			WheelAng:RotateAroundAxis(WheelAng:Forward(), 90)
 			JMod.RenderModel(self.Blade, BasePos + Right * -23 + Up * -4.3 + Forward * 0.2, WheelAng)
-			JMod.RenderModel(self.Tank, BasePos + Right * 28 + Up * -2, SelfAng)
 			if Closeness < 20000 and State > JMod.EZ_STATE_OFF then
 				local DisplayAng = SelfAng:GetCopy()
 				DisplayAng:RotateAroundAxis(DisplayAng:Forward(), 30)
@@ -312,9 +310,9 @@ elseif CLIENT then
 				local Elec = self:GetFuel()
 				local R, G, B = JMod.GoodBadColor(Elec / self.MaxFuel)
 
-				cam.Start3D2D(SelfPos + Up * 3 + Right * 28, DisplayAng, .08)
-				draw.SimpleTextOutlined("FUEL", "JMod-Display", 0, 0, Color(200, 255, 255, Opacity), TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP, 3, Color(0, 0, 0, Opacity))
-				draw.SimpleTextOutlined(tostring(math.Round(Elec)) .. "/" .. tostring(math.Round(self.MaxFuel)), "JMod-Display", 0, 30, Color(R, G, B, Opacity), TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP, 3, Color(0, 0, 0, Opacity))
+				cam.Start3D2D(SelfPos + Up * 1 + Right * 28, DisplayAng, .08)
+					draw.SimpleTextOutlined("FUEL", "JMod-Display", 0, 0, Color(200, 255, 255, Opacity), TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP, 3, Color(0, 0, 0, Opacity))
+					draw.SimpleTextOutlined(tostring(math.Round(Elec)) .. "/" .. tostring(math.Round(self.MaxFuel)), "JMod-Display", 0, 30, Color(R, G, B, Opacity), TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP, 3, Color(0, 0, 0, Opacity))
 				cam.End3D2D()
 			end
 		end
