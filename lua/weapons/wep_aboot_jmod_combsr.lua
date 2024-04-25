@@ -20,8 +20,8 @@ SWEP.CustomToggleCustomizeHUD = false
 
 JMod.ApplyAmmoSpecs(SWEP, "Sniper Pulse Ammo", 1)
 -- IN M/S
-SWEP.MuzzleVelocity = 500 -- projectile or phys bullet muzzle velocity
-SWEP.AlwaysPhysBullet = true
+SWEP.MuzzleVelocity = 400 -- projectile or phys bullet muzzle velocity
+SWEP.AlwaysPhysBullet = false
 SWEP.NeverPhysBullet = false
 SWEP.PhysBullets = true
 SWEP.PhysBulletMuzzleVelocity = 120 * 2 -- override phys bullet muzzle velocity
@@ -86,8 +86,8 @@ SWEP.MuzzleEffectAttachment = 1 -- which attachment to put the muzzle on
 SWEP.CaseEffectAttachment = 2 -- which attachment to put the case effect on
 
 SWEP.SightTime = 0.25
-SWEP.SpeedMult = 0.8
-SWEP.SightedSpeedMult = 0.5
+SWEP.SpeedMult = 0.7
+SWEP.SightedSpeedMult = 0.3
 
 SWEP.BulletBones = { -- the bone that represents bullets in gun/mag
 	-- [0] = "bulletchamber",

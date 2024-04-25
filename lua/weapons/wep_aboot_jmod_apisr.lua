@@ -135,7 +135,7 @@ SWEP.NoFlash = true
 SWEP.MuzzleEffectAttachment = 0 -- which attachment to put the muzzle on
 SWEP.CaseEffectAttachment = 1 -- which attachment to put the case effect on
 
-SWEP.SpeedMult = 0.8
+SWEP.SpeedMult = 0.7
 SWEP.SightedSpeedMult = 0.3
 SWEP.SightTime = 0.66
 
