@@ -81,7 +81,7 @@ function ENT:DoDetonation()
 	local attacker = IsValid(self:GetOwner()) and self:GetOwner() or self
 	local SelfPos = self:GetPos()
 	if self.EZfragment then
-		JMod.FragSplosion(self, SelfPos, 500, 30, 2000, attacker, self:GetVelocity():GetNormalized(), .01)
+		JMod.FragSplosion(self, SelfPos, 600, 20, 2000, attacker, self:GetVelocity():GetNormalized(), 0.3)
 		local Dmg = DamageInfo()
 		Dmg:SetAttacker(attacker)
 		Dmg:SetInflictor(self)
