@@ -32,7 +32,7 @@ SWEP.Secondary.Automatic = true
 SWEP.Secondary.Ammo = "none"
 SWEP.ShowWorldModel = true
 
-SWEP.EZaccepts = {JMod.EZ_RESOURCE_TYPES.FUEL}
+SWEP.EZconsumes = {JMod.EZ_RESOURCE_TYPES.FUEL}
 SWEP.MaxFuel = 50
 
 SWEP.VElements = {
@@ -283,7 +283,7 @@ function SWEP:PrimaryAttack()
 
 		if not(HasFuel) then
 			self:Cease()
-			self:Msg("Out of fuel!\nPress Reload on resource container to refill.")
+			self:Msg("Out of fuel!\nPress Alt+Use on resource container to refill.")
 		else
 			local FirePos, FireAng, AimVec = self:GetNozzle()
 			if ((State == STATE_NOTHIN) or (State == STATE_IGNITIN)) and not(self.Owner:IsPlayer() and self.Owner:IsSprinting()) then
@@ -380,29 +380,6 @@ function SWEP:Pawnch()
 	self:UpdateNextIdle()
 end
 
-function SWEP:Reload()
-	if SERVER then
-		local Time = CurTime()
-		local Ent = self:WhomIlookinAt()
-		
-		if IsValid(Ent) and Ent.GetEZsupplies then
-			for typ, amt in pairs(Ent:GetEZsupplies()) do
-				if table.HasValue(self.EZaccepts, typ) and (amt > 0) then
-					local CurAmt = self:GetEZsupplies(typ) or 0
-					local Take = math.min(amt, self.MaxFuel - CurAmt)
-					
-					if Take > 0 then
-						Ent:SetEZsupplies(typ, amt - Take, self.Owner)
-						self:SetEZsupplies(typ, CurAmt + Take)
-						sound.Play("items/ammo_pickup.wav", self:GetPos(), 65, math.random(90, 110))
-						JMod.ResourceEffect(typ, Ent:LocalToWorld(Ent:OBBCenter()), self:GetPos(), amt, 1, 1, 2)
-					end
-				end
-			end
-		end
-	end
-end
-
 function SWEP:WhomIlookinAt()
 	local Filter = {self.Owner}
 
@@ -413,6 +390,26 @@ function SWEP:WhomIlookinAt()
 	local Tr = util.QuickTrace(self.Owner:GetShootPos(), self.Owner:GetAimVector() * 100, Filter)
 
 	return Tr.Entity, Tr.HitPos, Tr.HitNormal
+end
+
+function SWEP:TryLoadResource(typ, amt)
+	if amt < 1 then return 0 end
+	local Accepted = 0
+
+	for _, v in pairs(self.EZconsumes) do
+		if typ == v then
+			local CurAmt = self:GetEZsupplies(typ) or 0
+			local Take = math.min(amt, self.MaxFuel - CurAmt)
+			
+			if Take > 0 then
+				self:SetEZsupplies(typ, CurAmt + Take)
+				sound.Play("snds_jack_gmod/gas_load.wav", self:GetPos(), 65, math.random(90, 110))
+				Accepted = Take
+			end
+		end
+	end
+
+	return Accepted
 end
 
 --
