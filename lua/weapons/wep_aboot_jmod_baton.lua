@@ -99,30 +99,39 @@ SWEP.Animations = {
 }
 
 SWEP.Hook_PostBash = function(wep, data)
-	local Tr = util.QuickTrace(wep.Owner:GetShootPos(), wep.Owner:GetAimVector() * 80, {wep.Owner})
-	local Ent, Pos = Tr.Entity, Tr.HitPos
+	local Ent, Pos = data.tr.Entity, data.tr.HitPos
 
-	if Tr.Hit then
+	if data.tr.Hit and not data.tr.HitSky and not data.tr.StartSolid then
 		local fx = EffectData()
 		fx:SetOrigin(Pos)
-		fx:SetNormal(Tr.HitNormal)
+		fx:SetNormal(data.tr.HitNormal)
 		util.Effect("StunstickImpact", fx, true, true)
-	end
 
-	local Surface = Tr.SurfaceProps
-	if Tr.Hit and (Surface) and (util.GetSurfaceData(Surface)) then
-		EmitSound(util.GetSurfaceData(Surface).bulletImpactSound, Pos, 0, CHAN_WEAPON)
+		local Surface = data.tr.SurfaceProps
+		if data.tr.Hit and (Surface) and (util.GetSurfaceData(Surface)) then
+			EmitSound(util.GetSurfaceData(Surface).bulletImpactSound, Pos, 0, CHAN_WEAPON)
+		end
 	end
-
-	if IsValid(Ent) then
-		if Ent:IsNPC() and (data.melee2) then
-			Ent.EZNPCincapacitate = (Ent.EZNPCincapacitate or CurTime()) + math.Rand(2, 3)
-		elseif Ent:IsPlayer() then
-			Ent:ViewPunch(Angle(math.random(-40, 2), math.random(-20, 20), math.random(-2, 2)))
-			net.Start("ABoot_StunStick")
-				net.WriteEntity(Ent)
-				net.WriteFloat(.5)
-			net.Send(Ent)
+	
+	if SERVER then
+		if IsValid(Ent) then
+			if Ent:IsNPC() then
+				Ent.EZNPCincapacitate = (Ent.EZNPCincapacitate or CurTime()) + math.Rand(2, 3)
+			elseif Ent:IsPlayer() then
+				Ent:ViewPunch(Angle(math.random(-40, 2), math.random(-20, 20), math.random(-2, 2)))
+				if data.melee2 then
+					JMod.EZimmobilize(Ent, 1, Ent)
+					net.Start("ABoot_StunStick")
+						net.WriteEntity(Ent)
+						net.WriteFloat(50)
+					net.Send(Ent)
+				else
+					net.Start("ABoot_StunStick")
+						net.WriteEntity(Ent)
+						net.WriteFloat(20)
+					net.Send(Ent)
+				end
+			end
 		end
 	end
 end
