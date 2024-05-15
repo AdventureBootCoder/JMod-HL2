@@ -81,13 +81,11 @@ JModHL2.ArmorTable = {
 			[DMG_NERVEGAS]=1,
 			[DMG_RADIATION]=1,
 			[DMG_ACID]=1,
-			[DMG_POISON]=1,
-			[DMG_DROWN]=1
+			[DMG_POISON]=1
 		},HEVArmorProtectionProfile),
 		resist={
 			[DMG_ACID]=.90,
-			[DMG_POISON]=.99,
-			[DMG_DROWN]=1
+			[DMG_POISON]=.99
 		},
 		chrg={
 			chemicals = 50,
