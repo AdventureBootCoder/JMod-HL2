@@ -156,6 +156,9 @@ elseif CLIENT then
 		if Active ~= self.LastState then
 			if Active == true then
 				self.TimeActivated = CurTime()
+				table.insert(JModHL2.ActiveTeleporters, self)
+			else
+				table.RemoveByValue(JModHL2.ActiveTeleporters, self)
 			end
 			self.LastState = Active
 		end
@@ -178,36 +181,6 @@ elseif CLIENT then
 		ply.Scared = true
 		EmitSound("npc/ichthyosaur/attack_growl1.wav", ply:EyePos() + IchyOrigin * 480, -1)
 	end
-
-	hook.Remove("RenderScreenspaceEffects", "ABoot_TeleportEffect")
-	hook.Add("RenderScreenspaceEffects", "ABoot_TeleportEffect", function()
-		local Ply = LocalPlayer()
-		local Teleporting = false
-		local Teleporter = nil
-		for _, v in ipairs(ents.FindByClass("ent_aboot_gmod_eztelemarker")) do
-			if (v:GetActivated() and v:GetPos():Distance(Ply:GetPos()) < v.TeleRange) and v:ShouldTeleport(Ply) then
-				Teleporting = true
-				Teleporter = v
-				if (v.TimeActivated >= (CurTime() - 0.2)) and not(Ply.Scared) and (Ply:WaterLevel() >= 3) then
-					--if math.random(0, 1000) >= 950 then
-						timer.Simple(0.5, function()
-							v:SummonIchthy(Ply)
-						end)
-					--end
-				end
-			end
-		end
-		if Teleporting then
-			DrawColorModify(Teleporter.ColorMods)
-			render.UpdateScreenEffectTexture()
-			render.SetMaterial(Overlay)
-			render.DrawScreenQuad(true)
-			--render.SetMaterial(Overlay)
-			--render.DrawScreenQuad(false)
-		elseif Ply.Scared then
-			Ply.Scared = nil
-		end
-	end)
 
 	language.Add("ent_aboot_gmod_eztelemarker", "EZ Teleport Marker")
 end

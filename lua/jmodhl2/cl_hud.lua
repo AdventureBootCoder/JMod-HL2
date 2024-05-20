@@ -195,6 +195,40 @@ hook.Add("RenderScreenspaceEffects", "JMODHL2_SCREENSPACE", function()
 	end
 end)
 
+JModHL2.ActiveTeleporters = JModHL2.ActiveTeleporters or {}
+hook.Add("RenderScreenspaceEffects", "ABoot_TeleportEffect", function()
+	local Ply = LocalPlayer()
+	local Teleporting = false
+	local Teleporter = nil
+	for k, v in ipairs(JModHL2.ActiveTeleporters) do
+		if IsValid(v) then
+			if (v:GetActivated() and v:GetPos():Distance(Ply:GetPos()) < v.TeleRange) and v:ShouldTeleport(Ply) then
+				Teleporting = true
+				Teleporter = v
+				if (v.TimeActivated >= (CurTime() - 0.2)) and not(Ply.Scared) and (Ply:WaterLevel() >= 3) then
+					if math.random(0, 50) >= 45 then
+						timer.Simple(0.5, function()
+							v:SummonIchthy(Ply)
+						end)
+					end
+				end
+			end
+		else
+			table.remove(JModHL2.ActiveTeleporters, k)
+		end
+	end
+	if Teleporting then
+		DrawColorModify(Teleporter.ColorMods)
+		render.UpdateScreenEffectTexture()
+		render.SetMaterial(Overlay)
+		render.DrawScreenQuad(true)
+		--render.SetMaterial(Overlay)
+		--render.DrawScreenQuad(false)
+	elseif Ply.Scared then
+		Ply.Scared = nil
+	end
+end)
+
 JModHL2.EZ_NightVisionScreenSpaceEffect = function(ply)
 
 	DrawColorModify({
