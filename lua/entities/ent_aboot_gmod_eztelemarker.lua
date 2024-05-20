@@ -9,8 +9,6 @@ ENT.JModPreferredCarryAngles = Angle(0, 0, 90)
 ENT.Model = "models/aboot/tpnade_lid.mdl"
 ENT.Mass = 5
 
-local Overlay = Material("effects/tp_eyefx/tpeye")
-
 function ENT:SetupDataTables()
 	self:NetworkVar("Bool", 0, "Activated")
 end

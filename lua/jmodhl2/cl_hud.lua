@@ -195,6 +195,8 @@ hook.Add("RenderScreenspaceEffects", "JMODHL2_SCREENSPACE", function()
 	end
 end)
 
+local Overlay = Material("effects/tp_eyefx/tpeye")
+
 JModHL2.ActiveTeleporters = JModHL2.ActiveTeleporters or {}
 hook.Add("RenderScreenspaceEffects", "ABoot_TeleportEffect", function()
 	local Ply = LocalPlayer()
@@ -202,7 +204,7 @@ hook.Add("RenderScreenspaceEffects", "ABoot_TeleportEffect", function()
 	local Teleporter = nil
 	for k, v in ipairs(JModHL2.ActiveTeleporters) do
 		if IsValid(v) then
-			if (v:GetActivated() and v:GetPos():Distance(Ply:GetPos()) < v.TeleRange) and v:ShouldTeleport(Ply) then
+			if (v:GetPos():Distance(Ply:GetPos()) < v.TeleRange) then
 				Teleporting = true
 				Teleporter = v
 				if (v.TimeActivated >= (CurTime() - 0.2)) and not(Ply.Scared) and (Ply:WaterLevel() >= 3) then
