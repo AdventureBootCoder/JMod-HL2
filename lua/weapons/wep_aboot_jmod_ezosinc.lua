@@ -289,7 +289,7 @@ function SWEP:PrimaryAttack()
 			if ((State == STATE_NOTHIN) or (State == STATE_IGNITIN)) and not(self.Owner:IsPlayer() and self.Owner:IsSprinting()) then
 				self:SetState(STATE_FLAMIN)
 				if self.SoundLoop then self.SoundLoop:Stop() end
-				self.SoundLoop = CreateSound(self, "snds_jack_gmod/flamethrower_loop.wav")
+				self.SoundLoop = CreateSound(self, "snds_jack_gmod/flamethrower_loop.ogg")
 				self.SoundLoop:SetSoundLevel(75)
 				self.SoundLoop:Play()
 			elseif (State == STATE_FLAMIN) then
@@ -349,7 +349,7 @@ function SWEP:SecondaryAttack()
 		if (State == STATE_NOTHIN) then
 			self:SetState(STATE_IGNITIN)
 			if self.SoundLoop then self.SoundLoop:Stop() end
-			self.SoundLoop = CreateSound(self, "snds_jack_gmod/flareburn.wav")
+			self.SoundLoop = CreateSound(self, "snds_jack_gmod/flareburn.ogg")
 			self.SoundLoop:SetSoundLevel(75)
 			self.SoundLoop:Play()
 		elseif (State == STATE_IGNITIN) then
@@ -403,7 +403,7 @@ function SWEP:TryLoadResource(typ, amt)
 			
 			if Take > 0 then
 				self:SetEZsupplies(typ, CurAmt + Take)
-				sound.Play("snds_jack_gmod/gas_load.wav", self:GetPos(), 65, math.random(90, 110))
+				sound.Play("snds_jack_gmod/gas_load.ogg", self:GetPos(), 65, math.random(90, 110))
 				Accepted = Take
 			end
 		end
@@ -497,7 +497,7 @@ function SWEP:Deploy()
 	if IsValid(vm) and vm.LookupSequence then
 		Downness = 10
 		self:UpdateNextIdle()
-		self:EmitSound("snds_jack_gmod/toolbox" .. math.random(1, 7) .. ".wav", 65, math.random(90, 110))
+		self:EmitSound("snds_jack_gmod/toolbox" .. math.random(1, 7) .. ".ogg", 65, math.random(90, 110))
 	end
 
 	return true
@@ -526,7 +526,7 @@ function SWEP:Think()
 			if self.Owner:IsPlayer() and self.Owner:KeyDown(IN_ATTACK2) then
 				self:SetState(STATE_IGNITIN)
 				if self.SoundLoop then self.SoundLoop:Stop() end
-				self.SoundLoop = CreateSound(self, "snds_jack_gmod/flareburn.wav")
+				self.SoundLoop = CreateSound(self, "snds_jack_gmod/flareburn.ogg")
 				self.SoundLoop:SetSoundLevel(75)
 				self.SoundLoop:Play()
 			else

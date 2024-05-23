@@ -124,7 +124,7 @@ JModHL2.ArmorTable = {
 		},
 		plymdl="models/aboot/player/hev_suit.mdl", -- https://steamcommunity.com/sharedfiles/filedetails/?id=1341386337&searchtext=hev+suit
 		mskmat="mats_aboot_gmod_sprites/helmet_vignette1.png",
-		sndlop="snds_jack_gmod/mask_breathe.wav",
+		sndlop="snds_jack_gmod/mask_breathe.ogg",
 		wgt = 40,
 		dur = 400,
 		ent = "ent_aboot_gmod_ezarmor_hev"
@@ -199,7 +199,7 @@ JModHL2.ArmorTable = {
 		},
 		plymdl = "models/aboot/combine/hev_suit/combine_super_solder.mdl",
 		mskmat = "mats_aboot_gmod_sprites/helmet_vignette2.png",
-		sndlop = "snds_jack_gmod/mask_breathe.wav",
+		sndlop = "snds_jack_gmod/mask_breathe.ogg",
 		wgt = 40,
 		dur = 400,
 		ent = "ent_aboot_gmod_ezarmor_combinesuit"

@@ -140,7 +140,7 @@ if(SERVER)then
 			elseif State == STATE_OFF then
 				if Alt then
 					self:TurnOn(Dude)
-					self:EmitSound("snd_jack_minearm.wav", 60, 100)
+					self:EmitSound("snd_jack_minearm.ogg", 60, 100)
 				else
 					constraint.RemoveAll(self)
 					self.StuckStick = nil
@@ -150,7 +150,7 @@ if(SERVER)then
 					JMod.Hint(Dude, "sticky")
 				end
 			elseif State == STATE_ON then
-				self:EmitSound("snd_jack_minearm.wav", 60, 70)
+				self:EmitSound("snd_jack_minearm.ogg", 60, 70)
 				self:TurnOff(Dude)
 			end
 		else
@@ -174,7 +174,7 @@ if(SERVER)then
 						self.StuckStick = Weld
 					end
 
-					self:EmitSound("snd_jack_claythunk.wav", 65, math.random(80, 120))
+					self:EmitSound("snd_jack_claythunk.ogg", 65, math.random(80, 120))
 					Dude:DropObject()
 					JMod.Hint(Dude, "arm")
 				end
@@ -319,7 +319,7 @@ if(SERVER)then
 						ZapEff:SetRadius(math.Rand(2, 4)) --thickness of strands
 						util.Effect("Sparks", ZapEff, true, true)
 						-- Electrical sound
-						shocker:EmitSound("snd_jack_turretfizzle.wav", 70, 90)
+						shocker:EmitSound("snd_jack_turretfizzle.ogg", 70, 90)
 						-- Reduce power
 						self:ConsumeElectricity(1)
 						if ShockEnt:IsPlayer() then

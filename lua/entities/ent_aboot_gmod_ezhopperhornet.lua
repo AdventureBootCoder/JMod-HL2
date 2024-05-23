@@ -109,14 +109,14 @@ if SERVER then
 			if Alt then
 				JMod.SetEZowner(self, activator)
 				JMod.Colorify(self)
-				self:EmitSound("snd_jack_minearm.wav", 60, 110)
+				self:EmitSound("snd_jack_minearm.ogg", 60, 110)
 				self:Arm(self.activator)
 			else
 				activator:PickupObject(self)
 				JMod.Hint(activator, "arm")
 			end
 		elseif not (activator.KeyDown and activator:KeyDown(IN_SPEED)) then
-			self:EmitSound("snd_jack_minearm.wav", 60, 70)
+			self:EmitSound("snd_jack_minearm.ogg", 60, 70)
 			self:Disarm()
 			JMod.SetEZowner(self, activator)
 			JMod.Colorify(self)
@@ -164,7 +164,7 @@ if SERVER then
 			util.Effect("eff_jack_gmod_efpburst", Eff, true, true)
 			util.ScreenShake(SelfPos, 99999, 99999, .1, 1000)
 			
-			self:EmitSound("snd_jack_fragsplodeclose.wav", 90, 100)
+			self:EmitSound("snd_jack_fragsplodeclose.ogg", 90, 100)
 
 			JMod.RicPenBullet(self, SelfPos, Dir, (1000 or ((Targ:IsVehicle() or Targ:InVehicle()) and 5000)) * JMod.Config.Explosives.Mine.Power, true, true)
 			SafeRemoveEntity(self)
@@ -180,7 +180,7 @@ if SERVER then
 			util.Effect("eff_jack_gmod_efpburst", Eff, true, true)
 			util.ScreenShake(SelfPos, 99999, 99999, .1, 1000)
 			
-			self:EmitSound("snd_jack_fragsplodeclose.wav", 90, 100)
+			self:EmitSound("snd_jack_fragsplodeclose.ogg", 90, 100)
 			JMod.RicPenBullet(self, SelfPos, Dir, 1000 * JMod.Config.Explosives.Mine.Power, true, true)
 			SafeRemoveEntity(self)
 			self.Exploded = true

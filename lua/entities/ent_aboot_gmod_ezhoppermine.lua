@@ -108,14 +108,14 @@ if SERVER then
 			if Alt then
 				JMod.SetEZowner(self, activator)
 				JMod.Colorify(self)
-				self:EmitSound("snd_jack_minearm.wav", 60, 110)
+				self:EmitSound("snd_jack_minearm.ogg", 60, 110)
 				self:Arm(self.activator)
 			else
 				activator:PickupObject(self)
 				JMod.Hint(activator, "arm")
 			end
 		elseif not (activator.KeyDown and activator:KeyDown(IN_SPEED)) then
-			self:EmitSound("snd_jack_minearm.wav", 60, 70)
+			self:EmitSound("snd_jack_minearm.ogg", 60, 70)
 			self:Disarm()
 			JMod.SetEZowner(self, activator)
 			JMod.Colorify(self)
@@ -203,7 +203,7 @@ if SERVER then
 		plooie:SetNormal(Up)
 		util.Effect("eff_jack_minesplode", plooie, true, true)
 		util.ScreenShake(SelfPos, 99999, 99999, 1, 500)
-		self:EmitSound("snd_jack_fragsplodeclose.wav", 90, 100)
+		self:EmitSound("snd_jack_fragsplodeclose.ogg", 90, 100)
 		JMod.Sploom(JMod.GetEZowner(self), SelfPos, 150, 125)
 		JMod.FragSplosion(self, SelfPos, 500, 20 * JMod.Config.Explosives.Mine.Power, 500, JMod.GetEZowner(self), Up, 1.3, 15)
 		SafeRemoveEntity(self)

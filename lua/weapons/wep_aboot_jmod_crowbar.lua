@@ -158,8 +158,8 @@ SWEP.Hook_PostBash = function(wep, data)
 					wep:TryBustDoor(Ent, wep.DoorBreachPower, Pos)
 				else
 					wep.TaskEntity = Ent
-					--sound.Play("snds_jack_gmod/ez_tools/hit.wav", Pos + VectorRand(), 60, math.random(50, 70))
-					--sound.Play("snds_jack_gmod/ez_dismantling/" .. math.random(1, 10) .. ".wav", Pos, 65, math.random(90, 110))
+					--sound.Play("snds_jack_gmod/ez_tools/hit.ogg", Pos + VectorRand(), 60, math.random(50, 70))
+					--sound.Play("snds_jack_gmod/ez_dismantling/" .. math.random(1, 10) .. ".ogg", Pos, 65, math.random(90, 110))
 					
 					JMod.Hint(wep.Owner, "work spread")
 					wep:SetNW2Float("EZtaskProgress", Ent:GetNW2Float("EZ"..Task.."Progress", 0))

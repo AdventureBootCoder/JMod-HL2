@@ -150,7 +150,7 @@ if(SERVER)then
 
 					local Message = JMod.EZprogressTask(Ent, HitPos, self, "salvage", 0.01)
 					if not(Message) then
-						sound.Play("snds_jack_gmod/ez_dismantling/1.wav", HitPos, 65, 110)--math.random(90, 110))
+						sound.Play("snds_jack_gmod/ez_dismantling/1.ogg", HitPos, 65, 110)--math.random(90, 110))
 					end
 					self:SetMessage("")
 					self:ConsumeElectricity(0.05  * JMod.Config.ResourceEconomy.ExtractionSpeed)

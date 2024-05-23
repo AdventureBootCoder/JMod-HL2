@@ -321,7 +321,7 @@ elseif CLIENT then
 		function MotherFrame:Paint()
 			if not self.storted then
 				self.storted = true
-				surface.PlaySound("snds_jack_gmod/ez_gui/menu_open.wav")
+				surface.PlaySound("snds_jack_gmod/ez_gui/menu_open.ogg")
 			end
 	
 			BlurBackground(self)
@@ -338,7 +338,7 @@ elseif CLIENT then
 
 		function MotherFrame:OnClose()
 			if not self.positiveClosed then
-				surface.PlaySound("snds_jack_gmod/ez_gui/menu_close.wav")
+				surface.PlaySound("snds_jack_gmod/ez_gui/menu_close.ogg")
 			end
 		end
 
@@ -397,7 +397,7 @@ elseif CLIENT then
 						self.hovered = true
 
 						if self.enabled then
-							surface.PlaySound("snds_jack_gmod/ez_gui/hover_ready.wav")
+							surface.PlaySound("snds_jack_gmod/ez_gui/hover_ready.ogg")
 						end
 					end
 				else
@@ -442,11 +442,11 @@ elseif CLIENT then
 						end
 					end)
 
-					surface.PlaySound("snds_jack_gmod/ez_gui/click_big.wav")
+					surface.PlaySound("snds_jack_gmod/ez_gui/click_big.ogg")
 					MotherFrame.positiveClosed = true
 					MotherFrame:Close()
 				else
-					surface.PlaySound("snds_jack_gmod/ez_gui/miss.wav")
+					surface.PlaySound("snds_jack_gmod/ez_gui/miss.ogg")
 				end
 			end
 

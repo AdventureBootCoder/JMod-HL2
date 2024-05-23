@@ -238,7 +238,7 @@ SWEP.Hook_Think = function(self)
 	local Heat = self:GetHeat()
 	if (Heat >= self.HeatCapacity) and not(self.CoolSoundPlayed) then
 		self.CoolSoundPlayed = true
-		self.Owner:EmitSound("snd_jack_plasmavent.wav", 70, 100)
+		self.Owner:EmitSound("snd_jack_plasmavent.ogg", 70, 100)
 		local Pewf = EffectData()
 		Pewf:SetOrigin(self.Owner:GetShootPos() + self.Owner:GetAimVector()*20 + self.Owner:GetRight()*2 - self.Owner:GetUp()*5)
 		Pewf:SetStart(self.Owner:GetVelocity())

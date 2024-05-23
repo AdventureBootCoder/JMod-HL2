@@ -247,7 +247,7 @@ if(SERVER)then
 			Mult = Mult * .2
 			if (math.random(1, 2) == 1) then
 				local SelfPos = self:GetPos()
-				sound.Play("snds_jack_gmod/ricochet_"..math.random(1,2)..".wav",SelfPos+VectorRand(),70,math.random(80,120))
+				sound.Play("snds_jack_gmod/ricochet_"..math.random(1,2)..".ogg",SelfPos+VectorRand(),70,math.random(80,120))
 				local effectdata = EffectData()
 				effectdata:SetOrigin(SelfPos - Up*16 + AimVec*20)
 				effectdata:SetNormal(VectorRand())
@@ -553,19 +553,19 @@ if(SERVER)then
 
 			if Dmg >= 60 then
 				util.Effect("RifleShellEject", Eff, true, true)
-				sound.Play("snds_jack_gmod/sentry_powerful.wav", ShootPos, 70, math.random(90, 110))
+				sound.Play("snds_jack_gmod/sentry_powerful.ogg", ShootPos, 70, math.random(90, 110))
 				ParticleEffect("muzzle_center_M82", ShootPos, AimAng, self)
 			elseif Dmg >= 15 then
 				util.Effect("RifleShellEject", Eff, true, true)
-				sound.Play("snds_jack_gmod/sentry.wav", ShootPos, 70, math.random(90, 110))
+				sound.Play("snds_jack_gmod/sentry.ogg", ShootPos, 70, math.random(90, 110))
 				ParticleEffect("muzzleflash_g3", ShootPos, AimAng, self)
 			else
 				util.Effect("ShellEject", Eff, true, true)
-				sound.Play("snds_jack_gmod/sentry_weak.wav", ShootPos, 70, math.random(90, 110))
+				sound.Play("snds_jack_gmod/sentry_weak.ogg", ShootPos, 70, math.random(90, 110))
 				ParticleEffect("muzzleflash_pistol", ShootPos, AimAng, self)
 			end
 
-			sound.Play("snds_jack_gmod/sentry_far.wav", SelfPos - Up, 100, math.random(90, 110))
+			sound.Play("snds_jack_gmod/sentry_far.ogg", SelfPos - Up, 100, math.random(90, 110))
 			ShootDir = (ShootDir + VectorRand() * math.Rand(.05, 1) * Inacc):GetNormalized()
 
 			local Ballut = {
@@ -634,8 +634,8 @@ if(SERVER)then
 			local Force = Dmg / 5
 			local ShootDir = (point - ShootPos):GetNormalized()
 			util.Effect("ShotgunShellEject", Eff, true, true)
-			sound.Play("snds_jack_gmod/sentry_shotgun.wav", ShootPos, 70, math.random(90, 110))
-			sound.Play("snds_jack_gmod/sentry_far.wav", ShootPos - Up, 100, math.random(90, 110))
+			sound.Play("snds_jack_gmod/sentry_shotgun.ogg", ShootPos, 70, math.random(90, 110))
+			sound.Play("snds_jack_gmod/sentry_far.ogg", ShootPos - Up, 100, math.random(90, 110))
 
 			local Ballut = {
 				Attacker = self.EZowner or self,
@@ -665,9 +665,9 @@ if(SERVER)then
 			local Force = Dmg / 5
 			local ShootDir = (point - ShootPos):GetNormalized()
 			util.Effect("RifleShellEject", Eff, true, true)
-			sound.Play("snds_jack_gmod/sentry.wav", SelfPos, 70, math.random(90, 110))
+			sound.Play("snds_jack_gmod/sentry.ogg", SelfPos, 70, math.random(90, 110))
 			ParticleEffect("muzzleflash_pistol_deagle", ShootPos, AimAng, self)
-			sound.Play("snds_jack_gmod/sentry_far.wav", ShootPos - Up, 100, math.random(90, 110))
+			sound.Play("snds_jack_gmod/sentry_far.ogg", ShootPos - Up, 100, math.random(90, 110))
 			ShootDir = (ShootDir + VectorRand() * math.Rand(.05, 1) * Inacc):GetNormalized()
 
 			JMod.RicPenBullet(self, ShootPos, ShootDir, Dmg, false, false, 1, 15, "eff_jack_gmod_smallarmstracer", function(att, tr, dmg)
@@ -708,9 +708,9 @@ if(SERVER)then
 			end)
 		elseif ProjType == "HE Grenade" then
 			local Dmg, Inacc = self.Damage, .06 / self.Accuracy
-			sound.Play("snds_jack_gmod/sentry_gl.wav", ShootPos, 70, math.random(90, 110))
+			sound.Play("snds_jack_gmod/sentry_gl.ogg", ShootPos, 70, math.random(90, 110))
 			ParticleEffect("muzzleflash_m79", ShootPos, AimAng, self)
-			sound.Play("snds_jack_gmod/sentry_far.wav", ShootPos - Up, 100, math.random(90, 110))
+			sound.Play("snds_jack_gmod/sentry_far.ogg", ShootPos - Up, 100, math.random(90, 110))
 			local Shell = ents.Create("ent_jack_gmod_ez40mmshell")
 			Shell:SetPos(SelfPos + Up * 36 + AimForward * 5)
 			Shell:SetAngles(AngleRand())
@@ -757,8 +757,8 @@ if(SERVER)then
 			local Dmg, Inacc = self.Damage, .06 / self.Accuracy
 			local Force = Dmg / 5
 			local ShootDir = (point - ShootPos):GetNormalized()
-			sound.Play("snds_jack_gmod/sentry_laser" .. math.random(1, 2) .. ".wav", ShootPos, 70, math.random(90, 110))
-			sound.Play("snds_jack_gmod/sentry_far.wav", ShootPos - Up, 100, math.random(90, 110))
+			sound.Play("snds_jack_gmod/sentry_laser" .. math.random(1, 2) .. ".ogg", ShootPos, 70, math.random(90, 110))
+			sound.Play("snds_jack_gmod/sentry_far.ogg", ShootPos - Up, 100, math.random(90, 110))
 			ShootDir = (ShootDir + VectorRand() * math.Rand(.05, 1) * Inacc):GetNormalized()
 			local Zap = EffectData()
 			Zap:SetOrigin(ShootPos)
@@ -805,7 +805,7 @@ if(SERVER)then
 				end
 
 				util.Decal("FadingScorch", Tr.HitPos + Tr.HitNormal, Tr.HitPos - Tr.HitNormal)
-				sound.Play("snd_jack_heavylaserburn.wav", Tr.HitPos, 60, math.random(90, 110))
+				sound.Play("snd_jack_heavylaserburn.ogg", Tr.HitPos, 60, math.random(90, 110))
 			end
 
 			Heat = Heat * 3
@@ -814,9 +814,9 @@ if(SERVER)then
 		elseif ProjType == "Missile Launcher" then
 			local Dmg, Inacc = self.Damage * 15, .06 / self.Accuracy
 			AmmoConsume = 5
-			sound.Play("snds_jack_gmod/sentry_gl.wav", SelfPos, 70, math.random(90, 110))
+			sound.Play("snds_jack_gmod/sentry_gl.ogg", SelfPos, 70, math.random(90, 110))
 			ParticleEffect("muzzleflash_m79", ShootPos, AimAng, self)
-			sound.Play("snds_jack_gmod/sentry_far.wav", SelfPos + Up, 100, math.random(90, 110))
+			sound.Play("snds_jack_gmod/sentry_far.ogg", SelfPos + Up, 100, math.random(90, 110))
 			-- leading calcs --
 			local Speed = 4000
 			local ShootDir = (point - ShootPos):GetNormalized()
@@ -925,7 +925,7 @@ if(SERVER)then
 		self:Point(Y + TurnAmtPitch, X - TurnAmtYaw)
 
 		if (math.abs(TurnAmtPitch) > .5) or (math.abs(TurnAmtYaw) > .5) then
-			sound.Play("snds_jack_gmod/ezsentry_turn.wav", self:GetPos(), 60, math.random(65, 80))
+			sound.Play("snds_jack_gmod/ezsentry_turn.ogg", self:GetPos(), 60, math.random(65, 80))
 		end
 
 		self:ConsumeElectricity()
@@ -938,7 +938,7 @@ if(SERVER)then
 		self:Point(Y + TurnAmtPitch, X - TurnAmtYaw)
 
 		if (math.abs(TurnAmtPitch) > .5) or (math.abs(TurnAmtYaw) > .5) then
-			sound.Play("snds_jack_gmod/ezsentry_turn.wav", self:GetPos(), 60, math.random(65, 80))
+			sound.Play("snds_jack_gmod/ezsentry_turn.ogg", self:GetPos(), 60, math.random(65, 80))
 		end
 
 		self:ConsumeElectricity()

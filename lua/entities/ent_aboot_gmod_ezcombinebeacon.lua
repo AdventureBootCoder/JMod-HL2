@@ -45,12 +45,12 @@ if SERVER then
 			self.Weld = constraint.Weld(Tr.Entity, self, 0, 0, 1000, true, false)
 		end
 		self.FuelLeft = 100
-		self:EmitSound("snd_jack_fragsplodeclose.wav", 70, 150)
+		self:EmitSound("snd_jack_fragsplodeclose.ogg", 70, 150)
 	end
 
 	function ENT:CustomThink(State, Time)
 		if self.Exploded then
-			self:EmitSound("snd_jack_sss.wav", 55, 80)
+			self:EmitSound("snd_jack_sss.ogg", 55, 80)
 			self.FuelLeft = self.FuelLeft - .5
 
 			if self.FuelLeft <= 0 then

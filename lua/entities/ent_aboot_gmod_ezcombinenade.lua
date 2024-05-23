@@ -68,7 +68,7 @@ if(SERVER)then
 		local PowerMult = 0.69
 		JMod.Sploom(self.Owner, self:GetPos(), 150, 400)
 		JMod.BlastDoors(self.Owner, self:GetPos(), 100, 445, false)
-		self:EmitSound("snd_jack_fragsplodeclose.wav", 90, 100)
+		self:EmitSound("snd_jack_fragsplodeclose.ogg", 90, 100)
 		local plooie = EffectData()
 		plooie:SetOrigin(SelfPos)
 		plooie:SetScale(0.5)

@@ -29,7 +29,7 @@ if SERVER then
 		end)
 		timer.Simple(1.5, function()
 			if not(IsValid(self)) then return end
-			self:EmitSound("snd_jack_wormhole.wav", 105, 100, 1)
+			self:EmitSound("snd_jack_wormhole.ogg", 105, 100, 1)
 			local PortalOpen = EffectData()
 			PortalOpen:SetOrigin(self:GetPos() + Vector(0, 0, 40))
 			PortalOpen:SetScale(self.TeleRange)
@@ -47,7 +47,7 @@ if SERVER then
 	function ENT:Prime()
 		if (self:GetState() ~= JMod.EZ_STATE_OFF) then return end
 		self:SetState(JMod.EZ_STATE_PRIMED)
-		self:EmitSound("snd_jack_cloakon.wav", 60, 100)
+		self:EmitSound("snd_jack_cloakon.ogg", 60, 100)
 		self:SetBodygroup(1, 0)
 
 		local Marker = ents.Create("ent_aboot_gmod_eztelemarker")
@@ -75,7 +75,7 @@ if SERVER then
 
 		self:SetColor(Color(0, 0, 0))
 		JMod.Sploom(self.EZowner, self:GetPos(), 20)
-		self:EmitSound("snd_jack_fragsplodeclose.wav", 90, 140)
+		self:EmitSound("snd_jack_fragsplodeclose.ogg", 90, 140)
 		local plooie = EffectData()
 		plooie:SetOrigin(SelfPos)
 		plooie:SetScale(1)

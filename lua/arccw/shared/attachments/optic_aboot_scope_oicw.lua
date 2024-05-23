@@ -104,8 +104,8 @@ att.AdditionalSights = {
 		Magnification = 1.5, -- this is how much your eyes zoom into the scope, not scope magnification
 		ScrollFunc = ArcCW.SCROLL_NONE,
 		IgnoreExtra = true,
-		SwitchToSound = "snds_jack_gmod/ez_weapons/handling/aim1.wav",
-		SwitchFromSound = "snds_jack_gmod/ez_weapons/handling/aim_out.wav",
+		SwitchToSound = "snds_jack_gmod/ez_weapons/handling/aim1.ogg",
+		SwitchFromSound = "snds_jack_gmod/ez_weapons/handling/aim_out.ogg",
 		SpecialScopeFunction = ThermalScopeFunction
 	}
 }
@@ -123,8 +123,8 @@ att.ToggleStats = {
 				Magnification = 1.5, -- this is how much your eyes zoom into the scope, not scope magnification
 				ScrollFunc = ArcCW.SCROLL_NONE,
 				IgnoreExtra = true,
-				SwitchToSound = "snds_jack_gmod/ez_weapons/handling/aim1.wav",
-				SwitchFromSound = "snds_jack_gmod/ez_weapons/handling/aim_out.wav",
+				SwitchToSound = "snds_jack_gmod/ez_weapons/handling/aim1.ogg",
+				SwitchFromSound = "snds_jack_gmod/ez_weapons/handling/aim_out.ogg",
 				SpecialScopeFunction = ThermalScopeFunction
 			}
 		}
@@ -140,8 +140,8 @@ att.ToggleStats = {
 				Magnification = 1.5, -- this is how much your eyes zoom into the scope, not scope magnification
 				ScrollFunc = ArcCW.SCROLL_NONE,
 				IgnoreExtra = true,
-				SwitchToSound = "snds_jack_gmod/ez_weapons/handling/aim1.wav",
-				SwitchFromSound = "snds_jack_gmod/ez_weapons/handling/aim_out.wav",
+				SwitchToSound = "snds_jack_gmod/ez_weapons/handling/aim1.ogg",
+				SwitchFromSound = "snds_jack_gmod/ez_weapons/handling/aim_out.ogg",
 				SpecialScopeFunction = TextFunc,
 				Thermal = true,
 				ThermalScopeColor = Color(255, 255, 255),
@@ -164,8 +164,8 @@ att.ToggleStats = {
 				Magnification = 1.5, -- this is how much your eyes zoom into the scope, not scope magnification
 				ScrollFunc = ArcCW.SCROLL_NONE,
 				IgnoreExtra = true,
-				SwitchToSound = "snds_jack_gmod/ez_weapons/handling/aim1.wav",
-				SwitchFromSound = "snds_jack_gmod/ez_weapons/handling/aim_out.wav",
+				SwitchToSound = "snds_jack_gmod/ez_weapons/handling/aim1.ogg",
+				SwitchFromSound = "snds_jack_gmod/ez_weapons/handling/aim_out.ogg",
 				SpecialScopeFunction = TextFunc
 			}
 		}

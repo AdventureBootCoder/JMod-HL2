@@ -554,7 +554,7 @@ if(SERVER)then
 		if IsValid(activator) then self.EZstayOn = true end
 		local OldOwner = JMod.GetEZowner(self)
 		self:SetState(STATE_WATCHING)
-		self:EmitSound("snds_jack_gmod/ezsentry_startup.wav", 65, 100)
+		self:EmitSound("snds_jack_gmod/ezsentry_startup.ogg", 65, 100)
 		self:ResetMemory()
 		self:CreateNPCTarget()
 	end
@@ -945,19 +945,19 @@ if(SERVER)then
 
 			if Dmg >= 60 then
 				util.Effect("RifleShellEject", Eff, true, true)
-				sound.Play("snds_jack_gmod/sentry_powerful.wav", SelfPos, 70, math.random(90, 110))
+				sound.Play("snds_jack_gmod/sentry_powerful.ogg", SelfPos, 70, math.random(90, 110))
 				ParticleEffect("muzzle_center_M82", ShootPos, AimAng, self)
 			elseif Dmg >= 15 then
 				util.Effect("RifleShellEject", Eff, true, true)
-				sound.Play("snds_jack_gmod/sentry.wav", SelfPos, 70, math.random(90, 110))
+				sound.Play("snds_jack_gmod/sentry.ogg", SelfPos, 70, math.random(90, 110))
 				ParticleEffect("muzzleflash_g3", ShootPos, AimAng, self)
 			else
 				util.Effect("ShellEject", Eff, true, true)
-				sound.Play("snds_jack_gmod/sentry_weak.wav", SelfPos, 70, math.random(90, 110))
+				sound.Play("snds_jack_gmod/sentry_weak.ogg", SelfPos, 70, math.random(90, 110))
 				ParticleEffect("muzzleflash_pistol", ShootPos, AimAng, self)
 			end
 
-			sound.Play("snds_jack_gmod/sentry_far.wav", SelfPos + Up, 100, math.random(90, 110))
+			sound.Play("snds_jack_gmod/sentry_far.ogg", SelfPos + Up, 100, math.random(90, 110))
 			ShootDir = (ShootDir + VectorRand() * math.Rand(.05, 1) * Inacc):GetNormalized()
 
 			local Ballut = {
@@ -1025,8 +1025,8 @@ if(SERVER)then
 			local Force = Dmg / 5
 			local ShootDir = (point - ShootPos):GetNormalized()
 			util.Effect("ShotgunShellEject", Eff, true, true)
-			sound.Play("snds_jack_gmod/sentry_shotgun.wav", SelfPos, 70, math.random(90, 110))
-			sound.Play("snds_jack_gmod/sentry_far.wav", SelfPos + Up, 100, math.random(90, 110))
+			sound.Play("snds_jack_gmod/sentry_shotgun.ogg", SelfPos, 70, math.random(90, 110))
+			sound.Play("snds_jack_gmod/sentry_far.ogg", SelfPos + Up, 100, math.random(90, 110))
 
 			local Ballut = {
 				Attacker = self.EZowner or self,

@@ -113,8 +113,8 @@ function SWEP:Initialize()
 	self:SetHoldType("slam")
 	self:SCKInitialize()
 	self.NextIdle = 0
-	self.Snd1 = CreateSound(self, "snds_jack_gmod/plasmaloop1.wav")
-	self.Snd2 = CreateSound(self, "snds_jack_gmod/plasmaloop_reversed1.wav")
+	self.Snd1 = CreateSound(self, "snds_jack_gmod/plasmaloop1.ogg")
+	self.Snd2 = CreateSound(self, "snds_jack_gmod/plasmaloop_reversed1.ogg")
 	self:Deploy()
 
 	self:SetGas(0)
@@ -304,7 +304,7 @@ function SWEP:TryLoadResource(typ, amt)
 			
 			if Take > 0 then
 				self:SetEZsupplies(typ, CurAmt + Take)
-				sound.Play("snds_jack_gmod/gas_load.wav", self:GetPos(), 65, math.random(90, 110))
+				sound.Play("snds_jack_gmod/gas_load.ogg", self:GetPos(), 65, math.random(90, 110))
 				Accepted = Take
 			end
 		end
@@ -396,7 +396,7 @@ function SWEP:Deploy()
 		--vm:SendViewModelMatchingSequence(vm:LookupSequence("fists_draw"))
 		vm:SendViewModelMatchingSequence(vm:LookupSequence("draw"))
 		self:UpdateNextIdle()
-		self:EmitSound("snds_jack_gmod/toolbox" .. math.random(1, 7) .. ".wav", 65, math.random(90, 110))
+		self:EmitSound("snds_jack_gmod/toolbox" .. math.random(1, 7) .. ".ogg", 65, math.random(90, 110))
 	end
 
 	if SERVER then
@@ -581,7 +581,7 @@ function SWEP:Think()
 	if (SERVER) then
 		--jprint(self.WasWelding)
 		if self:GetWelding() and not(self.WasWelding) then
-			sound.Play("snd_jack_plasmapop.wav", self.Owner:GetPos(), 75, math.random(95, 110), 1)
+			sound.Play("snd_jack_plasmapop.ogg", self.Owner:GetPos(), 75, math.random(95, 110), 1)
 			timer.Simple(0.1, function()
 				if IsValid(self) and (self:GetWelding()) then
 					self.Snd1:Play()
@@ -592,7 +592,7 @@ function SWEP:Think()
 		elseif not(self:GetWelding()) and self.WasWelding then
 			self.Snd1:Stop()
 			self.Snd2:Stop()
-			sound.Play("snd_jack_plasmapop.wav", self.Owner:GetPos(), 75, math.random(95, 110), 1)
+			sound.Play("snd_jack_plasmapop.ogg", self.Owner:GetPos(), 75, math.random(95, 110), 1)
 			self.WasWelding = false
 		end
 	end
@@ -634,7 +634,7 @@ function SWEP:WeldEffect(Tr)
 	if not(self.NextBurnSoundEmitTime)then self.NextBurnSoundEmitTime=CurTime() end
 	if(self.NextBurnSoundEmitTime < CurTime())then
 		self.NextBurnSoundEmitTime = CurTime()+math.random(.5, 1)--.075
-		--sound.Play("snd_jack_heavylaserburn.wav", Tr.HitPos, 65, math.random(90, 110))
+		--sound.Play("snd_jack_heavylaserburn.ogg", Tr.HitPos, 65, math.random(90, 110))
 		self.Snd1:ChangePitch(math.random(90, 110))
 		self.Snd2:ChangePitch(math.random(90, 110))
 	end

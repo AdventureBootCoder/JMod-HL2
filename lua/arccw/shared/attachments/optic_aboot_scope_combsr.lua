@@ -163,8 +163,8 @@ att.AdditionalSights = {
 		Magnification = 1, -- this is how much your eyes zoom into the scope, not scope magnification
 		ScrollFunc = ArcCW.SCROLL_NONE,
 		IgnoreExtra = true,
-		SwitchToSound = "snds_jack_gmod/ez_weapons/handling/aim1.wav",
-		SwitchFromSound = "snds_jack_gmod/ez_weapons/handling/aim_out.wav",
+		SwitchToSound = "snds_jack_gmod/ez_weapons/handling/aim1.ogg",
+		SwitchFromSound = "snds_jack_gmod/ez_weapons/handling/aim_out.ogg",
 		SpecialScopeFunction = XrayScopeFunction--TrackingScopeFunction
 	}
 }
@@ -182,8 +182,8 @@ att.ToggleStats = {
 				Magnification = 1, -- this is how much your eyes zoom into the scope, not scope magnification
 				ScrollFunc = ArcCW.SCROLL_NONE,
 				IgnoreExtra = true,
-				SwitchToSound = "snds_jack_gmod/ez_weapons/handling/aim1.wav",
-				SwitchFromSound = "snds_jack_gmod/ez_weapons/handling/aim_out.wav",
+				SwitchToSound = "snds_jack_gmod/ez_weapons/handling/aim1.ogg",
+				SwitchFromSound = "snds_jack_gmod/ez_weapons/handling/aim_out.ogg",
 				SpecialScopeFunction = XrayScopeFunction
 			}
 		}
@@ -199,8 +199,8 @@ att.ToggleStats = {
 				Magnification = 1, -- this is how much your eyes zoom into the scope, not scope magnification
 				ScrollFunc = ArcCW.SCROLL_NONE,
 				IgnoreExtra = true,
-				SwitchToSound = "snds_jack_gmod/ez_weapons/handling/aim1.wav",
-				SwitchFromSound = "snds_jack_gmod/ez_weapons/handling/aim_out.wav",
+				SwitchToSound = "snds_jack_gmod/ez_weapons/handling/aim1.ogg",
+				SwitchFromSound = "snds_jack_gmod/ez_weapons/handling/aim_out.ogg",
 				SpecialScopeFunction = TextFunc
 			}
 		}

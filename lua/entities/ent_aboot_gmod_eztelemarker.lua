@@ -66,7 +66,7 @@ if SERVER then
 
 				timer.Simple(1.5, function()
 					if not(IsValid(self)) then return end
-					self:EmitSound("snd_jack_wormhole.wav", 105, 100, 1)
+					self:EmitSound("snd_jack_wormhole.ogg", 105, 100, 1)
 					local PortalOpen = EffectData()
 					PortalOpen:SetOrigin(self:GetPos() + Vector(0, 0, 40))
 					PortalOpen:SetScale(self.TeleRange)

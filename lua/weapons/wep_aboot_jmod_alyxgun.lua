@@ -204,26 +204,26 @@ sound.Add({
 	channel = CHAN_STATIC,
 	volume = 1,
 	level = 60,
-	sound = "snds_jack_gmod/ez_weapons/pistol/out.wav"--"weapon/pistol/handling/pistol_mag_out_01.wav"
+	sound = "snds_jack_gmod/ez_weapons/pistol/out.ogg"--"weapon/pistol/handling/pistol_mag_out_01.wav"
 })
 sound.Add({
 	name = "Weapon_Alyxgun.Mag_Futz",
 	channel = CHAN_STATIC,
 	volume = 1,
 	level = 60,
-	sound = "snds_jack_gmod/ez_weapons/pistol/tap.wav"--"weapon/pistol/handling/pistol_mag_futz_01.wav"
+	sound = "snds_jack_gmod/ez_weapons/pistol/tap.ogg"--"weapon/pistol/handling/pistol_mag_futz_01.wav"
 })
 sound.Add({
 	name = "Weapon_Alyxgun.Mag_In",
 	channel = CHAN_STATIC,
 	volume = 1,
 	level = 60,
-	sound = "snds_jack_gmod/ez_weapons/pistol/in.wav"--"weapon/pistol/handling/pistol_mag_in_01.wav"
+	sound = "snds_jack_gmod/ez_weapons/pistol/in.ogg"--"weapon/pistol/handling/pistol_mag_in_01.wav"
 })
 sound.Add({
 	name = "Weapon_Alyxgun.Slide_Release",
 	channel = CHAN_STATIC,
 	volume = 1,
 	level = 60,
-	sound = "snds_jack_gmod/ez_weapons/pistol/release.wav"--"weapon/pistol/handling/pistol_slide_release_01.wav"
+	sound = "snds_jack_gmod/ez_weapons/pistol/release.ogg"--"weapon/pistol/handling/pistol_slide_release_01.wav"
 })

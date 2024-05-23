@@ -230,7 +230,7 @@ if(SERVER)then
 		--[[if (item:GetClass() == "item_healthkit") and (ply:Health() < ply:GetMaxHealth()) then
 			ply.EZhealth = (ply.EZhealth or 0) + 15
 			ply:PrintMessage(HUD_PRINTCENTER, "treatment " .. ply.EZhealth + ply:Health() .. "/" .. ply:GetMaxHealth())
-			sound.Play("snds_jack_gmod/ez_medical/" .. math.random(1, 27) .. ".wav", ply:GetShootPos(), 60, math.random(90, 110))
+			sound.Play("snds_jack_gmod/ez_medical/" .. math.random(1, 27) .. ".ogg", ply:GetShootPos(), 60, math.random(90, 110))
 			item:Remove()
 
 			return false
