@@ -160,8 +160,6 @@ if(SERVER)then
 				if Tr.Hit and IsValid(Tr.Entity:GetPhysicsObject()) and not Tr.Entity:IsNPC() and not Tr.Entity:IsPlayer() then
 					self.NextStick = Time + .5
 					local Ang = Tr.HitNormal:Angle()
-					Ang:RotateAroundAxis(Ang:Right(), 0)
-					Ang:RotateAroundAxis(Ang:Up(), 0)
 					self:SetAngles(Ang)
 					self:SetPos(Tr.HitPos + Tr.HitNormal * 5)
 
@@ -367,15 +365,58 @@ elseif(CLIENT)then
 	function ENT:CustomInit()
 		self.LightMdl = JMod.MakeModel(self, "models/MaxOfS2D/light_tubular.mdl")
 		self.MaxElectricity = 100
+		--self:CreateLightProjection()
+		--self.PixVis = util.GetPixelVisibleHandle()
+	end
+
+	--[[function ENT:CreateLightProjection()
+		local ProjectyLight = ProjectedTexture()
+		self.ProjectyLight = ProjectyLight
+
+		ProjectyLight:SetTexture("effects/flashlight001")
+		ProjectyLight:SetFarZ(1024)
+
+		ProjectyLight:SetPos(self:GetPos() - Vector(0, 0, 64))
+		ProjectyLight:SetAngles(self:GetAngles())
+		--ProjectyLight:SetNearZ(1)
+		--ProjectyLight:SetFOV(90)
+		ProjectyLight:Update()
+	end
+
+	function ENT:UpdateLightProjection()
+		if IsValid(self.ProjectyLight) then
+			self.ProjectyLight:SetPos(self:GetPos() + self:GetForward() * 8)
+			self.ProjectyLight:SetAngles(self:GetAngles())
+			self.ProjectyLight:Update()
+		else
+			self:CreateLightProjection()
+		end
+	end
+
+	function ENT:OnRemove()
+		if (IsValid(self.ProjectyLight)) then
+			self.ProjectyLight:Remove()
+		end
 	end
 
 	function ENT:Think()
 		local State, FT = self:GetState(), FrameTime()
 		if State == STATE_ON then
+			self:UpdateLightProjection()
+		else
+			if (IsValid(self.ProjectyLight)) then
+				self.ProjectyLight:Remove()
+			end
 		end
-	end
+	end--]]
 
 	local GlowSprite = Material("sprites/mat_jack_basicglow")
+	--local MatLight = Material( "sprites/light_ignorez" )
+	--local MatBeam = Material( "effects/lamp_beam" )
+	local SpriteCol1, SpriteCol2 = Color(255, 0, 0), Color(255, 255, 255, 150)
+
+	--ENT.WantsTranslucency = true
+	--function ENT:DrawTranslucent()
 
 	function ENT:Draw()
 		local Up, Right, Forward, State = self:GetUp(), self:GetRight(), self:GetForward(), self:GetState()
@@ -411,9 +452,50 @@ elseif(CLIENT)then
 			render.SetMaterial(GlowSprite)
 			local SpritePos = SelfPos + Forward * -2 + Up * 10
 			local Vec = (SpritePos - EyePos()):GetNormalized()
-			render.DrawSprite(SpritePos - Vec * 5, 20, 20, Color(255, 0, 0))
-			render.DrawSprite(SpritePos - Vec * 5, 10, 10, Color(255, 255, 255, 150))
+			render.DrawSprite(SpritePos - Vec * 5, 20, 20, SpriteCol1)
+			render.DrawSprite(SpritePos - Vec * 5, 10, 10, SpriteCol2)
+
+			--[[local SelfCol = self:GetColor()
+			local LightNrm = self:GetForward()
+			local LightPos = self:GetPos() + LightNrm * 8
+			local ViewNormal = self:GetPos() - EyePos()
+			local Dist = ViewNormal:Length()
+			ViewNormal:Normalize()
+			local ViewDot = ViewNormal:Dot( LightNrm * -1 )
+
+			-- Glow
+			if ( ViewDot >= 0.5 ) then
+
+				render.SetMaterial( MatLight )
+				local Visibile = util.PixelVisible( LightPos, 8, self.PixVis )
+
+				if ( !Visibile ) then return end
+
+				local Size = math.Clamp( Dist * Visibile * ViewDot * 1, 64, 512 )
+
+				Dist = math.Clamp( Dist, 32, 800 )
+				local Alpha = math.Clamp( ( 1000 - Dist ) * Visibile * ViewDot, 0, 100 )
+				local Col = SelfCol
+				Col.a = Alpha
+
+				render.DrawSprite( LightPos, Size, Size, Col )
+				render.DrawSprite( LightPos, Size * 0.4, Size * 0.4, Color( 255, 255, 255, Alpha ) )
+			end
+
+			-- Volumetrics
+			if ( ViewDot < 0.75 ) and ( ViewDot > -0.9 ) then
+				render.SetMaterial( MatBeam )
+		
+				local BeamDot = .25
+				local c = SelfCol
+		
+				render.StartBeam( 3 )
+					render.AddBeam( LightPos - LightNrm * 1, 90, 0.0, Color( c.r, c.g, c.b, 255 * BeamDot) )
+					render.AddBeam( LightPos + LightNrm * 100, 90, 0.5, Color( c.r, c.g, c.b, 64 * BeamDot) )
+					render.AddBeam( LightPos + LightNrm * 200, 128, 1, Color( c.r, c.g, c.b, 0) )
+				render.EndBeam()
+			end--]]
 		end
 	end
-	language.Add("ent_aboot_gmod_ezpounder","EZ Ground-Pounder")
+	language.Add("ent_aboot_gmod_ezpounder","EZ Capacitor")
 end
