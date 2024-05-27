@@ -1,5 +1,10 @@
 JModHL2 = JModHL2 or {}
 
+--[[if not JMod then
+	ErrorNoHalt("JMod is not installed!\n")
+	return
+end--]]
+
 -- we have to load locales before any other files
 -- because files that add concommands have help text
 -- and we want the help text to be localized
