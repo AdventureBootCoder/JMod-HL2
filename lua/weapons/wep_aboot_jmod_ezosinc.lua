@@ -111,6 +111,7 @@ function SWEP:ViewModelDrawn()
 	render.SetMaterial(GlowSprite)
 	local FlamePos, FlameAng = self:GetNozzle()
 
+	if not (FlamePos and FlameAng) then return end
 	if (State == STATE_FLAMIN) then
 		local Dir = FlameAng:Forward()
 		local Pos = FlamePos + FlameAng:Up()--self.Owner:GetShootPos() + self.Owner:GetRight() * 18 - self.Owner:GetUp() * 18
@@ -186,6 +187,7 @@ local Backness = 0
 function SWEP:GetViewModelPosition(pos, ang)
 	local FT = FrameTime()
 
+	if not IsValid(self.Owner) then return pos, ang end
 	if (self.Owner:KeyDown(IN_SPEED)) or (self.Owner:KeyDown(IN_ZOOM)) then
 		Downness = Lerp(FT * 2, Downness, 10)
 	else
