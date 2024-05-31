@@ -195,7 +195,7 @@ if(SERVER)then
 		return true
 	end
 
-	local Shockables = {MAT_METAL, MAT_VENT, MAT_DEFAULT, MAT_GRATE, MAT_FLESH, MAT_ALIENFLESH}
+	local Shockables = {[MAT_METAL] = true, [MAT_VENT] = true, [MAT_DEFAULT] = true, [MAT_GRATE] = true, [MAT_FLESH] = true, [MAT_ALIENFLESH] = true}
 
 	local function IsConnectableEnt(ent1, ent2)
 		if (ent2:IsValid()) and (ent2:GetClass() == "prop_physics") and (table.HasValue(Shockables, ent2:GetMaterialType())) then
@@ -288,7 +288,7 @@ if(SERVER)then
 		return false
 	end
 
-	local ShockBlacklist = {"ent_aboot_gmod_ezcapacitor"}
+	local ShockList = {["ent_aboot_gmod_ezcapacitor"] = false}
 
 	function ENT:Shock(shocker, shockedData)
 		if self:GetState() == STATE_ON then
@@ -296,7 +296,9 @@ if(SERVER)then
 			if (ShockEnt ~= self) and not(self.ElectricalCallbacks[ShockEnt:EntIndex()]) and (self:GetPos():Distance(shockedData.HitPos) <= self.ShockDistance) then
 				local Connected = self:CheckForConnection(shocker)
 				if Connected then
-					if (ShockEnt:IsPlayer() or ShockEnt:IsNPC()) or (table.HasValue(Shockables, ShockEnt:GetMaterialType()) and not(table.HasValue(ShockBlacklist, ShockEnt:GetClass()))) then
+					if ShockEnt.EZconsumes and table.HasValue(ShockEnt.EZconsumes, JMod.EZ_RESOURCE_TYPES.POWER) and ShockEnt.TryLoadResource and (ShockEnt:TryLoadResource(JMod.EZ_RESOURCE_TYPES.POWER, 1) > 0) then
+						self:ConsumeElectricity(1)
+					elseif (ShockEnt:IsPlayer() or ShockEnt:IsNPC()) or (Shockables[ShockEnt:GetMaterialType()] and not(ShockList[ShockEnt:GetClass()])) then
 						--[[if ShockEnt:GetGroundEntity() != NULL then
 							print("Ground Entity: ", ShockEnt:GetGroundEntity())
 						end--]]
