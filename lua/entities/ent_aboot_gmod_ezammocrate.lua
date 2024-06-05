@@ -346,6 +346,19 @@ if SERVER then
 
 		return 0
 	end
+	
+	local RestrictedMaterials = {
+		JMod.EZ_RESOURCE_TYPES.FISSILEMATERIAL,
+		JMod.EZ_RESOURCE_TYPES.ANTIMATTER
+	}
+	function ENT:PostEntityPaste(ply)
+		local Type = self:GetResourceType()
+		if not(JMod.IsAdmin(ply)) and table.HasValue(RestrictedMaterials, Type) then
+			self:SetEZsupplies(Type, 0, self)
+		end
+		self.NextLoad = 0
+	end
+
 elseif CLIENT then
 	function ENT:Initialize()
 		self:DrawShadow(true)
