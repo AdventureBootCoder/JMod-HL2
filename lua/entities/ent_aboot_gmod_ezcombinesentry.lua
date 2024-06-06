@@ -280,11 +280,17 @@ function ENT:CustomSetupDataTables()
 end
 
 function ENT:SetWater(amt)
-	self:SetAmmo(math.Clamp(amt, 0, self.MaxWater))
+	if self:GetAmmoType() == "Super Soaker" then
+		self:SetAmmo(math.Clamp(amt, 0, self.MaxWater))
+	end
 end
 
 function ENT:GetWater()
-	return self:GetAmmo()
+	if self:GetAmmoType() == "Super Soaker" then
+		return self:GetAmmo()
+	else
+		return 0
+	end
 end
 
 if(SERVER)then
