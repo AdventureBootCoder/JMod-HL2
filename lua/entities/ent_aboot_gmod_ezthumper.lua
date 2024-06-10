@@ -83,6 +83,7 @@ if(SERVER)then
 				if self:GetState() > STATE_OFF then
 					self:TurnOff(self.EZowner)
 				end
+				self.EZstayOn = nil
 				JMod.Hint(self.EZowner, "machine mounting problem")
 			end
 		end
