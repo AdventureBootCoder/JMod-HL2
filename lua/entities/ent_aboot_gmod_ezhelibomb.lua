@@ -11,6 +11,7 @@ ENT.AdminSpawnable = true
 ENT.JModPreferredCarryAngles = Angle(0, 0, 0)
 ENT.EZguidable = false
 ENT.EZbombBaySize = 12
+ENT.EZbuoyancy = .5
 ENT.DetOnImpactEnts = {"npc_helicopter", "npc_gunship", "phys_bone_follower"}
 ---
 local STATE_BROKEN, STATE_OFF, STATE_ARMED, STATE_COOKING = -1, 0, 1, 2
