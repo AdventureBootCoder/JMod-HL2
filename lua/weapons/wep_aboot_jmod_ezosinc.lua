@@ -291,7 +291,7 @@ function SWEP:PrimaryAttack()
 			if ((State == STATE_NOTHIN) or (State == STATE_IGNITIN)) and not(self.Owner:IsPlayer() and self.Owner:IsSprinting()) then
 				self:SetState(STATE_FLAMIN)
 				if self.SoundLoop then self.SoundLoop:Stop() end
-				self.SoundLoop = CreateSound(self, "snds_jack_gmod/flamethrower_loop.ogg")
+				self.SoundLoop = CreateSound(self, "snds_jack_gmod/flamethrower_loop.wav")
 				self.SoundLoop:SetSoundLevel(75)
 				self.SoundLoop:Play()
 			elseif (State == STATE_FLAMIN) then
@@ -351,7 +351,7 @@ function SWEP:SecondaryAttack()
 		if (State == STATE_NOTHIN) then
 			self:SetState(STATE_IGNITIN)
 			if self.SoundLoop then self.SoundLoop:Stop() end
-			self.SoundLoop = CreateSound(self, "snds_jack_gmod/flareburn.ogg")
+			self.SoundLoop = CreateSound(self, "snds_jack_gmod/flareburn.wav")
 			self.SoundLoop:SetSoundLevel(75)
 			self.SoundLoop:Play()
 		elseif (State == STATE_IGNITIN) then
@@ -528,7 +528,7 @@ function SWEP:Think()
 			if self.Owner:IsPlayer() and self.Owner:KeyDown(IN_ATTACK2) then
 				self:SetState(STATE_IGNITIN)
 				if self.SoundLoop then self.SoundLoop:Stop() end
-				self.SoundLoop = CreateSound(self, "snds_jack_gmod/flareburn.ogg")
+				self.SoundLoop = CreateSound(self, "snds_jack_gmod/flareburn.wav")
 				self.SoundLoop:SetSoundLevel(75)
 				self.SoundLoop:Play()
 			else

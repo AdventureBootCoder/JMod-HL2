@@ -113,8 +113,8 @@ function SWEP:Initialize()
 	self:SetHoldType("slam")
 	self:SCKInitialize()
 	self.NextIdle = 0
-	self.Snd1 = CreateSound(self, "snds_jack_gmod/plasmaloop1.ogg")
-	self.Snd2 = CreateSound(self, "snds_jack_gmod/plasmaloop_reversed1.ogg")
+	self.Snd1 = CreateSound(self, "snds_jack_gmod/plasmaloop1.wav")
+	self.Snd2 = CreateSound(self, "snds_jack_gmod/plasmaloop_reversed.wav")
 	self:Deploy()
 
 	self:SetGas(0)
