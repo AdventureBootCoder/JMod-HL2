@@ -1,6 +1,7 @@
-﻿-- AdventureBoots 2021
+﻿-- AdventureBoots 2024
 AddCSLuaFile()
-ENT.Type = "anim"
+DEFINE_BASECLASS("ent_jack_gmod_ezbomb")
+ENT.Base = "ent_jack_gmod_ezbomb"
 ENT.Author = "AdventureBoots"
 ENT.Category = "JMod - EZ HL:2"
 ENT.Information = "glhfggwpezpznore"
@@ -14,65 +15,22 @@ ENT.EZbombBaySize = 12
 ENT.EZbuoyancy = .5
 ENT.DetOnImpactEnts = {"npc_helicopter", "npc_gunship", "phys_bone_follower"}
 ---
-local STATE_BROKEN, STATE_OFF, STATE_ARMED, STATE_COOKING = -1, 0, 1, 2
+ENT.EZguidable = false
+ENT.Model = "models/combine_helicopter/helicopter_bomb01.mdl"
+ENT.Mass = 100
+ENT.DetSpeed = 1000
+ENT.DetType = "impactdet"
+ENT.Durability = 150
+ENT.SpawnHeight = 10
 
-function ENT:SetupDataTables()
-	self:NetworkVar("Int", 0, "State")
-	self:NetworkVar("Bool", 0, "Guided")
-end
+local STATE_BROKEN, STATE_OFF, STATE_ARMED, STATE_COOKING = -1, 0, 1, 2
 
 ---
 if SERVER then
-	function ENT:SpawnFunction(ply, tr)
-		local SpawnPos = tr.HitPos + tr.HitNormal * 10
-		local ent = ents.Create(self.ClassName)
-		ent:SetAngles(Angle(180, 0, 0))
-		ent:SetPos(SpawnPos)
-		JMod.SetEZowner(ent, ply)
-		ent:Spawn()
-		ent:Activate()
-		--local effectdata=EffectData()
-		--effectdata:SetEntity(ent)
-		--util.Effect("propspawn",effectdata)
-
-		return ent
-	end
-
 	function ENT:Initialize()
-		self:SetModel("models/combine_helicopter/helicopter_bomb01.mdl")
-		self:PhysicsInit(SOLID_VPHYSICS)
-		self:SetMoveType(MOVETYPE_VPHYSICS)
-		self:SetSolid(SOLID_VPHYSICS)
-		self:DrawShadow(true)
-		self:SetUseType(SIMPLE_USE)
+		BaseClass.Initialize(self)
 		self:SetSkin(1)
-		
-		---
-		local PhysObj = self:GetPhysicsObject()
-		timer.Simple(.01, function()
-			--self:GetPhysicsObject():SetMass(150)
-			PhysObj:Wake()
-			PhysObj:EnableDrag(false)
-			PhysObj:SetBuoyancyRatio(1)
-		end)
-
-		---
-		self:SetState(STATE_OFF)
-		self.LastUse = 0
-		self.CookingTimer = 0
-
-		if istable(WireLib) then
-			self.Inputs = WireLib.CreateInputs(self, {"Detonate", "Arm"}, {"Directly detonates the bomb", "Arms bomb when > 0"})
-			self.Outputs = WireLib.CreateOutputs(self, {"State"}, {"-1 broken \n 0 off \n 1 armed"})
-		end
-	end
-
-	function ENT:TriggerInput(iname, value)
-		if iname == "Detonate" and value > 0 then
-			self:Detonate()
-		elseif iname == "Arm" and value > 0 then
-			self:SetState(STATE_ARMED)
-		end
+		self.CookingTicks = 0
 	end
 
 	function ENT:PhysicsCollide(data, physobj)
@@ -105,32 +63,6 @@ if SERVER then
 			if data.Speed > 2000 then
 				self:Break()
 			end
-		end
-	end
-
-	function ENT:Break()
-		if self:GetState() == STATE_BROKEN then return end
-		self:SetState(STATE_BROKEN)
-		self:EmitSound("snd_jack_turretbreak.ogg", 70, math.random(80, 120))
-
-		for i = 1, 20 do
-			JMod.DamageSpark(self)
-		end
-
-		SafeRemoveEntityDelayed(self, 10)
-	end
-
-	function ENT:OnTakeDamage(dmginfo)
-		if IsValid(self.DropOwner) then
-			local Att = dmginfo:GetAttacker()
-			if IsValid(Att) and (self.DropOwner == Att) then return end
-		end
-
-		self:TakePhysicsDamage(dmginfo)
-
-		if JMod.LinCh(dmginfo:GetDamage(), 70, 150) then
-			JMod.SetEZowner(self, dmginfo:GetAttacker())
-			self:Detonate()
 		end
 	end
 
@@ -265,19 +197,15 @@ if SERVER then
 		self:Detonate()
 	end
 
-	function ENT:Think()
+	function ENT:AeroDragThink()
 		local State = self:GetState()
-		if istable(WireLib) then
-			WireLib.TriggerOutput(self, "State", State)
-		end
-
-		local Phys, UseAeroDrag = self:GetPhysicsObject(), true
+		local Phys = self:GetPhysicsObject()
 		--JMod.AeroDrag(self, -self:GetRight(), 6)
 		if State == STATE_COOKING then
-			self.CookingTimer = self.CookingTimer + .1
+			self.CookingTicks = self.CookingTicks + .1
 			self:SetSkin((self:GetSkin() == 1 and 0) or (self:GetSkin() == 0 and 1))
-			--jprint(self.CookingTimer)
-			if self.CookingTimer >= 6 then
+			--jprint(self.CookingTicks)
+			if self.CookingTicks >= 6 then
 				self:Detonate()
 			end
 		end
@@ -286,24 +214,17 @@ if SERVER then
 		return true
 	end
 elseif CLIENT then
-	--[[function ENT:Initialize()
-		self.Mdl = ClientsideModel("models/jailure/wwii/wwii.mdl")
-		self.Mdl:SetSubMaterial(0, "models/jmod/explosives/bombs/he_bomb")
-		self.Mdl:SetModelScale(.8, 0)
-		self.Mdl:SetPos(self:GetPos())
-		self.Mdl:SetParent(self)
-		self.Mdl:SetNoDraw(true)
-		--self.Guided=false
+	function ENT:Initialize()
+		--
+	end
+
+	function ENT:Think()
+		--
 	end
 
 	function ENT:Draw()
-		local Pos, Ang = self:GetPos(), self:GetAngles()
-		Ang:RotateAroundAxis(Ang:Up(), -90)
-		--self:DrawModel()
-		self.Mdl:SetRenderOrigin(Pos + Ang:Right() * 6 + Ang:Forward() * 15)
-		self.Mdl:SetRenderAngles(Ang)
-		self.Mdl:DrawModel()
-	end]]--
+		self:DrawModel()
+	end
 
 	language.Add("ent_jack_gmod_ezhelibomb", "EZ Helicopter Bomb")
 end
