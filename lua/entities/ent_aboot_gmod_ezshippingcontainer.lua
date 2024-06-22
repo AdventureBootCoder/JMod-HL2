@@ -41,6 +41,7 @@ function ENT:SetEZsupplies(typ, amt, setter)
 			net.WriteString(typ)
 			net.WriteInt(amt, 32)
 		net.Broadcast()
+		self:CalcWeight()
 	end
 end
 ---
