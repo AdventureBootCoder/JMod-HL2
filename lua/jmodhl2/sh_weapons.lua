@@ -57,18 +57,6 @@ JModHL2.WeaponTable = {
 		ent = "ent_aboot_jmod_ezweapon_mp5k",
 		Category = "JMod - EZ HL:2"
 	},
-	["Crowbar"] = {
-		mdl = "models/weapons/w_crowbar.mdl",
-		swep = "wep_aboot_jmod_crowbar",
-		ent = "ent_aboot_jmod_ezweapon_crowbar",
-		Category = "JMod - EZ HL:2"
-	},
-	["Stun Baton"] = {
-		mdl = "models/weapons/w_stunbaton.mdl",
-		swep = "wep_aboot_jmod_baton",
-		ent = "ent_aboot_jmod_ezweapon_baton",
-		Category = "JMod - EZ HL:2"
-	},
 	["OICW"] = {
 		mdl = "models/weapons/aboot/oicw/w_oicw.mdl",
 		swep = "wep_aboot_jmod_oicw",
@@ -109,6 +97,18 @@ JModHL2.WeaponTable = {
 		mdl = "models/weapons/alyxgun/alyxgun.mdl",
 		swep = "wep_aboot_jmod_alyxgun",
 		ent = "ent_aboot_jmod_ezweapon_alyxgun",
+		Category = "JMod - EZ HL:2"
+	},--]]
+	--[[["Crowbar"] = {
+		mdl = "models/weapons/w_crowbar.mdl",
+		swep = "wep_aboot_jmod_crowbar",
+		ent = "ent_aboot_jmod_ezweapon_crowbar",
+		Category = "JMod - EZ HL:2"
+	},
+	["Stun Baton"] = {
+		mdl = "models/weapons/w_stunbaton.mdl",
+		swep = "wep_aboot_jmod_baton",
+		ent = "ent_aboot_jmod_ezweapon_baton",
 		Category = "JMod - EZ HL:2"
 	}--]]
 }
