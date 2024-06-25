@@ -50,7 +50,7 @@ if SERVER then
 
 	function ENT:CustomThink(State, Time)
 		if self.Exploded then
-			self:EmitSound("snd_jack_sss.ogg", 55, 80)
+			self:EmitSound("snd_jack_sss.wav", 55, 80)
 			self.FuelLeft = self.FuelLeft - .5
 
 			if self.FuelLeft <= 0 then
