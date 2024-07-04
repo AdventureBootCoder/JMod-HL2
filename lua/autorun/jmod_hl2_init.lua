@@ -175,7 +175,7 @@ if(SERVER)then
 		end
 	end)
 
-	hook.Remove("PlayerAmmoChanged", "JMod_HL2_EZammoSwap")
+	--hook.Remove("PlayerAmmoChanged", "JMod_HL2_EZammoSwap")
 	--[[local HLtoEZammoTypes = {
 		["357"] = "Magnum Pistol Round",
 		["AR2"] = "Light Pulse Ammo",
@@ -257,6 +257,13 @@ if(SERVER)then
 			ply:PrintMessage(HUD_PRINTCENTER, "Linking to: " .. tostring(ply:GetNW2Entity("EZmachineTracking", nil)))
 		elseif ent == ply:GetNW2Entity("EZmachineTracking", ent) and (ent:GetState() == 0) then
 			ply:SetNW2Entity("EZmachineTracking", nil)
+		end
+	end)
+
+	-- Weird fix
+	hook.Add("PostGamemodeLoaded", "HL2ContainerRestore", function()
+		for k, v in ents.Iterator() do
+			if v.Contents then v.Contents = v.Contents end
 		end
 	end)
 
