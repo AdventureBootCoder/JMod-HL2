@@ -161,8 +161,8 @@ SWEP.Attachments = {
 		Offset = {
 			vang = Angle(90, 1, -90),
 			vpos = Vector(0, -5.4, 4),
-			wpos = Vector(1.5, 1.5, -5.7),
-			wang = Angle(-10, 0, 0)
+			wpos = Vector(6, 0.5, -6),
+			wang = Angle(-10, 0, -180)
 		},
 		--CorrectiveAng = Angle(0, 0, 0),
 		--CorrectivePos = Vector(0, 0, 0.03),
@@ -173,6 +173,7 @@ SWEP.Attachments = {
 		Slot = "perk"
 	},
 }
+PrintTable(SWEP.Attachments)
 
 SWEP.Animations = {
     ["idle"] = {
