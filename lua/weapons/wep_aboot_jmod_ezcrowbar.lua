@@ -56,14 +56,15 @@ SWEP.WElements = {
 SWEP.DropEnt = "ent_aboot_gmod_ezcrowbar"
 --
 SWEP.HitDistance		= 50
-SWEP.HitInclination		= 20
+SWEP.HitInclination		= 10
 SWEP.HitHeight 			= 0
-SWEP.HitAngle 			= 20
+SWEP.HitAngle 			= 30
 SWEP.HitPushback		= 100
 SWEP.MaxSwingAngle		= 120
 SWEP.SwingSpeed 		= 2
 SWEP.SwingPullback 		= 20
-SWEP.PrimaryAttackSpeed = 0.5
+SWEP.SwingOffset 		= Vector(10, 10, -3)
+SWEP.PrimaryAttackSpeed = 0.4
 SWEP.SecondaryAttackSpeed 	= 0
 SWEP.DoorBreachPower 	= .5
 --
