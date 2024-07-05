@@ -27,7 +27,7 @@ local STATE_BROKEN, STATE_OFF, STATE_RUNNING = -1, 0, 1
 ---
 function ENT:CustomSetupDataTables()
 	self:NetworkVar("Float", 1, "Progress")
-	self:NetworkVar("String", 0, "Message")
+	--self:NetworkVar("String", 0, "Message")
 end
 
 if(SERVER)then
@@ -84,6 +84,19 @@ if(SERVER)then
 			self:TurnOff(activator)
 		end
 	end
+
+	function ENT:OnBreak()
+		if self.SoundLoop then
+			self.SoundLoop:Stop()
+		end
+		self:SetBodygroup(1, 1)
+		self:SetBodygroup(2, 1)
+	end
+
+	function ENT:OnRepair()
+		self:SetBodygroup(1, 0)
+		self:SetBodygroup(2, 0)
+	end
 	
 	function ENT:OnRemove()
 		if(self.SoundLoop)then self.SoundLoop:Stop() end
@@ -107,7 +120,6 @@ if(SERVER)then
 
 				return
 			elseif State == STATE_RUNNING then
-
 				local PoundDir = Up * -35
 				local CutDir = Up
 				local CutStrength = 100
@@ -149,10 +161,12 @@ if(SERVER)then
 					self:HitEffect(HitPos, 1)
 
 					local Message = JMod.EZprogressTask(Ent, HitPos, self, "salvage", 0.01)
-					if not(Message) then
+					if Message then
+						Message = JMod.EZprogressTask(Ent, HitPos, self, "loosen", 0.01)
+					else
 						sound.Play("snds_jack_gmod/ez_dismantling/1.ogg", HitPos, 65, 110)--math.random(90, 110))
 					end
-					self:SetMessage("")
+					--self:SetMessage("")
 					self:ConsumeElectricity(0.05  * JMod.Config.ResourceEconomy.ExtractionSpeed)
 				end
 				self:ConsumeElectricity(0.05  * JMod.Config.ResourceEconomy.ExtractionSpeed)
