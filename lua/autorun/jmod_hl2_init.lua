@@ -260,16 +260,9 @@ if(SERVER)then
 		end
 	end)
 
-	-- Weird fix
-	hook.Add("PostGamemodeLoaded", "HL2ContainerRestore", function()
-		for k, v in ents.Iterator() do
-			if v.Contents then v.Contents = v.Contents end
-		end
-	end)
-
 	concommand.Add("aboot_debug", function(ply, cmd, args) 
 		if not GetConVar("sv_cheats"):GetBool() then return end
-		ply:EmitSound("Weapon_PhysCannon.Launch", CHAN_WEAPON)
+		--[[ply:EmitSound("Weapon_PhysCannon.Launch", CHAN_WEAPON)
 		local cballspawner = ents.Create("point_combine_ball_launcher")
 		cballspawner:SetAngles(ply:GetAngles())
 		cballspawner:SetPos(ply:GetShootPos() + ply:GetAimVector() * 14)
@@ -282,7 +275,18 @@ if(SERVER)then
 		cballspawner:Spawn()
 		cballspawner:Activate()
 		cballspawner:Fire("LaunchBall")
-		cballspawner:Fire("kill","",1)
+		cballspawner:Fire("kill","",1)--]]
+		local FunkyWater = ents.Create("func_water_analog")
+		FunkyWater:SetPos(ply:GetPos())
+		FunkyWater:SetAngles(ply:GetAngles())
+		FunkyWater:SetCollisionBounds(Vector(-100, -100, -100), Vector(100, 100, 100))	
+		FunkyWater:SetKeyValue("movedistance", "100")
+		FunkyWater:SetKeyValue("speed", "10")
+		FunkyWater:SetKeyValue("startposition", "1")
+		FunkyWater:SetMaterial("nature/water_movingplane")
+		FunkyWater:Spawn()
+		FunkyWater:Fire("Open", "", 0)
+		FunkyWater:Fire("EnableDraw", "", 0)
 	end, nil, "Debug testing command")
 
 elseif CLIENT then

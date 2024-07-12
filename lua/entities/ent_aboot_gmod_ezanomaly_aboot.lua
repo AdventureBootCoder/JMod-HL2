@@ -97,7 +97,7 @@ if SERVER then
 			local Closest, SelfPos = 9e9, self:GetPos()
 
 			local Resources = {}
-			for _, v in ipairs(ents.GetAll()) do
+			for _, v in ents.Iterator() do
 
 				if v.IsJackyEZresource and not(v:IsPlayerHolding()) and (v:GetPos():Distance(self.CachePos) > 200) then
 					table.insert(Resources, v)
@@ -258,10 +258,8 @@ if SERVER then
 	end
 
 	function ENT:FindPatsy(victim)
-		local Playas = player.GetAll()
-
-		if #Playas > 1 then
-			for k, v in pairs(Playas) do
+		if player.GetCount() > 1 then
+			for k, v in player.Iterator() do
 				if v ~= victim then return v end
 			end
 		end
