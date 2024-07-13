@@ -56,20 +56,21 @@ SWEP.WElements = {
 SWEP.DropEnt = "ent_aboot_gmod_ezcrowbar"
 --
 SWEP.HitDistance		= 50
-SWEP.HitInclination		= 10
-SWEP.HitHeight 			= 0
-SWEP.HitAngle 			= 30
+SWEP.HitInclination		= 0
+SWEP.HitHeight 			= -15
+SWEP.HitAngle 			= 45
 SWEP.HitPushback		= 100
-SWEP.MaxSwingAngle		= 120
+SWEP.MaxSwingAngle		= 100
 SWEP.SwingSpeed 		= 2
-SWEP.SwingPullback 		= 20
-SWEP.SwingOffset 		= Vector(10, 10, -3)
+SWEP.SwingPullback 		= 5
+SWEP.SwingOffset 		= Vector(5, 10, -3)
 SWEP.PrimaryAttackSpeed = 0.4
-SWEP.SecondaryAttackSpeed 	= 0
+SWEP.SecondaryAttackSpeed 	= 0.8
 SWEP.DoorBreachPower 	= .5
 --
 SWEP.SprintCancel 	= false
 SWEP.StrongSwing 	= true
+SWEP.SecondaryPush	= false
 --
 SWEP.SwingSound 	= Sound( "Weapon_Crowbar.Single" )
 SWEP.HitSoundWorld 	= Sound( "SolidMetal.ImpactHard" )
@@ -79,6 +80,7 @@ SWEP.PushSoundBody 	= Sound( "Flesh.ImpactSoft" )
 SWEP.IdleHoldType 	= "melee"
 SWEP.SprintHoldType = "melee"
 SWEP.ShowWorldModel = true
+SWEP.SwingVisualLowerAmount = 2
 --
 
 function SWEP:CustomInit()
@@ -96,7 +98,7 @@ function SWEP:CustomThink()
 	local Time = CurTime()
 	if self.NextTaskTime < Time then
 		self:SetTaskProgress(0)
-		self.NextTaskTime = Time + 1.5
+		self.NextTaskTime = Time + self.SecondaryAttackSpeed + 1
 	end
 end
 
@@ -108,47 +110,54 @@ local FleshTypes = {
 	MAT_ALIENFLESH
 }
 
-function SWEP:OnHit(swingProgress, tr)
+function SWEP:OnHit(swingProgress, tr, secondary)
 	local Owner = self:GetOwner()
-	--local SwingCos = math.cos(math.rad(swingProgress))
-	--local SwingSin = math.sin(math.rad(swingProgress))
 	local SwingAng = Owner:EyeAngles()
 	local SwingPos = Owner:GetShootPos()
 	local StrikeVector = tr.HitNormal
 	local StrikePos = (SwingPos - (SwingAng:Up() * 15))
 
-	local AxeDam = DamageInfo()
-	AxeDam:SetAttacker(Owner)
-	AxeDam:SetInflictor(self)
-	AxeDam:SetDamagePosition(tr.HitPos)
-	AxeDam:SetDamageType(DMG_SLASH)
-	AxeDam:SetDamage(math.random(10, 25))
-	AxeDam:SetDamageForce(StrikeVector:GetNormalized() * 2000)
+	local CrowDam = DamageInfo()
+	CrowDam:SetAttacker(Owner)
+	CrowDam:SetInflictor(self)
+	CrowDam:SetDamagePosition(tr.HitPos)
+	CrowDam:SetDamageType(DMG_SLASH)
+	CrowDam:SetDamage(math.random(10, 25) * JMod.GetPlayerStrength(Owner) * JMod.Config.Weapons.DamageMult)
+	CrowDam:SetDamageForce(StrikeVector:GetNormalized() * 2000 * JMod.GetPlayerStrength(Owner))
 
-	if (not(table.HasValue(FleshTypes, util.GetSurfaceData(tr.SurfaceProps).material))) then
-		local Mesg = JMod.EZprogressTask(tr.Entity, tr.HitPos, Owner, "salvage")
-		if Mesg then
-			--Owner:PrintMessage(HUD_PRINTCENTER, Mesg)
+	if secondary then
+		if IsValid(tr.Entity) then
+			local Message = JMod.EZprogressTask(tr.Entity, StrikePos, Owner, "loosen")
+
+			if Message then
+				self.Owner:PrintMessage(HUD_PRINTCENTER, Message)
+				self:TryBustDoor(Ent, self.DoorBreachPower, Pos)
+			else
+				JMod.Hint(Owner, "work spread")
+				self:SetTaskProgress(tr.Entity:GetNW2Float("EZloosenProgress", 0))
+				CrowDam:SetDamage(0)
+			end
+		elseif JMod.IsDoor(tr.Entity) then
+			self:TryBustDoor(tr.Entity, math.random(35, 50), tr.HitPos)
 			self:SetTaskProgress(0)
 		else
-			self:SetTaskProgress(tr.Entity:GetNW2Float("EZsalvageProgress", 0))
-			AxeDam:SetDamage(0)
+			CrowDam:SetDamage(CrowDam:GetDamage() * 1.2)
+			self:SetTaskProgress(0)
 		end
-	elseif JMod.IsDoor(tr.Entity) then
-		self:TryBustDoor(tr.Entity, math.random(35, 50), tr.HitPos)
-		self:SetTaskProgress(0)
-	else
-		self:SetTaskProgress(0)
 	end
 
-	tr.Entity:TakeDamageInfo(AxeDam)
+	tr.Entity:TakeDamageInfo(CrowDam)
 
 	sound.Play(util.GetSurfaceData(tr.SurfaceProps).impactHardSound, tr.HitPos, 75, 100, 1)
 	util.Decal("ManhackCut", tr.HitPos + tr.HitNormal * 10, tr.HitPos - tr.HitNormal * 10, {self, Owner})
 end
 
 function SWEP:FinishSwing(swingProgress)
-	self:SetTaskProgress(0)
+	if swingProgress >= self.MaxSwingAngle then
+		self:SetTaskProgress(0)
+	else
+		self.NextTaskTime = CurTime() + self.SecondaryAttackSpeed + 1
+	end
 end
 
 local LastProg = 0
@@ -162,7 +171,7 @@ function SWEP:DrawHUD()
 	local Prog = self:GetTaskProgress()
 
 	if Prog > 0 then
-		draw.SimpleTextOutlined("Hacking... ", "Trebuchet24", W * .5, H * .45, Color(255, 255, 255, 100), TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP, 3, Color(0, 0, 0, 50))
+		draw.SimpleTextOutlined("Loosening... ", "Trebuchet24", W * .5, H * .45, Color(255, 255, 255, 100), TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP, 3, Color(0, 0, 0, 50))
 		draw.RoundedBox(10, W * .3, H * .5, W * .4, H * .05, Color(0, 0, 0, 100))
 		draw.RoundedBox(10, W * .3 + 5, H * .5 + 5, W * .4 * LastProg / 100 - 10, H * .05 - 10, Color(255, 255, 255, 100))
 	end
