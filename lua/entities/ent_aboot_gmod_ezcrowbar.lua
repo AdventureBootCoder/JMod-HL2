@@ -46,7 +46,7 @@ if SERVER then
 		if data.DeltaTime > 0.2 then
 			if data.Speed > 100 then
 				self:EmitSound("Weapon.ImpactHard")
-				self:EmitSound("Solid_Metal.ImpactHard")
+				self:EmitSound("SolidMetal.ImpactHard")
 			end
 		end
 	end

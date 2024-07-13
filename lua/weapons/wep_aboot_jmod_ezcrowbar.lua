@@ -57,7 +57,7 @@ SWEP.DropEnt = "ent_aboot_gmod_ezcrowbar"
 --
 SWEP.HitDistance		= 50
 SWEP.HitInclination		= 0
-SWEP.HitHeight 			= -15
+SWEP.HitSpace 			= -15
 SWEP.HitAngle 			= 45
 SWEP.HitPushback		= 100
 SWEP.MaxSwingAngle		= 100

@@ -57,7 +57,7 @@ SWEP.DropEnt = "ent_aboot_gmod_ezstunstick"
 --
 SWEP.HitDistance		= 50
 SWEP.HitInclination		= 0
-SWEP.HitHeight 			= -15
+SWEP.HitSpace 			= -15
 SWEP.HitAngle 			= 45
 SWEP.HitPushback		= 100
 SWEP.MaxSwingAngle		= 100
@@ -84,22 +84,12 @@ SWEP.SwingVisualLowerAmount = 2
 --
 
 function SWEP:CustomInit()
-	self:SetTaskProgress(0)
-	self.NextTaskTime = 0
 	self:SetSwinging(false)
 	self.SwingProgress = 1
 end
 
-function SWEP:CustomSetupDataTables()
-	self:NetworkVar("Float", 1, "TaskProgress")
-end
-
 function SWEP:CustomThink()
-	local Time = CurTime()
-	if self.NextTaskTime < Time then
-		self:SetTaskProgress(0)
-		self.NextTaskTime = Time + self.SecondaryAttackSpeed + 1
-	end
+	--local Time = CurTime()
 end
 
 local FleshTypes = {
@@ -168,30 +158,6 @@ function SWEP:OnHit(swingProgress, tr, secondary)
 end
 
 function SWEP:FinishSwing(swingProgress)
-	if swingProgress >= self.MaxSwingAngle then
-		self:SetTaskProgress(0)
-	else
-		self.NextTaskTime = CurTime() + self.SecondaryAttackSpeed + 1
-	end
-end
-
-local LastProg = 0
-
-function SWEP:DrawHUD()
-	if GetConVar("cl_drawhud"):GetBool() == false then return end
-	local Ply = self.Owner
-	if Ply:ShouldDrawLocalPlayer() then return end
-	local W, H = ScrW(), ScrH()
-
-	local Prog = self:GetTaskProgress()
-
-	if Prog > 0 then
-		draw.SimpleTextOutlined("Loosening... ", "Trebuchet24", W * .5, H * .45, Color(255, 255, 255, 100), TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP, 3, Color(0, 0, 0, 50))
-		draw.RoundedBox(10, W * .3, H * .5, W * .4, H * .05, Color(0, 0, 0, 100))
-		draw.RoundedBox(10, W * .3 + 5, H * .5 + 5, W * .4 * LastProg / 100 - 10, H * .05 - 10, Color(255, 255, 255, 100))
-	end
-
-	LastProg = Lerp(FrameTime() * 5, LastProg, Prog)
 end
 
 if CLIENT then
@@ -201,62 +167,5 @@ if CLIENT then
 		if GetConVar("cl_drawhud"):GetBool() == false then return end
 		local Ply = self.Owner
 		if Ply:ShouldDrawLocalPlayer() then return end
-		local Prog = self:GetNW2Float("EZtaskProgress", 0)
-		local W, H, Build = ScrW(), ScrH()
-
-		if Prog > 0 then
-			draw.SimpleTextOutlined("Loosening...", "Trebuchet24", W * .5, H * .45, Color(255, 255, 255, 100), TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP, 3, Color(0, 0, 0, 50))
-			draw.RoundedBox(10, W * .3, H * .5, W * .4, H * .05, Color(0, 0, 0, 100))
-			draw.RoundedBox(10, W * .3 + 5, H * .5 + 5, W * .4 * LastProg / 100 - 10, H * .05 - 10, Color(255, 255, 255, 100))
-		end
-		LastProg = Lerp(FrameTime() * 5, LastProg, Prog)
 	end
 end
-
-sound.Add({name = "JMod_Weapon_Crowbar.Melee_Miss2",
-	channel = CHAN_WEAPON,
-	level = 79,
-	volume = 0.6,
-	pitch = {97, 103},
-	sound = {
-		"weapon/crowbar/crowbar_swing1.wav",
-		"weapon/crowbar/crowbar_swing2.wav",
-		"weapon/crowbar/crowbar_swing3.wav"
-	}
-})
-sound.Add({name = "JMod_Weapon_Crowbar.Melee_Hit2",
-	channel = CHAN_STATIC,
-	level = 60,
-	volume = 0.75,
-	pitch = {97, 103},
-	sound = {
-		")weapon/crowbar/crowbar_hit_world01.wav",
-		")weapon/crowbar/crowbar_hit_world02.wav",
-		")weapon/crowbar/crowbar_hit_world03.wav",
-		")weapon/crowbar/crowbar_hit_world04.wav",
-		")weapon/crowbar/crowbar_hit_world05.wav",
-		")weapon/crowbar/crowbar_hit_world06.wav"
-	}
-})
-
-sound.Add({name = "JMod_Weapon_HEV.Crowbar_Draw",
-	channel = CHAN_STATIC,
-	level = 60,
-	volume = 0.75,
-	sound = {
-		"fx/hev_suit/hev_draw_crowbar_01.wav",
-		"fx/hev_suit/hev_draw_crowbar_02.wav",
-		"fx/hev_suit/hev_draw_crowbar_03.wav"
-	}
-})
-sound.Add({name = "JMod_Weapon_HEV.Crowbar_Swing",
-	channel = CHAN_WEAPON,
-	level = 79,
-	volume = 0.6,
-	pitch = {97, 103},
-	sound = {
-		"fx/hev_suit/hev_swing_crowbar_01.wav",
-		"fx/hev_suit/hev_swing_crowbar_02.wav",
-		"fx/hev_suit/hev_swing_crowbar_03.wav"
-	}
-})
