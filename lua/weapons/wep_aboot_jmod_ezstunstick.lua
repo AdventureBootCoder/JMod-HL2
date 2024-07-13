@@ -64,8 +64,8 @@ SWEP.MaxSwingAngle		= 100
 SWEP.SwingSpeed 		= 2
 SWEP.SwingPullback 		= 1
 SWEP.SwingOffset 		= Vector(5, 10, -3)
-SWEP.PrimaryAttackSpeed = 0.8
-SWEP.SecondaryAttackSpeed 	= 0.7
+SWEP.PrimaryAttackSpeed = 0.9
+SWEP.SecondaryAttackSpeed 	= 1
 SWEP.DoorBreachPower 	= .5
 --
 SWEP.SprintCancel 	= false
@@ -121,7 +121,7 @@ function SWEP:OnHit(swingProgress, tr, secondary)
 	CrowDam:SetAttacker(Owner)
 	CrowDam:SetInflictor(self)
 	CrowDam:SetDamagePosition(tr.HitPos)
-	CrowDam:SetDamageType(DMG_SLASH)
+	CrowDam:SetDamageType(DMG_CLUB)
 	CrowDam:SetDamage(math.random(10, 25) * JMod.GetPlayerStrength(Owner) * JMod.Config.Weapons.DamageMult)
 	CrowDam:SetDamageForce(StrikeVector:GetNormalized() * 2000 * JMod.GetPlayerStrength(Owner))
 
