@@ -1,13 +1,13 @@
 -- Jackarunda 2021 - AdventureBoots 2023
 AddCSLuaFile()
 SWEP.Base = "wep_jack_gmod_ezmeleebase"
-SWEP.PrintName = "EZ Crowbar"
+SWEP.PrintName = "EZ Stun-Stick"
 SWEP.Author = "Jackarunda"
 SWEP.Purpose = ""
 --JMod.SetWepSelectIcon(SWEP, "entities/ent_jack_gmod_ezcrowbar")
-SWEP.ViewModel = "models/weapons/c_crowbar.mdl"--"models/weapons/crowbar/c_crowbar.mdl"
-SWEP.WorldModel = "models/weapons/w_crowbar.mdl"
-SWEP.BodyHolsterModel = "models/weapons/w_crowbar.mdl"
+SWEP.ViewModel = "models/weapons/c_stunstick.mdl"--"models/weapons/crowbar/c_crowbar.mdl"
+SWEP.WorldModel = "models/weapons/w_stunbaton.mdl"
+SWEP.BodyHolsterModel = "models/weapons/w_stunbaton.mdl"
 SWEP.BodyHolsterSlot = "back"
 SWEP.BodyHolsterAng = Angle(-93, -90, 0)
 SWEP.BodyHolsterAngL = Angle(-93, -90, 0)
@@ -53,7 +53,7 @@ SWEP.WElements = {
 	}--]]
 }
 
-SWEP.DropEnt = "ent_aboot_gmod_ezcrowbar"
+SWEP.DropEnt = "ent_aboot_gmod_ezstunstick"
 --
 SWEP.HitDistance		= 50
 SWEP.HitInclination		= 0
@@ -62,20 +62,20 @@ SWEP.HitAngle 			= 45
 SWEP.HitPushback		= 100
 SWEP.MaxSwingAngle		= 100
 SWEP.SwingSpeed 		= 2
-SWEP.SwingPullback 		= 5
+SWEP.SwingPullback 		= 1
 SWEP.SwingOffset 		= Vector(5, 10, -3)
-SWEP.PrimaryAttackSpeed = 0.4
-SWEP.SecondaryAttackSpeed 	= 0.8
+SWEP.PrimaryAttackSpeed = 0.8
+SWEP.SecondaryAttackSpeed 	= 0.7
 SWEP.DoorBreachPower 	= .5
 --
 SWEP.SprintCancel 	= false
 SWEP.StrongSwing 	= true
 SWEP.SecondaryPush	= false
 --
-SWEP.SwingSound 	= Sound( "Weapon_Crowbar.Single" )
-SWEP.HitSoundWorld 	= Sound( "SolidMetal.ImpactHard" )
-SWEP.HitSoundBody 	= Sound( "Flesh.ImpactHard" )
-SWEP.PushSoundBody 	= Sound( "Flesh.ImpactSoft" )
+SWEP.SwingSound 	= Sound( "Weapon_StunStick.Swing" )
+SWEP.HitSoundWorld 	= Sound( "Weapon_StunStick.Melee_HitWorld" )
+SWEP.HitSoundBody 	= Sound( "Weapon_StunStick.Melee_Hit" )
+SWEP.PushSoundBody 	= Sound( "Weapon_StunStick.Melee_Miss" )
 --
 SWEP.IdleHoldType 	= "melee"
 SWEP.SprintHoldType = "melee"
@@ -125,31 +125,46 @@ function SWEP:OnHit(swingProgress, tr, secondary)
 	CrowDam:SetDamage(math.random(10, 25) * JMod.GetPlayerStrength(Owner) * JMod.Config.Weapons.DamageMult)
 	CrowDam:SetDamageForce(StrikeVector:GetNormalized() * 2000 * JMod.GetPlayerStrength(Owner))
 
-	if secondary then
-		if IsValid(tr.Entity) then
-			local Message = JMod.EZprogressTask(tr.Entity, StrikePos, Owner, "loosen")
+	local Ent = tr.Entity
+	local Pos = tr.HitPos
 
-			if Message then
-				self.Owner:PrintMessage(HUD_PRINTCENTER, Message)
-				self:TryBustDoor(Ent, self.DoorBreachPower, Pos)
-			else
-				JMod.Hint(Owner, "work spread")
-				self:SetTaskProgress(tr.Entity:GetNW2Float("EZloosenProgress", 0))
-				CrowDam:SetDamage(0)
+	if tr.Hit and not tr.HitSky and not tr.StartSolid then
+		local fx = EffectData()
+		fx:SetOrigin(tr.HitPos)
+		fx:SetNormal(tr.HitNormal)
+		util.Effect("StunstickImpact", fx, true, true)
+
+		local Surface = tr.SurfaceProps
+		if tr.Hit and (Surface) and (util.GetSurfaceData(Surface)) then
+			EmitSound(util.GetSurfaceData(Surface).bulletImpactSound, Pos, 0, CHAN_WEAPON)
+		end
+	end
+	
+	if SERVER then
+		if IsValid(Ent) then
+			if Ent:IsNPC() then
+				Ent.EZNPCincapacitate = (Ent.EZNPCincapacitate or CurTime()) + math.Rand(2, 3)
+			elseif Ent:IsPlayer() then
+				Ent:ViewPunch(Angle(math.random(-40, 2), math.random(-20, 20), math.random(-2, 2)))
+				if secondary then
+					JMod.EZimmobilize(Ent, 1, Ent)
+					net.Start("ABoot_StunStick")
+						net.WriteEntity(Ent)
+						net.WriteFloat(50)
+					net.Send(Ent)
+				else
+					net.Start("ABoot_StunStick")
+						net.WriteEntity(Ent)
+						net.WriteFloat(20)
+					net.Send(Ent)
+				end
 			end
-		elseif JMod.IsDoor(tr.Entity) then
-			self:TryBustDoor(tr.Entity, math.random(35, 50), tr.HitPos)
-			self:SetTaskProgress(0)
-		else
-			CrowDam:SetDamage(CrowDam:GetDamage() * 1.2)
-			self:SetTaskProgress(0)
 		end
 	end
 
 	tr.Entity:TakeDamageInfo(CrowDam)
 
 	sound.Play(util.GetSurfaceData(tr.SurfaceProps).impactHardSound, tr.HitPos, 75, 100, 1)
-	util.Decal("ManhackCut", tr.HitPos + tr.HitNormal * 10, tr.HitPos - tr.HitNormal * 10, {self, Owner})
 end
 
 function SWEP:FinishSwing(swingProgress)

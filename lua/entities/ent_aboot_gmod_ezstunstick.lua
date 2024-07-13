@@ -1,10 +1,10 @@
 ﻿-- Jackarunda 2021 -- AdventureBoots 2023
 AddCSLuaFile()
 ENT.Type = "anim"
-ENT.Author = "Adventure Boots"
+ENT.Author = "AdventureBoots"
 ENT.Category = "JMod - EZ HL:2"
 ENT.Information = "glhfggwpezpznore"
-ENT.PrintName = "EZ Crowbar"
+ENT.PrintName = "EZ Stun Stick"
 ENT.NoSitAllowed = true
 ENT.Spawnable = true
 ENT.AdminSpawnable = true
@@ -12,7 +12,7 @@ ENT.AdminSpawnable = true
 ENT.JModPreferredCarryAngles = Angle(0, 0, 0)
 ENT.DamageThreshold = 120
 ENT.JModEZstorable = true
-ENT.SWEPtoGive = "wep_aboot_jmod_ezcrowbar"
+ENT.SWEPtoGive = "wep_aboot_jmod_ezstunstick"
 
 ---
 if SERVER then
@@ -28,7 +28,7 @@ if SERVER then
 	end
 
 	function ENT:Initialize()
-		self:SetModel("models/weapons/w_crowbar.mdl")
+		self:SetModel("models/weapons/w_stunbaton.mdl")
 		self:PhysicsInit(SOLID_VPHYSICS)
 		self:SetMoveType(MOVETYPE_VPHYSICS)
 		self:SetSolid(SOLID_VPHYSICS)
@@ -82,5 +82,5 @@ elseif CLIENT then
 		self:DrawModel()
 	end
 
-	language.Add("ent_aboot_gmod_ezcrowbar", "EZ Crowbar")
+	language.Add("ent_aboot_gmod_ezstunstick", "EZ Stunny Stick")
 end
