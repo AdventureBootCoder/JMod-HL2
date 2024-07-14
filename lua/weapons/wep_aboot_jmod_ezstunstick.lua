@@ -66,7 +66,7 @@ SWEP.SwingPullback 		= 1
 SWEP.SwingOffset 		= Vector(5, 10, -3)
 SWEP.PrimaryAttackSpeed = 0.9
 SWEP.SecondaryAttackSpeed 	= 1
-SWEP.DoorBreachPower 	= .5
+SWEP.DoorBreachPower 	= .1
 --
 SWEP.SprintCancel 	= false
 SWEP.StrongSwing 	= true

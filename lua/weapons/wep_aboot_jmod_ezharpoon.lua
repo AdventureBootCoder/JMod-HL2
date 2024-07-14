@@ -5,7 +5,7 @@ SWEP.PrintName = "EZ Harpoon"
 SWEP.Author = "Jackarunda"
 SWEP.Purpose = ""
 --JMod.SetWepSelectIcon(SWEP, "entities/ent_jack_gmod_ezcrowbar")
-SWEP.ViewModel = "models/weapons/c_stunstick.mdl"--"models/weapons/crowbar/c_crowbar.mdl"
+SWEP.ViewModel = "models/weapons/v_jmod_musket.mdl"--"models/weapons/crowbar/c_crowbar.mdl"
 SWEP.WorldModel = "models/props_junk/harpoon002a.mdl"
 SWEP.BodyHolsterModel = "models/props_junk/harpoon002a.mdl"
 SWEP.BodyHolsterSlot = "back"
@@ -14,7 +14,7 @@ SWEP.BodyHolsterAngL = Angle(-93, -90, 0)
 SWEP.BodyHolsterPos = Vector(3, -10, -3)
 SWEP.BodyHolsterPosL = Vector(4, -10, 3)
 SWEP.BodyHolsterScale = 1
-SWEP.ViewModelFOV = 50
+SWEP.ViewModelFOV = 70
 SWEP.Slot = 1
 SWEP.SlotPos = 5
 SWEP.ShowWorldModel = false
@@ -22,13 +22,27 @@ SWEP.ShowViewModel = false
 SWEP.UseHands = false
 
 SWEP.VElements = {
-	["harpoon"] = { 
+	--[[["harpoon"] = { 
 		type = "Model", 
 		model = "models/props_junk/harpoon002a.mdl", 
 		bone = "ValveBiped.Bip01_R_Hand", 
 		rel = "", 
-		pos = Vector(30, 0, 0), 
-		angle = Angle(-10, -10, -30), 
+		pos = Vector(0, -200, 0), 
+		angle = Angle(-90, 0, 0), 
+		size = Vector(1, 1, 1), 
+		color = Color(255, 255, 255, 255), 
+		surpresslightning = false, 
+		material = "", 
+		skin = 0, 
+		bodygroup = {} 
+	}--]]
+	["harpoon"] = { 
+		type = "Model", 
+		model = "models/props_junk/harpoon002a.mdl", 
+		bone = "Musket", 
+		rel = "", 
+		pos = Vector(0, -40, 0), 
+		angle = Angle(5, 75, 20), 
 		size = Vector(1, 1, 1), 
 		color = Color(255, 255, 255, 255), 
 		surpresslightning = false, 
@@ -59,17 +73,17 @@ SWEP.DropEnt = "ent_aboot_gmod_ezharpoon"
 --
 SWEP.HitDistance		= 90
 SWEP.HitInclination		= 0
-SWEP.HitSpace 			= 0
+SWEP.HitSpace 			= 5
 SWEP.HitAngle 			= 45
 SWEP.HitPushback		= 200
-SWEP.StartSwingAngle	= 135
-SWEP.MaxSwingAngle		= 5
-SWEP.SwingSpeed 		= 2
-SWEP.SwingPullback 		= 5
+SWEP.StartSwingAngle	= 130
+SWEP.MaxSwingAngle		= 50
+SWEP.SwingSpeed 		= 1
+SWEP.SwingPullback 		= 0
 SWEP.SwingOffset 		= Vector(5, 10, -3)
 SWEP.PrimaryAttackSpeed = 1
 SWEP.SecondaryAttackSpeed 	= 2
-SWEP.DoorBreachPower 	= .5
+SWEP.DoorBreachPower 	= 0
 --
 SWEP.SprintCancel 	= true
 SWEP.StrongSwing 	= true
@@ -80,22 +94,33 @@ SWEP.HitSoundWorld 	= Sound( "SolidMetal.ImpactHard" )
 SWEP.HitSoundBody 	= Sound( "Flesh.ImpactHard" )
 SWEP.PushSoundBody 	= Sound( "Flesh.ImpactSoft" )
 --
-SWEP.IdleHoldType 	= "melee2"
+SWEP.IdleHoldType 	= "knife"
 SWEP.SprintHoldType = "knife"
+SWEP.SwingSeq = "dryfire"
 SWEP.SwingVisualLowerAmount = -5
 --
 
 function SWEP:CustomInit()
 	self:SetSwinging(false)
 	self.SwingProgress = 1
+	self.NextStopStab = 0
 end
 
 function SWEP:CustomThink()
 	local Time = CurTime()
-	if self:GetSwinging() == true then
-		self.VElements["harpoon"].pos = Vector(30, 10, 0)
-	else
-		self.VElements["harpoon"].pos = Vector(30, 0, 0)
+	local Swinging = self:GetSwinging()
+	local SwingFrac = self.SwingProgress/self.MaxSwingAngle	
+	--if self:GetSwinging() == true then jprint(self.SwingProgress, SwingFrac) end
+	if (Swinging) and (self.NextStopStab < Time) then
+		self.NextStopStab = Time + self.PrimaryAttackSpeed * .75
+	end
+
+	if self.NextStopStab > Time then
+		self.VElements["harpoon"].pos = LerpVector(SwingFrac + .1, self.VElements["harpoon"].pos, Vector(-15, -35, -5))
+		self.VElements["harpoon"].angle = LerpAngle(SwingFrac, self.VElements["harpoon"].angle,  Angle(10, 80, 25))
+	elseif not(Swinging) then
+		self.VElements["harpoon"].pos = LerpVector(FrameTime() * 25, self.VElements["harpoon"].pos, Vector(-15, 0, 0))
+		self.VElements["harpoon"].angle = LerpAngle(FrameTime() * 25, self.VElements["harpoon"].angle,  Angle(10, 75, 20))
 	end
 end
 
@@ -125,7 +150,8 @@ function SWEP:OnHit(swingProgress, tr, secondary)
 		tr.Entity:TakeDamageInfo(PokeDam)
 
 		local Boolet = {}
-		Boolet.Damage = 0
+		Boolet.Num = 1
+		Boolet.Damage = 1
 		Boolet.Src = Owner:GetShootPos()
 		Boolet.Dir = Owner:GetAimVector()
 		self:FireBullets(Boolet)

@@ -6,7 +6,7 @@ ENT.Category = "JMod - EZ HL:2"
 ENT.Information = "glhfggwpezpznore"
 ENT.PrintName = "EZ Harpoon"
 ENT.NoSitAllowed = true
-ENT.Spawnable = false
+ENT.Spawnable = true
 ENT.AdminSpawnable = true
 ---
 ENT.JModPreferredCarryAngles = Angle(0, 0, 0)
@@ -35,6 +35,7 @@ if SERVER then
 		self:DrawShadow(true)
 		self:SetUseType(SIMPLE_USE)
 
+		self.StuckStick = nil
 		---
 		timer.Simple(.01, function()
 			self:GetPhysicsObject():SetMass(100)
@@ -48,8 +49,8 @@ if SERVER then
 				self:EmitSound("Wood_Plank.ImpactHard")
 				self:EmitSound("SolidMetal.ImpactHard")
 				local RelativeSpeed = (data.OurOldVelocity + data.TheirOldVelocity):Length()
-
-				if (RelativeSpeed > 500) then
+				jprint(RelativeSpeed)
+				if (RelativeSpeed > 200) then
 					local PokeTr = util.QuickTrace(self:LocalToWorld(self:OBBCenter()), self:GetForward() * 70, {self})
 					debugoverlay.Line(self:LocalToWorld(self:OBBCenter()), PokeTr.HitPos, 1, Color(255, 0, 0), true)
 					if PokeTr.Hit then
@@ -63,6 +64,13 @@ if SERVER then
 								PokeDam:SetDamagePosition(PokeTr.HitPos)
 								PokeDam:SetDamageForce(data.OurOldVelocity)
 								PokeTr.Entity:TakeDamageInfo(PokeDam)
+
+								local WeldTr = util.QuickTrace(self:LocalToWorld(self:OBBCenter()), self:GetForward() * 70, {self})
+
+								if WeldTr.Hit then
+									self:SetPos(WeldTr.HitPos + WeldTr.HitNormal * 38)
+									self.StuckStick = constraint.Weld(self, WeldTr.Entity, 0, WeldTr.PhysicsBone, 0, true, false)
+								end
 							end
 						end)
 					end
@@ -84,11 +92,20 @@ if SERVER then
 
 	function ENT:Use(activator)
 		if activator:KeyDown(JMod.Config.General.AltFunctionKey) and not activator:HasWeapon(self.SWEPtoGive) then
-			activator:Give(self.SWEPtoGive)
-			activator:SelectWeapon(self.SWEPtoGive)
+			--activator:Give(self.SWEPtoGive)
+			--activator:SelectWeapon(self.SWEPtoGive)
 
-			self:Remove()
+			--self:Remove()
 		else
+			if IsValid(self.StuckStick) then
+				SafeRemoveEntity(self.StuckStick)
+				self:GetPhysicsObject():EnableCollisions(false)
+				timer.Simple(.1, function() 
+					if IsValid(self) then 
+						self:GetPhysicsObject():EnableCollisions(true) 
+					end 
+				end)
+			end
 			JMod.SetEZowner(self, activator)
 			JMod.ThrowablePickup(activator, self, 1500, 500)
 		end
@@ -105,5 +122,5 @@ elseif CLIENT then
 		self:DrawModel()
 	end
 
-	language.Add("ent_aboot_gmod_ezcrowbar", "EZ Crowbar")
+	language.Add("ent_aboot_gmod_ezharpoon", "EZ Harpoon")
 end
