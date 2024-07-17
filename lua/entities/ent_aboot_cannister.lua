@@ -84,7 +84,7 @@ if SERVER then
 			Yay:Activate()
 
 			if resourceAmt then
-				Yay:SetResource(resourceAmt)
+				Yay:SetEZsupplies(Yay.EZsupplies, resourceAmt)
 			end
 
 			if IsValid(Yay) then

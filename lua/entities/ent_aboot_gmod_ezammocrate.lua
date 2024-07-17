@@ -70,8 +70,7 @@ if SERVER then
 		self:DrawShadow(true)
 		self:SetUseType(SIMPLE_USE)
 		---
-		self:SetResource(0)
-		self:ApplySupplyType("generic")
+		self:SetEZsupplies(self:GetResourceType(), 0)
 		self.EZconsumes = {JMod.EZ_RESOURCE_TYPES.AMMO, JMod.EZ_RESOURCE_TYPES.MUNITIONS}
 		self.LastOpenTime = 0
 
@@ -233,7 +232,7 @@ if SERVER then
 						
 						if ply:GetAmmoCount(PrimType) < PrimMax then
 							ply:GiveAmmo(AmtToGive, PrimType)
-							self:SetResource(ResourceLeftInBox - math.ceil(AmtToGive * ResourceUnitPerAmmo))
+							self:SetEZsupplies(self:GetResourceType(), ResourceLeftInBox - math.ceil(AmtToGive * ResourceUnitPerAmmo))
 							self:UseEffect(self:GetPos(), self)
 						end
 					end
@@ -265,7 +264,7 @@ if SERVER then
 						
 						if ply:GetAmmoCount(SecType) < SecMax then
 							ply:GiveAmmo(AmtToGive, SecType)
-							self:SetResource(ResourceLeftInBox - math.ceil(AmtToGive * ResourceUnitPerAmmo))
+							self:SetEZsupplies(self:GetResourceType(), ResourceLeftInBox - math.ceil(AmtToGive * ResourceUnitPerAmmo))
 							self:UseEffect(self:GetPos(), self)
 						end
 					end
@@ -298,14 +297,14 @@ if SERVER then
 					Box:SetAngles(self:GetAngles())
 					Box:Spawn()
 					Box:Activate()
-					Box:SetResource(Given)
+					Box:SetEZsupplies(Box.EZsupplies, Given, self)
 					Box.NextLoad = CurTime() + 2
 					if IsValid(activator) and activator:Alive() then
 						Box:Use(activator, activator)
 					end
 				end
 			end)
-			self:SetResource(Resource - Given)
+			self:SetEZsupplies(self:GetResourceType(), Resource - Given, activator)
 		end
 		self:CalcWeight()
 
@@ -338,7 +337,7 @@ if SERVER then
 			local Missing = self.MaxResource - Resource
 			if Missing <= 0 then return 0 end
 			local Accepted = math.min(Missing, amt)
-			self:SetResource(Resource + Accepted)
+			self:SetEZsupplies(self:GetResourceType(), Resource + Accepted)
 			self:CalcWeight()
 			self.NextLoad = Time + .5
 

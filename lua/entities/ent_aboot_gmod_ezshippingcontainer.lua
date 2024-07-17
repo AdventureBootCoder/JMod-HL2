@@ -31,7 +31,6 @@ function ENT:GetEZsupplies(typ)
 end
 
 function ENT:SetEZsupplies(typ, amt, setter)
-	if not self.Contents[typ] then /*error(tostring(typ)..", "..tostring(self.Contents[typ])..", "..tostring(amt))*/ return end
 	self.Contents[typ] = amt
 	self:SetResource(math.Clamp(amt, 0, self.MaxResource))
 	if SERVER then
@@ -174,7 +173,7 @@ if SERVER then
 				Box:SetAngles(self:GetAngles())
 				Box:Spawn()
 				Box:Activate()
-				Box:SetResource(Given)
+				Box:SetEZsupplies(Box.EZsupplies, Given, self)
 				Box.NextLoad = CurTime() + 2
 				Needed = Needed - Given
 				self:CalcWeight()
