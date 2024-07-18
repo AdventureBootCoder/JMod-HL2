@@ -13,6 +13,7 @@ ENT.JModPreferredCarryAngles = Angle(0, 0, 0)
 ENT.DamageThreshold = 120
 ENT.JModEZstorable = true
 ENT.SWEPtoGive = "wep_aboot_jmod_ezharpoon"
+ENT.EZinvThrowable = true
 
 ---
 if SERVER then
@@ -38,43 +39,50 @@ if SERVER then
 		self.StuckStick = nil
 		---
 		timer.Simple(.01, function()
-			self:GetPhysicsObject():SetMass(100)
+			self:GetPhysicsObject():SetMass(10)
 			self:GetPhysicsObject():Wake()
 		end)
 	end
 
 	function ENT:PhysicsCollide(data, physobj)
-		if data.DeltaTime > 0.2 then
-			if data.Speed > 100 then
-				self:EmitSound("Wood_Plank.ImpactHard")
-				self:EmitSound("SolidMetal.ImpactHard")
+		if data.Speed > 200 and data.DeltaTime > 0.2 then
+			local PokeDir = self:GetForward()
+			local ImpactDot = PokeDir:Dot(data.OurOldVelocity:GetNormalized())
+			if ImpactDot > .5 then
+				self:EmitSound("SolidMetal.ImpactSoft")
+
 				local RelativeSpeed = (data.OurOldVelocity + data.TheirOldVelocity):Length()
-				jprint(RelativeSpeed)
-				if (RelativeSpeed > 200) then
-					local PokeTr = util.QuickTrace(self:LocalToWorld(self:OBBCenter()), self:GetForward() * 70, {self})
-					debugoverlay.Line(self:LocalToWorld(self:OBBCenter()), PokeTr.HitPos, 1, Color(255, 0, 0), true)
+				if not (self:IsPlayerHolding()) and (RelativeSpeed > 300) and not IsValid(self.StuckStick) then
+					local PokeStart = self:WorldSpaceCenter() + PokeDir * 50
+					local PokeTr = util.QuickTrace(PokeStart, PokeDir * 70, {self})
+					debugoverlay.Line(PokeStart, PokeTr.HitPos, 2, Color(255, 0, 0), true)
 					if PokeTr.Hit then
 						timer.Simple(0, function() 
-							if IsValid(self) and IsValid(data.HitEntity) then
+							if IsValid(self) and IsValid(data.HitEntity) or (data.HitEntity == game.GetWorld()) then
 								local PokeDam = DamageInfo()
 								PokeDam:SetDamageType(DMG_BULLET)
-								PokeDam:SetDamage(RelativeSpeed)
+								PokeDam:SetDamage(RelativeSpeed * .05)
 								PokeDam:SetAttacker(JMod.GetEZowner(self))
 								PokeDam:SetInflictor(self)
 								PokeDam:SetDamagePosition(PokeTr.HitPos)
 								PokeDam:SetDamageForce(data.OurOldVelocity)
 								PokeTr.Entity:TakeDamageInfo(PokeDam)
 
-								local WeldTr = util.QuickTrace(self:LocalToWorld(self:OBBCenter()), self:GetForward() * 70, {self})
+								jprint("Sped", RelativeSpeed)
+								if (RelativeSpeed > 800) and (math.random(1, 6) == 1) then
+									self:EmitSound("Wood_Solid.Break")
+									SafeRemoveEntity(self)
 
-								if WeldTr.Hit then
-									self:SetPos(WeldTr.HitPos + WeldTr.HitNormal * 38)
-									self.StuckStick = constraint.Weld(self, WeldTr.Entity, 0, WeldTr.PhysicsBone, 0, true, false)
+									return
 								end
+
+								self:Impale(PokeStart, PokeDir)
 							end
 						end)
 					end
 				end
+			else
+				self:EmitSound("Wood_Plank.ImpactHard")
 			end
 		end
 	end
@@ -96,15 +104,14 @@ if SERVER then
 			--activator:SelectWeapon(self.SWEPtoGive)
 
 			--self:Remove()
+			activator:PrintMessage(HUD_PRINTCENTER, "Harpoon swep coming soon!")
 		else
+			if IsValid(self.StuckIn) then
+				self:SetParent()
+			end
 			if IsValid(self.StuckStick) then
 				SafeRemoveEntity(self.StuckStick)
-				self:GetPhysicsObject():EnableCollisions(false)
-				timer.Simple(.1, function() 
-					if IsValid(self) then 
-						self:GetPhysicsObject():EnableCollisions(true) 
-					end 
-				end)
+				self:SetPos(self:GetPos() + self:GetForward() * -38)
 			end
 			JMod.SetEZowner(self, activator)
 			JMod.ThrowablePickup(activator, self, 1500, 500)
@@ -112,8 +119,76 @@ if SERVER then
 	end
 
 	function ENT:Think()
-		JMod.AeroDrag(self, self:GetForward(), 2, 100)
+		--[[if self.StuckIn then
+			local StaySticked = true
+
+			if IsValid(self.StuckIn) then
+				if self.StuckIn:IsPlayer() and not self.StuckIn:Alive() then
+					StaySticked = false
+				elseif self.StuckIn:IsNPC() and self.StuckIn.Health and self.StuckIn:Health() <= 0 then
+					StaySticked = false
+				end
+			else
+				StaySticked = false
+			end
+
+			if not StaySticked then
+				local NewPos = self:GetPos()
+				self:SetParent(nil)
+				self.StuckIn = nil
+
+				--self:SetPos(NewPos)
+				StuckTr = util.QuickTrace(self:GetPos(), self:GetForward() * 70, {self})
+
+				if StuckTr.Hit then
+					if IsValid(StuckTr.Entity) and StuckTr.Entity:GetMoveType() == MOVETYPE_VPHYSICS then
+						self:SetPos(StuckTr.HitPos + StuckTr.Normal * -38)
+						--self:SetAngles(StuckTr.Normal:Angle())
+						self.StuckStick = constraint.Weld(self, StuckTr.Entity, 0, StuckTr.PhysicsBone, 50000, true, false)
+					end
+				end
+			end
+
+			self:NextThink(CurTime() + 1)
+
+			return true
+		else--]]
+			JMod.AeroDrag(self, self:GetForward(), 2, 100)
+		--end
 	end
+
+	function ENT:Impale(start, dir)
+		--PokeStart = self:WorldSpaceCenter() + dir * 50
+		local WeldTr = util.QuickTrace(start, dir * 70, {self})
+		debugoverlay.Line(start, WeldTr.HitPos, 2, Color(255, 81, 0), true)
+
+		if WeldTr.Hit and not WeldTr.HitSky then
+			local ImpaleEnt = WeldTr.Entity
+			if IsValid(ImpaleEnt) or (ImpaleEnt == game.GetWorld()) then
+				if (ImpaleEnt:GetMoveType() == MOVETYPE_VPHYSICS) or (ImpaleEnt:GetMoveType() == MOVETYPE_NONE) then
+					if self:GetPhysicsObject():GetVelocity():Length() > 10 then
+						self:SetPos(WeldTr.HitPos + WeldTr.Normal * -38)
+						self:SetAngles(WeldTr.Normal:Angle())
+					end
+					self.StuckStick = constraint.Weld(self, ImpaleEnt, 0, WeldTr.PhysicsBone, 50000, true, false)
+				elseif WeldTr.Health and WeldTr:Health() <= 0 then
+					self.StuckIn = ImpaleEnt
+					self:SetParent(ImpaleEnt)
+				end
+			end
+		end
+	end
+
+	hook.Add("EntityRemoved", "JMod_HarpoonRelease", function(ent)
+		for k, v in pairs(ent:GetChildren()) do
+			if (v:GetClass() == "ent_aboot_gmod_ezharpoon") then
+				local StickPos = v:WorldSpaceCenter()
+				local StickDir = v:GetAngles():Forward()
+				v:SetParent(nil)
+				v:Impale(StickPos, StickDir)
+			end
+		end
+	end)
 
 elseif CLIENT then
 	function ENT:Initialize()
