@@ -68,7 +68,6 @@ if SERVER then
 								PokeDam:SetDamageForce(data.OurOldVelocity)
 								PokeTr.Entity:TakeDamageInfo(PokeDam)
 
-								jprint("Sped", RelativeSpeed)
 								if (RelativeSpeed > 800) and (math.random(1, 6) == 1) then
 									self:EmitSound("Wood_Solid.Break")
 									SafeRemoveEntity(self)
