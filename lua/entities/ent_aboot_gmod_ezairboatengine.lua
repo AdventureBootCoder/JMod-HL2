@@ -108,7 +108,6 @@ if SERVER then
 			if not IsValid(self) or (State < STATE_OFF) then return end
 			self:SetState(STATE_SPINNING)
 			self:SetThrottle(self.MaxBladeSpeed * 0.1)
-			self:StartSound()
 		end)
 	end
 
@@ -117,7 +116,7 @@ if SERVER then
 		self:SetState(STATE_OFF)
 		self:SetThrottle(0)
 		self:EmitSound("vehicles/airboat/fan_motor_shut_off1.wav", 60, 100)
-		self:EndSound()
+		self:EndSounds()
 	end
 
 	function ENT:SetThrottle(val)
@@ -136,18 +135,7 @@ if SERVER then
 		end
 	end
 
-	function ENT:StartSound()
-		if not self.FanSoundLoop then
-			self.FanSoundLoop = CreateSound(self, self.IdleSounds[1])
-			self.FanSoundLoop:Play()
-		end 
-		if self.EngineSoundLoop then
-			self.EngineSoundLoop = CreateSound(self, self.IdleSounds[2])
-			self.EngineSoundLoop:Play()
-		end
-	end
-
-	function ENT:EndSound()
+	function ENT:EndSounds()
 		if self.FanSoundLoop then
 			self.FanSoundLoop:Stop()
 			self.FanSoundLoop = nil
@@ -195,7 +183,7 @@ if SERVER then
 		local Time, State = CurTime(), self:GetState()
 
 		if State == STATE_BROKEN then
-			self:EndSound()
+			self:EndSounds()
 			return
 		end
 		local CurSpeed = self:GetBladeSpeed()
@@ -249,11 +237,11 @@ if SERVER then
 	end
 
 	function ENT:OnBreak()
-		self:EndSound()
+		self:EndSounds()
 	end
 
 	function ENT:OnRemove()
-		self:EndSound()
+		self:EndSounds()
 	end
 
 elseif CLIENT then
