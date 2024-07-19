@@ -180,7 +180,7 @@ if SERVER then
 
 	hook.Add("EntityRemoved", "JMod_HarpoonRelease", function(ent)
 		for k, v in pairs(ent:GetChildren()) do
-			if (v:GetClass() == "ent_aboot_gmod_ezharpoon") then
+			if IsValid(v) and (v:GetClass() == "ent_aboot_gmod_ezharpoon") then
 				local StickPos = v:WorldSpaceCenter()
 				local StickDir = v:GetAngles():Forward()
 				v:SetParent(nil)

@@ -1,4 +1,4 @@
-﻿-- Jackarunda 2021
+﻿-- AdventureBoots 2023
 AddCSLuaFile()
 ENT.Type = "anim"
 ENT.PrintName = "EZ Shipping Container"
