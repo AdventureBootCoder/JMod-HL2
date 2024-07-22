@@ -12,13 +12,17 @@ ENT.AdminSpawnable = true
 ENT.JModPreferredCarryAngles = Angle(0, 0, 0)
 ENT.Model = "models/aboot/ez_airboat_engine.mdl"
 ENT.Mass = 45
-ENT.IdleSounds = {"vehicles/airboat/fan_blade_idle_loop1.wav", "vehicles/airboat/fan_motor_idle_loop1.wav"}
-ENT.FullThrottleSounds = {"vehicles/airboat/fan_blade_fullthrottle_loop1.wav", "vehicles/airboat/fan_motor_fullthrottle_loop1.wav"}
+ENT.IdleSounds = {
+	fan = "vehicles/airboat/fan_blade_idle_loop1.wav", 
+	motor = "vehicles/airboat/fan_motor_idle_loop1.wav"}
+ENT.FullThrottleSounds = {
+	fan = "vehicles/airboat/fan_blade_fullthrottle_loop1.wav", 
+	motor ="vehicles/airboat/fan_motor_fullthrottle_loop1.wav"}
 --
 ENT.StaticPerfSpecs={ 
 	MaxFuel = 100,
 	MaxDurability = 100,
-	Armor = 1.5
+	Armor = 2
 }
 ENT.EZconsumes = {
 	JMod.EZ_RESOURCE_TYPES.BASICPARTS,
@@ -39,8 +43,8 @@ if SERVER then
 		local WireInputDesc = {"1 turns on, 0 turns off", "Sets the desired speed and direction of spinning"}
 		self.Inputs = WireLib.CreateInputs(self, WireInputs, WireInputDesc)
 		--
-		local WireOutputs = {"State [NORMAL]", "CurSpin [NORMAL]"}
-		local WireOutputDesc = {"The state of the machine \n-1 is broken \n0 is off \n1 is on \n2 is speeling", "The current speed and direction of spin"}
+		local WireOutputs = {"State [NORMAL]", "CurSpin [NORMAL]", "DesiredSpin [NORMAL]"}
+		local WireOutputDesc = {"The state of the machine \n-1 is broken \n0 is off \n1 is on \n2 is speeling", "The current speed and direction of spin", "The desired speed and direction of spin"}
 		for _, typ in ipairs(self.EZconsumes) do
 			if typ == JMod.EZ_RESOURCE_TYPES.BASICPARTS then typ = "Durability" end
 			local ResourceName = string.Replace(typ, " ", "")
@@ -96,8 +100,8 @@ if SERVER then
 		self.MaxBladeSpeed = 100
 		self.DesiredBladeSpeed = 0
 		self:SetBladeSpeed(0)
-		self.FanSoundLoop = CreateSound(self, self.IdleSounds[1])
-		self.EngineSoundLoop = CreateSound(self, self.IdleSounds[2])
+		self.FanSoundLoop = CreateSound(self, self.IdleSounds["fan"])
+		self.EngineSoundLoop = CreateSound(self, self.IdleSounds["motor"])
 	end
 
 	function ENT:TurnOn()
@@ -115,6 +119,7 @@ if SERVER then
 		if self:GetState() < STATE_SPINNING then return end
 		self:SetState(STATE_OFF)
 		self:SetThrottle(0)
+		self:SetBladeSpeed(0)
 		self:EmitSound("vehicles/airboat/fan_motor_shut_off1.wav", 60, 100)
 		self:EndSounds()
 	end
@@ -122,17 +127,18 @@ if SERVER then
 	function ENT:SetThrottle(val)
 		if self:GetState() < STATE_SPINNING then return end
 		self.DesiredBladeSpeed = math.Clamp(val, -self.MaxBladeSpeed, self.MaxBladeSpeed)
+		if WireLib then
+			WireLib.TriggerOutput(self, "DesiredSpin", self.DesiredBladeSpeed)
+		end
 		if self.EngineSoundLoop then
 			self.EngineSoundLoop:Stop()
 		end
 		if val > 50 then
-			self.EngineSoundLoop = CreateSound(self, self.FullThrottleSounds[2])
+			self.EngineSoundLoop = CreateSound(self, self.FullThrottleSounds["motor"])
 		else
-			self.EngineSoundLoop = CreateSound(self, self.IdleSounds[2])
+			self.EngineSoundLoop = CreateSound(self, self.IdleSounds["motor"])
 		end
-		if val ~= self:GetBladeSpeed() then
-			self.EngineSoundLoop:Play()
-		end
+		self.EngineSoundLoop:Play()
 	end
 
 	function ENT:EndSounds()
@@ -191,6 +197,11 @@ if SERVER then
 		--jprint("cur: " .. tostring(CurSpeed) .. " desired: " .. tostring(self.DesiredBladeSpeed))
 		if CurSpeed ~= self.DesiredBladeSpeed then
 			CurSpeed = (math.Approach(math.Clamp(CurSpeed, -self.MaxBladeSpeed, self.MaxBladeSpeed), self.DesiredBladeSpeed, 15 / ThinkRate))
+			if self.EngineSoundLoop then self.EngineSoundLoop:ChangePitch(50 + 50 * math.abs(CurSpeed) / self.MaxBladeSpeed, .1) end
+			if self.FanSoundLoop then self.FanSoundLoop:ChangePitch(50 + 50 * math.abs(CurSpeed) / self.MaxBladeSpeed, .1) end
+			if WireLib then
+				WireLib.TriggerOutput(self, "CurSpin", CurSpeed)
+			end
 		end
 
 		self:SetBladeSpeed(CurSpeed)
@@ -210,10 +221,10 @@ if SERVER then
 
 			if (math.abs(CurSpeed) < 80) then
 				if self.FanSoundLoop then self.FanSoundLoop:Stop() end
-				self.FanSoundLoop = CreateSound(self, self.IdleSounds[1])
+				self.FanSoundLoop = CreateSound(self, self.IdleSounds["fan"])
 			elseif (math.abs(CurSpeed) > 80) then
 				if self.FanSoundLoop then self.FanSoundLoop:Stop() end
-				self.FanSoundLoop = CreateSound(self, self.FullThrottleSounds[1])
+				self.FanSoundLoop = CreateSound(self, self.FullThrottleSounds["fan"])
 			end
 
 			self:ConsumeFuel(0.001 * CurSpeed / ThinkRate)
@@ -257,7 +268,7 @@ elseif CLIENT then
 		local FT = FrameTime()
 
 		if State == STATE_SPINNING then
-			self.BladeTurn = self.BladeTurn + BladeSpeed * 100 * FT
+			self.BladeTurn = self.BladeTurn + BladeSpeed * 66 * FT
 		end
 
 		if self.BladeTurn > 360 then
@@ -301,6 +312,8 @@ elseif CLIENT then
 				cam.Start3D2D(SelfPos + Up * 1 + Right * 28, DisplayAng, .08)
 					draw.SimpleTextOutlined("FUEL", "JMod-Display", 0, 0, Color(200, 255, 255, Opacity), TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP, 3, Color(0, 0, 0, Opacity))
 					draw.SimpleTextOutlined(tostring(math.Round(Elec)) .. "/" .. tostring(math.Round(self.MaxFuel)), "JMod-Display", 0, 30, Color(R, G, B, Opacity), TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP, 3, Color(0, 0, 0, Opacity))
+					draw.SimpleTextOutlined("RPM", "JMod-Display", 0, 60, Color(200, 255, 255, Opacity), TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP, 3, Color(0, 0, 0, Opacity))
+					draw.SimpleTextOutlined(tostring(math.Round(self:GetBladeSpeed())), "JMod-Display", 0, 90, Color(255, 255, 255, Opacity), TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP, 3, Color(0, 0, 0, Opacity))
 				cam.End3D2D()
 			end
 		end

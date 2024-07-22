@@ -38,7 +38,7 @@ if(SERVER)then
 		self.NextOSHAthinkTime = 0
         timer.Simple(5, function()
             if IsValid(self) then
-            JMod.Hint(self.EZowner, "ore scan")
+            JMod.Hint(self.EZowner, "work spread")
             end
         end)
 	end
