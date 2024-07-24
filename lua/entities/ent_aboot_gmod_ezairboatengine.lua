@@ -40,7 +40,7 @@ if SERVER then
 	function ENT:SetupWire()
 		if not(istable(WireLib)) then return end
 		local WireInputs = {"TurnOnOff [NORMAL]", "Spin [NORMAL]"}
-		local WireInputDesc = {"1 turns on, 0 turns off", "Sets the desired speed and direction of spinning"}
+		local WireInputDesc = {"1 turns on, 0 turns off", "Sets the desired speed and direction of spinning\nmin -100, max 100"}
 		self.Inputs = WireLib.CreateInputs(self, WireInputs, WireInputDesc)
 		--
 		local WireOutputs = {"State [NORMAL]", "CurSpin [NORMAL]", "DesiredSpin [NORMAL]"}
@@ -119,7 +119,6 @@ if SERVER then
 		if self:GetState() < STATE_SPINNING then return end
 		self:SetState(STATE_OFF)
 		self:SetThrottle(0)
-		self:SetBladeSpeed(0)
 		self:EmitSound("vehicles/airboat/fan_motor_shut_off1.wav", 60, 100)
 		self:EndSounds()
 	end
@@ -194,19 +193,18 @@ if SERVER then
 		end
 		local CurSpeed = self:GetBladeSpeed()
 
-		--jprint("cur: " .. tostring(CurSpeed) .. " desired: " .. tostring(self.DesiredBladeSpeed))
-		if CurSpeed ~= self.DesiredBladeSpeed then
-			CurSpeed = (math.Approach(math.Clamp(CurSpeed, -self.MaxBladeSpeed, self.MaxBladeSpeed), self.DesiredBladeSpeed, 15 / ThinkRate))
-			if self.EngineSoundLoop then self.EngineSoundLoop:ChangePitch(50 + 50 * math.abs(CurSpeed) / self.MaxBladeSpeed, .1) end
-			if self.FanSoundLoop then self.FanSoundLoop:ChangePitch(50 + 50 * math.abs(CurSpeed) / self.MaxBladeSpeed, .1) end
-			if WireLib then
-				WireLib.TriggerOutput(self, "CurSpin", CurSpeed)
-			end
-		end
-
-		self:SetBladeSpeed(CurSpeed)
-
 		if State == STATE_SPINNING then
+			--jprint("cur: " .. tostring(CurSpeed) .. " desired: " .. tostring(self.DesiredBladeSpeed))
+			if CurSpeed ~= self.DesiredBladeSpeed then
+				CurSpeed = (math.Approach(math.Clamp(CurSpeed, -self.MaxBladeSpeed, self.MaxBladeSpeed), self.DesiredBladeSpeed, 15 / ThinkRate))
+				if self.EngineSoundLoop then self.EngineSoundLoop:ChangePitch(50 + 50 * math.abs(CurSpeed) / self.MaxBladeSpeed, .1) end
+				if self.FanSoundLoop then self.FanSoundLoop:ChangePitch(50 + 50 * math.abs(CurSpeed) / self.MaxBladeSpeed, .1) end
+				if WireLib then
+					WireLib.TriggerOutput(self, "CurSpin", CurSpeed)
+				end
+			end
+			self:SetBladeSpeed(CurSpeed)
+
 			if self:GetFuel() <= 0 then
 				self:TurnOff()
 
@@ -216,7 +214,7 @@ if SERVER then
 			local Phys = self:GetPhysicsObject()
 
 			if IsValid(Phys) then
-				Phys:ApplyForceCenter(self:GetRight() * CurSpeed * 1500 / ThinkRate)
+				Phys:ApplyForceCenter(self:GetRight() * CurSpeed * 2000 / ThinkRate)
 			end
 
 			if (math.abs(CurSpeed) < 80) then
@@ -230,6 +228,8 @@ if SERVER then
 			self:ConsumeFuel(0.001 * CurSpeed / ThinkRate)
 
 			self:UpdateWireOutputs()
+		elseif State == STATE_OFF then
+			self:SetBladeSpeed(math.Approach(CurSpeed, 0, 100 / ThinkRate))
 		end
 
 		self:NextThink(Time + (1 / ThinkRate))

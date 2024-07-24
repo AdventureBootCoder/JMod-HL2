@@ -104,7 +104,7 @@ if(SERVER)then
 	
 	function ENT:Think()
 		local State, Time, Prog = self:GetState(), CurTime(), self:GetProgress()
-		local SelfPos, Up, Right, Forward = self:GetPos(), self:GetUp(), self:GetRight(), self:GetForward()
+		local SelfPos, SelfUp, SelfRight, Forward = self:GetPos(), self:GetUp(), self:GetRight(), self:GetForward()
 		local Phys = self:GetPhysicsObject()
 
 		self:UpdateWireOutputs()
@@ -120,56 +120,62 @@ if(SERVER)then
 
 				return
 			elseif State == STATE_RUNNING then
-				local PoundDir = Up * -35
-				local CutDir = Up
-				local CutStrength = 100
 
-				local PoundTr = util.TraceHull({
-					start = SelfPos + PoundDir * .7,
-					endpos = SelfPos + PoundDir,
-					maxs = Vector(10, 10, 10),
-					mins = Vector(-10, -10, -10),
-					filter = self,
-					mask = MASK_SOLID,
-					ignoreworld = false
-				})
-				local HitPos = PoundTr.HitPos
-				debugoverlay.Line(SelfPos + PoundDir * .7, HitPos, 1, Color(255, 0, 0), true)
-				
-				if (PoundTr.Hit) then
-					local Ent = PoundTr.Entity
-					if IsValid(Ent) then
-						local Dmg = DamageInfo()
-						Dmg:SetDamagePosition(HitPos)
-						Dmg:SetDamageForce(PoundDir * CutStrength)
-						Dmg:SetDamage(3)
-						Dmg:SetDamageType(DMG_SLASH)
-						Dmg:SetInflictor(Ent)
-						Dmg:SetAttacker(JMod.GetEZowner(self))
-						Ent:TakeDamageInfo(Dmg)
-						if Ent:IsPlayer() then
-							Ent:SetVelocity(PoundDir * CutStrength / 10)
-						elseif IsValid(Ent:GetPhysicsObject()) then
-							Ent:GetPhysicsObject():ApplyForceOffset(PoundDir * -CutStrength, HitPos + CutDir * CutStrength)
+				local Resolution = 8
+				local Radius = 16
+				local RotationAngles = self:GetAngles():GetCopy()
+				local SpinOrigin = SelfPos + SelfUp * -16
+				local CutStrength = 5000
+
+				for i = 1, Resolution do
+					RotationAngles:RotateAroundAxis(RotationAngles:Forward(), 360 / Resolution)
+					local CutDir = RotationAngles:Right()
+					local LineStart = SpinOrigin + RotationAngles:Up() * Radius + CutDir * -Radius * .5
+					--debugoverlay.Line(LineStart, LineStart + CutDir * Radius, .2, Color(255, i * 100 / Resolution, 0), true)
+					local CutTr = util.QuickTrace(LineStart, CutDir * Radius, {self})
+
+					if (CutTr.Hit) then
+						local Ent = CutTr.Entity
+						local HitPos = CutTr.HitPos
+
+						if IsValid(Ent) then
+							local Dmg = DamageInfo()
+							Dmg:SetDamagePosition(HitPos)
+							Dmg:SetDamageForce(CutDir * CutStrength)
+							Dmg:SetDamage(3)
+							Dmg:SetDamageType(DMG_SLASH)
+							Dmg:SetInflictor(Ent)
+							Dmg:SetAttacker(JMod.GetEZowner(self))
+							Ent:TakeDamageInfo(Dmg)
+							if Ent:IsPlayer() then
+								Ent:SetVelocity(CutDir * CutStrength / 10)
+							elseif IsValid(Ent:GetPhysicsObject()) then
+								Ent:GetPhysicsObject():ApplyForceOffset(CutDir * CutStrength, HitPos)
+							end
 						end
-					end
-					self:GetPhysicsObject():ApplyForceOffset(PoundDir * CutStrength, HitPos + CutDir * CutStrength)
+						self:GetPhysicsObject():ApplyForceOffset(CutDir * -CutStrength, HitPos)
 
-					if PoundTr.SurfaceProps > 0 then
-						self:EmitSound(util.GetSurfaceData(PoundTr.SurfaceProps).impactSoftSound)
-					end
-					self:HitEffect(HitPos, 1)
+						if CutTr.SurfaceProps > 0 then
+							self:EmitSound(util.GetSurfaceData(CutTr.SurfaceProps).impactSoftSound)
+						end
+						self:HitEffect(HitPos, 1)
 
-					local Message = JMod.EZprogressTask(Ent, HitPos, self, "salvage", 0.01)
-					if Message then
-						Message = JMod.EZprogressTask(Ent, HitPos, self, "loosen", 0.01)
-					else
-						sound.Play("snds_jack_gmod/ez_dismantling/1.ogg", HitPos, 65, 110)--math.random(90, 110))
+						local Message = JMod.EZprogressTask(Ent, HitPos, self, "salvage", 0.01)
+						if Message then
+							Message = JMod.EZprogressTask(Ent, HitPos, self, "loosen", 0.01)
+						else
+							sound.Play("snds_jack_gmod/ez_dismantling/1.ogg", HitPos, 65, 110)--math.random(90, 110))
+						end
+						if Message then
+							debugoverlay.Text(HitPos, Message, .2, true)
+						end
+
+						self:ConsumeElectricity(0.05 * JMod.Config.Tools.Toolbox.DeconstructSpeedMult)
+
+						break
 					end
-					--self:SetMessage("")
-					self:ConsumeElectricity(0.05  * JMod.Config.ResourceEconomy.ExtractionSpeed)
 				end
-				self:ConsumeElectricity(0.05  * JMod.Config.ResourceEconomy.ExtractionSpeed)
+				self:ConsumeElectricity(0.05 * JMod.Config.Tools.Toolbox.DeconstructSpeedMult)
 			end
 		end
 
