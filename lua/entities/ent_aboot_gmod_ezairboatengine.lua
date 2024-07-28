@@ -214,7 +214,64 @@ if SERVER then
 			local Phys = self:GetPhysicsObject()
 
 			if IsValid(Phys) then
-				Phys:ApplyForceCenter(self:GetRight() * CurSpeed * 2000 / ThinkRate)
+				local SelfPos = self:GetPos()
+				local SelfUp, SelfRight, SelfForward = self:GetUp(), self:GetRight(), self:GetForward()
+				Phys:ApplyForceCenter(SelfRight * CurSpeed * 2000 / ThinkRate)
+
+				if (self.NextWhackTime or 0) < CurTime() then
+					self.NextWhackTime = CurTime() + math.min(1, math.abs(1 / (CurSpeed * .5 / 3.14)))
+					--jprint(math.abs(1 / (CurSpeed * .5 / 3.14)))
+					local Resolution = 16
+					local Radius = 30
+					local RotationAngles = self:GetAngles():GetCopy()
+					local SpinOrigin = SelfPos + SelfRight * -23 + SelfUp * -4.3
+					local CutStrength = 1000
+
+					RotationAngles:RotateAroundAxis(SelfUp, 90)
+					for i = 1, Resolution do
+						local CutDir = RotationAngles:Right()
+						local Reverse = CurSpeed < 0
+						if Reverse then
+							CutDir = -CutDir
+							RotationAngles:RotateAroundAxis(RotationAngles:Forward(), -360 / Resolution)
+						else
+							RotationAngles:RotateAroundAxis(RotationAngles:Forward(), 360 / Resolution)
+						end
+						
+						local LineStart = SpinOrigin + RotationAngles:Up() * Radius + CutDir * -Radius / math.pi
+						debugoverlay.Cross(SpinOrigin, 5, .2, Color(255, i * 100 / Resolution, 0), true)
+						debugoverlay.Line(LineStart, LineStart + CutDir * Radius / math.pi, .2, Color(255, i * 100 / Resolution, 0), true)
+						local CutTr = util.QuickTrace(LineStart, CutDir * Radius / math.pi, {self, self:GetParent()})
+
+						if (CutTr.Hit) then
+							local Ent = CutTr.Entity
+							local HitPos = CutTr.HitPos
+
+							if IsValid(Ent) then
+								local Dmg = DamageInfo()
+								Dmg:SetDamagePosition(HitPos)
+								Dmg:SetDamageForce(CutDir * CutStrength)
+								Dmg:SetDamage(3)
+								Dmg:SetDamageType(DMG_SLASH)
+								Dmg:SetInflictor(Ent)
+								Dmg:SetAttacker(JMod.GetEZowner(self))
+								Ent:TakeDamageInfo(Dmg)
+								if Ent:IsPlayer() then
+									Ent:SetVelocity(CutDir * CutStrength / 10)
+								elseif IsValid(Ent:GetPhysicsObject()) then
+									Ent:GetPhysicsObject():ApplyForceOffset(CutDir * CutStrength, HitPos)
+								end
+							end
+							Phys:ApplyForceOffset(CutDir * -CutStrength, HitPos)
+
+							if CutTr.SurfaceProps > 0 then
+								self:EmitSound(util.GetSurfaceData(CutTr.SurfaceProps).impactSoftSound)
+							end
+							--self:HitEffect(HitPos, 1)
+							break
+						end
+					end
+				end
 			end
 
 			if (math.abs(CurSpeed) < 80) then
@@ -226,7 +283,6 @@ if SERVER then
 			end
 
 			self:ConsumeFuel(0.001 * CurSpeed / ThinkRate)
-
 			self:UpdateWireOutputs()
 		elseif State == STATE_OFF then
 			self:SetBladeSpeed(math.Approach(CurSpeed, 0, 100 / ThinkRate))

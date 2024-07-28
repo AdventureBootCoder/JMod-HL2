@@ -236,7 +236,7 @@ elseif(CLIENT)then
 		self:DrawModel()
 		--
 
-		local Obscured = util.TraceLine({start = EyePos(), endpos = MotorPos, filter = {LocalPlayer(), self}, mask = MASK_OPAQUE}).Hit
+		local Obscured = util.TraceLine({start = EyePos(), endpos = SelfPos, filter = {LocalPlayer(), self}, mask = MASK_OPAQUE}).Hit
 		local Closeness = LocalPlayer():GetFOV() * (EyePos():Distance(SelfPos))
 		local DetailDraw = Closeness < 36000 -- cutoff point is 400 units when the fov is 90 degrees
 		local DrillDraw = true
@@ -258,7 +258,7 @@ elseif(CLIENT)then
 		if Obscured then DetailDraw = false end -- if obscured, at least disable details
 		
 		if DetailDraw then
-			if (Closeness < 40000) and (State == STATE_RUNNING) then
+			if (State == STATE_RUNNING) then
 				local DisplayAng = SelfAng:GetCopy()
 				DisplayAng:RotateAroundAxis(DisplayAng:Forward(), 90)
 				DisplayAng:RotateAroundAxis(DisplayAng:Up(), 180)
@@ -270,6 +270,8 @@ elseif(CLIENT)then
 					draw.SimpleTextOutlined(tostring(math.Round(ElecFrac*100)).."%","JMod-Display",0,-30,Color(R,G,B,Opacity),TEXT_ALIGN_CENTER,TEXT_ALIGN_TOP,3,Color(0,0,0,Opacity))
 				cam.End3D2D()
 			end
+		else
+			debugoverlay.Cross(SelfPos, 10, .2, Color(255, 0, 0), true)
 		end
 	end
 	language.Add("ent_aboot_gmod_ezpounder","EZ Ground-Pounder")
