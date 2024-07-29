@@ -307,10 +307,6 @@ JModHL2.ArmorTable = {
 			[DMG_ACID]=1,
 			[DMG_POISON]=1,
 		}, NonArmorProtectionProfile),
-		resist={
-			[DMG_ACID]=.75,
-			[DMG_POISON]=.90
-		},
 		eff={
 			zombie = true
 		},
