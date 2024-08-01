@@ -307,7 +307,6 @@ function SWEP:PrimaryAttack()
 			if (State == STATE_FLAMIN) and (math.Rand(0, 1) > .3) then
 				if self.Owner:IsPlayer() then self.Owner:LagCompensation(true) end
 				self:Pawnch()
-				self.Owner:ViewPunch(AngleRand(-.2, .2))
 				local Spread = 20
 				for i = 1, 10 do
 					local RandAng = AngleRand(-Spread, Spread)
@@ -318,7 +317,7 @@ function SWEP:PrimaryAttack()
 							local DmgInfo = DamageInfo()
 							DmgInfo:SetAttacker(self.Owner)
 							DmgInfo:SetInflictor(self)
-							DmgInfo:SetDamage(math.random(1, 3))
+							DmgInfo:SetDamage(math.random(1, 5))
 							DmgInfo:SetDamageType(DMG_BURN)
 							Ent:TakeDamageInfo(DmgInfo)
 							if (math.random(1, 5) == 1) then Ent:Ignite(math.random(5, 10), 50) end
@@ -378,6 +377,7 @@ function SWEP:Msg(msg)
 end
 
 function SWEP:Pawnch()
+	self.Owner:ViewPunch(AngleRand(-.2, .2))
 	self.Owner:SetAnimation(PLAYER_ATTACK1)
 	self:UpdateNextIdle()
 end
