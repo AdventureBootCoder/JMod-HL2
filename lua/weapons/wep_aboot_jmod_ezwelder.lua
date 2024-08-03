@@ -170,6 +170,11 @@ function SWEP:ViewModelDrawn()
 		
 		if WeldingMask then
 			Ply.EZautoDarken = 1
+		elseif math.random(1, 5) == 1 then
+			local plooie = EffectData()
+			plooie:SetOrigin(ShootPos)
+			plooie:SetScale(.1)
+			util.Effect("eff_jack_gmod_flashbang", plooie, true, true)
 		end
 	end
 end
@@ -196,8 +201,15 @@ function SWEP:DrawWorldModel()
 			dlight.DieTime = CurTime() + .2
 			dlight.Style = 0
 		end--]]
-		if (EyePos():Distance(Pos) < 200) and WeldingMask then
-			Ply.EZautoDarken = 200 / EyePos():Distance(Pos)
+		if (EyePos():Distance(Pos) < 400)  then 
+			if WeldingMask then
+				Ply.EZautoDarken = 400 / EyePos():Distance(Pos)
+			elseif math.random(1, 5) == 1 then
+				local plooie = EffectData()
+				plooie:SetOrigin(Pos)
+				plooie:SetScale(.1)
+				util.Effect("eff_jack_gmod_flashbang", plooie, true, true)
+			end
 		end
 	end
 end
@@ -256,29 +268,6 @@ end
 
 function SWEP:Msg(msg)
 	self.Owner:PrintMessage(HUD_PRINTCENTER, msg)
-end
-
-function SWEP:Reload()
-	--[[if SERVER then
-		local Time = CurTime()
-		local Ent = self:WhomIlookinAt()
-		
-		if IsValid(Ent) and Ent.GetEZsupplies then
-			for typ, amt in pairs(Ent:GetEZsupplies()) do
-				if table.HasValue(self.EZconsumes, typ) and (amt > 0) then
-					local CurAmt = self:GetEZsupplies(typ) or 0
-					local Take = math.min(amt, 100 - CurAmt)
-					
-					if Take > 0 then
-						Ent:SetEZsupplies(typ, amt - Take, self.Owner)
-						self:SetEZsupplies(typ, CurAmt + Take)
-						sound.Play("items/ammo_pickup.wav", self:GetPos(), 65, math.random(90, 110))
-						JMod.ResourceEffect(typ, Ent:LocalToWorld(Ent:OBBCenter()), self:GetPos(), amt, 1, 1, 2)
-					end
-				end
-			end
-		end
-	end--]]
 end
 
 function SWEP:WhomIlookinAt()
@@ -556,10 +545,6 @@ function SWEP:Think()
 					local WeldingMask = JMod.PlyHasArmorEff(Ply, "flashresistant")
 					if not(WeldingMask) and (math.random(1, 5) == 1) then
 						self:WeldBurn(Ply, Ply:GetShootPos())
-						local plooie = EffectData()
-						plooie:SetOrigin(ShootPos)
-						plooie:SetScale(.2)
-						util.Effect("eff_jack_gmod_flashbang", plooie, true, true)
 					end
 				end
 
@@ -581,7 +566,7 @@ function SWEP:Think()
 	if (SERVER) then
 		--jprint(self.WasWelding)
 		if self:GetWelding() and not(self.WasWelding) then
-			sound.Play("snd_jack_plasmapop.ogg", self.Owner:GetPos(), 75, math.random(95, 110), 1)
+			sound.Play("snd_jack_plasmapop.ogg", self.Owner:GetPos(), 75, math.random(95, 110), .5)
 			timer.Simple(0.1, function()
 				if IsValid(self) and (self:GetWelding()) then
 					self.Snd1:Play()
@@ -592,7 +577,7 @@ function SWEP:Think()
 		elseif not(self:GetWelding()) and self.WasWelding then
 			self.Snd1:Stop()
 			self.Snd2:Stop()
-			sound.Play("snd_jack_plasmapop.ogg", self.Owner:GetPos(), 75, math.random(95, 110), 1)
+			--sound.Play("snd_jack_plasmapop.ogg", self.Owner:GetPos(), 75, math.random(95, 110), .5)
 			self.WasWelding = false
 		end
 	end
@@ -602,10 +587,10 @@ function SWEP:WeldBurn(target, pos, dir)
 	local Burrn = DamageInfo()
 	Burrn:SetDamage(math.Rand(0.2, 0.5))
 	if pos then
-	Burrn:SetDamagePosition(pos)
+		Burrn:SetDamagePosition(pos)
 	end
 	if dir then
-	Burrn:SetDamageForce(dir)
+		Burrn:SetDamageForce(dir)
 	end
 	Burrn:SetAttacker(self.Owner)
 	Burrn:SetInflictor(self)
