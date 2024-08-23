@@ -14,6 +14,7 @@ ENT.JModGUIcolorable = false
 ENT.JModEZstorable = true
 ENT.EZscannerDanger = true
 ENT.JModPreferredCarryAngles = Angle(0, 0, 0)
+ENT.EZcolorable = true
 ENT.EZhopperMine = true
 
 ENT.BlacklistedNPCs = {"bullseye_strider_focus", "npc_turret_floor", "npc_turret_ceiling", "npc_turret_ground"}
