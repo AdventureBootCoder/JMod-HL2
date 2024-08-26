@@ -152,32 +152,29 @@ if(SERVER)then
 				self:EmitSound("snd_jack_minearm.ogg", 60, 70)
 				self:TurnOff(Dude)
 			end
-		else
-			if Alt then return end
-			if (self.NextStick < Time) then
-				local Tr = util.QuickTrace(Dude:GetShootPos(), Dude:GetAimVector() * 80, {self, Dude})
+		elseif self:IsPlayerHolding() and not(Alt) and (self.NextStick < Time) then
+			local Tr = util.QuickTrace(Dude:GetShootPos(), Dude:GetAimVector() * 80, {self, Dude})
 
-				if Tr.Hit and IsValid(Tr.Entity:GetPhysicsObject()) and not Tr.Entity:IsNPC() and not Tr.Entity:IsPlayer() then
-					self.NextStick = Time + .5
-					local Ang = Tr.HitNormal:Angle()
-					self:SetAngles(Ang)
-					self:SetPos(Tr.HitPos + Tr.HitNormal * 5)
+			if Tr.Hit and IsValid(Tr.Entity:GetPhysicsObject()) and not Tr.Entity:IsNPC() and not Tr.Entity:IsPlayer() then
+				self.NextStick = Time + .5
+				local Ang = Tr.HitNormal:Angle()
+				self:SetAngles(Ang)
+				self:SetPos(Tr.HitPos + Tr.HitNormal * 5)
 
-					-- crash prevention
-					if Tr.Entity:GetClass() == "func_breakable" then
-						timer.Simple(0, function()
-							self:GetPhysicsObject():Sleep()
-						end)
-					else
-						local Weld = constraint.Weld(self, Tr.Entity, 0, Tr.PhysicsBone, 3000, false, false)
-						self.StuckTo = Tr.Entity
-						self.StuckStick = Weld
-					end
-
-					self:EmitSound("snd_jack_claythunk.ogg", 65, math.random(80, 120))
-					Dude:DropObject()
-					JMod.Hint(Dude, "arm")
+				-- crash prevention
+				if Tr.Entity:GetClass() == "func_breakable" then
+					timer.Simple(0, function()
+						self:GetPhysicsObject():Sleep()
+					end)
+				else
+					local Weld = constraint.Weld(self, Tr.Entity, 0, Tr.PhysicsBone, 3000, false, false)
+					self.StuckTo = Tr.Entity
+					self.StuckStick = Weld
 				end
+
+				self:EmitSound("snd_jack_claythunk.ogg", 65, math.random(80, 120))
+				Dude:DropObject()
+				JMod.Hint(Dude, "arm")
 			end
 		end
 	end
