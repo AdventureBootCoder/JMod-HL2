@@ -127,10 +127,9 @@ if(SERVER)then
 	function ENT:Use(activator, activatorAgain, onOff)
 		local Dude = activator or activatorAgain
 		local Time = CurTime()
-
+		local Alt = Dude:KeyDown(JMod.Config.General.AltFunctionKey)
 		if tobool(onOff) then
 			local State = self:GetState()
-			local Alt = Dude:KeyDown(JMod.Config.General.AltFunctionKey)
 			JMod.SetEZowner(self, Dude, true)
 
 			if State == STATE_BROKEN then
@@ -154,7 +153,8 @@ if(SERVER)then
 				self:TurnOff(Dude)
 			end
 		else
-			if self:IsPlayerHolding() and (self.NextStick < Time) then
+			if Alt then return end
+			if (self.NextStick < Time) then
 				local Tr = util.QuickTrace(Dude:GetShootPos(), Dude:GetAimVector() * 80, {self, Dude})
 
 				if Tr.Hit and IsValid(Tr.Entity:GetPhysicsObject()) and not Tr.Entity:IsNPC() and not Tr.Entity:IsPlayer() then
@@ -198,7 +198,7 @@ if(SERVER)then
 	local Shockables = {[MAT_METAL] = true, [MAT_VENT] = true, [MAT_DEFAULT] = true, [MAT_GRATE] = true, [MAT_FLESH] = true, [MAT_ALIENFLESH] = true}
 
 	local function IsConnectableEnt(ent1, ent2)
-		if (ent2:IsValid()) and (ent2:GetClass() == "prop_physics") and (table.HasValue(Shockables, ent2:GetMaterialType())) then
+		if (ent2:IsValid()) and (ent2:GetClass() == "prop_physics") and Shockables[ent2:GetMaterialType()] then
 			if IsValid(ent1) then
 				local Rad1, Rad2 = ent1:BoundingRadius() + 5, ent2:BoundingRadius() + 5
 				local Dist = ent1:LocalToWorld(ent1:OBBCenter()):Distance(ent2:LocalToWorld(ent2:OBBCenter()))
@@ -227,7 +227,7 @@ if(SERVER)then
 		local FoundEnts = connected or {}
 		for _, Weld in pairs(constraint.FindConstraints(ent, "Weld")) do
 			local EntToCheck = Weld.Ent1
-			if not(EntToCheck ~= ent) then
+			if EntToCheck == ent then
 				EntToCheck = Weld.Ent2
 			end
 			if IsConnectableEnt(ent, EntToCheck) and not(table.HasValue(FoundEnts, EntToCheck)) then
