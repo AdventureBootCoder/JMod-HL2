@@ -299,7 +299,7 @@ if(SERVER)then
 						--[[if ShockEnt:GetGroundEntity() != NULL then
 							print("Ground Entity: ", ShockEnt:GetGroundEntity())
 						end--]]
-						DropEntityIfHeld(ShockEnt)
+						ShockEnt:ForcePlayerDrop()
 						local Damage, Force = math.random(1, 10), 500 -- Adjust damage and force factors as desired
 						local Zap = DamageInfo()
 						Zap:SetDamage(Damage)
