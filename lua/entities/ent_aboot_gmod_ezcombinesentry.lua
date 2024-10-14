@@ -213,7 +213,7 @@ function ENT:SetMods(tbl, ammoType)
 		self.EZconsumes={JMod.EZ_RESOURCE_TYPES.AMMO,JMod.EZ_RESOURCE_TYPES.POWER,JMod.EZ_RESOURCE_TYPES.BASICPARTS,JMod.EZ_RESOURCE_TYPES.COOLANT}
 	end
 	if SERVER then
-		self:SetupWire()
+		--self:SetupWire()
 	end
 end
 
@@ -714,6 +714,7 @@ if(SERVER)then
 		local Time = CurTime()
 
 		if self.NextRealThink < Time then
+			self:UpdateWireOutputs()
 			local Electricity, Ammo = self:GetElectricity(), self:GetAmmo()
 			self.NextRealThink = Time + .25 / self.ThinkSpeed
 			self.Firing = false
