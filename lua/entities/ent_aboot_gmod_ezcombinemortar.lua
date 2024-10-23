@@ -373,10 +373,6 @@ if(SERVER)then
 	--- End wire stuff
 
 	function ENT:CustomInit()
-		local phys=self:GetPhysicsObject()
-		if phys:IsValid()then
-			phys:SetBuoyancyRatio(.3)
-		end
 		self.EZconsumes = {
 			JMod.EZ_RESOURCE_TYPES.AMMO,
 			JMod.EZ_RESOURCE_TYPES.POWER,
