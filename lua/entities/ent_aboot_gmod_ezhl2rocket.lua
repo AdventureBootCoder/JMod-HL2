@@ -152,7 +152,7 @@ if SERVER then
 		else
 			self:SetPos(SelfPos + self.CurVel / ThinkRate)
 			--local AngleToBe = self.CurVel:GetNormalized():Angle()
-			local AimPos = (self.OwnerTr and self.OwnerTr.HitPos) or self.Owner.GuidePos
+			local AimPos = (self.OwnerTr and self.OwnerTr.HitPos) or self.Owner.MissileGuidePos
 			if self.Guided and (not(AimPos) or (AimPos:Distance(self:GetPos()) < 10)) then
 				self:Detonate()
 

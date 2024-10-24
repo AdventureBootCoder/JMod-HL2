@@ -899,7 +899,7 @@ if(SERVER)then
 			end
 		end
 		if self.SearchData.LastKnownPos then
-			self.GuidePos = self.SearchData.LastKnownPos
+			self.MissileGuidePos = self.SearchData.LastKnownPos
 		end
 		
 		self:NextThink(Time + .02)

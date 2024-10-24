@@ -11,12 +11,12 @@ ENT.Spawnable = true
 ENT.AdminSpawnable = true
 ENT.SpawnHeight = 15
 ENT.EZconsumes = nil
-ENT.EZscannerDanger=true
-ENT.JModPreferredCarryAngles=Angle(0,0,180)
-ENT.EZupgradable=true
-ENT.Model="models/combine_turrets/ground_turret.mdl"
---ENT.Mat="models/mat_jack_gmod_ezsentry"
-ENT.Mass=nil
+ENT.EZscannerDanger = true
+ENT.JModPreferredCarryAngles = Angle(0, 0, 180)
+ENT.EZupgradable = true
+ENT.Model = "models/combine_turrets/ground_turret.mdl"
+--ENT.Mat = "models/mat_jack_gmod_ezsentry"
+ENT.Mass = nil
 ENT.EZcolorable = false
 -- config --
 ENT.AmmoTypes = {
@@ -126,99 +126,15 @@ ENT.DynamicPerfSpecs={
 ----
 local STATE_BROKEN,STATE_OFF,STATE_WATCHING,STATE_SEARCHING,STATE_ENGAGING,STATE_WHINING,STATE_OVERHEATED = -1,0,1,2,3,4,5
 function ENT:CustomSetupDataTables()
-	self:NetworkVar("Int",2,"Ammo")
-	self:NetworkVar("Float",1,"AimPitch")
-	self:NetworkVar("Float",2,"AimYaw")
-	self:NetworkVar("Float",3,"PerfMult")
-	self:NetworkVar("Float",4,"Coolant")
-	self:NetworkVar("String",0,"AmmoType")
+	self:NetworkVar("Int", 2, "Ammo")
+	self:NetworkVar("Float", 1, "AimPitch")
+	self:NetworkVar("Float", 2, "AimYaw")
+	self:NetworkVar("Float", 3, "PerfMult")
+	self:NetworkVar("Float", 4, "Coolant")
+	self:NetworkVar("String", 0, "AmmoType")
 end
 
 if(SERVER)then
-	--- Wire stuff
-	function ENT:SetupWire()
-		if not(istable(WireLib)) then return end
-		local WireInputs = {
-			"Toggle [NORMAL]", 
-			"On-Off [NORMAL]", 
-			"Engage [ENTITY]", 
-			"AimAt [VECTOR]", 
-			"Shoot [NORMAL]",
-			"Reset [NORMAL]"
-		}
-		local WireInputDesc = {
-			"Greater than 1 toggles machine on and off", 
-			"1 turns on, 0 turns off", 
-			"Entity to get angry at",
-			"Vector to aim at",
-			"Fires sentry",
-			"Resets sentry memory"
-		}
-		self.Inputs = WireLib.CreateInputs(self, WireInputs, WireInputDesc)
-		--
-		local WireOutputs = {"State [NORMAL]", "Grade [NORMAL]"}
-		local WireOutputDesc = {"The state of the machine \n-1 is broken \n0 is off \n1 is on", "The machine grade"}
-		for _, typ in ipairs(self.EZconsumes) do
-			if typ == JMod.EZ_RESOURCE_TYPES.BASICPARTS then typ = "Durability" end
-			local ResourceName = string.Replace(typ, " ", "")
-			local ResourceDesc = "Amount of "..ResourceName.." left"
-			--
-			local OutResourceName = string.gsub(ResourceName, "^%l", string.upper).." [NORMAL]"
-			table.insert(WireOutputs, OutResourceName)
-			table.insert(WireOutputDesc, ResourceDesc)
-		end
-		self.Outputs = WireLib.CreateOutputs(self, WireOutputs, WireOutputDesc)
-	end
-
-	function ENT:TriggerInput(iname, value)
-		local State, Owner = self:GetState(), JMod.GetEZowner(self)
-		if State < 0 then return end
-		if iname == "On-Off" then
-			if value == 1 then
-				self:TurnOn(Owner)
-			elseif value == 0 then
-				self:TurnOff(Owner)
-			end
-		elseif iname == "Toggle" then
-			if value > 0 then
-				if State == 0 then
-					self:TurnOn(Owner)
-				elseif State > 0 then
-					self:TurnOff(Owner)
-				end
-			end
-		elseif iname == "Engage" then
-			if IsValid(value) then
-				self.EngageOverride = true
-				self:Engage(value)
-			else
-				self.EngageOverride = false
-			end
-		elseif iname == "AimAt" then
-			if value == Vector(0, 0, 0) then
-				self.AimOverride = nil
-			else
-				self.AimOverride = value
-				local NeedTurnPitch, NeedTurnYaw = self:GetTargetAimOffset(value)
-
-				if (math.abs(NeedTurnPitch) > 0) or (math.abs(NeedTurnYaw) > 0) then
-					self:Turn(NeedTurnPitch, NeedTurnYaw)
-				end
-			end
-		elseif iname == "Shoot" then
-			if value > 0 then
-				self.FireOverride = true
-			else
-				self.FireOverride = false
-			end
-		elseif iname == "Reset" then
-			if value > 0 then
-				self:ResetMemory()
-			end
-		end
-	end
-	--- End wire stuff
-	
 	function ENT:CreateNPCTarget()
 		if not IsValid(self.NPCTarget) then
 			self.NPCTarget = ents.Create("npc_bullseye")
@@ -234,14 +150,14 @@ if(SERVER)then
 	end
 
 	function ENT:CustomDetermineDmgMult(dmginfo)
-		local Mult=1
+		local Mult = 1
 		local IncomingVec = dmginfo:GetDamageForce():GetNormalized()
 		local Up,Right,Forward = self:GetUp(),self:GetRight(),self:GetForward()
 		local AimAng = self:GetAngles()
 		local AimVec = AimAng:Forward()
 		local AttackAngle = -math.deg(math.asin(AimVec:Dot(IncomingVec)))
 		if(AttackAngle >= 60)then
-			debugoverlay.Cross(dmginfo.HitPos)
+			debugoverlay.Cross(dmginfo:GetDamagePosition() or self:GetPos(), 10, 2, Color(255, 0, 0), true)
 			Mult = Mult * .2
 			if (math.random(1, 2) == 1) then
 				local SelfPos = self:GetPos()
@@ -481,11 +397,6 @@ if(SERVER)then
 				self:Whine()
 			end
 
-			if self.NextFixTime < Time then
-				self.NextFixTime = Time + 10
-				self:GetPhysicsObject():SetBuoyancyRatio(.3)
-			end
-
 			---
 			if self.Heat > 55 then
 				local SelfPos, Up, Right, Forward = self:GetPos(), self:GetUp(), self:GetRight(), self:GetForward()
@@ -518,21 +429,36 @@ if(SERVER)then
 			end
 		end
 
+		if self.SearchData.LastKnownPos then
+			self.MissileGuidePos = self.SearchData.LastKnownPos -- This is for guiding the rockets
+		end
+
 		self:NextThink(Time + .02)
 
 		return true
 	end
 
 	function ENT:FireAtPoint(point, targVel)
-		if not point then return end
-		local Ammo = self:GetAmmo()
-		if Ammo <= 0 then return end
 		local SelfPos, Up, Right, Forward, ProjType = self:GetPos(), self:GetUp(), self:GetRight(), self:GetForward(), self:GetAmmoType()
 		local AimAng = self:GetAngles()
 		AimAng:RotateAroundAxis(AimAng:Up(), self:GetAimYaw())
+		AimAng:RotateAroundAxis(AimAng:Right(), self:GetAimPitch())
 		local AimForward = AimAng:Forward()
-		local ShootPos = SelfPos + AimForward * (4 + self.BarrelLength) - AimAng:Up() * 20
+		local ShootPos = SelfPos + AimForward * (self.BarrelLength + 4) + AimAng:Up() * -20
+
+		if not(point) or (point == vector_origin) then
+			local Trace = util.QuickTrace(ShootPos, AimForward * 100, self)
+			point = Trace.HitPos
+		end
+
+		---
+		local Ammo = self:GetAmmo()
+		if Ammo <= 0 then return end
+		if self:GetElectricity() <= 0 then return end
 		local AmmoConsume, ElecConsume = 1, .02
+		if self.AmmoRefundTable[ProjType].spawnType == JMod.EZ_RESOURCE_TYPES.POWER then
+			AmmoConsume = 0
+		end
 		local Heat = self.Damage * self.ShotCount / 30
 		self:AddVisualRecoil(Heat * 2)
 
@@ -587,7 +513,7 @@ if(SERVER)then
 			local ShellAng = AimAng:GetCopy()
 			ShellAng:RotateAroundAxis(ShellAng:Up(), -90)
 			local Eff = EffectData()
-			Eff:SetOrigin(SelfPos - Up * 16 + AimForward * 5)
+			Eff:SetOrigin(SelfPos + Up * 36 + AimForward * 5)
 			Eff:SetAngles(ShellAng)
 			Eff:SetFlags(5)
 			Eff:SetEntity(self)
@@ -598,8 +524,7 @@ if(SERVER)then
 
 			util.Effect("MuzzleFlash", Eff)
 
-			sound.Play("weapons/ar2/fire1.wav", ShootPos, 100, math.random(80, 100))
-			--sound.Play("Weapon_AR2.Single", ShootPos, 100, math.random(80, 100))
+			sound.Play("^npc/turret_floor/shoot1.wav", SelfPos + Up, 100, math.random(80, 100))
 			ShootDir = (ShootDir + VectorRand() * math.Rand(.05, 1) * Inacc):GetNormalized()
 
 			local Ballut = {
@@ -619,6 +544,7 @@ if(SERVER)then
 			}
 
 			self:FireBullets(Ballut)
+			ElecConsume = .025 * Dmg
 		elseif ProjType == "Buckshot" then
 			ParticleEffect("muzzleflash_shotgun", ShootPos, AimAng, self)
 			local ShellAng = AimAng:GetCopy()
@@ -807,7 +733,6 @@ if(SERVER)then
 			end
 
 			Heat = Heat * 3
-			AmmoConsume = 0
 			ElecConsume = .025 * Dmg
 		elseif ProjType == "Missile Launcher" then
 			local Dmg, Inacc = self.Damage * 15, .06 / self.Accuracy
@@ -824,7 +749,7 @@ if(SERVER)then
 			--
 			ShootDir = (ShootDir + VectorRand() * math.Rand(.05, 1) * Inacc):GetNormalized()
 			local Rocket = ents.Create("ent_aboot_gmod_ezhl2rocket")
-			Rocket:SetPos(ShootPos + Up * 100)
+			Rocket:SetPos(ShootPos)
 			ShootAng:RotateAroundAxis(ShootAng:Up(), -90)
 			Rocket:SetAngles(ShootAng)
 			JMod.SetEZowner(Rocket, JMod.GetEZowner(self) or self)

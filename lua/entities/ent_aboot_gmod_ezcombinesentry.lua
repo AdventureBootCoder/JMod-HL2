@@ -24,13 +24,13 @@ ENT.AmmoTypes = {
 	["Pulse Rifle"] = {
 		FireRate = 1.8,
 		Damage = .35,
-		Accuracy = .8,
-		BarrelLength = .9,
+		Accuracy = .6,
+		BarrelLength = .8,
 		MaxAmmo = 1.5,
 		TargetingRadius = 1,
 		-- make it faster
-		SearchSpeed = 1.5,
-		TargetLockTime = .5,
+		SearchSpeed = 1.4,
+		TargetLockTime = .6,
 		TurnSpeed = 1.5
 	},
 	["Buckshot"] = {
@@ -912,6 +912,9 @@ if(SERVER)then
 		if (self.Firing or self.FireOverride) and (self.NextFire < Time) then
 			self.NextFire = Time + 1 / self.FireRate -- (1/self.FireRate^1.2+0.05)
 			self:FireAtPoint((self.FireOverride and vector_origin) or self.SearchData.LastKnownPos, self.SearchData.LastKnownVel or Vector(0, 0, 0))
+		end
+		if self.SearchData.LastKnownPos then
+			self.MissileGuidePos = self.SearchData.LastKnownPos -- This is for guiding the rockets
 		end
 		if State == STATE_SEARCHING then
 			self:ScanMove(1)
