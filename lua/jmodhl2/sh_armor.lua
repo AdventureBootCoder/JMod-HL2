@@ -331,8 +331,7 @@ JModHL2.ArmorTable = {
 		clr = { r = 255, g = 255, b = 255 },
 		clrForced = true,
 		slots = {
-			eyes = .85,
-			mouthnose = .75
+			eyes = .90
 		},
 		def = table.Inherit({
 			[DMG_NERVEGAS]=1,
