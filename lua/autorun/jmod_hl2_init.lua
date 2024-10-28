@@ -74,7 +74,7 @@ if(SERVER)then
 		playa:SetNW2Float(tag_counter, 0)
 	end)
 
-	hook.Add("JModHookEZArmorSync", "ABootHL2ArmorCheck", function(playa)
+	hook.Add("JMod_EZarmorSync", "ABootHL2ArmorCheck", function(playa)
 		local PlyEff = JMod.PlyHasArmorEff(playa)
 		if PlyEff and PlyEff.HEVsuit then
 			if not(playa:IsSuitEquipped()) then
