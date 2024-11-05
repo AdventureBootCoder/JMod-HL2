@@ -220,16 +220,21 @@ if(SERVER)then
 
 	--hook.Remove("PlayerCanPickupItem", "JMod_HL2_EZpickup")
 	hook.Add("PlayerCanPickupItem", "JMod_HL2_EZpickup", function(ply, item)
-		if (EZammoPickup:GetBool() == true) and (HLtoEZammo[item:GetClass()]) then
-			EZammoConversion = HLtoEZammo[item:GetClass()]
+		EZammoConversion = HLtoEZammo[item:GetClass()]
+		if (EZammoPickup:GetBool() == true) and (EZammoConversion) then
+			local PlayerSWEP = ply:GetActiveWeapon()
 			local AmmoID = game.GetAmmoID(EZammoConversion[1])
-			local MaxAmmo = game.GetAmmoMax(AmmoID) * JMod.Config.Weapons.AmmoCarryLimitMult
-			local AmmoToGive = math.min(EZammoConversion[2], MaxAmmo - ply:GetAmmoCount(EZammoConversion[1]))
-			if AmmoToGive > 0 then
-				ply:GiveAmmo(AmmoToGive, EZammoConversion[1])
-				item:Remove()
 
-				return false
+			if (AmmoID ~= -1) and IsValid(PlayerSWEP) and ((PlayerSWEP:GetPrimaryAmmoType() == AmmoID) or (PlayerSWEP:GetSecondaryAmmoType() == AmmoID)) then
+				local AmmoID = game.GetAmmoID(EZammoConversion[1])
+				local MaxAmmo = game.GetAmmoMax(AmmoID) * JMod.Config.Weapons.AmmoCarryLimitMult
+				local AmmoToGive = math.min(EZammoConversion[2], MaxAmmo - ply:GetAmmoCount(EZammoConversion[1]))
+				if AmmoToGive > 0 then
+					ply:GiveAmmo(AmmoToGive, EZammoConversion[1])
+					item:Remove()
+
+					return false
+				end
 			end
 		end
 		--[[if (item:GetClass() == "item_healthkit") and (ply:Health() < ply:GetMaxHealth()) then
