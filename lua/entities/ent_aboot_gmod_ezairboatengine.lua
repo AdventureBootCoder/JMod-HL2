@@ -282,7 +282,7 @@ if SERVER then
 				self.FanSoundLoop = CreateSound(self, self.FullThrottleSounds["fan"])
 			end
 
-			self:ConsumeFuel(0.001 * CurSpeed / ThinkRate)
+			self:ConsumeFuel(0.001 * math.abs(CurSpeed) / ThinkRate)
 			self:UpdateWireOutputs()
 		elseif State == STATE_OFF then
 			self:SetBladeSpeed(math.Approach(CurSpeed, 0, 100 / ThinkRate))
