@@ -15,7 +15,7 @@ SWEP.WorldModelOffset = {
 SWEP.NoHideLeftHandInCustomization = true
 
 SWEP.DefaultBodygroups = "00000000000"
-JModHL2.ApplyAmmoSpecs(SWEP, "Heavy Rifle Round", 1.5)
+JModHL2.ApplyAmmoSpecs(SWEP, "Heavy Rifle Round-API", 1.5)
 SWEP.CustomToggleCustomizeHUD = false
 --
 SWEP.RicPenShotData = {150, true, false, 1}

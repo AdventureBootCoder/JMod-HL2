@@ -144,6 +144,15 @@ JModHL2.AmmoTable = {
 		tracer = "tfa_mmod_tracer_ar3",
 		dmgtype = DMG_SNIPER
 	},
+	["Heavy Rifle Round-API"] = {
+		resourcetype = "munitions",
+		sizemult = 24,
+		carrylimit = 25,
+		basedmg = 200,
+		effrange = 300,
+		terminaldmg = 30,
+		penetration = 120
+	},
 	["25mm Grenade"] = {
 		resourcetype = "munitions",
 		carrylimit = 12,
