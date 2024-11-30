@@ -110,12 +110,8 @@ hook.Add("JMod_OnRadioDeliver", "JMODHL2_CANNISTER_DELIVER", function(stationID,
 			end)
 			---
 		end)
-		JMod.NotifyAllRadios(stationID, "good drop")
-	else
-		station.nextReadyTime = CurTime() + (math.random(4, 8) * JMod.Config.RadioSpecs.DeliveryTimeMult)
-		JMod.NotifyAllRadios(stationID, "drop failed")
 	end
-	return true
+	return true, (math.random(4, 8) * JMod.Config.RadioSpecs.DeliveryTimeMult)
 end)
 
 hook.Add("JMod_RadioDelivery", "JMODHL2_SPEEDYDELIVER", function(ply, transceiver, pkg, DeliveryTime, Pos)

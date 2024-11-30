@@ -11,6 +11,7 @@ SWEP.Trivia_Calibre = "??"
 SWEP.Trivia_Mechanism = "??"
 SWEP.Trivia_Country = "??"
 SWEP.Trivia_Year = "??"
+SWEP.NPCFriendly = true
 SWEP.Slot = 3
 SWEP.ViewModel = "models/weapons/aboot/combsr/c_combsr.mdl"
 SWEP.WorldModel = "models/weapons/aboot/combsr/w_combinesniper_e2.mdl"
@@ -33,7 +34,7 @@ SWEP.PhysTracerProfile = 6
 SWEP.AimSwayFactor = .1
 
 SWEP.Bipod_Integral = true -- Integral bipod (ie, weapon model has one)
-SWEP.BipodDispersion = 0.5 -- Bipod dispersion for Integral bipods
+SWEP.BipodDispersion = 0.3 -- Bipod dispersion for Integral bipods
 SWEP.BipodRecoil = 0.1 -- Bipod recoil for Integral bipods
 
 SWEP.ReloadInSights = true
@@ -64,8 +65,8 @@ SWEP.Firemodes = {
 SWEP.NPCWeaponType = {"weapon_ar2", "weapon_crossbow"}
 SWEP.NPCWeight = 10
 
-SWEP.AccuracyMOA = 9 -- accuracy in Minutes of Angle. There are 60 MOA in a degree.
-SWEP.HipDispersion = 200 -- inaccuracy added by hip firing.
+SWEP.AccuracyMOA = 3 -- accuracy in Minutes of Angle. There are 60 MOA in a degree.
+SWEP.HipDispersion = 300 -- inaccuracy added by hip firing.
 SWEP.MoveDispersion = 500
 
 SWEP.MagID = "cosr" -- the magazine pool this gun draws from

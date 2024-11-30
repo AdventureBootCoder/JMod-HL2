@@ -98,13 +98,19 @@ JModHL2.ArmorTable = {
 		eff={
 			HEVsuit = true,
 			speedBoost = 1,
-			flashresistant = true
+			flashresistant = true,
+			nightVision = false
 		},
 		blackvisionwhendead = false,
 		tgl = {
 			blackvisionwhendead = true,
 			mskmat = "mats_aboot_gmod_sprites/helmet_vignette1.png",
-			eff = {nightVision = true},
+			eff = {
+				HEVsuit = true,
+				speedBoost = 1,
+				flashresistant = true,
+				nightVision = true
+			},
 			slots={
 				eyes = 1,
 				mouthnose = 1,
@@ -504,7 +510,7 @@ hook.Add("Move", "JMOD_HL2_ARMOR_MOVE", function(ply, mv)
 			end
 		elseif ply.EZarmor.effects.jetmod then
 			if not(RegularJump) and mv:KeyDown(IN_JUMP) then
-				if not(ply:OnGround()) and ply:GetNW2Bool("EZjetmod_canuse", true) and Charges > 0.1 then
+				if not(ply:OnGround()) and ply:GetNW2Bool("EZjetmod_canuse", true) and Charges > 0.15 then
 					-- Get Eye angles and then get the direction the jump module would actually be aiming
 					local Drain = 0.02
 					local Dir = ply:GetAngles()
@@ -523,7 +529,7 @@ hook.Add("Move", "JMOD_HL2_ARMOR_MOVE", function(ply, mv)
 					end
 					NewVel = NewVel:GetNormalized() * 12
 					if util.QuickTrace(ply:GetPos(), Vector(0, 0, -120), {ply}).Hit then
-						NewVel = NewVel + Vector(0, 0, 3)
+						NewVel = NewVel --+ Vector(0, 0, 3)
 					end
 					-- Tell the server that's where we're going
 					mv:SetVelocity(OldVel + NewVel)
