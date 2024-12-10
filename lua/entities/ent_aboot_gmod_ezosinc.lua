@@ -75,7 +75,7 @@ if SERVER then
 
 	function ENT:Use(activator)
 		local SwepToGive = "wep_aboot_jmod_ezosinc"
-		if activator:KeyDown(JMod.Config.General.AltFunctionKey) then
+		if JMod.IsAltUsing(activator) then
 			activator:PickupObject(self)
 		elseif not activator:HasWeapon(SwepToGive) then
 			activator:Give(SwepToGive)

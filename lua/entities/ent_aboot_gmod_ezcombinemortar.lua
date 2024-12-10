@@ -509,7 +509,7 @@ if(SERVER)then
 
 	function ENT:Use(activator)
 		if IsValid(activator) and activator:IsPlayer() then
-			local State, Alt = self:GetState(), activator:KeyDown(JMod.Config.General.AltFunctionKey)
+			local State, Alt = self:GetState(), JMod.IsAltUsing(activator)
 
 			if Alt then
 				activator:PickupObject(self)

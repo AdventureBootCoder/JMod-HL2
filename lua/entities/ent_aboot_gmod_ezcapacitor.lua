@@ -127,7 +127,7 @@ if(SERVER)then
 	function ENT:Use(activator, activatorAgain, onOff)
 		local Dude = activator or activatorAgain
 		local Time = CurTime()
-		local Alt = Dude:KeyDown(JMod.Config.General.AltFunctionKey)
+		local Alt = JMod.IsAltUsing(Dude)
 		if tobool(onOff) then
 			local State = self:GetState()
 			JMod.SetEZowner(self, Dude, true)

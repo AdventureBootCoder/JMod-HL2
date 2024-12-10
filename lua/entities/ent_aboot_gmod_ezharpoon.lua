@@ -98,7 +98,7 @@ if SERVER then
 	end
 
 	function ENT:Use(activator)
-		if activator:KeyDown(JMod.Config.General.AltFunctionKey) and not activator:HasWeapon(self.SWEPtoGive) then
+		if JMod.IsAltUsing(activator) and not activator:HasWeapon(self.SWEPtoGive) then
 			--activator:Give(self.SWEPtoGive)
 			--activator:SelectWeapon(self.SWEPtoGive)
 

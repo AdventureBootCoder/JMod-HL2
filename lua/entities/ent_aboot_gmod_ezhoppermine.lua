@@ -103,7 +103,7 @@ if SERVER then
 		local State = self:GetState()
 		if State < 0 then return end
 		self.AutoArm = false
-		local Alt = activator:KeyDown(JMod.Config.General.AltFunctionKey)
+		local Alt = JMod.IsAltUsing(activator)
 
 		if State == STATE_OFF then
 			if Alt then
@@ -394,7 +394,7 @@ if SERVER then
 		if ent.EZhopperMine then
 			if ent:GetState() == STATE_HELD then
 				ent:SetState(STATE_OFF)
-				if ply:KeyDown(JMod.Config.General.AltFunctionKey) then
+				if JMod.IsAltUsing(ply) then
 					ent:Arm(ply)
 				end
 			end

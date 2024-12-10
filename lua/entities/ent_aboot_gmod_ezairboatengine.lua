@@ -156,7 +156,7 @@ if SERVER then
 		self.NextUseTime = CurTime() + 1
 		local State = self:GetState()
 		local IsPly = (IsValid(activator) and activator:IsPlayer())
-		local Alt = IsPly and activator:KeyDown(JMod.Config.General.AltFunctionKey)
+		local Alt = IsPly and JMod.IsAltUsing(activator)
 		JMod.SetEZowner(self, activator)
 
 		if State == JMod.EZ_STATE_BROKEN then

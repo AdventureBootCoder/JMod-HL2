@@ -136,7 +136,7 @@ if(SERVER)then
 		self.NextUseTime = Time + 2
 		local State = self:GetState()
 		local OldOwner = JMod.GetEZowner(self)
-		local alt = activator:KeyDown(JMod.Config.General.AltFunctionKey)
+		local alt = JMod.IsAltUsing(activator)
 		JMod.SetEZowner(self, activator)
 
 		if State == STATE_BROKEN then

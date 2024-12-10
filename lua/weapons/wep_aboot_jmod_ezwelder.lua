@@ -424,7 +424,7 @@ function SWEP:Think()
 		self:UpdateNextIdle()
 	end
 
-	local Alt = Ply:KeyDown(JMod.Config.General.AltFunctionKey)
+	local Alt = JMod.IsAltUsing(Ply)
 
 	if (Ply:KeyDown(IN_SPEED)) or (Ply:KeyDown(IN_ZOOM)) then
 		self:SetHoldType("normal")

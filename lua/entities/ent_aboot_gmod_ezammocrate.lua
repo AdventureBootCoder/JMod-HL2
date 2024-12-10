@@ -277,7 +277,7 @@ if SERVER then
 		JMod.Hint(activator, "crate")
 		local Resource, Time = self:GetResource(), CurTime()
 		if Resource <= 0 then return end
-		local Alt = activator:KeyDown(JMod.Config.General.AltFunctionKey)
+		local Alt = JMod.IsAltUsing(activator)
 
 		if self.LastOpenTime < Time then
 			self:Open(true)
