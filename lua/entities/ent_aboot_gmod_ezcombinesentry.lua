@@ -158,6 +158,10 @@ ENT.AmmoRefundTable = {
 	["Super Soaker"] = {
 		varToRead = "Water",
 		spawnType = JMod.EZ_RESOURCE_TYPES.WATER,
+	},
+	["Flamethrower"] = {
+		varToRead = "Fuel",
+		spawnType = JMod.EZ_RESOURCE_TYPES.FUEL,
 	}
 }
 
@@ -246,6 +250,12 @@ function ENT:InitPerfSpecs(removeAmmo)
 		self.MaxWater = 0
 	end
 
+	if (self.AmmoRefundTable[AmmoType].spawnType == JMod.EZ_RESOURCE_TYPES.FUEL) then
+		self.MaxFuel = self.MaxAmmo / 1.5
+	else
+		self.MaxFuel = 0
+	end
+
 	if self.AmmoRefundTable[AmmoType].spawnType ~= JMod.EZ_RESOURCE_TYPES.POWER then
 		-- we're not using Electricity as our ammo, so set it to 0
 		-- no exploit
@@ -283,6 +293,20 @@ end
 
 function ENT:GetWater()
 	if self.AmmoRefundTable[self:GetAmmoType()].spawnType == JMod.EZ_RESOURCE_TYPES.WATER then
+		return self:GetAmmo()
+	else
+		return 0
+	end
+end
+
+function ENT:SetFuel(amt)
+	if self.AmmoRefundTable[self:GetAmmoType()].spawnType == JMod.EZ_RESOURCE_TYPES.FUEL then
+		self:SetAmmo(math.Clamp(amt, 0, self.MaxFuel))
+	end
+end
+
+function ENT:GetFuel()
+	if self.AmmoRefundTable[self:GetAmmoType()].spawnType == JMod.EZ_RESOURCE_TYPES.FUEL then
 		return self:GetAmmo()
 	else
 		return 0

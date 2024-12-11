@@ -278,14 +278,18 @@ if(SERVER)then
 		JMod.Hint(self.EZowner, "sentry upgrade")
 	end
 
+	local MainThinkSpeed = .02
 	function ENT:Think()
 		local Time = CurTime()
+		local State = self:GetState()
 
 		if self.NextRealThink < Time then
+			self:UpdateWireOutputs()
+
 			local Electricity, Ammo = self:GetElectricity(), self:GetAmmo()
 			self.NextRealThink = Time + .25 / self.ThinkSpeed
 			self.Firing = false
-			local State = self:GetState()
+			
 			local SelfAng = self:GetAngles()
 
 			if State > 0 then
@@ -296,6 +300,9 @@ if(SERVER)then
 				elseif State == STATE_OVERHEATED then
 					if self.Heat < 45 then
 						self:SetState(STATE_WATCHING)
+					else
+						self.FireOverride = false
+						self.NextFire = self.NextRealThink
 					end
 				else
 					if Ammo <= 0 then
@@ -313,7 +320,7 @@ if(SERVER)then
 
 				if Target then
 					self:Engage(Target)
-				else
+				elseif not self.AimOverride then -- Don't return to forward if we are being aimed manually
 					self:ReturnToForward()
 				end
 				if self.NextPingTime < Time then
@@ -442,18 +449,15 @@ if(SERVER)then
 			self.Heat = math.Clamp(self.Heat - CoolinAmt, 0, 100)
 		end
 
-		if self.Firing or self.FireOverride then
-			if self.NextFire < Time then
-				self.NextFire = Time + 1 / self.FireRate --  (1/self.FireRate^1.2+0.05) 
-				self:FireAtPoint(self.SearchData.LastKnownPos, self.SearchData.LastKnownVel or Vector(0, 0, 0))
-			end
+		if (self.Firing or self.FireOverride) and (self.NextFire < Time) then
+			self.NextFire = Time + 1 / self.FireRate -- (1/self.FireRate^1.2+0.05)
+			self:FireAtPoint((self.FireOverride and vector_origin) or self.SearchData.LastKnownPos, self.SearchData.LastKnownVel or Vector(0, 0, 0))
 		end
-
 		if self.SearchData.LastKnownPos then
 			self.MissileGuidePos = self.SearchData.LastKnownPos -- This is for guiding the rockets
 		end
-
-		self:NextThink(Time + .02)
+		
+		self:NextThink(Time + MainThinkSpeed)
 
 		return true
 	end
@@ -832,8 +836,25 @@ if(SERVER)then
 				end
 			end
 			Heat = 0
-			AmmoConsume = 2
+			AmmoConsume = 1
 			ElecConsume = 0.1
+		elseif ProjType == "Flamethrower" then
+			local FireAng = AimAng:GetCopy()
+			local FireRight = FireAng:Right()
+			local FireForward = FireAng:Forward()
+			local FireUp = FireAng:Up()
+			local Foof = EffectData()
+			Foof:SetNormal(FireAng:Forward())
+			Foof:SetScale(2)
+			Foof:SetStart(FireAng:Forward() * 1200)
+			Foof:SetEntity(self)
+			Foof:SetAttachment(1)
+			util.Effect("eff_jack_gmod_ezflamethrowerfire", Foof, true, true)
+			--JMod.LiquidSpray(ShootPos, FireForward * 1000, 1, self:EntIndex(), 2)
+			JMod.FireSplosion(ShootPos, FireForward * 500, 1, 0, 1, true, self, JMod.GetEZowner(self))
+			Heat = 1
+			AmmoConsume = 1
+			ElecConsume = 0.2
 		end
 
 		---
@@ -945,7 +966,8 @@ elseif(CLIENT)then
 		["HE Grenade"] = 2,
 		["Missile Launcher"] = 2,
 		["Pulse Laser"] = 3,
-		["Super Soaker"] = 0
+		["Super Soaker"] = 0,
+		["Flamethrower"] = 0
 	}
 
 	local FirstFrame = true
