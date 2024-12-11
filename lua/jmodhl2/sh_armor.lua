@@ -430,7 +430,7 @@ hook.Add("StartCommand", "JMOD_HL2_ZOMBIE_MOVE", function(ply,cmd)
 		local RandDir = (cmd:GetViewAngles():Forward() + VectorRand(-0.1, 0.1)):Angle()
 		cmd:ClearMovement()
 		cmd:SetViewAngles(Angle(0, RandDir.y, 0))
-		cmd:SetForwardMove(50)
+		cmd:SetForwardMove(ply:GetWalkSpeed() * .75)
 		cmd:SetButtons(IN_ATTACK)
 		if (ply.EZzombieTime or 0) < Time then
 			ply.EZzombieTime = Time + math.Rand(3, 10)
@@ -475,7 +475,7 @@ hook.Add("Move", "JMOD_HL2_ARMOR_MOVE", function(ply, mv)
 		if ply.EZarmor.effects.jumpmod then
 			if not(RegularJump) and mv:KeyDown(IN_JUMP) and IsFirstTimePredicted() then
 				local Charges = ply:GetNW2Float(tag_counter, 0)
-				if not(ply:OnGround()) and ply:GetNW2Bool("EZjumpmod_canuse", true) and (Charges >= 1) then
+				if not(ply:OnGround()) and ply:GetNW2Bool("EZjumpmodCanUse", true) and (Charges >= 1) then
 					-- Get Eye angles and then get the direction the jump module would actually be aiming
 					local Aim = ply:EyeAngles()
 					local OldVel, NewVel = mv:GetVelocity(), Aim:Up() * 450
@@ -498,19 +498,19 @@ hook.Add("Move", "JMOD_HL2_ARMOR_MOVE", function(ply, mv)
 					-- Make sure to reduce the charges left
 					Charges = Charges - 1
 					ply:SetNW2Float(tag_counter, Charges)
-					ply:SetNW2Bool("EZjumpmod_canuse", false)
+					ply:SetNW2Bool("EZjumpmodCanUse", false)
 					-- Timer for regulating useage
-					timer.Create(ply:Nick().."jumpmod_timer", 0.4, 1, function()
-						ply:SetNW2Bool("EZjumpmod_canuse", true)
+					timer.Create(ply:Nick().."EZjumpmodTimer", 0.4, 1, function()
+						ply:SetNW2Bool("EZjumpmodCanUse", true)
 					end)
-					timer.Start(ply:Nick().."jumpmod_timer")
+					timer.Start(ply:Nick().."EZjumpmodTimer")
 
 					return true
 				end
 			end
 		elseif ply.EZarmor.effects.jetmod then
 			if not(RegularJump) and mv:KeyDown(IN_JUMP) then
-				if not(ply:OnGround()) and ply:GetNW2Bool("EZjetmod_canuse", true) and Charges > 0.15 then
+				if not(ply:OnGround()) and Charges > 0.15 then
 					-- Get Eye angles and then get the direction the jump module would actually be aiming
 					local Drain = 0.02
 					local Dir = ply:GetAngles()
@@ -597,8 +597,8 @@ hook.Add("OnPlayerHitGround", "JMOD_HL2_HITGROUND", function(ply, water, float, 
 	if water then return end
 	local Charges = ply:GetNW2Float(tag_counter, 0)
 
-	ply:SetNW2Bool("EZjumpmod_canuse", true)
-	timer.Stop(ply:Nick().."jumpmod_timer")
+	ply:SetNW2Bool("EZjumpmodCanUse", true)
+	timer.Stop(ply:Nick().."EZjumpmodTimer")
 	ply.played_sound = false
 end)
 
@@ -646,12 +646,39 @@ if CLIENT then
 			end
 		end
 	end)
-
-	net.Receive("ABoot_StunStick", function(len)
-		local ply = net.ReadEntity()
-		local Stun = net.ReadFloat()
-		if IsValid(ply) and ply:Alive() then
-			ply.EZstun = (ply.EZstun or 0) + Stun
-		end
-	end)
 end
+
+function JModHL2.EZstun(ent, amt, attacker, immobilize)
+	if SERVER then
+		ent:SetNW2Float("EZstunAmount", ent:GetNW2Float("EZstunAmount", 0) + amt)
+	end
+end
+
+hook.Add("StartCommand", "JMOD_HL2_STUNEFFECT", function(ply, cmd)
+	local StunAmt = ply:GetNW2Float("EZstunAmount", 0)
+	if StunAmt > 0 then
+		cmd:ClearMovement()
+		cmd:ClearButtons()
+
+		--[[if JMod.LinCh(StunAmt, 0.5, 3) then
+			if math.random(1, 2) > 1 then
+				cmd:SetButtons(IN_ATTACK)
+			else
+				cmd:SetButtons(IN_ATTACK2)
+			end
+		else
+			cmd:SetButtons(IN_JUMP)
+		end--]]
+
+		if IsFirstTimePredicted() then
+			local FT = FrameTime()
+			ply:SetNW2Float("EZstunAmount", math.Clamp(StunAmt - 1 * FT, 0, 10))
+		end
+
+		-- Add some movement to make the player more disoriented
+		local StunFraction = math.Clamp(StunAmt, 0, 10)
+		local CurrentViewAngles = cmd:GetViewAngles()
+		local Sine = math.sin(RealTime() / 10)
+		cmd:SetViewAngles(Angle(CurrentViewAngles.pitch + Sine * math.Rand(-10, 10) * StunFraction, CurrentViewAngles.yaw + Sine * math.Rand(-1, 1) * StunFraction, CurrentViewAngles.roll))
+	end
+end)

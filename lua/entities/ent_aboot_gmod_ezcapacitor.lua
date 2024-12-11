@@ -293,8 +293,8 @@ if(SERVER)then
 			if (ShockEnt ~= self) and not(self.ElectricalCallbacks[ShockEnt:EntIndex()]) and (self:GetPos():Distance(shockedData.HitPos) <= self.ShockDistance) then
 				local Connected = self:CheckForConnection(shocker)
 				if Connected then
-					if ShockEnt.EZconsumes and table.HasValue(ShockEnt.EZconsumes, JMod.EZ_RESOURCE_TYPES.POWER) and ShockEnt.TryLoadResource and (ShockEnt:TryLoadResource(JMod.EZ_RESOURCE_TYPES.POWER, 1) > 0) then
-						self:ConsumeElectricity(1)
+					if ShockEnt.EZconsumes and table.HasValue(ShockEnt.EZconsumes, JMod.EZ_RESOURCE_TYPES.POWER) and ShockEnt.TryLoadResource then
+						self:ConsumeElectricity(ShockEnt:TryLoadResource(JMod.EZ_RESOURCE_TYPES.POWER, self:GetElectricity()))
 					elseif (ShockEnt:IsPlayer() or ShockEnt:IsNPC()) or (Shockables[ShockEnt:GetMaterialType()] and not(ShockList[ShockEnt:GetClass()])) then
 						--[[if ShockEnt:GetGroundEntity() != NULL then
 							print("Ground Entity: ", ShockEnt:GetGroundEntity())
@@ -327,10 +327,7 @@ if(SERVER)then
 							local vec = (shockedData.HitPos - ShockEnt:GetPos()):GetNormalized()
 							ShockEnt:SetVelocity(vec * 100)
 							ShockEnt:ViewPunch(Angle(math.random(-40, 2), math.random(-20, 20), math.random(-2, 2)))
-							net.Start("ABoot_StunStick")
-								net.WriteEntity(ShockEnt)
-								net.WriteFloat(.5)
-							net.Send(ShockEnt)
+							JModHL2.EZstun(ShockEnt, 1, self)
 						end
 						self.LastShockedEnt = ShockEnt
 					end

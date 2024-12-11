@@ -66,7 +66,7 @@ hook.Add("HUDPaint", "JMOD_HL2_HUDPAINT", function()
 			draw.DrawText("ALT: "..tostring(math.min(Dist, 9999)), "HudDefault", x + (SCR_W * (BAR_WIDTH + MARGIN) * 3.2), y - (SCR_H * BAR_HEIGHT), BAR_COL_FULL, TEXT_ALIGN_LEFT)
 			local Ang = math.Round(Ply:EyeAngles().p)
 			draw.DrawText("ANG: "..tostring(-Ang), "HudDefault", x + (SCR_W * (BAR_WIDTH + MARGIN) * 3.2), y - (SCR_H * BAR_HEIGHT) + 25, BAR_COL_FULL, TEXT_ALIGN_LEFT)
-			if Ply:GetNW2Bool("EZjumpmod_canuse", false) and charge >= 1 then
+			if Ply:GetNW2Bool("EZjumpmodCanUse", false) and charge >= 1 then
 				draw.DrawText("READY", "HudDefault", x + (SCR_W * (BAR_WIDTH + MARGIN) * 3.2), y - (SCR_H * BAR_HEIGHT) + 50, BAR_COL_FULL, TEXT_ALIGN_LEFT)
 			else
 				draw.DrawText("CHARGE", "HudDefault", x + (SCR_W * (BAR_WIDTH + MARGIN) * 3.2), y - (SCR_H * BAR_HEIGHT) + 50, BAR_COL_EMPTY, TEXT_ALIGN_LEFT)
@@ -175,23 +175,19 @@ hook.Add("RenderScreenspaceEffects", "JMODHL2_SCREENSPACE", function()
 	else
 		Ply.EZautoDarken = 0
 	end
-	if Ply.EZstun then
-		if Ply.EZstun > 0 then
-			DrawColorModify({
-				["$pp_colour_addr"] = 0,
-				["$pp_colour_addg"] = 0,
-				["$pp_colour_addb"] = 0 + Ply.EZstun * .05,
-				["$pp_colour_brightness"] = 0 + Ply.EZstun * .5,
-				["$pp_colour_contrast"] = 1,
-				["$pp_colour_colour"] = 1,
-				["$pp_colour_mulr"] = 0,
-				["$pp_colour_mulg"] = 0,
-				["$pp_colour_mulb"] = 0
-			})
-			Ply.EZstun = math.Clamp(Ply.EZstun - 2 * FT, 0, 2)
-		else
-			Ply.EZstun = nil
-		end
+	local StunAmt = Ply:GetNW2Float("EZstunAmount", 0)
+	if StunAmt > 0 then
+		DrawColorModify({
+			["$pp_colour_addr"] = 0,
+			["$pp_colour_addg"] = 0,
+			["$pp_colour_addb"] = 0 + StunAmt * .05,
+			["$pp_colour_brightness"] = 0 + StunAmt * .5,
+			["$pp_colour_contrast"] = 1,
+			["$pp_colour_colour"] = 1,
+			["$pp_colour_mulr"] = 0,
+			["$pp_colour_mulg"] = 0,
+			["$pp_colour_mulb"] = 0
+		})
 	end
 end)
 

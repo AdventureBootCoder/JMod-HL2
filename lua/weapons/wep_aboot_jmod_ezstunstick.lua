@@ -117,6 +117,7 @@ function SWEP:OnHit(swingProgress, tr, secondary)
 
 	local Ent = tr.Entity
 	local Pos = tr.HitPos
+	local Surface = util.GetSurfaceData(tr.SurfaceProps)
 
 	if tr.Hit and not tr.HitSky and not tr.StartSolid then
 		local fx = EffectData()
@@ -124,9 +125,8 @@ function SWEP:OnHit(swingProgress, tr, secondary)
 		fx:SetNormal(tr.HitNormal)
 		util.Effect("StunstickImpact", fx, true, true)
 
-		local Surface = tr.SurfaceProps
-		if tr.Hit and (Surface) and (util.GetSurfaceData(Surface)) then
-			EmitSound(util.GetSurfaceData(Surface).bulletImpactSound, Pos, 0, CHAN_WEAPON)
+		if tr.Hit and (Surface) then
+			EmitSound(Surface.bulletImpactSound, Pos, 0, CHAN_WEAPON)
 		end
 	end
 	
@@ -138,23 +138,18 @@ function SWEP:OnHit(swingProgress, tr, secondary)
 				Ent:ViewPunch(Angle(math.random(-40, 2), math.random(-20, 20), math.random(-2, 2)))
 				if secondary then
 					JMod.EZimmobilize(Ent, 1, Ent)
-					net.Start("ABoot_StunStick")
-						net.WriteEntity(Ent)
-						net.WriteFloat(50)
-					net.Send(Ent)
+					JModHL2.EZstun(Ent, 2, Ent)
 				else
-					net.Start("ABoot_StunStick")
-						net.WriteEntity(Ent)
-						net.WriteFloat(20)
-					net.Send(Ent)
+					JModHL2.EZstun(Ent, .5, Ent)
 				end
 			end
 		end
 	end
-
 	tr.Entity:TakeDamageInfo(CrowDam)
 
-	sound.Play(util.GetSurfaceData(tr.SurfaceProps).impactHardSound, tr.HitPos, 75, 100, 1)
+	if tr.Hit and Surface then
+		EmitSound(Surface.impactHardSound, Pos, 0, CHAN_WEAPON)
+	end
 end
 
 function SWEP:FinishSwing(swingProgress)
