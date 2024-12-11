@@ -609,10 +609,21 @@ if(SERVER)then
 		local TargetAngle = self:WorldToLocal(TargPos):Angle().y
 		if not((TargetAngle < 40) or (TargetAngle > 320)) then return false end
 
+		local Filter = {self, ent, self.NPCTarget}
+
+		if ent:IsPlayer() and IsValid(ent:GetEntityInUse()) then
+			table.insert(Filter, ent:GetUseEntity())
+		end
+
+		local Parent = ent:GetParent()
+		if IsValid(Parent) then
+			table.insert(Filter, Parent)
+		end
+
 		local Tr = util.TraceLine({
 			start = SelfPos,
 			endpos = TargPos,
-			filter = {self, ent, self.NPCTarget},
+			filter = Filter,
 			mask = MASK_SHOT + MASK_WATER
 		})
 
@@ -620,7 +631,7 @@ if(SERVER)then
 	end
 
 	function ENT:ShouldSoak(ent)
-		if not IsValid(ent) then return false end
+		--if not IsValid(ent) then return false end
 		if ent == self then return false end
 		if ent:IsOnFire() then return true end
 		if ent:GetClass() == "ent_jack_gmod_ezfirehazard" then return true end
@@ -1268,13 +1279,15 @@ if(SERVER)then
 			ElecConsume = .025 * Dmg
 		elseif ProjType == "Super Soaker" then
 			local ShellAng = AimAng:GetCopy()
-			--ShellAng:RotateAroundAxis(ShellAng:Up(), 0)
-			local Splach = EffectData()
-			Splach:SetOrigin(SelfPos + Up * 55 + Right * -5 + AimForward * 16)
 			local Zoop = ShellAng:Forward()
+			local SplachPos = ShootPos
+			--ShellAng:RotateAroundAxis(ShellAng:Up(), 0)
+			--[[local Splach = EffectData()
+			Splach:SetOrigin(SplachPos)
 			Splach:SetStart(Zoop * 12)
 			Splach:SetScale(1)
-			util.Effect("eff_jack_gmod_spranklerspray", Splach)
+			util.Effect("eff_jack_gmod_spranklerspray", Splach)--]]
+			JMod.LiquidSpray(SplachPos, Zoop * 2000 * self.TargetingRadius / 1000, 1, self:EntIndex(), 3)
 			---
 			local ShootDir = (point - ShootPos):GetNormalized()
 

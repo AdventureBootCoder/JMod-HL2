@@ -80,7 +80,16 @@ ENT.AmmoTypes = {
 		SearchSpeed = 2,
 		TargetLockTime = .1,
 		TurnSpeed = 2
-	}	
+	},
+	["Flamethrower"] = {
+		FireRate = 2,
+		Damage = 0.01,
+		Accuracy = .25,
+		TargetingRadius = 1.2,
+		SearchSpeed = 2,
+		TargetLockTime = .1,
+		TurnSpeed = 2
+	}
 }
 
 --[[
@@ -189,7 +198,7 @@ if(SERVER)then
 		return Mult
 	end
 
-	function ENT:CanISee(ent)
+	function ENT:CanSeeTarget(ent)
 		if not IsValid(ent) then return false end
 		local TargPos, SelfPos = self:DetermineTargetAimPoint(ent), self:GetPos() - self:GetUp() * 16
 		local Dist = TargPos:Distance(SelfPos)
@@ -197,11 +206,22 @@ if(SERVER)then
 
 		local TargetAngle = self:WorldToLocal(TargPos):Angle().y
 		if not((TargetAngle < self.StaticPerfSpecs.MaxYawTurn) or (TargetAngle > (360 - self.StaticPerfSpecs.MaxYawTurn))) then return false end
+		
+		local Filter = {self, ent, self.NPCTarget}
+
+		if ent:IsPlayer() and IsValid(ent:GetEntityInUse()) then
+			table.insert(Filter, ent:GetUseEntity())
+		end
+
+		local Parent = ent:GetParent()
+		if IsValid(Parent) then
+			table.insert(Filter, Parent)
+		end
 
 		local Tr = util.TraceLine({
 			start = SelfPos,
 			endpos = TargPos,
-			filter = {self, ent, self.NPCTarget},
+			filter = Filter,
 			mask = MASK_SHOT + MASK_WATER
 		})
 
@@ -782,9 +802,10 @@ if(SERVER)then
 		elseif ProjType == "Super Soaker" then
 			local ShellAng = AimAng:GetCopy()
 			--ShellAng:RotateAroundAxis(ShellAng:Up(), 0)
-			local Splach = EffectData()
-			Splach:SetOrigin(SelfPos + Up * 55 + Right * -5 + AimForward * 16)
 			local Zoop = ShellAng:Forward()
+			local SplachPos = ShootPos 
+			local Splach = EffectData()
+			Splach:SetOrigin(SplachPos)
 			Splach:SetStart(Zoop * 12)
 			Splach:SetScale(1)
 			util.Effect("eff_jack_gmod_spranklerspray", Splach)
