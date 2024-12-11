@@ -28,8 +28,8 @@ att.Mult_SpeedMult = 0.95
 			return "idle"
 		end
 	end
-end
+end--]]
 
 att.Hook_Compatible = function(wep)
 	if wep.Bipod_Integral then return false end
-end--]]
+end
