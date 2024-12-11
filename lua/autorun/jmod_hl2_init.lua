@@ -51,7 +51,6 @@ if(SERVER)then
 	util.AddNetworkString("ABoot_ContainerMenu")
 	util.AddNetworkString("ABoot_VolumeContainerMenu")
 	util.AddNetworkString("ABoot_JumpmodParticles")
-	util.AddNetworkString("ABoot_StunStick")
 	local defaultHEVdisable = CreateConVar("aboot_disable_hev", "0", FCVAR_ARCHIVE, "Removes the HEV suit from players on spawn and when it's destroyed. \nNo more running around with an invisible HEV suit")
 	local noPowerDraw = CreateConVar("aboot_infinite_power", "0", FCVAR_ARCHIVE, "Disables jump/jet modules drawing internal power, effectivly making their charge infinite")
 	local EZammoPickup = CreateConVar("aboot_ez_ammopickup", "0", FCVAR_ARCHIVE, "Turns HL2 ammo pickups into EZ ammo pickups for the weapon you are holding")
@@ -122,7 +121,7 @@ if(SERVER)then
 					if val < 1 then
 						ply.EZjumpmod_usealert = true
 					elseif val >= 1 and ply.EZjumpmod_usealert then
-						ply:SetNW2Bool("EZjumpmod_canuse", true)
+						ply:SetNW2Bool("EZjumpmodCanUse", true)
 						ply.EZjumpmod_usealert = nil
 						ply:SendLua([[surface.PlaySound("]] .. JModHL2.EZ_JUMPSNDS.READY .. [[")]])
 					end
