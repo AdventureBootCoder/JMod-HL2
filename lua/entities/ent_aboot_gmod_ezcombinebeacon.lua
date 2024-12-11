@@ -89,7 +89,7 @@ elseif CLIENT then
 
 	local BeaconAnim = 0
 
-	hook.Add("PostDrawTranslucentRenderables", "JMod_EZ_SignalBeacon", function()
+	--[[hook.Add("PostDrawTranslucentRenderables", "JMod_EZ_SignalBeacon", function()
 		for _, beacon in pairs(ents.FindByClass("ent_aboot_gmod_ezcombinebeacon")) do
 			local Ply = LocalPlayer()
 			local State = beacon:GetState()
@@ -113,7 +113,7 @@ elseif CLIENT then
 				end
 			end
 		end
-	end)
+	end)--]]
 
 	language.Add("ent_aboot_gmod_ezcombinebeacon", "EZ Signal Beacon")
 end
