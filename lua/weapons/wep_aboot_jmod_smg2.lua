@@ -82,6 +82,7 @@ SWEP.ShootVol = 80 -- volume of shoot sound
 SWEP.ShootPitch = 100 -- pitch of shoot sound
 
 SWEP.ShootSound = "Weapon_SMG1.Fire"
+SWEP.ShootSoundSilenced = "weapons/arccw/m4a1/m4a1-1.wav"
 SWEP.DistantShootSound = "Weapon_SMG1.NPC"
 
 SWEP.MirrorVMWM = false -- Copy the viewmodel, along with all its attachments, to the worldmodel. Super convenient!
