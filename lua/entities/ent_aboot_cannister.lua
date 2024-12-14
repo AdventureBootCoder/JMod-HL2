@@ -78,6 +78,9 @@ if SERVER then
 			end
 		else
 			local Yay = ents.Create(itemClass)
+			if Yay.IsJackyEZmachine and JMod.Config.Machines.SpawnMachinesFull then
+				Yay.SpawnFull = true
+			end
 			Yay:SetPos(pos + VectorRand() * math.Rand(0, 30))
 			Yay:SetAngles(VectorRand():Angle())
 			Yay:Spawn()
@@ -87,28 +90,26 @@ if SERVER then
 				Yay:SetEZsupplies(Yay.EZsupplies, resourceAmt)
 			end
 
-			if IsValid(Yay) then
-				JMod.SetEZowner(Yay, owner)
+			JMod.SetEZowner(Yay, owner)
 
-				-- this arrests overlap-ejection velocity so items don't thwack players
-				timer.Simple(.025, function()
-					if IsValid(Yay) then
-						Yay:GetPhysicsObject():SetVelocity(Vector(0, 0, 0))
-					end
-				end)
+			-- this arrests overlap-ejection velocity so items don't thwack players
+			timer.Simple(.025, function()
+				if IsValid(Yay) then
+					Yay:GetPhysicsObject():SetVelocity(Vector(0, 0, 0))
+				end
+			end)
 
-				timer.Simple(.05, function()
-					if IsValid(Yay) then
-						Yay:GetPhysicsObject():SetVelocity(Vector(0, 0, 0))
-					end
-				end)
+			timer.Simple(.05, function()
+				if IsValid(Yay) then
+					Yay:GetPhysicsObject():SetVelocity(Vector(0, 0, 0))
+				end
+			end)
 
-				timer.Simple(.1, function()
-					if IsValid(Yay) then
-						Yay:GetPhysicsObject():SetVelocity(Vector(0, 0, 0))
-					end
-				end)
-			end
+			timer.Simple(.1, function()
+				if IsValid(Yay) then
+					Yay:GetPhysicsObject():SetVelocity(Vector(0, 0, 0))
+				end
+			end)
 		end
 	end
 
