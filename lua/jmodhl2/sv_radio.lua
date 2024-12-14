@@ -32,10 +32,10 @@ local function ThrowStuff(Pod, Position, GroundType)
 end
 
 hook.Add("JMod_OnRadioDeliver", "JMODHL2_CANNISTER_DELIVER", function(stationID, dropPos)
-	if not(BallisticDelivery:GetBool()) then return nil end
+	if not(BallisticDelivery:GetBool()) then return end
 	local station = JMod.EZ_RADIO_STATIONS[stationID]
 	local Radio = station.lastCaller
-	if not(IsValid(Radio) and Radio:GetClass() == "ent_aboot_gmod_ezcombineradio") then return nil end
+	if not(IsValid(Radio) and Radio:GetClass() == "ent_aboot_gmod_ezcombineradio") then return end
 	local Delay = 4
 	local YawIncrement = 20
 	local PitchIncrement = 10
@@ -115,9 +115,9 @@ hook.Add("JMod_OnRadioDeliver", "JMODHL2_CANNISTER_DELIVER", function(stationID,
 end)
 
 hook.Add("JMod_RadioDelivery", "JMODHL2_SPEEDYDELIVER", function(ply, transceiver, pkg, DeliveryTime, Pos)
-	if not(BallisticDelivery:GetBool()) then return nil end
+	if not(BallisticDelivery:GetBool()) then return end
 	local station = JMod.EZ_RADIO_STATIONS[transceiver:GetOutpostID()]
-	if not(IsValid(station.lastCaller) and station.lastCaller:GetClass() == "ent_aboot_gmod_ezcombineradio") then return nil end
+	if not(IsValid(station.lastCaller) and station.lastCaller:GetClass() == "ent_aboot_gmod_ezcombineradio") then return end
 	local Tr = util.QuickTrace(ply:GetPos() + Vector(0, 0, 30), (VectorRand() * Vector(1, 1, 0)) * 300, {ply})
-	return (DeliveryTime * .1), Tr.HitPos--ply:GetEyeTrace().HitPos
+	return (DeliveryTime * .1), ply:GetEyeTrace().HitPos--Tr.HitPos
 end)
