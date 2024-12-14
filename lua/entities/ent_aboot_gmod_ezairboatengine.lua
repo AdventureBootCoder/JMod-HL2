@@ -12,6 +12,7 @@ ENT.AdminSpawnable = true
 ENT.JModPreferredCarryAngles = Angle(0, 0, 0)
 ENT.Model = "models/aboot/ez_airboat_engine.mdl"
 ENT.Mass = 45
+ENT.EZupgradable = false
 ENT.IdleSounds = {
 	fan = "vehicles/airboat/fan_blade_idle_loop1.wav", 
 	motor = "vehicles/airboat/fan_motor_idle_loop1.wav"}
@@ -95,7 +96,6 @@ if SERVER then
 
 	function ENT:CustomInit()
 		self.NextUseTime = 0
-		self.EZupgradable = false
 		self.EZcolorable = false
 		self.MaxBladeSpeed = 100
 		self.DesiredBladeSpeed = 0

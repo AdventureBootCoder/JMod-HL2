@@ -47,7 +47,6 @@ if(SERVER)then
 			self:TryPlace()
 		end)
 		self:NextThink(1)
-		self.EZupgradable = true
 		--self:SetMaterial("models/aboot/aboot_combinethumper002_mat.vmt")
 		timer.Simple(0, function() 
 			self:TryPlace()
