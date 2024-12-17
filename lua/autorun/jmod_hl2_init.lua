@@ -51,9 +51,9 @@ if(SERVER)then
 	util.AddNetworkString("ABoot_ContainerMenu")
 	util.AddNetworkString("ABoot_VolumeContainerMenu")
 	util.AddNetworkString("ABoot_JumpmodParticles")
-	local defaultHEVdisable = CreateConVar("aboot_disable_hev", "0", FCVAR_ARCHIVE, "Removes the HEV suit from players on spawn and when it's destroyed. \nNo more running around with an invisible HEV suit")
-	local noPowerDraw = CreateConVar("aboot_infinite_power", "0", FCVAR_ARCHIVE, "Disables jump/jet modules drawing internal power, effectivly making their charge infinite")
-	local EZammoPickup = CreateConVar("aboot_ez_ammopickup", "0", FCVAR_ARCHIVE, "Turns HL2 ammo pickups into EZ ammo pickups for the weapon you are holding")
+	local defaultHEVdisable = CreateConVar("jmod_hl2_disable_hev", "0", FCVAR_ARCHIVE, "Removes the HEV suit from players on spawn and when it's destroyed. \nNo more running around with an invisible HEV suit")
+	local noPowerDraw = CreateConVar("jmod_hl2_infinite_power", "0", FCVAR_ARCHIVE, "Disables jump/jet modules drawing internal power, effectivly making their charge infinite")
+	local EZammoPickup = CreateConVar("jmod_hl2_ammopickup", "0", FCVAR_ARCHIVE, "Turns HL2 ammo pickups into EZ ammo pickups for the weapon you are holding")
 
 	local function RemoveHEVsuit(playa) 
 		playa:SetArmor(0)
@@ -297,7 +297,7 @@ elseif CLIENT then
 
 	list.Set( "ContentCategoryIcons", "JMod - EZ HL:2", "jmod_icon_hl2.png" )
 
-	local simpleWeaponSelect = CreateConVar("aboot_simple_weapon_select", "1", FCVAR_ARCHIVE, "Enables a vey crude weapon select stand in for when you don't have an HEV suit. It's recomended you get a better one.")
+	local simpleWeaponSelect = CreateConVar("jmod_hl2_simple_weapon_select", "1", FCVAR_ARCHIVE, "Enables a vey crude weapon select stand in for when you don't have an HEV suit. It's recomended you get a better one.")
 
 	-- Since weapons aren't guranteed to be in proper order, we have to do it ourselves
 	--[[local function OrderWeaponList(WeaponList) 

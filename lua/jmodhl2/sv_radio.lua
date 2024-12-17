@@ -1,5 +1,5 @@
 
-local BallisticDelivery = CreateConVar("aboot_cannister_delivery", "1", FCVAR_ARCHIVE, "Causes the combine radio to delivery items by headcrab cannister instead of airplane", 0, 1)
+local BallisticDelivery = CreateConVar("jmod_hl2_cannister_delivery", "1", FCVAR_ARCHIVE, "Causes the combine radio to delivery items by headcrab cannister instead of airplane", 0, 1)
 
 local ModelTable={
 	[1]="models/props_debris/concrete_chunk03a.mdl",
