@@ -84,7 +84,7 @@ ENT.AmmoTypes = {
 		TurnSpeed = 2
 	},
 	["Flamethrower"] = {
-		FireRate = 10,
+		FireRate = 2,
 		Damage = 1,
 		Accuracy = .25,
 		TargetingRadius = 0.5,

@@ -82,7 +82,7 @@ ENT.AmmoTypes = {
 		TurnSpeed = 2
 	},
 	["Flamethrower"] = {
-		FireRate = 5,
+		FireRate = 2,
 		Damage = 1,
 		Accuracy = .25,
 		TargetingRadius = 1.2,
@@ -861,12 +861,12 @@ if(SERVER)then
 			local Foof = EffectData()
 			Foof:SetNormal(FireAng:Forward())
 			Foof:SetScale(2)
-			Foof:SetStart(FireAng:Forward() * 1200)
+			Foof:SetStart(FireAng:Forward() * self.TargetingRadius * .9)
 			Foof:SetEntity(self)
 			Foof:SetAttachment(1)
 			util.Effect("eff_jack_gmod_ezflamethrowerfire", Foof, true, true)
 			--JMod.LiquidSpray(ShootPos, FireForward * 1000, 1, self:EntIndex(), 2)
-			JMod.FireSplosion(ShootPos, FireForward * 500, 1, 0, 1, true, self, JMod.GetEZowner(self))
+			JMod.FireSplosion(ShootPos, FireForward * self.TargetingRadius * .7, 1, 0, 1, true, self, JMod.GetEZowner(self))
 			Heat = 1
 			AmmoConsume = 1
 			ElecConsume = 0.2
