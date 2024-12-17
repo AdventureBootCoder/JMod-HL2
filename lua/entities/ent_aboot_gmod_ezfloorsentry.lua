@@ -82,13 +82,14 @@ ENT.AmmoTypes = {
 		TurnSpeed = 2
 	},
 	["Flamethrower"] = {
-		FireRate = 2,
-		Damage = 0.01,
+		FireRate = 5,
+		Damage = 1,
 		Accuracy = .25,
 		TargetingRadius = 1.2,
 		SearchSpeed = 2,
 		TargetLockTime = .1,
-		TurnSpeed = 2
+		TurnSpeed = 2,
+		SoundLoopSound = "snds_jack_gmod/flamethrower_loop.wav"
 	}
 }
 
@@ -452,7 +453,21 @@ if(SERVER)then
 		if (self.Firing or self.FireOverride) and (self.NextFire < Time) then
 			self.NextFire = Time + 1 / self.FireRate -- (1/self.FireRate^1.2+0.05)
 			self:FireAtPoint((self.FireOverride and vector_origin) or self.SearchData.LastKnownPos, self.SearchData.LastKnownVel or Vector(0, 0, 0))
+			if self.SoundLoopSound and not(self.SoundLoop) then
+				self.SoundLoop = CreateSound(self, self.SoundLoopSound)
+				self.SoundLoop:SetSoundLevel(80)
+			end
+			if (self.SoundLoop) and not(self.SoundLoop:IsPlaying()) then 
+				self.SoundLoop:Play() 
+				self.SoundLoop:ChangeVolume(2) 
+			end
+			self.WasFiring = true
+		end 
+		
+		if self.WasFiring and not(self.Firing or self.FireOverride) and ((self.NextFire + .5) < Time) then
+			if (self.SoundLoop) then self.SoundLoop:Stop() end
 		end
+
 		if self.SearchData.LastKnownPos then
 			self.MissileGuidePos = self.SearchData.LastKnownPos -- This is for guiding the rockets
 		end
@@ -966,8 +981,8 @@ elseif(CLIENT)then
 		["HE Grenade"] = 2,
 		["Missile Launcher"] = 2,
 		["Pulse Laser"] = 3,
-		["Super Soaker"] = 0,
-		["Flamethrower"] = 0
+		["Super Soaker"] = 3,
+		["Flamethrower"] = 2
 	}
 
 	local FirstFrame = true

@@ -311,8 +311,7 @@ function SWEP:PrimaryAttack()
 				for i = 1, 10 do
 					local RandAng = AngleRand(-Spread, Spread)
 					local Tracer = util.QuickTrace(self.Owner:GetShootPos(), self.Owner:GetAimVector() * self.EffectiveRange + RandAng:Forward() * Spread * 2, self.Owner)
-					local Ents = ents.FindInSphere(Tracer.HitPos, 20)
-					for _, Ent in ipairs(Ents) do
+					for _, Ent in ipairs(ents.FindInSphere(Tracer.HitPos, 20)) do
 						if Ent ~= self.Owner then
 							local DmgInfo = DamageInfo()
 							DmgInfo:SetAttacker(self.Owner)

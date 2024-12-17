@@ -14,7 +14,7 @@ ENT.EZconsumes = nil
 ENT.EZscannerDanger = true
 ENT.JModPreferredCarryAngles = Angle(0, 0, 0)
 ENT.EZupgradable = true
-ENT.Model = "models/aboot/combine/ez_floor_turret.mdl"
+ENT.Model = "models/combine_turrets/floor_turret.mdl"--"models/aboot/combine/ez_floor_turret.mdl"
 --ENT.Mat = "models/mat_jack_gmod_ezsentry"
 ENT.Mass = nil
 ENT.EZcolorable = false
@@ -82,7 +82,17 @@ ENT.AmmoTypes = {
 		SearchSpeed = 2,
 		TargetLockTime = .1,
 		TurnSpeed = 2
-	}	
+	},
+	["Flamethrower"] = {
+		FireRate = 10,
+		Damage = 1,
+		Accuracy = .25,
+		TargetingRadius = 0.5,
+		SearchSpeed = 2,
+		TargetLockTime = .1,
+		TurnSpeed = 2,
+		SoundLoopSound = "snds_jack_gmod/flamethrower_loop.wav"
+	}
 }
 
 --[[
@@ -102,7 +112,9 @@ ENT.StaticPerfSpecs = {
 	BlacklistedNPCs = {"npc_enemyfinder", "bullseye_strider_focus", "npc_turret_floor", "npc_turret_ceiling", "npc_turret_ground", "npc_bullseye"},
 	WhitelistedNPCs = {"npc_rollermine"},
 	SpecialTargetingHeights = {
-		["npc_rollermine"] = 15
+		["npc_rollermine"] = 15,
+		["npc_zombie_torso"] = 15,
+		["npc_fastzombie_torso"] = 15
 	},
 	MaxDurability = 100,
 	ThinkSpeed = 1,
@@ -198,6 +210,9 @@ end
 
 function ENT:InitPerfSpecs(removeAmmo)
 	if not self.ModPerfSpecs then return end
+	self.SoundLoopSound = nil
+	if self.SoundLoop then self.SoundLoop:Stop() end
+
 	local PerfMult = self:GetPerfMult() or 1
 	local Grade = self:GetGrade()
 	local NetworkTable = {}
@@ -235,6 +250,8 @@ function ENT:InitPerfSpecs(removeAmmo)
 		for attrib, mult in pairs(self.AmmoTypes[AmmoType]) do
 			if istable(mult) then
 				mult = nil
+			elseif isstring(mult) then
+				self[attrib] = mult
 			else
 				--print("applying AmmoType multiplier of "..mult .." to "..attrib..": "..self[attrib].." -> "..self[attrib]*mult)
 				local NewValue = self[attrib] * mult
@@ -461,6 +478,8 @@ if(SERVER)then
 		self.EngageOverride = nil
 		self.AimOverride = nil
 		self.FireOverride = nil
+
+		if (self.SoundLoop) then self.SoundLoop:Stop() end
 	end
 	
 	function ENT:OnPostEntityPaste(ply, ent, createdEntities)
@@ -591,15 +610,15 @@ if(SERVER)then
 			if ent:LookupBone("ValveBiped.Bip01_Head1") then
 				HeadPos = ent:GetBonePosition(ent:LookupBone("ValveBiped.Bip01_Head1"))
 			end
-			local CenterPos = nil
+			local CenterPos = ent:GetPos()
 
 			if SpecialTargetingHeight then
 				Height = SpecialTargetingHeight
 			else
 				Height = ent:OBBMaxs().z - ent:OBBMins().z
-				CenterPos = ent:GetPos() + Vector(0, 0, Height * .5)
+				CenterPos = CenterPos + Vector(0, 0, Height * .5)
 			end
-			if HeadPos.z > CenterPos.z then
+			if (HeadPos.z > CenterPos.z) then
 				return HeadPos
 			else
 				return CenterPos
@@ -622,6 +641,7 @@ if(SERVER)then
 
 	function ENT:OnRemove()
 		self:RemoveNPCTarget()
+		if (self.SoundLoop) then self.SoundLoop:Stop() end
 	end
 
 	function ENT:CanSeeTarget(ent)
@@ -947,7 +967,21 @@ if(SERVER)then
 		if (self.Firing or self.FireOverride) and (self.NextFire < Time) then
 			self.NextFire = Time + 1 / self.FireRate -- (1/self.FireRate^1.2+0.05)
 			self:FireAtPoint((self.FireOverride and vector_origin) or self.SearchData.LastKnownPos, self.SearchData.LastKnownVel or Vector(0, 0, 0))
+			if self.SoundLoopSound and not(self.SoundLoop) then
+				self.SoundLoop = CreateSound(self, self.SoundLoopSound)
+				self.SoundLoop:SetSoundLevel(80)
+			end
+			if (self.SoundLoop) and not(self.SoundLoop:IsPlaying()) then 
+				self.SoundLoop:Play() 
+				self.SoundLoop:ChangeVolume(2) 
+			end
+			self.WasFiring = true
+		end 
+		
+		if self.WasFiring and not(self.Firing or self.FireOverride) and ((self.NextFire + .5) < Time) then
+			if (self.SoundLoop) then self.SoundLoop:Stop() end
 		end
+
 		if self.SearchData.LastKnownPos then
 			self.MissileGuidePos = self.SearchData.LastKnownPos -- This is for guiding the rockets
 		end
@@ -1337,6 +1371,37 @@ if(SERVER)then
 			Heat = 0
 			AmmoConsume = 2
 			ElecConsume = 0.25
+		elseif ProjType == "Flamethrower" then
+			local Spread = self.Accuracy * 20
+			local EZowner = JMod.GetEZowner(self)
+			local RandAng = AngleRand(-Spread, Spread)
+			local Tracer = util.QuickTrace(ShootPos, AimForward * self.TargetingRadius + RandAng:Forward() * Spread * 2, self)
+			for _, Ent in ipairs(ents.FindInSphere(Tracer.HitPos, 50)) do
+				if Ent ~= self and Ent ~= self.NPCTarget then
+					local DmgInfo = DamageInfo()
+					DmgInfo:SetAttacker(EZowner)
+					DmgInfo:SetInflictor(self)
+					DmgInfo:SetDamage(math.random(2, 5) * self.Damage)
+					DmgInfo:SetDamageType(DMG_BURN)
+					Ent:TakeDamageInfo(DmgInfo)
+					if (math.random(1, 10) == 1) then Ent:Ignite(math.random(5, 10), 50) end
+				end
+			end
+			
+			if math.random(1, 20) == 1 then
+				util.Decal("Scorch", Tracer.HitPos + Tracer.HitNormal, Tracer.HitPos - Tracer.HitNormal)
+			end
+
+			local Foof = EffectData()
+			Foof:SetOrigin(ShootPos)
+			Foof:SetNormal(AimForward)
+			Foof:SetScale(3 * self.Damage)
+			Foof:SetStart(AimForward * self.TargetingRadius * 2)
+			util.Effect("eff_jack_gmod_fire", Foof, true, true)
+
+			Heat = 0.01 * self.Damage
+			AmmoConsume = 1
+			ElecConsume = 0.05
 		end
 
 		---
@@ -1462,9 +1527,10 @@ elseif(CLIENT)then
 		["API Bullet"] = 0,
 		["Buckshot"] = 1,
 		["HE Grenade"] = 2,
+		["Missile Launcher"] = 0,
 		["Pulse Laser"] = 3,
-		["Super Soaker"] = 0,
-		["Missile Launcher"] = 0
+		["Super Soaker"] = 3,
+		["Flamethrower"] = 2
 	}
 
 	local FirstFrame = true
