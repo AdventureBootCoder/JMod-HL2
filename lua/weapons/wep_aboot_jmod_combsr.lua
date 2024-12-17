@@ -74,9 +74,9 @@ SWEP.MagID = "cosr" -- the magazine pool this gun draws from
 SWEP.ShootVol = 100 -- volume of shoot sound
 SWEP.ShootPitch = 100 -- pitch of shoot sound
 
-SWEP.ShootSound = "npc/sniper/sniper1.wav" --"weapons/ar2/fire1.wav"
-SWEP.ShootSoundSilenced = "weapons/arccw/m4a1/m4a1_01.wav"
-SWEP.DistantShootSound = "npc/sniper/echo1.wav" --"weapons/ar2/fire1.wav"
+SWEP.ShootSound = "npc/sniper/echo1.wav" --"npc/sniper/sniper1.wav" --"weapons/ar2/fire1.wav"
+SWEP.ShootSoundSilenced = "weapons/arccw/m4a1/m4a1_01.wav" -- You can't silence a mag gun
+SWEP.DistantShootSound = "npc/sniper/sniper1.wav" --"npc/sniper/echo1.wav" --"weapons/ar2/fire1.wav"
 
 SWEP.MuzzleEffect = "muzzleflash_5"
 SWEP.ShellModel = nil--"models/shells/shell_338mag.mdl"
@@ -156,19 +156,19 @@ SWEP.Attachments = {
 		CorrectiveAng = Angle(0, 0, 0),
 		Installed = "optic_aboot_scope_combsr"
 	},
-	{
+	--[[{
 		PrintName = "Muzzle",
 		DefaultAttName = "Standard Muzzle",
 		Slot = "muzzle",
 		Bone = "v_weapon.g3sg1_Parent",
 		Offset = {
-			vpos = Vector(32.5,0,40), -- offset that the attachment will be relative to the bone
-			vang = Angle(53,0,0),
+			vpos = Vector(0.1, -6.05, -35),
+			vang = Angle(-90, 0, -90),
 			wpos = Vector(50, 1.2, -15.3),
 			wang = Angle(-10,-3, 0)
 		},
 		--InstalledEles = {"nobrake"},
-	},
+	},--]]
 	{
 		PrintName = "Stock",
 		Slot = "stock",
