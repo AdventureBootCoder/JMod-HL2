@@ -271,6 +271,7 @@ elseif CLIENT then
 
 	local blurMat = Material("pp/blurscreen")
 	local Dynamic = 0
+	local BlurryMenus = GetConVar("jmod_cl_blurry_menus")
 	local function BlurBackground(panel)
 		if not (IsValid(panel) and panel:IsVisible()) then return end
 		local layers, density, alpha = 1, 1, 255
