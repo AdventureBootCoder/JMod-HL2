@@ -271,14 +271,13 @@ elseif CLIENT then
 
 	local blurMat = Material("pp/blurscreen")
 	local Dynamic = 0
-	local BlurryMenus = GetConVar("jmod_cl_blurry_menus")
 	local function BlurBackground(panel)
 		if not (IsValid(panel) and panel:IsVisible()) then return end
 		local layers, density, alpha = 1, 1, 255
 		local x, y = panel:LocalToScreen(0, 0)
 		local FrameRate, Num, Dark = 1 / FrameTime(), 5, 150
 	
-		if BlurryMenus:GetBool() then
+		if GetConVar("jmod_cl_blurry_menus"):GetBool() then
 			surface.SetDrawColor(255, 255, 255, alpha)
 			surface.SetMaterial(blurMat)
 	
