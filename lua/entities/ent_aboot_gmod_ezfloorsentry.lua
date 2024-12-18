@@ -855,9 +855,8 @@ if(SERVER)then
 			ElecConsume = 0.1
 		elseif ProjType == "Flamethrower" then
 			local FireAng = AimAng:GetCopy()
-			local FireRight = FireAng:Right()
 			local FireForward = FireAng:Forward()
-			local FireUp = FireAng:Up()
+			FireForward = (FireForward + VectorRand() * .1 * self.Accuracy):GetNormalized()
 			local Foof = EffectData()
 			Foof:SetNormal(FireAng:Forward())
 			Foof:SetScale(2)
