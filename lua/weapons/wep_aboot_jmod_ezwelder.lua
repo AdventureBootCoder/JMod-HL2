@@ -170,11 +170,17 @@ function SWEP:ViewModelDrawn()
 		
 		if WeldingMask then
 			Ply.EZautoDarken = 1
-		elseif math.random(1, 5) == 1 then
-			local plooie = EffectData()
-			plooie:SetOrigin(ShootPos)
-			plooie:SetScale(.1)
-			util.Effect("eff_jack_gmod_flashbang", plooie, true, true)
+		else
+			Ply.EZnextFlashTime = Ply.EZnextFlashTime or math.random(1, 3)
+			if Ply.EZnextFlashTime <= 0 then
+				Ply.EZnextFlashTime = math.random(1, 3)
+				local plooie = EffectData()
+				plooie:SetOrigin(Tracey.HitPos)
+				plooie:SetScale(.3)
+				util.Effect("eff_jack_gmod_flashbang", plooie, true, true)
+			else
+				Ply.EZnextFlashTime = Ply.EZnextFlashTime - FrameTime()
+			end
 		end
 	end
 end
@@ -204,11 +210,17 @@ function SWEP:DrawWorldModel()
 		if (EyePos():Distance(Pos) < 400)  then 
 			if WeldingMask then
 				Ply.EZautoDarken = 400 / EyePos():Distance(Pos)
-			elseif math.random(1, 5) == 1 then
-				local plooie = EffectData()
-				plooie:SetOrigin(Pos)
-				plooie:SetScale(.1)
-				util.Effect("eff_jack_gmod_flashbang", plooie, true, true)
+			else
+				Ply.EZnextFlashTime = Ply.EZnextFlashTime or math.random(1, 3)
+				if Ply.EZnextFlashTime <= 0 then
+					Ply.EZnextFlashTime = math.random(1, 3)
+					local plooie = EffectData()
+					plooie:SetOrigin(Pos)
+					plooie:SetScale(.3)
+					util.Effect("eff_jack_gmod_flashbang", plooie, true, true)
+				else
+					Ply.EZnextFlashTime = Ply.EZnextFlashTime - FrameTime()
+				end
 			end
 		end
 	end
