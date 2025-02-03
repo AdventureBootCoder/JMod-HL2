@@ -256,14 +256,14 @@ elseif CLIENT then
 			local Up, Right, Forward, Resource = Ang:Up(), Ang:Right(), Ang:Forward(), tostring(self:GetResource())
 			Ang:RotateAroundAxis(Ang:Right(), 90)
 			Ang:RotateAroundAxis(Ang:Up(), -90)
-			cam.Start3D2D(Pos + Up * 40 - Forward * 65 + Right * 10, Ang, .4)
-			draw.SimpleText("ADVENTURE INDUSTRIES", "JMod-Stencil", 0, 0, TxtCol, TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP)
+			cam.Start3D2D(Pos + Up * 40 - Forward * 65 + Right * 0, Ang, .4)
+			draw.SimpleText("Adv Battle Ops & Operatives Tech", "JMod-Stencil", 0, 0, TxtCol, TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP)
 			draw.SimpleText(Resource .. "/" .. tostring(self.MaxResource), "JMod-Stencil", 0, 85, TxtCol, TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP)
 			cam.End3D2D()
 			---
 			Ang:RotateAroundAxis(Ang:Right(), 180)
-			cam.Start3D2D(Pos + Up * 40 + Forward * 65 - Right * 10.1, Ang, .4)
-			draw.SimpleText("ADVENTURE INDUSTRIES", "JMod-Stencil", 0, 0, TxtCol, TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP)
+			cam.Start3D2D(Pos + Up * 40 + Forward * 65 - Right * 0, Ang, .4)
+			draw.SimpleText("Adv Battle Ops & Operatives Tech", "JMod-Stencil", 0, 0, TxtCol, TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP)
 			draw.SimpleText(Resource .. "/" .. tostring(self.MaxResource), "JMod-Stencil", 0, 85, TxtCol, TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP)
 			cam.End3D2D()
 		end
