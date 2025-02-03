@@ -13,6 +13,10 @@ ENT.Model = "models/props_lab/powerbox02d.mdl"
 ENT.Mass = 30
 ENT.SpawnHeight = 10
 ENT.JModPreferredCarryAngles = Angle(0, 180, 0)
+--
+ENT.EZpowerBank = true
+ENT.MaxConnectionRange = 500
+--
 ENT.EZupgradable = false
 ENT.EZcolorable = false
 ENT.StaticPerfSpecs = {
@@ -149,8 +153,12 @@ if(SERVER)then
 					JMod.Hint(Dude, "sticky")
 				end
 			elseif State == STATE_ON then
-				self:EmitSound("snd_jack_minearm.ogg", 60, 70)
-				self:TurnOff(Dude)
+				if Alt then
+					self:ModConnections(Dude)
+				else
+					self:EmitSound("snd_jack_minearm.ogg", 60, 70)
+					self:TurnOff(Dude)
+				end
 			end
 		elseif self:IsPlayerHolding() and not(Alt) and (self.NextStick < Time) then
 			local Tr = util.QuickTrace(Dude:GetShootPos(), Dude:GetAimVector() * 80, {self, Dude})
@@ -186,7 +194,11 @@ if(SERVER)then
 		self:UpdateWireOutputs()
 		self.LastShockedEnt = nil
 
-		self:ConsumeElectricity(math.Rand(0.02, 0.05))
+		if (State == STATE_ON) then
+			--self:CheckForConnection()
+			self:ConsumeElectricity(math.Rand(0.02, 0.05))
+			JMod.DistributePower(self)
+		end
 
 		self:NextThink(Time + 1)
 		return true
