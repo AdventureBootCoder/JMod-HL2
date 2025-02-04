@@ -15,7 +15,7 @@ ENT.SpawnHeight = 10
 ENT.JModPreferredCarryAngles = Angle(0, 180, 0)
 --
 ENT.EZpowerBank = true
-ENT.MaxConnectionRange = 500
+ENT.MaxConnectionRange = 600
 --
 ENT.EZupgradable = false
 ENT.EZcolorable = false
@@ -264,7 +264,7 @@ if(SERVER)then
 
 	function ENT:CheckForConnection(shocker)
 		if IsValid(shocker) then
-			if FindNextConnection(self, shocker) then
+			if (shocker == self) or FindNextConnection(self, shocker) then
 
 				return true
 			end
@@ -274,8 +274,8 @@ if(SERVER)then
 				local EntID = Ent:EntIndex()
 				if not(self.ElectricalCallbacks[EntID]) then
 					-- Here's where we do the callback thing
-					local ShockCallback = Ent:AddCallback("PhysicsCollide", function(ent, data)
-						if not(IsValid(ent)) or not(IsValid(data.HitEntity)) or (data.HitEntity == self) then return end
+					local ShockCallback = Ent:AddCallback("PhysicsCollide", function(shocker, data)
+						if not(IsValid(Ent)) or not(IsValid(data.HitEntity)) or (data.HitEntity == self) then return end
 						if data.DeltaTime > 0.2 then
 							timer.Simple(0, function()
 								if not(IsValid(Ent)) or not(IsValid(data.HitEntity)) then return end
@@ -288,6 +288,8 @@ if(SERVER)then
 						end
 					end)
 					if ShockCallback then
+						Ent.EZconnectedCapacitors = Ent.EZconnectedCapacitors or {}
+						Ent.EZconnectedCapacitors[self:EntIndex()] = self
 						self.ElectricalCallbacks[EntID] = ShockCallback
 					end
 				end
@@ -300,62 +302,143 @@ if(SERVER)then
 	local ShockList = {["ent_aboot_gmod_ezcapacitor"] = false}
 
 	function ENT:Shock(shocker, shockedData)
-		if self:GetState() == STATE_ON then
-			local ShockEnt = shockedData.HitEntity
-			if (ShockEnt ~= self) and not(self.ElectricalCallbacks[ShockEnt:EntIndex()]) and (self:GetPos():Distance(shockedData.HitPos) <= self.ShockDistance) then
-				local Connected = self:CheckForConnection(shocker)
-				if Connected then
-					if ShockEnt.EZconsumes and table.HasValue(ShockEnt.EZconsumes, JMod.EZ_RESOURCE_TYPES.POWER) and ShockEnt.TryLoadResource then
-						self:ConsumeElectricity(ShockEnt:TryLoadResource(JMod.EZ_RESOURCE_TYPES.POWER, self:GetElectricity()))
-					elseif (ShockEnt:IsPlayer() or ShockEnt:IsNPC()) or (Shockables[ShockEnt:GetMaterialType()] and not(ShockList[ShockEnt:GetClass()])) then
-						--[[if ShockEnt:GetGroundEntity() != NULL then
-							print("Ground Entity: ", ShockEnt:GetGroundEntity())
-						end--]]
-						ShockEnt:ForcePlayerDrop()
-						local Damage, Force = math.random(1, 10), 500 -- Adjust damage and force factors as desired
-						local Zap = DamageInfo()
-						Zap:SetDamage(Damage)
-						Zap:SetDamageForce(-shockedData.HitNormal * Force)
-						Zap:SetDamagePosition(shockedData.HitPos)
-						Zap:SetAttacker(JMod.GetEZowner(self))
-						Zap:SetInflictor(shocker)
-						Zap:SetDamageType(DMG_SHOCK)
-						ShockEnt:TakeDamageInfo(Zap)
-						-- Electrical effect
-						local ZapEff = EffectData()
-						ZapEff:SetOrigin(shockedData.HitPos)
-						ZapEff:SetNormal(shockedData.HitNormal)
-						ZapEff:SetMagnitude(math.Rand(5, 10)) --amount and shoot hardness
-						ZapEff:SetScale(math.Rand(.5, 1.5)) --length of strands
-						ZapEff:SetRadius(math.Rand(2, 4)) --thickness of strands
-						util.Effect("Sparks", ZapEff, true, true)
-						-- Electrical sound
-						shocker:EmitSound("snd_jack_turretfizzle.ogg", 70, 90)
-						-- Reduce power
-						self:ConsumeElectricity(1)
-						if ShockEnt:IsPlayer() then
-							JMod.EZimmobilize(ShockEnt, 1.5, self)
-							ShockEnt:SetGroundEntity(nil)
-							local vec = (shockedData.HitPos - ShockEnt:GetPos()):GetNormalized()
-							ShockEnt:SetVelocity(vec * 100)
-							ShockEnt:ViewPunch(Angle(math.random(-40, 2), math.random(-20, 20), math.random(-2, 2)))
-							JModHL2.EZstun(ShockEnt, 1, self)
-						end
-						self.LastShockedEnt = ShockEnt
+		if self:GetState() ~= STATE_ON then return end
+
+		local ShockEnt = shockedData.HitEntity
+		if (ShockEnt ~= self) and not(self.ElectricalCallbacks[ShockEnt:EntIndex()]) and (self:GetPos():Distance(shockedData.HitPos) <= self.ShockDistance) then
+			local Connected = self:CheckForConnection(shocker)
+			if Connected then
+				if ShockEnt.EZconsumes and table.HasValue(ShockEnt.EZconsumes, JMod.EZ_RESOURCE_TYPES.POWER) and ShockEnt.TryLoadResource then
+					self:ConsumeElectricity(ShockEnt:TryLoadResource(JMod.EZ_RESOURCE_TYPES.POWER, self:GetElectricity()))
+				elseif (ShockEnt:IsPlayer() or ShockEnt:IsNPC()) or (Shockables[ShockEnt:GetMaterialType()] and not(ShockList[ShockEnt:GetClass()])) then
+					--[[if ShockEnt:GetGroundEntity() != NULL then
+						print("Ground Entity: ", ShockEnt:GetGroundEntity())
+					end--]]
+					ShockEnt:ForcePlayerDrop()
+					local Damage, Force = math.random(1, 10), 500 -- Adjust damage and force factors as desired
+					local Zap = DamageInfo()
+					Zap:SetDamage(Damage)
+					Zap:SetDamageForce(-shockedData.HitNormal * Force)
+					Zap:SetDamagePosition(shockedData.HitPos)
+					Zap:SetAttacker(JMod.GetEZowner(self))
+					Zap:SetInflictor(shocker)
+					Zap:SetDamageType(DMG_SHOCK)
+					ShockEnt:TakeDamageInfo(Zap)
+					-- Electrical effect
+					local ZapEff = EffectData()
+					ZapEff:SetOrigin(shockedData.HitPos)
+					ZapEff:SetNormal(shockedData.HitNormal)
+					ZapEff:SetMagnitude(math.Rand(5, 10)) --amount and shoot hardness
+					ZapEff:SetScale(math.Rand(.5, 1.5)) --length of strands
+					ZapEff:SetRadius(math.Rand(2, 4)) --thickness of strands
+					util.Effect("Sparks", ZapEff, true, true)
+					-- Electrical sound
+					shocker:EmitSound("snd_jack_turretfizzle.ogg", 70, 90)
+					-- Reduce power
+					self:ConsumeElectricity(2)
+					if ShockEnt:IsPlayer() then
+						JMod.EZimmobilize(ShockEnt, 1.5, self)
+						ShockEnt:SetGroundEntity(nil)
+						local vec = (shockedData.HitPos - ShockEnt:GetPos()):GetNormalized()
+						ShockEnt:SetVelocity(vec * 100)
+						ShockEnt:ViewPunch(Angle(math.random(-40, 2), math.random(-20, 20), math.random(-2, 2)))
+						JModHL2.EZstun(ShockEnt, 1, self)
 					end
+					self.LastShockedEnt = ShockEnt
+
+					return true
 				end
-			else
-				shocker:RemoveCallback("PhysicsCollide", self.ElectricalCallbacks[shocker:EntIndex()])
-				self.ElectricalCallbacks[shocker:EntIndex()] = nil
 			end
+		else
+			shocker:RemoveCallback("PhysicsCollide", self.ElectricalCallbacks[shocker:EntIndex()])
+			self.ElectricalCallbacks[shocker:EntIndex()] = nil
+			shocker.EZconnectedCapacitors = shocker.EZconnectedCapacitors or {}
+			shocker.EZconnectedCapacitors[self:EntIndex()] = nil
 		end
 	end
+
+	hook.Add("JMod_EZprogressTask", "JMod_ZapWorkers", function(ent, pos, deconstructor, task, mult)
+		if (ent:GetClass() == "ent_aboot_gmod_ezcapacitor") then 
+			return ent:Shock(ent, {
+				HitEntity = deconstructor, 
+				HitPos = pos, 
+				HitNormal = (pos - deconstructor:GetPos()):GetNormalized()
+			}) and "Zap" or nil
+			
+		elseif ent.EZconnectedCapacitors then
+			local Shocking = false
+			for k, v in pairs(ent.EZconnectedCapacitors) do
+				if IsValid(v) and v:GetState() == STATE_ON then
+					Shocking = v:Shock(ent, {
+						HitEntity = deconstructor, 
+						HitPos = pos, 
+						HitNormal = (pos - deconstructor:GetPos()):GetNormalized()
+					})
+				end
+			end
+
+			return Shocking and "Zap" or nil
+		end
+	end)
+
+	hook.Add("PostEntityTakeDamage", "JMod_ZapWorkers", function(ent, dmginfo)
+		local Attacker = IsValid(dmginfo:GetAttacker()) and dmginfo:GetAttacker() or dmginfo:GetInflictor()
+		if not IsValid(Attacker) then return end
+		if (ent:GetClass() == "ent_aboot_gmod_ezcapacitor") then
+			local DmgPos = dmginfo:GetDamagePosition()
+			local PosDiff = DmgPos - Attacker:GetPos()
+			if (PosDiff:Length() <= 100) and (dmginfo:IsDamageType(DMG_CLUB) or dmginfo:IsDamageType(DMG_SLASH)) then
+				ent:Shock(ent, {
+					HitEntity = Attacker, 
+					HitPos = DmgPos, 
+					HitNormal = (PosDiff):GetNormalized()
+				})
+			end
+		elseif ent.EZconnectedCapacitors then
+			local DmgPos = dmginfo:GetDamagePosition()
+			local PosDiff = DmgPos - Attacker:GetPos()
+			local PosDir = (PosDiff):GetNormalized()
+			if (PosDiff:Length() <= 100) and (dmginfo:IsDamageType(DMG_CLUB) or dmginfo:IsDamageType(DMG_SLASH)) then
+				for k, v in pairs(ent.EZconnectedCapacitors) do
+					v:Shock(ent, {
+						HitEntity = Attacker, 
+						HitPos = DmgPos, 
+						HitNormal = PosDir
+					})
+				end
+			end
+		end
+	end)
+
+	hook.Add("OnPhysgunPickup", "JMod_ZapWorkers", function(ply, ent)
+		if (ent:GetClass() == "ent_aboot_gmod_ezcapacitor") then
+			local PosDiff = ply:GetShootPos() - ent:GetPos()
+			ent:Shock(ent, {
+				HitEntity = ply, 
+				HitPos = ply:GetShootPos(), 
+				HitNormal = (PosDiff):GetNormalized()
+			})
+		elseif ent.EZconnectedCapacitors then
+			local Pos = ply:GetShootPos()
+			local PosDir = (Pos - ent:GetPos()):GetNormalized()
+			for k, v in pairs(ent.EZconnectedCapacitors) do
+				v:Shock(ent, {
+					HitEntity = ply, 
+					HitPos = Pos, 
+					HitNormal = PosDir
+				})
+			end
+		end
+	end)
 
 	function ENT:OnRemove()
 		if self.ElectricalCallbacks then
 			for k, v in pairs(self.ElectricalCallbacks) do
-				if (IsValid(Entity(k))) then
-					Entity(k):RemoveCallback("PhysicsCollide", v)
+				local Ent = Entity(k)
+				if (IsValid(Ent)) then
+					Ent:RemoveCallback("PhysicsCollide", v)
+					Ent.EZconnectedCapacitors = Ent.EZconnectedCapacitors or {}
+					Ent.EZconnectedCapacitors[self:EntIndex()] = nil
 				end
 			end
 		end
