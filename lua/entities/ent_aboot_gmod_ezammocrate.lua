@@ -207,10 +207,19 @@ if SERVER then
 			local PrimMax, SecMax, PrimName, SecName = game.GetAmmoMax(PrimType), game.GetAmmoMax(SecType), game.GetAmmoName(PrimType), game.GetAmmoName(SecType)
 			
 			local IsMunitionBox = self.EZsupplies == "munitions"
+			local ArmorAmmoCarryMult = 1
+			if ply.EZarmor and ply.EZarmor.items then
+				for id, v in pairs(ply.EZarmor.items) do
+					local ArmorInfo = JMod.ArmorTable[v.name]
+					if ArmorInfo.ammoCarryMult then
+						ArmorAmmoCarryMult = ArmorAmmoCarryMult * ArmorInfo.ammoCarryMult
+					end
+				end
+			end
 
 			--[[ PRIMARY --]]
 			if PrimName then 
-				PrimMax = PrimMax * JMod.Config.Weapons.AmmoCarryLimitMult
+				PrimMax = PrimMax * JMod.Config.Weapons.AmmoCarryLimitMult * ArmorAmmoCarryMult
 				local IsPrimMunitions = table.HasValue(JMod.Config.Weapons.AmmoTypesThatAreMunitions, PrimName)
 				if (IsPrimMunitions == IsMunitionBox) and not(IsAmmoOnTable(PrimName, JMod.Config.Weapons.WeaponAmmoBlacklist)) then
 					if PrimType and (PrimType ~= -1) then
@@ -242,7 +251,7 @@ if SERVER then
 			if self:GetResource() <= 0 then return end
 			--[[ SECONDARY --]]
 			if SecName then 
-				SecMax = SecMax * JMod.Config.Weapons.AmmoCarryLimitMult
+				SecMax = SecMax * JMod.Config.Weapons.AmmoCarryLimitMult * ArmorAmmoCarryMult
 				local IsSecMunitions = table.HasValue(JMod.Config.Weapons.AmmoTypesThatAreMunitions, SecName)
 				if (IsSecMunitions == IsMunitionBox) and not(IsAmmoOnTable(SecName, JMod.Config.Weapons.WeaponAmmoBlacklist)) then
 					if SecType and (SecType ~= -1) then
