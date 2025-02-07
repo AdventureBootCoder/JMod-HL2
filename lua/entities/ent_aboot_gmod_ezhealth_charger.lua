@@ -1,7 +1,7 @@
 -- AdventureBoots 2022
 AddCSLuaFile()
 ENT.Type = "anim"
-ENT.PrintName = "EZ Health Charger"
+ENT.PrintName = "EZ Charger Health"
 ENT.Author = "AdventureBoots"
 ENT.Category = "JMod - EZ HL:2"
 ENT.Information = "Magnum Opus"
@@ -14,10 +14,12 @@ ENT.Model = "models/props_combine/health_charger001.mdl"
 ENT.Mat = nil
 ----
 ENT.JModPreferredCarryAngles = Angle(0, 180, 0)
-ENT.EZconsumes = {JMod.EZ_RESOURCE_TYPES.BASICPARTS, JMod.EZ_RESOURCE_TYPES.MEDICALSUPPLIES}
+ENT.EZconsumes = {JMod.EZ_RESOURCE_TYPES.BASICPARTS, JMod.EZ_RESOURCE_TYPES.MEDICALSUPPLIES, JMod.EZ_RESOURCE_TYPES.POWER}
 ENT.EZupgradable = false
 ENT.StaticPerfSpecs = {
-	MaxSupplies = 100
+	MaxSupplies = 100,
+	MaxDurability = 100,
+	MaxElectricity = 100
 }
 
 local STATE_BROKEN, STATE_OFF, STATE_CHARGIN = -1, 0, 1
@@ -39,6 +41,7 @@ if(SERVER)then
 		ent:Spawn()
 		ent:Activate()
 		ent.Weld = constraint.Weld(ent, tr.Entity, 0, tr.PhysicsBone, 50000, false, false)
+
 		return ent
 	end
 
@@ -55,7 +58,7 @@ if(SERVER)then
 		end
 	end
 
-	function ENT:Use(activator,activatorAgain,onOff)
+	function ENT:Use(activator, activatorAgain, onOff)
 		local Dude = mactivator or activatorAgain
 		local Time = CurTime()
 		local State = self:GetState()
@@ -63,11 +66,15 @@ if(SERVER)then
 			return
 		elseif (State == STATE_OFF) then
 			if(tobool(onOff))then -- we got pressed
-				if (Dude:Health() < 100) and (self:GetSupplies() > 0) then
+				local Supps = self:GetSupplies()
+				local Elec = self:GetElectricity()
+				if (Dude:Health() < Dude:GetMaxHealth()) and (Supps > 0) and (Elec > 0) then
 					self:TurnOn(Dude)
-				elseif self:GetSupplies() <= 0 then
+				elseif Supps <= 0 then
 					JMod.Hint(activator, "afh supply")
 					self:EmitSound("items/medshotno1.wav")
+				elseif Elec <= 0 then
+					JMod.Hint(activator, "nopower")
 				else
 					self:EmitSound("items/medshotno1.wav")
 				end
@@ -85,7 +92,7 @@ if(SERVER)then
 		if State == STATE_BROKEN then return end
 		if State == STATE_CHARGIN then
 
-			if((IsValid(self.User))and(self.User:Alive())and(self.User:Health() < 100)and(self:GetSupplies() > 0))then
+			if(IsValid(self.User) and (self.User:Alive()) and (self.User:Health() < self.User:GetMaxHealth()) and (self:GetSupplies() > 0))then
 				local Tr = self.User:GetEyeTrace()
 
 				if((Tr.Hit) and (Tr.Entity == self))and( self.User:GetShootPos():Distance(self:GetPos()) < 100)then
@@ -94,9 +101,11 @@ if(SERVER)then
 						self.User:PrintMessage(HUD_PRINTCENTER, "stopping bleeding")
 						self.User.EZbleeding = math.Clamp(self.User.EZbleeding - 2 * JMod.Config.Tools.Medkit.HealMult, 0, 9e9)
 						self:ConsumeSupplies(.5)
+						self:ConsumeElectricity(1)
 					else
 						self.User:SetHealth(self.User:Health() + 1)
 						self:ConsumeSupplies(1.5)
+						self:ConsumeElectricity(.5)
 					end
 				else
 					self:TurnOff(true)
@@ -136,13 +145,16 @@ if(SERVER)then
 			nextOk = Time + 1
 			self:EmitSound("items/medshot4.wav")
 		end
+		if not self.ChargeSound then
+			self.ChargeSound = CreateSound(self, "items/medcharge4.wav")
+		end
 		self.ChargeSound:Play()
 		self.User = dude
 		self:SetState(STATE_CHARGIN)
 	end
 
 	function ENT:OnRemove()
-		if IsValid(self.ChargeSound) then
+		if self.ChargeSound then
 			self.ChargeSound:Stop()
 		end
 	end
@@ -150,9 +162,14 @@ if(SERVER)then
 elseif(CLIENT)then
 	function ENT:Initialize()
 		local LerpedSupplies = 0
+		local LerpedElec = 0
 		self:AddCallback("BuildBonePositions", function(ent, numbones)
 			local SupplyFrac = LerpedSupplies / 100
 			local DrainedFraction = 1 - SupplyFrac
+			--
+			local ElecFrac = LerpedElec / 100
+			local DrainedFractionElec = 1 - ElecFrac
+
 			local Pos, Ang = ent:GetBonePosition(0)
 			local Up, Right, Forward = Ang:Up(), Ang:Right(), Ang:Forward()
 			--local Vary = math.sin(CurTime()*12)/2+.5
@@ -160,10 +177,10 @@ elseif(CLIENT)then
 			if not(ent:GetBoneName(1)) then
 				return
 			end
-			if(DrainedFraction <= 0.98)then
+			if(DrainedFractionElec <= 0.98)then
 				local SpinAng = Ang:GetCopy()
-				SpinAng:RotateAroundAxis(Up, 360 * DrainedFraction)
-				ent:SetBonePosition(2, Pos - Right *5.25 + Up * (6 - DrainedFraction * 5) + Forward * 2.5, SpinAng)
+				SpinAng:RotateAroundAxis(Up, 360 * DrainedFractionElec)
+				ent:SetBonePosition(2, Pos - Right *5.25 + Up * (6 - DrainedFractionElec * 5) + Forward * 2.5, SpinAng)
 			else
 				ent:SetBonePosition(2, Pos-Right * 5.25 + (Up * 0.85) + Forward * 2.5, Ang)
 			end
@@ -179,6 +196,7 @@ elseif(CLIENT)then
 				MacTheMatrix:Scale(Vector(1, DrainedFraction * -10, 1))
 				ent:SetBoneMatrix(1, MacTheMatrix)
 				LerpedSupplies = Lerp(math.ease.OutCubic(FrameTime() * 5), LerpedSupplies, self:GetSupplies())
+				LerpedElec = Lerp(math.ease.OutCubic(FrameTime() * 5), LerpedElec, self:GetElectricity())
 			end
 		end)
 	end

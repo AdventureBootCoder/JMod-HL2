@@ -1,7 +1,7 @@
 -- AdventureBoots 2022
 AddCSLuaFile()
 ENT.Type = "anim"
-ENT.PrintName = "EZ Suit Charger"
+ENT.PrintName = "EZ Charger Suit"
 ENT.Author = "AdventureBoots"
 ENT.Category = "JMod - EZ HL:2"
 ENT.Information = "Magnum Opus"
@@ -56,7 +56,7 @@ if(SERVER)then
 			return
 		elseif State == STATE_OFF then
 			if tobool(onOff) then -- we got pressed
-				if (Dude:Armor() < 100) and (Dude:IsSuitEquipped()) and (self:GetElectricity() > 0) then
+				if (Dude:Armor() < Dude:GetMaxArmor()) and (Dude:IsSuitEquipped()) and (self:GetElectricity() > 0) then
 					self:TurnOn(Dude)
 				else
 					self:EmitSound("items/suitchargeno1.wav")
@@ -74,10 +74,10 @@ if(SERVER)then
 		local State = self:GetState()
 		if State == STATE_BROKEN then return end
 		if State == STATE_CHARGIN then
-			if (IsValid(self.User)) and (self.User:Alive()) and (self.User:Armor() < 100) and (self.User:IsSuitEquipped()) and (self:GetElectricity()>0) then
-				local Tr=self.User:GetEyeTrace()
-				if((Tr.Hit)and(Tr.Entity==self))and(self.User:GetShootPos():Distance(self:GetPos())<100)then
-					self.User:SetArmor(self.User:Armor()+1)
+			if (IsValid(self.User)) and (self.User:Alive()) and (self.User:Armor() < self.User:GetMaxArmor()) and (self.User:IsSuitEquipped()) and (self:GetElectricity() > 0) then
+				local Tr = self.User:GetEyeTrace()
+				if((Tr.Hit) and (Tr.Entity == self)) and (self.User:GetShootPos():Distance(self:GetPos()) < 100)then
+					self.User:SetArmor(self.User:Armor() + 1)
 					self:ConsumeElectricity(1.334)
 				else
 					self:TurnOff(true)
@@ -108,25 +108,30 @@ if(SERVER)then
 			nextOk = Time + 1
 			self:EmitSound("items/suitchargeok1.wav")
 		end
+		if not self.ChargeSound then
+			self.ChargeSound = CreateSound(self, "items/suitcharge1.wav")
+		end
 		self.ChargeSound:Play()
 		self.User = dude
 		self:SetState(STATE_CHARGIN)
 	end
 
 	function ENT:OnRemove()
-		self.ChargeSound:Stop()
+		if self.ChargeSound then
+			self.ChargeSound:Stop()
+		end
 	end
 
 elseif(CLIENT)then
 	function ENT:Initialize()
 		local LerpedElec = 0
 		self:AddCallback("BuildBonePositions", function(ent,numbones)
-
 			local ElecFrac = LerpedElec / 100
-			local DrainedFraction= 1 - ElecFrac
-			local Pos,Ang=ent:GetBonePosition(0)
+			local DrainedFraction = 1 - ElecFrac
+
+			local Pos, Ang = ent:GetBonePosition(0)
 			local Up, Right, Forward = Ang:Up(), Ang:Right(), Ang:Forward()
-			local Vary=math.sin(CurTime()*12)/2+.5
+			local Vary = math.sin(CurTime()*12)/2+.5
 			if not(ent:GetBoneName(1)) then
 				return
 			end
