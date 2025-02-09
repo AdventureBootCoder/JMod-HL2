@@ -117,6 +117,8 @@ if SERVER then
 		end
 	end
 
+	local HL2Ammo = {"AR2", "Pistol", "XBowBolt", "SMG1", "357", "Buckshot", "RPG_Round", "slam", "Grenade", "AlyxGun", "SniperRound"}
+
 	function ENT:OnTakeDamage(dmginfo)
 		self:TakePhysicsDamage(dmginfo)
 
@@ -124,12 +126,11 @@ if SERVER then
 		if (IsValid(Attacker) and Attacker:IsPlayer()) then
 			local Wep = Attacker:GetActiveWeapon()
 			if IsValid(Wep) and (Wep:GetClass() == "weapon_crowbar") then
-				local HL2Ammo = {"AR2", "Pistol", "XBowBolt", "SMG1", "357", "Buckshot", "RPG_Round", "slam", "Grenade", "AlyxGun", "SniperRound"}
+				self:Open(true)
 				for k, v in ipairs(HL2Ammo) do
-					self:Open(true)
-					timer.Simple(1, function()
-						if IsValid(self) and IsValid(activator) then
-							self:GivePlyAmmo(activator, true, v)
+					timer.Simple(.5, function()
+						if IsValid(self) and IsValid(Attacker) then
+							self:GivePlyAmmo(Attacker, true, v)
 						end
 					end)
 				end
@@ -203,7 +204,7 @@ if SERVER then
 		local Wep = ply:GetActiveWeapon()
 
 		if IsValid(Wep) then
-			local PrimType, SecType, PrimSize, SecSize = (ammotype and game.GetAmmoID(ammoType)) or Wep:GetPrimaryAmmoType(), Wep:GetSecondaryAmmoType(), Wep:GetMaxClip1(), Wep:GetMaxClip2()
+			local PrimType, SecType, PrimSize, SecSize = ((ammoType ~= nil) and game.GetAmmoID(ammoType)) or Wep:GetPrimaryAmmoType(), Wep:GetSecondaryAmmoType(), Wep:GetMaxClip1(), Wep:GetMaxClip2()
 			local PrimMax, SecMax, PrimName, SecName = game.GetAmmoMax(PrimType), game.GetAmmoMax(SecType), game.GetAmmoName(PrimType), game.GetAmmoName(SecType)
 			
 			local IsMunitionBox = self.EZsupplies == "munitions"
