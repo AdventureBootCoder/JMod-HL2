@@ -121,3 +121,47 @@ hook.Add("JMod_RadioDelivery", "JMODHL2_SPEEDYDELIVER", function(ply, transceive
 	local Tr = util.QuickTrace(ply:GetPos() + Vector(0, 0, 30), (VectorRand() * Vector(1, 1, 0)) * 300, {ply})
 	return (DeliveryTime * .1), ply:GetEyeTrace().HitPos--Tr.HitPos
 end)
+--[[]
+concommand.Add("jmod_hl2_buzz", function(ply, cmd, args) 
+	if IsValid(ply) and not ply:IsSuperAdmin() then return end
+
+	local PlyTr = ply:GetEyeTrace()
+
+	local ShootPos = ply:GetShootPos() + Vector(0, 0, 1000)
+	local ShootAngle = (PlyTr.HitPos - ShootPos):Angle()
+
+	local BulletNum = 120
+	for i = 1, BulletNum do
+		timer.Simple((i / BulletNum) * 1.5, function()
+			JMod.RicPenBullet(ply, ShootPos, ShootAngle:Forward() + VectorRand() * 0.05, 150, true, true, 1, 1, nil)--"eff_jack_gmod_smallarmstracer")
+			ShootAngle:RotateAroundAxis(ShootAngle:Right(), 45 / BulletNum)
+			ShootPos = ShootPos + ShootAngle:Forward() * 400 / BulletNum
+		end)
+	end
+	timer.Simple(2, function()
+		local FlyPos = PlyTr.HitPos + Vector(0, 0, 2000)
+		local FlyVec = PlyTr.Normal
+		FlyVec.z = 0
+		FlyVec:Normalize()
+		local Eff = EffectData()
+		Eff:SetOrigin(FlyPos)
+		Eff:SetStart(FlyVec * -400)
+		local Filter = RecipientFilter()
+		Filter:AddAllPlayers()
+		util.Effect("eff_jack_gmod_jetflyby", Eff, true, Filter)
+
+		timer.Simple(.1, function()
+			if not IsValid(ply) or not ply:Alive() then return end
+			
+			sound.Play("snd_jack_flyby_drop.mp3", FlyPos, 150, 100)
+
+			for k, playa in pairs(ents.FindInSphere(FlyPos, 6000)) do
+				if playa:IsPlayer() then
+					local SoundPos = playa:GetShootPos()
+					sound.Play("snd_jack_flyby_drop.mp3", SoundPos + (FlyPos - SoundPos) * 10, 50, 100)
+				end
+			end
+		end)
+	end)
+end, nil, "Airstrike run")
+--]]

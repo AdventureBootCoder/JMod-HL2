@@ -1,0 +1,20 @@
+"VertexLitGeneric"
+{
+	"$basetexture" "models/phoenix_soldiers/backpack_diffuse"
+	"$bumpmap"	"models/phoenix_soldiers/backpack_normal"
+	"$halflambert"	"1"
+	
+	"$phong" "1"
+	"$basemapalphaphongmask" "1"
+	//"$phongexponenttexture" "models/phoenix_soldiers/backpack_spec"
+	"$phongexponent" "4"
+	"$phongboost"	".3"
+	"$phongfresnelranges"	"[0.41 0.41 .5]"
+	"$halflambert" "0"
+	"$phongdisablehalflambert" "1"
+	"$phongalbedotint" "1"
+	
+//	"$rimlight"	"1"
+	"$rimlightexponent"	"15"
+	"$rimlightboost"	"0.155"
+}

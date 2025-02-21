@@ -397,6 +397,48 @@ JModHL2.ArmorTable = {
 		dur = 100,
 		ent = "ent_aboot_gmod_ezarmor_longfallboots"
 	},
+	["ABoot PCV Suit"]={
+		PrintName = "EZ PCV Suit",
+		Category = "JMod - EZ HL:2",
+		mdl = "models/aboot/pcv_suit.mdl",
+		clrForced = false,
+		slots={
+			chest = 1,
+			abdomen = 1
+		},
+		def=table.Inherit({
+			[DMG_NERVEGAS]=1,
+			[DMG_RADIATION]=1,
+			[DMG_ACID]=1,
+			[DMG_POISON]=1
+		},HEVArmorProtectionProfile),
+		resist={
+			[DMG_ACID]=.90,
+			[DMG_POISON]=.99
+		},
+		chrg={
+			power = 50
+		},
+		snds={
+			eq="hl1/fvox/bell.wav",
+			uneq="hl1/fvox/deactivated.wav"
+		},
+		eff={
+			HEVsuit = true,
+			speedBoost = 1,
+		},
+		wgt = 15,
+		dur = 300,
+		storage = 5,
+		bon = "ValveBiped.Bip01_Spine2",
+		siz = Vector(1.15, 1, 1),
+		pos = Vector(-4.2, -8.4, 0),
+		ang = Angle(-85, 1, 93.5),
+		bdg = {
+			[1] = 0,
+		},
+		ent = "ent_aboot_gmod_ezarmor_pcv"
+	},
 }
 
 local function HL2LoadAdditionalArmor()
