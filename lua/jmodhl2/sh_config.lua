@@ -492,6 +492,17 @@ hook.Add("JMod_PostLuaConfigLoad", "JMod_HL2_PostLoadConfig", function(Config)
 			craftingType = {"workbench", "fabricator"},
 			description = "A foot based suit of armor for the dual portal device."
 		},
+		["HL Powered Combat Vest"] = {
+			results = JMod.ArmorTable["Powered Combat Vest"].ent,
+			craftingReqs = {
+				[JMod.EZ_RESOURCE_TYPES.ADVANCEDTEXTILES] = 60,
+				[JMod.EZ_RESOURCE_TYPES.ADVANCEDPARTS] = 5,
+				[JMod.EZ_RESOURCE_TYPES.RUBBER] = 40
+			},
+			category = "Apparel",
+			craftingType = {"workbench", "fabricator"},
+			description = "Nothing says HECU like a Powered Combat Vest."
+		},
 		--[[["Physics Manipulator"] = {
 			craftingReqs = {
 				["basic parts"] = 300,

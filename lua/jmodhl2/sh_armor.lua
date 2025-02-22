@@ -97,7 +97,7 @@ JModHL2.ArmorTable = {
 		},
 		eff={
 			HEVsuit = true,
-			speedBoost = 1,
+			speedBoost = 1.2,
 			flashresistant = true,
 			nightVision = false
 		},
@@ -107,7 +107,7 @@ JModHL2.ArmorTable = {
 			mskmat = "mats_aboot_gmod_sprites/helmet_vignette1.png",
 			eff = {
 				HEVsuit = true,
-				speedBoost = 1,
+				speedBoost = 1.2,
 				flashresistant = true,
 				nightVision = true
 			},
@@ -131,7 +131,7 @@ JModHL2.ArmorTable = {
 		plymdl="models/aboot/player/hev_suit.mdl", -- https://steamcommunity.com/sharedfiles/filedetails/?id=1341386337&searchtext=hev+suit
 		mskmat="mats_aboot_gmod_sprites/helmet_vignette1.png",
 		sndlop="snds_jack_gmod/mask_breathe.ogg",
-		wgt = 40,
+		wgt = 30,
 		dur = 400,
 		ent = "ent_aboot_gmod_ezarmor_hev"
 	},
@@ -206,7 +206,7 @@ JModHL2.ArmorTable = {
 		plymdl = "models/aboot/combine/hev_suit/combine_super_solder.mdl",
 		mskmat = "mats_aboot_gmod_sprites/helmet_vignette2.png",
 		sndlop = "snds_jack_gmod/mask_breathe.ogg",
-		wgt = 40,
+		wgt = 30,
 		dur = 400,
 		ent = "ent_aboot_gmod_ezarmor_combinesuit"
 	},
@@ -397,8 +397,8 @@ JModHL2.ArmorTable = {
 		dur = 100,
 		ent = "ent_aboot_gmod_ezarmor_longfallboots"
 	},
-	["ABoot PCV Suit"]={
-		PrintName = "EZ PCV Suit",
+	["Powered Combat Vest"]={
+		PrintName = "EZ PCV",
 		Category = "JMod - EZ HL:2",
 		mdl = "models/aboot/pcv_suit.mdl",
 		clrForced = false,
@@ -425,10 +425,10 @@ JModHL2.ArmorTable = {
 		},
 		eff={
 			HEVsuit = true,
-			speedBoost = 1,
+			speedBoost = 1.2,
 		},
-		wgt = 15,
-		dur = 300,
+		wgt = 12,
+		dur = 400,
 		storage = 5,
 		bon = "ValveBiped.Bip01_Spine2",
 		siz = Vector(1.15, 1, 1),
