@@ -1,8 +1,8 @@
-player_manager.AddValidModel( "ABoot HEV Suit", "models/aboot/player/hev_suit.mdl" );
-list.Set( "PlayerOptionsModel", "ABoot HEV Suit", "models/aboot/player/hev_suit.mdl" );
-player_manager.AddValidHands( "ABoot HEV Suit", "models/aboot/ragenigga/viewmodels/c_arms_classic.mdl", 0, "00000000" )
-list.Set( "PlayerOptionsModel", "Combine Super Soldier", "models/aboot/combine/hev_suit/combine_super_solder.mdl" )
-player_manager.AddValidModel( "Combine Super Soldier", "models/aboot/combine/hev_suit/combine_super_solder.mdl" )
+player_manager.AddValidModel("ABoot HEV Suit", "models/aboot/player/hev_suit.mdl");
+list.Set("PlayerOptionsModel", "ABoot HEV Suit", "models/aboot/player/hev_suit.mdl");
+player_manager.AddValidHands("ABoot HEV Suit", "models/aboot/ragenigga/viewmodels/c_arms_classic.mdl", 0, "00000000")
+list.Set("PlayerOptionsModel", "Combine Super Soldier", "models/aboot/combine/hev_suit/combine_super_solder.mdl")
+player_manager.AddValidModel("Combine Super Soldier", "models/aboot/combine/hev_suit/combine_super_solder.mdl")
 player_manager.AddValidHands("Combine Super Soldier", "models/aboot/combine/hev_suit/combine_super_solder_h.mdl", 0, "00000000")
 
 JMod = JMod or {}
@@ -133,6 +133,7 @@ JModHL2.ArmorTable = {
 		sndlop="snds_jack_gmod/mask_breathe.ogg",
 		wgt = 30,
 		dur = 400,
+		HEVsuit = true,
 		ent = "ent_aboot_gmod_ezarmor_hev"
 	},
 	["ABoot Combine Suit"]={
@@ -208,6 +209,7 @@ JModHL2.ArmorTable = {
 		sndlop = "snds_jack_gmod/mask_breathe.ogg",
 		wgt = 30,
 		dur = 400,
+		HEVsuit = true,
 		ent = "ent_aboot_gmod_ezarmor_combinesuit"
 	},
 	["ABoot Jump Module"]={
@@ -407,14 +409,14 @@ JModHL2.ArmorTable = {
 			abdomen = 1
 		},
 		def=table.Inherit({
-			[DMG_NERVEGAS]=1,
-			[DMG_RADIATION]=1,
-			[DMG_ACID]=1,
-			[DMG_POISON]=1
+			[DMG_NERVEGAS]=1.5,
+			[DMG_RADIATION]=1.5,
+			[DMG_ACID]=1.5,
+			[DMG_POISON]=1.5
 		},HEVArmorProtectionProfile),
 		resist={
 			[DMG_ACID]=.90,
-			[DMG_POISON]=.99
+			[DMG_POISON]=.99,
 		},
 		chrg={
 			power = 50
@@ -424,12 +426,25 @@ JModHL2.ArmorTable = {
 			uneq="hl1/fvox/deactivated.wav"
 		},
 		eff={
-			HEVsuit = true,
 			speedBoost = 1.2,
+			chargeEquipped = true,
+			chargeShield = true
 		},
-		wgt = 12,
+		tgl = {
+			eff={
+				speedBoost = 1.2,
+				chargeEquipped = false,
+				chargeShield = false
+			},
+			slots={
+				chest = 1,
+				abdomen = 1
+			}
+		},
+		wgt = 20,
 		dur = 400,
 		storage = 5,
+		HEVsuit = true,
 		bon = "ValveBiped.Bip01_Spine2",
 		siz = Vector(1.15, 1, 1),
 		pos = Vector(-4.2, -8.4, 0),
@@ -644,7 +659,7 @@ hook.Add("OnPlayerHitGround", "JMOD_HL2_HITGROUND", function(ply, water, float, 
 	ply.played_sound = false
 end)
 
-hook.Add( "GetFallDamage", "JMOD_HL2_FALLDAMAGEPROTECT", function(ply, speed)
+hook.Add("GetFallDamage", "JMOD_HL2_FALLDAMAGEPROTECT", function(ply, speed)
 	if ply:IsPlayer() and JMod.PlyHasArmorEff(ply, "fallProtect") then
 		ply:EmitSound("physics/metal/metal_box_impact_hard"..tostring(math.random(1, 3))..".wav", 60, math.random(110, 120), 0.5, CHAN_AUTO)
 
@@ -652,11 +667,11 @@ hook.Add( "GetFallDamage", "JMOD_HL2_FALLDAMAGEPROTECT", function(ply, speed)
 	end
 end)
 
-hook.Add( "EntityTakeDamage", "JMOD_HL2_FALLDAMAGEPROTECT", function(target, dmginfo)
+hook.Add("EntityTakeDamage", "JMOD_HL2_FALLDAMAGEPROTECT", function(target, dmginfo)
 	if (target:IsPlayer() and dmginfo:IsFallDamage()) and JMod.PlyHasArmorEff(target, "fallProtect") then
 		dmginfo:ScaleDamage(0)
 	end
-end )
+end)
 
 hook.Add("PlayerFootstep", "JMOD_HL2_FOOTSTEP", function(ply, pos, foot, sound, volume, filter)
 	if (ply.EZarmor and ply.EZarmor.effects and ply.EZarmor.effects.fallProtect) then

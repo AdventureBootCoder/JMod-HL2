@@ -73,18 +73,37 @@ if(SERVER)then
 		playa:SetNW2Float(tag_counter, 0)
 	end)
 
+	function JModHL2.PlyWearingHEVsuit(playa)
+		if not playa.EZarmor then return false end
+		if (playa.EZarmor.effects.HEVsuit) then return true end
+
+		for id, armorData in pairs(playa.EZarmor.items) do
+			local Info = JMod.ArmorTable[armorData.name]
+
+			if (Info.eff and Info.eff.HEVsuit) then
+
+				return true
+			end
+		end
+
+		return false
+	end
+
 	hook.Add("JMod_EZarmorSync", "ABootHL2ArmorCheck", function(playa)
-		local PlyEff = JMod.PlyHasArmorEff(playa)
-		if PlyEff and PlyEff.HEVsuit then
+		local WearingHEV = JModHL2.PlyWearingHEVsuit(playa)
+		if WearingHEV then
 			if not(playa:IsSuitEquipped()) then
 				playa:EquipSuit()
 			end
 		elseif defaultHEVdisable:GetBool() and playa:IsSuitEquipped() then
 			RemoveHEVsuit(playa)
 		end
-		if PlyEff and PlyEff.HEVreq and not(PlyEff.HEVsuit) then
-			for id, items in pairs(playa.EZarmor.items) do
-				if (JMod.ArmorTable[items.name].eff) and (JMod.ArmorTable[items.name].eff.HEVreq) then
+
+		if not(WearingHEV) then
+			for id, armorData in pairs(playa.EZarmor.items) do
+				local Info = JMod.ArmorTable[armorData.name]
+
+				if (Info.eff) and (Info.eff.HEVreq) then
 					playa:PrintMessage(HUD_PRINTCENTER, "This armor requires an HEV suit")
 					JMod.RemoveArmorByID(playa, id)
 				end
@@ -101,7 +120,7 @@ if(SERVER)then
 
 		for _, ply in player.Iterator() do
 			if ply.EZarmor and ply.EZarmor.effects then
-				if ply.EZarmor.effects.HEVsuit then
+				if PlyWearingHEVsuit then
 					local TrackedMachine = ply:GetNW2Entity("EZmachineTracking", nil)
 					if IsValid(TrackedMachine) then
 						if TrackedMachine.Target and IsValid(TrackedMachine.Target) and (TrackedMachine:GetState() > 0) then

@@ -496,7 +496,7 @@ hook.Add("JMod_PostLuaConfigLoad", "JMod_HL2_PostLoadConfig", function(Config)
 			results = JMod.ArmorTable["Powered Combat Vest"].ent,
 			craftingReqs = {
 				[JMod.EZ_RESOURCE_TYPES.ADVANCEDTEXTILES] = 60,
-				[JMod.EZ_RESOURCE_TYPES.ADVANCEDPARTS] = 5,
+				[JMod.EZ_RESOURCE_TYPES.ADVANCEDPARTS] = 10,
 				[JMod.EZ_RESOURCE_TYPES.RUBBER] = 40
 			},
 			category = "Apparel",
