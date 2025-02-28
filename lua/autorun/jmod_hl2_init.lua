@@ -80,7 +80,7 @@ if(SERVER)then
 		for id, armorData in pairs(playa.EZarmor.items) do
 			local Info = JMod.ArmorTable[armorData.name]
 
-			if (Info.eff and Info.eff.HEVsuit) then
+			if (Info.HEVsuit) then
 
 				return true
 			end

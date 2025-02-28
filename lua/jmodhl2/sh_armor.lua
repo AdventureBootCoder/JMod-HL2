@@ -96,7 +96,6 @@ JModHL2.ArmorTable = {
 			uneq="hl1/fvox/deactivated.wav"
 		},
 		eff={
-			HEVsuit = true,
 			speedBoost = 1.2,
 			flashresistant = true,
 			nightVision = false
@@ -106,7 +105,6 @@ JModHL2.ArmorTable = {
 			blackvisionwhendead = true,
 			mskmat = "mats_aboot_gmod_sprites/helmet_vignette1.png",
 			eff = {
-				HEVsuit = true,
 				speedBoost = 1.2,
 				flashresistant = true,
 				nightVision = true
@@ -178,7 +176,6 @@ JModHL2.ArmorTable = {
 			uneq="hl1/fvox/deactivated.wav"
 		},
 		eff={
-			HEVsuit = true,
 			speedBoost = 1,
 			flashresistant = true
 		},
