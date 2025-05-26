@@ -436,7 +436,7 @@ hook.Add("JMod_PostLuaConfigLoad", "JMod_HL2_PostLoadConfig", function(Config)
 			description = "An rpg with laser guidence capabilities."
 		},
 		["HL Combine Suit"] = {
-			results = JMod.ArmorTable["ABoot Combine Suit"].ent,
+			results = JModHL2.ArmorTable["ABoot Combine Suit"].ent,
 			craftingReqs = {
 				[JMod.EZ_RESOURCE_TYPES.CHEMICALS] = 20,
 				[JMod.EZ_RESOURCE_TYPES.ADVANCEDTEXTILES] = 150,
@@ -448,7 +448,7 @@ hook.Add("JMod_PostLuaConfigLoad", "JMod_HL2_PostLoadConfig", function(Config)
 			description = "High tech full-body protection meant for Combine elite scouts."
 		},
 		["HL HEV Suit"] = {
-			results = JMod.ArmorTable["ABoot HEV Suit"].ent,
+			results = JModHL2.ArmorTable["ABoot HEV Suit"].ent,
 			craftingReqs = {
 				[JMod.EZ_RESOURCE_TYPES.CHEMICALS] = 20,
 				[JMod.EZ_RESOURCE_TYPES.ADVANCEDTEXTILES] = 150,
@@ -460,7 +460,7 @@ hook.Add("JMod_PostLuaConfigLoad", "JMod_HL2_PostLoadConfig", function(Config)
 			description = "Hazardous EnViromental suit. But it also has a helmet this time."
 		},
 		["HL Jet Module"] = {
-			results = JMod.ArmorTable["ABoot Jet Module"].ent,
+			results = JModHL2.ArmorTable["ABoot Jet Module"].ent,
 			craftingReqs = {
 				[JMod.EZ_RESOURCE_TYPES.PRECISIONPARTS] = 120,
 				[JMod.EZ_RESOURCE_TYPES.ADVANCEDPARTS] = 5,
@@ -471,7 +471,7 @@ hook.Add("JMod_PostLuaConfigLoad", "JMod_HL2_PostLoadConfig", function(Config)
 			description = "A short range jetpack that needs to be recharged frequently."
 		},
 		["HL Jump Module"] = {
-			results = JMod.ArmorTable["ABoot Jump Module"].ent,
+			results = JModHL2.ArmorTable["ABoot Jump Module"].ent,
 			craftingReqs = {
 				[JMod.EZ_RESOURCE_TYPES.BASICPARTS] = 150,
 				[JMod.EZ_RESOURCE_TYPES.PRECISIONPARTS] = 5,
@@ -482,7 +482,7 @@ hook.Add("JMod_PostLuaConfigLoad", "JMod_HL2_PostLoadConfig", function(Config)
 			description = "A jump pack that uses pressurized gas to jump over gaps and obstacles."
 		},
 		["HL Longfall Boots"] = {
-			results = JMod.ArmorTable["Longfall Boots"].ent,
+			results = JModHL2.ArmorTable["Longfall Boots"].ent,
 			craftingReqs = {
 				[JMod.EZ_RESOURCE_TYPES.BASICPARTS] = 50,
 				[JMod.EZ_RESOURCE_TYPES.PRECISIONPARTS] = 5,
@@ -493,7 +493,7 @@ hook.Add("JMod_PostLuaConfigLoad", "JMod_HL2_PostLoadConfig", function(Config)
 			description = "A foot based suit of armor for the dual portal device."
 		},
 		["HL Powered Combat Vest"] = {
-			results = JMod.ArmorTable["Powered Combat Vest"].ent,
+			results = JModHL2.ArmorTable["Powered Combat Vest"].ent,
 			craftingReqs = {
 				[JMod.EZ_RESOURCE_TYPES.ADVANCEDTEXTILES] = 60,
 				[JMod.EZ_RESOURCE_TYPES.ADVANCEDPARTS] = 10,

@@ -496,11 +496,10 @@ end)
 
 local RegularJump, NextEffectTime = true, 0
 hook.Add("Move", "JMOD_HL2_ARMOR_MOVE", function(ply, mv)
-	if ply.IsProne and ply:IsProne() or ply:GetMoveType() ~= MOVETYPE_WALK then
+	if (ply.IsProne and ply:IsProne()) or ply:GetMoveType() ~= MOVETYPE_WALK then
 		ply.EZjetting = false
 		if ply.EZThrusterSound then
 			ply.EZThrusterSound:Stop()
-			ply.EZThrusterSound = nil
 		end
 		
 		return 
