@@ -4,7 +4,7 @@ SWEP.Base = "wep_jack_gmod_ezmeleebase"
 SWEP.PrintName = "EZ Stun-Stick"
 SWEP.Author = "Jackarunda"
 SWEP.Purpose = ""
---JMod.SetWepSelectIcon(SWEP, "entities/ent_jack_gmod_ezcrowbar")
+JMod.SetWepSelectIcon(SWEP, "entities/ent_aboot_gmod_ezstunstick")
 SWEP.ViewModel = "models/weapons/c_stunstick.mdl"--"models/weapons/crowbar/c_crowbar.mdl"
 SWEP.WorldModel = "models/weapons/w_stunbaton.mdl"
 SWEP.BodyHolsterModel = "models/weapons/w_stunbaton.mdl"

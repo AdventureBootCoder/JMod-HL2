@@ -3,7 +3,7 @@ AddCSLuaFile()
 SWEP.PrintName = "EZ Welder"
 SWEP.Author = "AdventureBoots"
 SWEP.Purpose = ""
-JMod.SetWepSelectIcon(SWEP, "entities/ent_jack_gmod_eztoolbox")
+JMod.SetWepSelectIcon(SWEP, "entities/ent_aboot_gmod_ezwelder")
 SWEP.Spawnable = false
 SWEP.UseHands = true
 SWEP.DrawAmmo = false
@@ -108,6 +108,9 @@ SWEP.WElements = {
 
 SWEP.LastSalvageAttempt = 0
 SWEP.NextSwitch = 0
+-- Entity ref is key, value is position
+SWEP.LastEnt = nil 
+SWEP.LastPos = nil
 
 function SWEP:Initialize()
 	self:SetHoldType("slam")
@@ -142,7 +145,7 @@ function SWEP:ViewModelDrawn()
 		local HitAngy = Dir:Angle()
 		HitAngy:RotateAroundAxis(HitAngy:Right(), -90)
 		cam.Start3D2D(Tracey.HitPos, HitAngy, 0.5 * Tracey.Fraction)
-			surface.DrawCircle(0, 0, 10, 200, 200, 0, 200)
+			surface.DrawCircle(0, 0, 5, 200, 200, 0, 200)
 		cam.End3D2D()
 	end
 
@@ -471,47 +474,32 @@ function SWEP:Think()
 				local BaseShootPos = self.Owner:GetShootPos()
 				local ShootPos = BaseShootPos + self.Owner:GetRight() * 4 - self.Owner:GetUp() * 1
 				local AimVec = self.Owner:GetAimVector()
-				local WeldTable = {}
+				
 				local WeldPos = nil
 				local WeldNorm = nil
-				for i = 1, 2 do
-					local Tress=util.TraceLine({
-						start = BaseShootPos, 
-						endpos = ShootPos + AimVec * math.Rand(10, 100),
-						filter = self.Owner,
-						mask = MASK_SHOT
-					})
-					if(Tress.Hit) then
-						if (table.HasValue(WeldMats, Tress.MatType) or JMod.IsDoor(Tress.Entity)) then
-							WeldTable[i] = Tress.Entity
-							WeldPos = Tress.HitPos
-							WeldNorm = Tress.HitNormal
-						elseif IsValid(Tress.Entity) then
-							self:WeldBurn(Tress.Entity, Tress.HitPos, AimVec * 100)
-						end
-						self:WeldEffect(Tress)
-					else
-						--self:SetWelding(false)
-						--[[local FireVec = (self:GetVelocity() / 1000 + self.Owner:GetAimVector()):GetNormalized()
-						local Flame = ents.Create("ent_jack_gmod_eznapalm")
-						Flame:SetPos(self.Owner:GetShootPos() + FireVec)
-						Flame:SetAngles(FireVec:Angle())
-						Flame:SetOwner(JMod.GetEZowner(self))
-						JMod.SetEZowner(Flame, self.EZowner or self)
-						Flame.SpeedMul = 5
-						Flame.Creator = self.Owner
-						Flame.HighVisuals = math.random(1, 5) == 1
-						Flame:Spawn()
-						Flame:Activate()--]]
-					end
-				end
-				self:SetElectricity(math.max(self:GetElectricity() - .05, 0))
-				self:SetGas(math.max(self:GetGas() - .02, 0))
-				self:SetWelding(true)
 
-				if(math.random(1, 3) == 2)then
-					local EntOne = WeldTable[1]
-					local EntTwo = WeldTable[2]
+				local Tress = util.TraceLine({
+					start = BaseShootPos, 
+					endpos = ShootPos + AimVec * 100,
+					filter = self.Owner,
+					mask = MASK_SHOT
+				})
+
+				local EntOne = self.LastEnt
+				local EntTwo = nil
+
+				if (Tress.Hit) then
+					if (table.HasValue(WeldMats, Tress.MatType) or JMod.IsDoor(Tress.Entity)) then
+						EntTwo = Tress.Entity
+					elseif IsValid(Tress.Entity) then
+						self:WeldBurn(Tress.Entity, Tress.HitPos, AimVec * 100)
+					end
+					self:WeldEffect(Tress)
+					WeldPos = Tress.HitPos
+					WeldNorm = Tress.HitNormal
+				end
+
+				if (Tress.Hit) and (EntOne ~= EntTwo) then
 					if Alt then --Deweld
 						if IsValid(EntOne) and IsValid(EntOne:GetPhysicsObject()) then 
 							MassOne = EntOne:GetPhysicsObject():GetMass()
@@ -533,31 +521,42 @@ function SWEP:Think()
 								end
 							end
 						end
-					else --Weld
-						if IsValid(EntOne) and JMod.IsDoor(EntOne)then EntOne:Fire("lock", "", 0) end
-						if IsValid(EntTwo) and JMod.IsDoor(EntTwo)then EntTwo:Fire("lock", "", 0) end
-						if((IsValid(EntOne) or (EntOne and EntOne:IsWorld())) and (IsValid(EntTwo) or (EntOne and EntOne:IsWorld())))then
-							if (EntOne ~= EntTwo) then
-								local Strength = math.random(1, 20000)
-								Strength = Strength + math.random(1, 20000)
-								Strength = Strength + math.random(1, 20000)
-								Strength = Strength + math.random(1, 20000)
-								Strength = Strength + math.random(1, 20000)
-								constraint.Weld(EntOne, EntTwo, 0, 0, Strength, false)
-								local effectdata = EffectData()
-								effectdata:SetOrigin(WeldPos)
-								effectdata:SetNormal(WeldNorm)
-								effectdata:SetMagnitude(8) --amount and shoot hardness
-								effectdata:SetScale(2) --length of strands
-								effectdata:SetRadius(2) --thickness of strands
-								util.Effect("Sparks",effectdata,true,true)
+					elseif (WeldPos:DistToSqr(self.LastPos or WeldPos) < 100) then --Weld
+						if IsValid(EntOne) and JMod.IsDoor(EntOne) then EntOne:Fire("lock", "", 0) end
+						if IsValid(EntTwo) and JMod.IsDoor(EntTwo) then EntTwo:Fire("lock", "", 0) end
+						if (EntOne ~= nil and EntTwo ~= nil) then
+							print(EntOne, EntTwo)
+							local CurrentWeld = constraint.Find(EntOne, EntTwo, "Weld", 0, 0)
+
+							if CurrentWeld then
+								local Strength = CurrentWeld:GetTable().forcelimit + math.random(1000, 5000)
+								CurrentWeld:Remove()
+								timer.Simple(.01, function()
+									Weld = constraint.Weld(EntOne, EntTwo, 0, 0, Strength, false, false)
+								end)
+							else
+								CurrentWeld = constraint.Weld(EntOne, EntTwo, 0, 0, math.random(5, 1000), false, false)
 							end
+							
+							local effectdata = EffectData()
+							effectdata:SetOrigin(WeldPos)
+							effectdata:SetNormal(WeldNorm)
+							effectdata:SetMagnitude(8) --amount and shoot hardness
+							effectdata:SetScale(2) --length of strands
+							effectdata:SetRadius(2) --thickness of strands
+							util.Effect("Sparks", effectdata, true, true)
 						end
 					end
-					local WeldingMask = JMod.PlyHasArmorEff(Ply, "flashresistant")
-					if not(WeldingMask) and (math.random(1, 5) == 1) then
-						self:WeldBurn(Ply, Ply:GetShootPos())
-					end
+					self.LastEnt = EntTwo
+					self.LastPos = WeldPos
+				end
+
+				self:SetElectricity(math.max(self:GetElectricity() - .05, 0))
+				self:SetGas(math.max(self:GetGas() - .02, 0))
+				self:SetWelding(true)
+
+				if not(JMod.PlyHasArmorEff(Ply, "flashresistant")) and (math.random(1, 5) == 1) then
+					self:WeldBurn(Ply, Ply:GetShootPos())
 				end
 
 				if(math.random(1, 2) == 2)then
@@ -711,16 +710,44 @@ local function FindClosestArmor(self)
 	return ClosestPiece
 end
 
+local function IsEngineMode(AimPos, Engine)
+	if not IsValid(Engine) then return false end
+
+	if not isfunction(Engine.GetDoorHandler) then return (AimPos - Engine:GetPos()):Length() < 25 end
+
+	local DoorHandler = Engine:GetDoorHandler()
+
+	if IsValid(DoorHandler) then
+		if DoorHandler:IsOpen() then
+			return (AimPos - Engine:GetPos()):Length() < 50
+		end
+
+		return false
+	end
+
+	return (AimPos - Engine:GetPos()):Length() < 25
+end
+
 hook.Add("JModHL2_ShouldWeldFix", "JMODHL2_LVS_CAR_REPAIR", function(ply, target, pos) 
 	local Welder = ply:GetActiveWeapon()
 	local ArmorMode = false
+	local EngineMode = false
 	local Target = GetLVS(Welder)
+
+	if isfunction(Target.GetEngine) then
+		local Engine = Target:GetEngine()
+
+		EngineMode = IsEngineMode(pos, Engine)
+
+		if IsValid(Engine) and EngineMode then
+			Target = Engine
+		end
+	end
 
 	if IsValid(ply) and ply:KeyDown(IN_RELOAD) then
 		Target = FindClosestArmor(Welder)
 		ArmorMode = true
 	end
-
 	
 	if IsValid(Target) then
 		local HP = Target:GetHP()
@@ -753,6 +780,16 @@ hook.Add("JModHL2_WeldFix", "JMODHL2_LVS_CAR_REPAIR", function(ply, target, pos)
 		end
 		return 0, 0
 	end
+
+	if isfunction(Target.GetEngine) then
+		local Engine = Target:GetEngine()
+
+		EngineMode = IsEngineMode(pos, Engine)
+
+		if IsValid(Engine) and EngineMode then
+			Target = Engine
+		end
+	end
 	
 	local HP = Target:GetHP()
 	local MaxHP = Target:GetMaxHP()
@@ -761,7 +798,7 @@ hook.Add("JModHL2_WeldFix", "JMODHL2_LVS_CAR_REPAIR", function(ply, target, pos)
 	
 	Target:SetHP( math.min(math.Round(HP + 3), MaxHP ) )
 	
-	if not ArmorMode then return 0.03, 0.02, "Frame: "..HP.."/"..MaxHP end
+	if not ArmorMode then return 0.03, 0.02, (EngineMode and "Engine" or "Frame") .. ": "..HP.."/"..MaxHP end
 	
 	if Target:GetDestroyed() then Target:SetDestroyed( false ) end
 	

@@ -4,7 +4,7 @@ SWEP.Base = "wep_jack_gmod_ezmeleebase"
 SWEP.PrintName = "EZ Harpoon"
 SWEP.Author = "Jackarunda"
 SWEP.Purpose = ""
---JMod.SetWepSelectIcon(SWEP, "entities/ent_jack_gmod_ezcrowbar")
+JMod.SetWepSelectIcon(SWEP, "entities/ent_aboot_gmod_ezharpoon")
 SWEP.ViewModel = "models/weapons/v_jmod_musket.mdl"--"models/weapons/crowbar/c_crowbar.mdl"
 SWEP.WorldModel = "models/props_junk/harpoon002a.mdl"
 SWEP.BodyHolsterModel = "models/props_junk/harpoon002a.mdl"
