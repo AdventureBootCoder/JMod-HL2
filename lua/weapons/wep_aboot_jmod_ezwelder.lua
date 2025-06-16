@@ -122,6 +122,7 @@ function SWEP:Initialize()
 
 	self:SetGas(0)
 	self:SetElectricity(0)
+	self.LastPos = Vector(0, 0, 0)
 end
 
 function SWEP:PreDrawViewModel(vm, wep, ply)
@@ -250,6 +251,8 @@ function SWEP:SetupDataTables()
 	self:NetworkVar("Float", 1, "Gas")
 	self:NetworkVar("Bool", 0, "Welding")
 	self:NetworkVar("String", 0, "StatusMessage")
+	self:NetworkVar("Entity", 0, "LastEnt")
+	self:NetworkVar("Int", 0, "WeldStrength")
 end
 
 function SWEP:UpdateNextIdle()
@@ -274,7 +277,7 @@ function SWEP:GetEZsupplies(resourceType)
 end
 
 function SWEP:SetEZsupplies(typ, amt, setter)
-	if not SERVER then print("[JMOD] - You can't set EZ supplies on client") return end
+	if not SERVER then return end
 	local ResourceSetMethod = self["Set"..JMod.EZ_RESOURCE_TYPE_METHODS[typ]]
 	if ResourceSetMethod then
 		ResourceSetMethod(self, amt)
@@ -434,7 +437,6 @@ function SWEP:Think()
 	local idletime = self.NextIdle
 
 	if idletime > 0 and Time > idletime then
-		--vm:SendViewModelMatchingSequence(vm:LookupSequence("fists_idle_0" .. math.random(1, 2)))
 		vm:SendViewModelMatchingSequence(vm:LookupSequence("idle01" .. math.random(1, 2)))
 		self:UpdateNextIdle()
 	end
@@ -452,7 +454,6 @@ function SWEP:Think()
 			local Ent, Pos, Norm = self:WhomIlookinAt()
 
 			if IsValid(Ent) and (hook.Run("JModHL2_ShouldWeldFix", Ply, Ent, Pos)) then
-				--if (SERVER) then
 				local PowerConsume, GasConsume, Message = hook.Run("JModHL2_WeldFix", Ply, Ent, Pos)
 				if PowerConsume and (PowerConsume > 0) then
 					self:SetElectricity(math.max(self:GetElectricity() - PowerConsume, 0))
@@ -485,7 +486,7 @@ function SWEP:Think()
 					mask = MASK_SHOT
 				})
 
-				local EntOne = self.LastEnt
+				local EntOne = self:GetLastEnt()
 				local EntTwo = nil
 
 				if (Tress.Hit) then
@@ -502,40 +503,46 @@ function SWEP:Think()
 				if (Tress.Hit) and (EntOne ~= EntTwo) then
 					if Alt then --Deweld
 						if IsValid(EntOne) and IsValid(EntOne:GetPhysicsObject()) then 
-							MassOne = EntOne:GetPhysicsObject():GetMass()
-							if math.random(0, MassOne) >= (MassOne * 0.9) then
-								if JMod.IsDoor(EntOne) then EntOne:Fire("unlock", "", 0) end
-								local ConTable = constraint.FindConstraint(EntOne, "Weld")
-								if ConTable and ConTable.Constraint then
-									SafeRemoveEntity(ConTable.Constraint)
-								end
-							end
-						end
-						if IsValid(EntTwo) and IsValid(EntTwo:GetPhysicsObject()) then 
-							MassTwo = EntTwo:GetPhysicsObject():GetMass()
-							if math.random(0, MassTwo) >= (MassTwo * 0.9) then 
-								if JMod.IsDoor(EntTwo) then EntOne:Fire("unlock", "", 0) end
-								local ConTable = constraint.FindConstraint(EntTwo, "Weld")
-								if ConTable and ConTable.Constraint then
-									SafeRemoveEntity(ConTable.Constraint)
+							if JMod.IsDoor(EntOne) and math.random() < 0.3 then EntOne:Fire("unlock", "", 0) end
+							local CurrentWeld = constraint.Find(EntOne, EntTwo, "Weld", 0, 0)
+							if CurrentWeld then
+								local CurrentStrength = CurrentWeld:GetTable().forcelimit
+								if CurrentStrength > 0 then
+									local NewStrength = math.max(CurrentStrength - math.random(500, 5000), 0)
+									if NewStrength < 1 then
+										SafeRemoveEntity(CurrentWeld)
+									else
+										SafeRemoveEntity(CurrentWeld)
+										timer.Simple(.01, function()
+											local NewWeld = constraint.Weld(EntOne, EntTwo, 0, 0, NewStrength, false, false)
+										end)
+									end
+									self:SetWeldStrength(NewStrength)
 								end
 							end
 						end
 					elseif (WeldPos:DistToSqr(self.LastPos or WeldPos) < 100) then --Weld
-						if IsValid(EntOne) and JMod.IsDoor(EntOne) then EntOne:Fire("lock", "", 0) end
-						if IsValid(EntTwo) and JMod.IsDoor(EntTwo) then EntTwo:Fire("lock", "", 0) end
+						if IsValid(EntOne) and JMod.IsDoor(EntOne) then 
+							EntOne:Fire("lock", "", 0) 
+						end
+
 						if (EntOne ~= nil and EntTwo ~= nil) then
-							print(EntOne, EntTwo)
 							local CurrentWeld = constraint.Find(EntOne, EntTwo, "Weld", 0, 0)
 
 							if CurrentWeld then
-								local Strength = CurrentWeld:GetTable().forcelimit + math.random(1000, 5000)
-								CurrentWeld:Remove()
-								timer.Simple(.01, function()
-									Weld = constraint.Weld(EntOne, EntTwo, 0, 0, Strength, false, false)
-								end)
+								local CurrentStrength = CurrentWeld:GetTable().forcelimit
+								local Strength = math.min(CurrentStrength + math.random(1000, 5000), 50000)
+								if CurrentStrength < 50000 then
+									SafeRemoveEntity(CurrentWeld)
+									timer.Simple(.01, function()
+										local NewWeld = constraint.Weld(EntOne, EntTwo, 0, 0, Strength, false, false)
+									end)
+								end
+								self:SetWeldStrength(Strength)
 							else
-								CurrentWeld = constraint.Weld(EntOne, EntTwo, 0, 0, math.random(5, 1000), false, false)
+								local Strength = math.min(math.random(5, 1000), 50000)
+								CurrentWeld = constraint.Weld(EntOne, EntTwo, 0, 0, Strength, false, false)
+								self:SetWeldStrength(Strength)
 							end
 							
 							local effectdata = EffectData()
@@ -547,7 +554,7 @@ function SWEP:Think()
 							util.Effect("Sparks", effectdata, true, true)
 						end
 					end
-					self.LastEnt = EntTwo
+					self:SetLastEnt(EntTwo)
 					self.LastPos = WeldPos
 				end
 
@@ -575,7 +582,6 @@ function SWEP:Think()
 		end
 	end
 	if (SERVER) then
-		--jprint(self.WasWelding)
 		if self:GetWelding() and not(self.WasWelding) then
 			sound.Play("snd_jack_plasmapop.ogg", self.Owner:GetPos(), 75, math.random(95, 110), .5)
 			timer.Simple(0.1, function()
@@ -588,7 +594,6 @@ function SWEP:Think()
 		elseif not(self:GetWelding()) and self.WasWelding then
 			self.Snd1:Stop()
 			self.Snd2:Stop()
-			--sound.Play("snd_jack_plasmapop.ogg", self.Owner:GetPos(), 75, math.random(95, 110), .5)
 			self.WasWelding = false
 		end
 	end
@@ -828,19 +833,57 @@ function SWEP:DrawHUD()
 		draw.SimpleTextOutlined(self:GetStatusMessage(), "Trebuchet24", W * .5, H * .4, InfoTextColor, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER, 1, OutlineColor)
 	end
 
+	-- Welding state indicators
 	local Tr = util.QuickTrace(Ply:EyePos(), Ply:GetAimVector() * 80, {Ply})
 	local Ent = Tr.Entity
-	if IsValid(Ent) and Ent.IsJackyEZmachine then
-		draw.SimpleTextOutlined((Ent.PrintName and tostring(Ent.PrintName)) or tostring(Ent), "Trebuchet24", W * .7, H * .5, Color(255, 255, 255, 100), TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP, 3, Color(0, 0, 0, 50))
-		if Ent.MaxDurability then
-		draw.SimpleTextOutlined("Durability: "..tostring(math.Round(Ent:GetNW2Float("EZdurability", 0)) + Ent.MaxDurability * 2).."/"..Ent.MaxDurability*3, "Trebuchet24", W * .7, H * .5 + 30, Color(255, 255, 255, 100), TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP, 3, Color(0, 0, 0, 50))
-		end
-		if Ent.GetGrade and Ent:GetGrade() > 0 then
-		draw.SimpleTextOutlined("Grade: "..tostring(Ent:GetGrade()), "Trebuchet24", W * .7, H * .5 + 60, Color(255, 255, 255, 100), TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP, 3, Color(0, 0, 0, 50))
+
+	-- Draw current target info
+	if IsValid(Ent) then
+		local EntName = Ent.PrintName or Ent:GetClass()
+		local EntColor = Color(255, 255, 255, 100)
+		
+		draw.SimpleTextOutlined(EntName, "Trebuchet24", W * .7, H * .5, EntColor, TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP, 3, Color(0, 0, 0, 50))
+		
+		-- Draw welding instructions when welding
+		if self:GetWelding() then
+			-- Draw a pulsing circle in the center to indicate welding
+			local pulse = math.sin(CurTime() * 5) * 0.5 + 0.5
+			local circleColor = Color(255, 200, 0, 100 + pulse * 155)
+			
+			-- Draw the welding indicator
+			--draw.SimpleTextOutlined("WELDING", "Trebuchet24", W * .5, H * .5 - 30, circleColor, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER, 3, Color(0, 0, 0, 50))
+			draw.SimpleTextOutlined("Move quickly between objects", "Trebuchet24", W * .5, H * .5 + 80, circleColor, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER, 3, Color(0, 0, 0, 50))
+			
+			-- Draw weld strength
+			local weldStrength = self:GetWeldStrength()
+			local maxStrength = 50000 -- Maximum possible weld strength
+			local strengthRatio = math.Clamp(weldStrength / maxStrength, 0, 1)
+			
+			local progressBarWidth = 200
+			local progressBarHeight = 10
+			local progressBarX = W * 0.5 - progressBarWidth * 0.5
+			local progressBarY = H * 0.5 + 50
+			
+			-- Draw progress bar background
+			draw.RoundedBox(5, progressBarX, progressBarY, progressBarWidth, progressBarHeight, Color(0, 0, 0, 100))
+			-- Draw progress bar fill
+			draw.RoundedBox(5, progressBarX, progressBarY, progressBarWidth * strengthRatio, progressBarHeight, circleColor)
+			
+			-- Draw weld strength text
+			--draw.SimpleTextOutlined("Weld Strength: " .. weldStrength, "Trebuchet24", W * .5, H * .5 + 70, circleColor, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER, 3, Color(0, 0, 0, 50))
 		end
 	end
 
-	--surface.DrawCircle(W * .5, H * .5, 100, 255, 255, 255, 200)
+	-- Draw machine info if applicable
+	if IsValid(Ent) and Ent.IsJackyEZmachine then
+		draw.SimpleTextOutlined((Ent.PrintName and tostring(Ent.PrintName)) or tostring(Ent), "Trebuchet24", W * .7, H * .5, Color(255, 255, 255, 100), TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP, 3, Color(0, 0, 0, 50))
+		if Ent.MaxDurability then
+			draw.SimpleTextOutlined("Durability: "..tostring(math.Round(Ent:GetNW2Float("EZdurability", 0)) + Ent.MaxDurability * 2).."/"..Ent.MaxDurability*3, "Trebuchet24", W * .7, H * .5 + 30, Color(255, 255, 255, 100), TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP, 3, Color(0, 0, 0, 50))
+		end
+		if Ent.GetGrade and Ent:GetGrade() > 0 then
+			draw.SimpleTextOutlined("Grade: "..tostring(Ent:GetGrade()), "Trebuchet24", W * .7, H * .5 + 60, Color(255, 255, 255, 100), TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP, 3, Color(0, 0, 0, 50))
+		end
+	end
 end
 
 ----------------- sck -------------------
