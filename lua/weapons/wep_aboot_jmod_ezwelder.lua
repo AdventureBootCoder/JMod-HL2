@@ -561,6 +561,7 @@ function SWEP:Think()
 				self:SetElectricity(math.max(self:GetElectricity() - .05, 0))
 				self:SetGas(math.max(self:GetGas() - .02, 0))
 				self:SetWelding(true)
+				self:SetStatusMessage("Move quickly between objects")
 
 				if not(JMod.PlyHasArmorEff(Ply, "flashresistant")) and (math.random(1, 5) == 1) then
 					self:WeldBurn(Ply, Ply:GetShootPos())
@@ -852,7 +853,7 @@ function SWEP:DrawHUD()
 			
 			-- Draw the welding indicator
 			--draw.SimpleTextOutlined("WELDING", "Trebuchet24", W * .5, H * .5 - 30, circleColor, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER, 3, Color(0, 0, 0, 50))
-			draw.SimpleTextOutlined("Move quickly between objects", "Trebuchet24", W * .5, H * .5 + 80, circleColor, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER, 3, Color(0, 0, 0, 50))
+			--draw.SimpleTextOutlined("Move quickly between objects", "Trebuchet24", W * .5, H * .5 + 80, circleColor, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER, 3, Color(0, 0, 0, 50))
 			
 			-- Draw weld strength
 			local weldStrength = self:GetWeldStrength()
@@ -862,7 +863,7 @@ function SWEP:DrawHUD()
 			local progressBarWidth = 200
 			local progressBarHeight = 10
 			local progressBarX = W * 0.5 - progressBarWidth * 0.5
-			local progressBarY = H * 0.5 + 50
+			local progressBarY = H * 0.5 - 70
 			
 			-- Draw progress bar background
 			draw.RoundedBox(5, progressBarX, progressBarY, progressBarWidth, progressBarHeight, Color(0, 0, 0, 100))
