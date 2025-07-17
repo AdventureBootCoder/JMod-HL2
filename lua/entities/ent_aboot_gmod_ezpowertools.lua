@@ -129,10 +129,10 @@ if(SERVER)then
 
 				for i = 1, Resolution do
 					RotationAngles:RotateAroundAxis(RotationAngles:Forward(), 360 / Resolution)
-					local CutDir = RotationAngles:Right()
-					local LineStart = SpinOrigin + RotationAngles:Up() * Radius + CutDir * -Radius * .5
-					--debugoverlay.Line(LineStart, LineStart + CutDir * Radius, .2, Color(255, i * 100 / Resolution, 0), true)
-					local CutTr = util.QuickTrace(LineStart, CutDir * Radius, {self})
+					local CutDir = RotationAngles:Right() * -1
+					local LineStart = SpinOrigin + RotationAngles:Up() * Radius + CutDir * Radius * -.5
+					local LineOffset = CutDir * Radius
+					local CutTr = util.QuickTrace(LineStart, LineOffset, {self})
 
 					if (CutTr.Hit) then
 						local Ent = CutTr.Entity
@@ -150,10 +150,10 @@ if(SERVER)then
 							if Ent:IsPlayer() then
 								Ent:SetVelocity(CutDir * CutStrength / 10)
 							elseif IsValid(Ent:GetPhysicsObject()) then
-								Ent:GetPhysicsObject():ApplyForceOffset(CutDir * CutStrength, HitPos)
+								Ent:GetPhysicsObject():ApplyForceOffset(CutDir * -CutStrength, HitPos)
 							end
 						end
-						self:GetPhysicsObject():ApplyForceOffset(CutDir * -CutStrength, HitPos)
+						self:GetPhysicsObject():ApplyForceOffset(CutDir * CutStrength, HitPos)
 
 						if CutTr.SurfaceProps > 0 then
 							self:EmitSound(util.GetSurfaceData(CutTr.SurfaceProps).impactSoftSound)
@@ -251,8 +251,8 @@ elseif(CLIENT)then
 			SawAng:RotateAroundAxis(Forward, self.CurSpin)
 			JMod.RenderModel(self.SawBlade, SawPos, SawAng, Vector(.8, .8, .8), nil)
 		end--]]
-		self:ManipulateBoneAngles(self:LookupBone("start"), Angle(self.CurSpin, 0, 0))
-		self:ManipulateBoneAngles(self:LookupBone("end"), Angle(self.CurSpin, 0, 0))
+		self:ManipulateBoneAngles(self:LookupBone("start"), Angle(-self.CurSpin, 0, 0))
+		self:ManipulateBoneAngles(self:LookupBone("end"), Angle(-self.CurSpin, 0, 0))
 
 		if (not(DetailDraw)) and (Obscured) then return end -- if player is far and sentry is obscured, draw nothing
 		if Obscured then DetailDraw = false end -- if obscured, at least disable details
