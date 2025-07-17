@@ -157,7 +157,6 @@ function SWEP:ViewModelDrawn()
 		effectdata:SetScale(0.5)
 		util.Effect( "MuzzleEffect", effectdata, true, true )
 
-		local WeldingMask = JMod.PlyHasArmorEff(Ply, "flashresistant")
 		local dlight = DynamicLight(self:EntIndex())
 		if(dlight)then
 			dlight.MinLight=0
@@ -172,6 +171,7 @@ function SWEP:ViewModelDrawn()
 			dlight.Style = 0
 		end--]]
 		
+		local WeldingMask = JMod.PlyHasArmorEff(Ply, "flashresistant")
 		if WeldingMask then
 			Ply.EZautoDarken = 1
 		else
