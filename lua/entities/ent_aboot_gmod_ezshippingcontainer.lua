@@ -165,21 +165,69 @@ if SERVER then
 		local AmountLeft = self.Contents[resTyp]
 		if AmountLeft <= 0 then return end
 		local Needed = math.min(amt, AmountLeft)
-		for i = 1, math.ceil(Needed / 100) do
-			timer.Simple(0.3 * i, function()
-				if not IsValid(self) then return end
-				local Box, Given = ents.Create(JMod.EZ_RESOURCE_ENTITIES[resTyp]), math.min(Needed, 100)
-				Box:SetPos(self:GetPos() + self:GetRight() * -210 + self:GetUp() * 20)
-				Box:SetAngles(self:GetAngles())
-				Box:Spawn()
-				Box:Activate()
-				Box:SetEZsupplies(Box.EZsupplies, Given, self)
-				Box.NextLoad = CurTime() + 2
-				Needed = Needed - Given
-				self:CalcWeight()
-			end)
+		
+		-- Get the max resource amount per box from JMod config
+		local MaxResourcePerBox = 100 * (JMod.Config.ResourceEconomy.MaxResourceMult or 1)
+		
+		-- Only create aidbox if requested amount exceeds max resource per box
+		if Needed > MaxResourcePerBox then
+			-- Create JMod aidbox with the requested resource
+			local AidBox = ents.Create("ent_jack_aidbox")
+			if not IsValid(AidBox) then return end
+			
+			-- Disable smoke signal effect since players already know where it is
+			AidBox.NoSmokeSignal = true
+			AidBox.NoFadeIn = true
+			AidBox.Chrimsas = false
+			AidBox.InitialVel = self:GetPhysicsObject():GetVelocity()
+			
+			-- Set position near the container
+			AidBox:SetPos(self:GetPos() + self:GetRight() * -250 + self:GetUp() * 20)
+			local SpawnAngles = self:GetAngles()
+			SpawnAngles:RotateAroundAxis(self:GetRight(), -90)
+			AidBox:SetAngles(SpawnAngles)
+			AidBox:Spawn()
+			AidBox:Activate()
+			
+			-- Create contents table for the aidbox
+			-- Format: {entity_class, amount} for resources
+			local ResourceEntity = JMod.EZ_RESOURCE_ENTITIES[resTyp]
+			if ResourceEntity then
+				-- Calculate how many resource boxes we need
+				local NumBoxes = math.ceil(Needed / MaxResourcePerBox)
+				local Contents = {}
+				
+				-- Add the resource boxes to contents
+				for i = 1, NumBoxes do
+					local BoxAmount = math.min(MaxResourcePerBox, Needed - (i - 1) * MaxResourcePerBox)
+					table.insert(Contents, {ResourceEntity, 1, BoxAmount})
+				end
+				
+				-- Set the aidbox contents
+				AidBox.Contents = Contents
+				AidBox:SetPackageName(string.upper(resTyp) .. " x" .. tostring(NumBoxes))
+			end
+		else
+			-- For smaller amounts, create individual resource boxes like before
+			for i = 1, math.ceil(Needed / MaxResourcePerBox) do
+				timer.Simple(0.3 * i, function()
+					if not IsValid(self) then return end
+					local Box, Given = ents.Create(JMod.EZ_RESOURCE_ENTITIES[resTyp]), math.min(Needed, MaxResourcePerBox)
+					Box:SetPos(self:GetPos() + self:GetRight() * -250 + self:GetUp() * 20)
+					Box:SetAngles(self:GetAngles())
+					Box:Spawn()
+					Box:Activate()
+					Box:SetEZsupplies(Box.EZsupplies, Given, self)
+					Box.NextLoad = CurTime() + 2
+					Needed = Needed - Given
+					self:CalcWeight()
+				end)
+			end
 		end
+		
+		-- Update container contents
 		self.Contents[resTyp] = self.Contents[resTyp] - Needed
+		self:CalcWeight()
 		self.NextUse = CurTime() + 1
 	end
 
@@ -346,22 +394,8 @@ elseif CLIENT then
 
 		local W, H = TabPanel:GetWide(), TabPanel:GetTall()
 
-		local RequestedAmount = 100
-		local AmountSlider = vgui.Create( "DNumSlider", TabPanel )
-		AmountSlider:SetPos(10, 575) -- Set the position
-		AmountSlider:SetSize(250, 100) -- Set the size
-		AmountSlider:SetText("Requested Amount") -- Set the text above the slider
-		AmountSlider:SetMin(0) -- Set the minimum number you can slide to
-		AmountSlider:SetMax(Container.MaxResource) -- Set the maximum number you can slide to
-		AmountSlider:SetDecimals(0) -- Decimal places - zero for whole number
-		AmountSlider:SetValue(RequestedAmount)
-
-		function AmountSlider:OnValueChanged(num)
-			RequestedAmount = AmountSlider:GetValue()
-		end
-
 		local Scroll = vgui.Create("DScrollPanel", TabPanel)
-		Scroll:SetSize(W - 10, H - 100)
+		Scroll:SetSize(W - 10, H - 40)
 		Scroll:SetPos(10, 10)
 		---
 		local Y, AlphabetizedItemNames = 0, table.GetKeys(Contents)
@@ -416,8 +450,35 @@ elseif CLIENT then
 
 			function Butt:DoClick()
 				if self.enabled then
-					timer.Simple(.5, function()
-						if IsValid(Container) then
+					-- Create amount selection frame similar to JMod's inventory
+					local AmountFrame = vgui.Create("DFrame")
+					AmountFrame:SetSize(350, 160)
+					AmountFrame:SetTitle("Take " .. string.upper(itemName) .. " amount")
+					AmountFrame:Center()
+					AmountFrame:MakePopup()
+
+					function AmountFrame:Paint(w, h)
+						EZBlurBackground(self)
+					end
+
+					local MaxAmount = Container.Contents[itemName]
+					local amtSlide = vgui.Create("DNumSlider", AmountFrame)
+					amtSlide:SetText(string.upper(itemName))
+					amtSlide:SetSize(280, 20)
+					amtSlide:SetPos((AmountFrame:GetWide() - amtSlide:GetWide()) / 2, 30)
+					amtSlide:SetMin(0)
+					amtSlide:SetMax(MaxAmount)
+					amtSlide:SetValue(math.min(100, MaxAmount))
+					amtSlide:SetDecimals(0)
+
+					local takeButton = vgui.Create("DButton", AmountFrame)
+					takeButton:SetSize(100, 30)
+					takeButton:SetPos((AmountFrame:GetWide() - takeButton:GetWide()) / 2, 75)
+					takeButton:SetText("TAKE")
+
+					function takeButton:DoClick()
+						local RequestedAmount = amtSlide:GetValue()
+						if IsValid(Container) and RequestedAmount > 0 then
 							net.Start("ABoot_ContainerMenu")
 								net.WriteEntity(Container)
 								net.WriteString(itemName)
@@ -429,11 +490,20 @@ elseif CLIENT then
 								Container.Contents[itemName] = Container.Contents[itemName] - Needed
 							end
 						end
-					end)
+						AmountFrame:Close()
+						MotherFrame.positiveClosed = true
+						MotherFrame:Close()
+						surface.PlaySound("snds_jack_gmod/ez_gui/click_big.ogg")
+					end
 
-					surface.PlaySound("snds_jack_gmod/ez_gui/click_big.ogg")
-					MotherFrame.positiveClosed = true
-					MotherFrame:Close()
+					local cancelButton = vgui.Create("DButton", AmountFrame)
+					cancelButton:SetSize(100, 30)
+					cancelButton:SetPos((AmountFrame:GetWide() - cancelButton:GetWide()) / 2, 120)
+					cancelButton:SetText("CANCEL")
+
+					function cancelButton:DoClick()
+						AmountFrame:Close()
+					end
 				else
 					surface.PlaySound("snds_jack_gmod/ez_gui/miss.ogg")
 				end
