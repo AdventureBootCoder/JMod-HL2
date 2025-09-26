@@ -120,7 +120,7 @@ if(SERVER)then
 
 		for _, ply in player.Iterator() do
 			if ply.EZarmor and ply.EZarmor.effects then
-				if PlyWearingHEVsuit then
+				if JModHL2.PlyWearingHEVsuit(ply) then
 					local TrackedMachine = ply:GetNW2Entity("EZmachineTracking", nil)
 					if IsValid(TrackedMachine) then
 						if TrackedMachine.Target and IsValid(TrackedMachine.Target) and (TrackedMachine:GetState() > 0) then
