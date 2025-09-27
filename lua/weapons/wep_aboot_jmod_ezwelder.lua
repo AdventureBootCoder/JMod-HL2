@@ -36,6 +36,7 @@ SWEP.MaxElectricity = 100
 SWEP.MaxGas = 100
 ---
 SWEP.MaxRange = 150
+SWEP.MaxWeldStrength = 50000
 
 --[[function SWEP:FrontSight()
 	local Flicker = math.Rand(.5,1)
@@ -122,6 +123,7 @@ function SWEP:Initialize()
 
 	self:SetGas(0)
 	self:SetElectricity(0)
+	self:SetWeldStrength(-1) -- Initialize as no weld present
 	self.LastPos = Vector(0, 0, 0)
 end
 
@@ -284,10 +286,6 @@ function SWEP:SetEZsupplies(typ, amt, setter)
 	end
 end
 
-function SWEP:Msg(msg)
-	self.Owner:PrintMessage(HUD_PRINTCENTER, msg)
-end
-
 function SWEP:WhomIlookinAt()
 	local Filter = {self.Owner}
 
@@ -448,7 +446,7 @@ function SWEP:Think()
 		self:SetWelding(false)
 	else
 		if (self:GetElectricity() <= 0) or (self:GetGas() <= 0) then
-			self:Msg("You need power and/or gas")
+			self:SetStatusMessage("No power or gas")
 			self:SetWelding(false)
 		elseif Ply:KeyDown(IN_ATTACK2) and (self:GetNextSecondaryFire() <= Time) then
 			local Ent, Pos, Norm = self:WhomIlookinAt()
@@ -507,10 +505,12 @@ function SWEP:Think()
 							local CurrentWeld = constraint.Find(EntOne, EntTwo, "Weld", 0, 0)
 							if CurrentWeld then
 								local CurrentStrength = CurrentWeld:GetTable().forcelimit
+								-- Don't modify unbreakable welds (strength 0)
 								if CurrentStrength > 0 then
 									local NewStrength = math.max(CurrentStrength - math.random(500, 5000), 0)
 									if NewStrength < 1 then
 										SafeRemoveEntity(CurrentWeld)
+										self:SetWeldStrength(-1) -- No weld present after removal
 									else
 										SafeRemoveEntity(CurrentWeld)
 										timer.Simple(.01, function()
@@ -518,7 +518,13 @@ function SWEP:Think()
 										end)
 									end
 									self:SetWeldStrength(NewStrength)
+								else
+									-- Unbreakable weld - can't be dewelded
+									self:SetWeldStrength(0)
 								end
+							else
+								-- No weld exists to deweld
+								self:SetWeldStrength(-1)
 							end
 						end
 					elseif (WeldPos:DistToSqr(self.LastPos or WeldPos) < 100) then --Weld
@@ -530,17 +536,25 @@ function SWEP:Think()
 							local CurrentWeld = constraint.Find(EntOne, EntTwo, "Weld", 0, 0)
 
 							if CurrentWeld then
-								local CurrentStrength = CurrentWeld:GetTable().forcelimit
-								local Strength = math.min(CurrentStrength + math.random(1000, 5000), 50000)
-								if CurrentStrength < 50000 then
+								local CurrentStrength = CurrentWeld:GetTable().forcelimit or -1
+								
+								if CurrentStrength == 0 then
+									-- Already unbreakable, don't downgrade
+									self:SetWeldStrength(0)
+								elseif CurrentStrength < self.MaxWeldStrength then
+									local Strength = math.min(CurrentStrength + math.random(1000, 5000), self.MaxWeldStrength)
+									-- If we've reached max strength, make it unbreakable by setting to 0
+									if Strength >= self.MaxWeldStrength then
+										Strength = 0
+									end
 									SafeRemoveEntity(CurrentWeld)
 									timer.Simple(.01, function()
 										local NewWeld = constraint.Weld(EntOne, EntTwo, 0, 0, Strength, false, false)
 									end)
+									self:SetWeldStrength(Strength)
 								end
-								self:SetWeldStrength(Strength)
 							else
-								local Strength = math.min(math.random(5, 1000), 50000)
+								local Strength = math.min(math.random(5, 1000), self.MaxWeldStrength)
 								CurrentWeld = constraint.Weld(EntOne, EntTwo, 0, 0, Strength, false, false)
 								self:SetWeldStrength(Strength)
 							end
@@ -556,12 +570,25 @@ function SWEP:Think()
 					end
 					self:SetLastEnt(EntTwo)
 					self.LastPos = WeldPos
+				else
+					-- During active welding, be more lenient about weld detection
+					-- Check if there's a weld between current or last known entities
+					local CheckEntOne = IsValid(EntOne) and EntOne or self:GetLastEnt()
+					local CheckEntTwo = IsValid(EntTwo) and EntTwo or nil
+					
+					if IsValid(CheckEntOne) and IsValid(CheckEntTwo) then
+						local ExistingWeld = constraint.Find(CheckEntOne, CheckEntTwo, "Weld", 0, 0)
+						if ExistingWeld then
+							self:SetWeldStrength(ExistingWeld:GetTable().forcelimit or -1)
+						end
+						-- Don't reset to -1 during active welding operations - maintain last known state
+					end
 				end
 
 				self:SetElectricity(math.max(self:GetElectricity() - .05, 0))
 				self:SetGas(math.max(self:GetGas() - .02, 0))
 				self:SetWelding(true)
-				self:SetStatusMessage("Move quickly between objects")
+				self:SetStatusMessage("LMB: Strengthen welds between objects | ALT+LMB: Weaken")
 
 				if not(JMod.PlyHasArmorEff(Ply, "flashresistant")) and (math.random(1, 5) == 1) then
 					self:WeldBurn(Ply, Ply:GetShootPos())
@@ -580,6 +607,26 @@ function SWEP:Think()
 			self:SetHoldType("slam")
 			self:SetWelding(false)
 			self:SetStatusMessage("")
+			
+			-- When not actively welding, check what we're aiming at for display
+			if SERVER then
+				local EntOne, EntTwo = self:GetLastEnt(), nil
+				local Ent, Pos, Norm = self:WhomIlookinAt()
+				if IsValid(Ent) and (table.HasValue(WeldMats, util.QuickTrace(self.Owner:GetShootPos(), self.Owner:GetAimVector() * 100, self.Owner).MatType) or JMod.IsDoor(Ent)) then
+					EntTwo = Ent
+				end
+				
+				if IsValid(EntOne) and IsValid(EntTwo) then
+					local ExistingWeld = constraint.Find(EntOne, EntTwo, "Weld", 0, 0)
+					if ExistingWeld then
+						self:SetWeldStrength(ExistingWeld:GetTable().forcelimit or -1)
+					else
+						self:SetWeldStrength(-1) -- No weld present
+					end
+				else
+					self:SetWeldStrength(-1) -- No valid weld target
+				end
+			end
 		end
 	end
 	if (SERVER) then
@@ -760,7 +807,7 @@ hook.Add("JModHL2_ShouldWeldFix", "JMODHL2_LVS_CAR_REPAIR", function(ply, target
 		local MaxHP = Target:GetMaxHP()
 		--jprint(Target, HP)
 		if not ArmorMode then
-			ply:PrintMessage(HUD_PRINTCENTER, "Hold R for Armor Mode")
+			Welder:SetStatusMessage("Hold R for Armor Mode")
 		end
 
 		return (HP < MaxHP)
@@ -857,21 +904,58 @@ function SWEP:DrawHUD()
 			
 			-- Draw weld strength
 			local weldStrength = self:GetWeldStrength()
-			local maxStrength = 50000 -- Maximum possible weld strength
-			local strengthRatio = math.Clamp(weldStrength / maxStrength, 0, 1)
+			local maxStrength = self.MaxWeldStrength -- Maximum possible weld strength
+			local isUnbreakable = weldStrength == 0
+			local hasNoWeld = weldStrength == -1
+			local strengthRatio
+			
+			if hasNoWeld then
+				strengthRatio = 0
+			elseif isUnbreakable then
+				strengthRatio = 1
+			else
+				strengthRatio = math.Clamp(weldStrength / maxStrength, 0, 1)
+			end
 			
 			local progressBarWidth = 200
 			local progressBarHeight = 10
 			local progressBarX = W * 0.5 - progressBarWidth * 0.5
 			local progressBarY = H * 0.5 - 70
 			
+			-- Different colors for different weld states
+			local fillColor, borderThickness
+			if hasNoWeld then
+				fillColor = Color(128, 128, 128, 100) -- Gray for no weld
+				borderThickness = 1
+			elseif isUnbreakable then
+				fillColor = Color(255, 215, 0, 255) -- Gold for unbreakable
+				borderThickness = 3
+			else
+				fillColor = circleColor -- Normal welding color
+				borderThickness = 1
+			end
+			
 			-- Draw progress bar background
 			draw.RoundedBox(5, progressBarX, progressBarY, progressBarWidth, progressBarHeight, Color(0, 0, 0, 100))
+			-- Draw thicker border for unbreakable welds
+			if isUnbreakable then
+				for i = 1, borderThickness do
+					draw.RoundedBox(5, progressBarX - i, progressBarY - i, progressBarWidth + i*2, progressBarHeight + i*2, Color(255, 215, 0, 50))
+				end
+			end
 			-- Draw progress bar fill
-			draw.RoundedBox(5, progressBarX, progressBarY, progressBarWidth * strengthRatio, progressBarHeight, circleColor)
+			draw.RoundedBox(5, progressBarX, progressBarY, progressBarWidth * strengthRatio, progressBarHeight, fillColor)
 			
 			-- Draw weld strength text
-			--draw.SimpleTextOutlined("Weld Strength: " .. weldStrength, "Trebuchet24", W * .5, H * .5 + 70, circleColor, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER, 3, Color(0, 0, 0, 50))
+			local strengthText
+			if hasNoWeld then
+				strengthText = "NO WELD"
+			elseif isUnbreakable then
+				strengthText = "UNBREAKABLE"
+			else
+				strengthText = "Strength: " .. weldStrength .. "/" .. maxStrength
+			end
+			draw.SimpleTextOutlined(strengthText, "Trebuchet24", W * .5, H * .5 - 30, fillColor, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER, 3, Color(0, 0, 0, 50))
 		end
 	end
 
