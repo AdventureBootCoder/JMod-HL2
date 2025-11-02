@@ -80,7 +80,7 @@ if(SERVER)then
 		for id, armorData in pairs(playa.EZarmor.items) do
 			local Info = JMod.ArmorTable[armorData.name]
 
-			if (Info.HEVsuit) then
+			if Info and (Info.HEVsuit) then
 
 				return true
 			end
@@ -103,7 +103,7 @@ if(SERVER)then
 			for id, armorData in pairs(playa.EZarmor.items) do
 				local Info = JMod.ArmorTable[armorData.name]
 
-				if (Info.eff) and (Info.eff.HEVreq) then
+				if Info and (Info.eff) and (Info.eff.HEVreq) then
 					playa:PrintMessage(HUD_PRINTCENTER, "This armor requires an HEV suit")
 					JMod.RemoveArmorByID(playa, id)
 				end
@@ -165,7 +165,7 @@ if(SERVER)then
 								for id, armorData in pairs(ply.EZarmor.items) do
 									local Info = JMod.ArmorTable[armorData.name]
 
-									if Info.eff and (Info.eff.jumpmod or Info.eff.jetmod) and not(Info.AdminOnly == true) then
+									if Info and Info.eff and (Info.eff.jumpmod or Info.eff.jetmod) and not(Info.AdminOnly == true) then
 										
 										if armorData.chrg.power < 1.1 * JMod.Config.Armor.ChargeDepletionMult then
 											JMod.EZarmorWarning(ply, "Jump module is out of charge")
