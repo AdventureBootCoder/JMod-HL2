@@ -1103,7 +1103,7 @@ elseif(CLIENT)then
 
 					if AmmoType ~= "Pulse Laser" then
 						local Ammo, AmmoName = self:GetAmmo(), "AMMO"
-						local AmmoFrac = Ammo / self.MaxAmmo
+						local AmmoFrac = Ammo / (self.MaxAmmo or 100)
 						local R, G, B = JMod.GoodBadColor(AmmoFrac)
 						if AmmoType == "Super Soaker" then
 							AmmoName = "WATER"
@@ -1120,7 +1120,7 @@ elseif(CLIENT)then
 				---
 				cam.Start3D2D(DisplayPos + DisplayAng:Up() * 4 + DisplayAng:Forward() * -4.5 + DisplayAng:Right() * -18, DisplayAng, .075)
 					draw.SimpleTextOutlined("POWER", "JMod-Display", 0, 0, Color(255, 255, 255, Opacity), TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP, 3, Color(0, 0, 0, Opacity))
-					local ElecFrac = self:GetElectricity() / self.MaxElectricity
+					local ElecFrac = self:GetElectricity() / (self.MaxElectricity or 100)
 					local R, G, B = JMod.GoodBadColor(ElecFrac)
 					draw.SimpleTextOutlined(tostring(math.Round(ElecFrac * 100)) .. "%", "JMod-Display", 0, 30, Color(R, G, B, Opacity), TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP, 3, Color(0, 0, 0, Opacity))
 
