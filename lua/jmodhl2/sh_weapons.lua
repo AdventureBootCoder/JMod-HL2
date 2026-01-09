@@ -1,6 +1,4 @@
 JMod = JMod or {}
-JMod.AdditionalAmmoTable = JMod.AdditionalAmmoTable or {}
-JMod.AdditionalWeaponTable = JMod.AdditionalWeaponTable or {}
 
 JModHL2.WeaponTable = {
 	["Pulse Rifle"] = {
@@ -114,130 +112,20 @@ JModHL2.WeaponTable = {
 }
 
 JModHL2.AmmoTable = {
-	["Light Pulse Ammo"] = {
-		resourcetype = "ammo",
-		sizemult = .5,
-		carrylimit = 720,
-		basedmg = 30,
-		effrange = 90,
-		terminaldmg = 5,
-		penetration = 25,
-		tracer = "tfa_mmod_tracer_ar2"
-	},
-	["Heavy Pulse Ammo"] = {
-		resourcetype = false,
-		carrylimit = 100,
-		basedmg = 25,
-		effrange = 95,
-		terminaldmg = 10,
-		penetration = 25,
-		tracer = "tfa_mmod_tracer_ar3",
-		dmgtype = DMG_AIRBOAT
-	},
-	["Sniper Pulse Ammo"] = {
-		resourcetype = false,
-		carrylimit = 50,
-		basedmg = 80,
-		effrange = 200,
-		terminaldmg = 20,
-		penetration = 25,
-		tracer = "tfa_mmod_tracer_ar3",
-		dmgtype = DMG_SNIPER
-	},
-	["Heavy Rifle Round-API"] = {
-		resourcetype = "munitions",
-		sizemult = 24,
-		carrylimit = 25,
-		basedmg = 200,
-		effrange = 300,
-		terminaldmg = 30,
-		penetration = 120
-	},
-	["25mm Grenade"] = {
-		resourcetype = "munitions",
-		carrylimit = 12,
-		basedmg = 80,
-		effrange = 80,
-		terminaldmg = 50,
-		penetration = 1
-	},
-	["RPG Round"] = {
-		resourcetype = "munitions",
-		sizemult = 40,
-		carrylimit = 4,
-		ent = "ent_aboot_gmod_ezhl2rocket",
-		nicename = "EZ RPG Round",
-		basedmg = 350,
-		blastrad = 200,
-		dmgtype = DMG_BLAST
-	}
+	{name = "Light Pulse Ammo", resourcetype = "ammo", sizemult = .5, carrylimit = 720, basedmg = 30, effrange = 90, terminaldmg = 5, penetration = 25, tracer = "tfa_mmod_tracer_ar2"},
+	{name = "Heavy Pulse Ammo", resourcetype = false, carrylimit = 100, basedmg = 25, effrange = 95, terminaldmg = 10, penetration = 25, tracer = "tfa_mmod_tracer_ar3", dmgtype = DMG_AIRBOAT},
+	{name = "Sniper Pulse Ammo", resourcetype = false, carrylimit = 50, basedmg = 80, effrange = 200, terminaldmg = 20, penetration = 25, tracer = "tfa_mmod_tracer_ar3", dmgtype = DMG_SNIPER},
+	{name = "Heavy Rifle Round-API", resourcetype = "munitions", sizemult = 24, carrylimit = 25, basedmg = 200, effrange = 300, terminaldmg = 30, penetration = 120},
+	{name = "25mm Grenade", resourcetype = "munitions", carrylimit = 12, basedmg = 80, effrange = 80, terminaldmg = 50, penetration = 1},
+	{name = "RPG Round", resourcetype = "munitions", sizemult = 40, carrylimit = 4, ent = "ent_aboot_gmod_ezhl2rocket", nicename = "EZ RPG Round", basedmg = 350, blastrad = 200, dmgtype = DMG_BLAST},
+	-- Add new ammo types at the end!
 }
 
-table.Merge(JMod.AdditionalWeaponTable, JModHL2.WeaponTable)
-table.Merge(JMod.AdditionalAmmoTable, JModHL2.AmmoTable)
+-- Register using the new hook system - runs AFTER JMod base ammo
+hook.Add("JMod_RegisterAmmoTypes", "JModHL2", function()
+	JMod.LoadAmmoTable(JModHL2.AmmoTable)
+end)
 
-if JMod and JMod.LoadAdditionalAmmo and JMod.LoadAdditionalWeaponEntities then
-	JMod.LoadAdditionalAmmo()
-	JMod.LoadAdditionalWeaponEntities()
-end
-
-function JModHL2.GetAmmoSpecs(typ)
-	if JMod.GetAmmoSpecs and JMod.GetAmmoSpecs(typ) then return JMod.GetAmmoSpecs(typ) end
-	if not JModHL2.AmmoTable[typ] then return nil end
-	local Result, BaseType = table.FullCopy(JModHL2.AmmoTable[typ]), string.Split(typ, "-")[1]
-
-	return table.Inherit(Result, JModHL2.AmmoTable[BaseType])
-end
-
-function JModHL2.ApplyAmmoSpecs(wep, typ, mult)
-	--[[timer.Simple(1, function()
-		JMod.ApplyAmmoSpecs(wep, typ, mult) 
-	end)]]--
-	mult = mult or 1
-	wep.Primary.Ammo = typ
-	local Specs = JModHL2.GetAmmoSpecs(typ)
-	if not Specs then
-		timer.Simple(1, function()
-			JMod.ApplyAmmoSpecs(wep, typ, mult) 
-		end)
-
-		return
-	end
-	wep.Damage = Specs.basedmg * mult
-	wep.Num = Specs.projnum or 1
-
-	if Specs.effrange then
-		wep.Range = Specs.effrange
-	end
-
-	if Specs.terminaldmg then
-		wep.DamageMin = Specs.terminaldmg * mult
-	end
-
-	if Specs.penetration then
-		wep.Penetration = Specs.penetration
-	end
-
-	if Specs.blastrad then
-		wep.BlastRadius = Specs.blastrad
-	end
-
-	if Specs.dmgtype then
-		wep.DamageType = Specs.dmgtype
-	end
-
-	if Specs.expanding then
-		wep.EZexpangingAmmo = Specs.expanding
-	end
-
-	if Specs.armorpiercing then
-		wep.EZarmorpiercingAmmo = Specs.armorpiercing
-	end
-
-	-- todo: implement this when we add these types
-	if Specs.tracer then
-		wep.Tracer = Specs.tracer
-	else
-		wep.Tracer = nil
-	end
-end
+hook.Add("JMod_RegisterWeaponEntities", "JModHL2", function()
+	JMod.GenerateWeaponEntities(JModHL2.WeaponTable)
+end)

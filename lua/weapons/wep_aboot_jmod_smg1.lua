@@ -71,7 +71,7 @@ SWEP.Secondary.Sound		= Sound( "Weapon_SMG1.Double" )
 SWEP.MagID = "smg1" -- the magazine pool this gun draws from
 SWEP.Secondary.DefaultClip = 1
 
-JModHL2.ApplyAmmoSpecs(SWEP, "Pistol Round", 1.1)
+JMod.ApplyAmmoSpecs(SWEP, "Pistol Round", 1.1)
 
 SWEP.ShootVol = 80 -- volume of shoot sound
 SWEP.ShootPitch = 100 -- pitch of shoot sound

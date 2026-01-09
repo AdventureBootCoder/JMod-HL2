@@ -16,7 +16,7 @@ SWEP.WorldModelOffset = {
 }
 SWEP.DefaultBodygroups = "00000000000"
 
-JModHL2.ApplyAmmoSpecs(SWEP, "Pistol Round", 1)
+JMod.ApplyAmmoSpecs(SWEP, "Pistol Round", 1)
 
 SWEP.Range = 50 -- in METRES
 SWEP.RangeMin = 20

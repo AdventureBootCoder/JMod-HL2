@@ -25,7 +25,7 @@ SWEP.BodyHolsterAngL = Angle(-10, 10, 180)
 SWEP.BodyHolsterPos = Vector(5, -10, -4)
 SWEP.BodyHolsterPosL = Vector(5, -10, 4)
 
-JModHL2.ApplyAmmoSpecs(SWEP, "Heavy Pulse Ammo", 1)
+JMod.ApplyAmmoSpecs(SWEP, "Heavy Pulse Ammo", 1)
 -- IN M/S
 SWEP.ChamberSize = 0 -- how many rounds can be chambered.
 SWEP.Primary.ClipSize = 100 -- DefaultClip is automatically set.

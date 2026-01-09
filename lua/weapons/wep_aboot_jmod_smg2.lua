@@ -16,7 +16,7 @@ SWEP.WorldModelOffset = {
 
 SWEP.DefaultBodygroups = "00000000000"
 SWEP.CustomToggleCustomizeHUD = false
-JModHL2.ApplyAmmoSpecs(SWEP, "Pistol Round", 1.3)
+JMod.ApplyAmmoSpecs(SWEP, "Pistol Round", 1.3)
 
 --SWEP.Damage = 10
 --SWEP.DamageMin = 6

@@ -25,7 +25,7 @@ SWEP.BodyHolsterAngL = Angle(-10, 10, 180)
 SWEP.BodyHolsterPos = Vector(5, -10, -4)
 SWEP.BodyHolsterPosL = Vector(5, -10, 4)
 
-JModHL2.ApplyAmmoSpecs(SWEP, "Light Rifle Round", 1)
+JMod.ApplyAmmoSpecs(SWEP, "Light Rifle Round", 1)
 SWEP.CustomToggleCustomizeHUD = false
 
 --[[

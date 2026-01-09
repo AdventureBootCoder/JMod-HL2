@@ -14,7 +14,7 @@ SWEP.WorldModelOffset = {
 }
 
 SWEP.DefaultBodygroups = "00000000000"
-JModHL2.ApplyAmmoSpecs(SWEP, "Light Rifle Round", 0.8)
+JMod.ApplyAmmoSpecs(SWEP, "Light Rifle Round", 0.8)
 SWEP.CustomToggleCustomizeHUD = false
 
 SWEP.BodyHolsterSlot = "back"

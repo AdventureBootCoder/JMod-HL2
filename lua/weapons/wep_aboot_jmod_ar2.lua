@@ -23,7 +23,7 @@ SWEP.BodyHolsterPosL = Vector(5, -10, 4)
 
 SWEP.CustomToggleCustomizeHUD = false
 
-JModHL2.ApplyAmmoSpecs(SWEP, "Light Pulse Ammo", 1)
+JMod.ApplyAmmoSpecs(SWEP, "Light Pulse Ammo", 1)
 -- IN M/S
 SWEP.ChamberSize = 0 -- how many rounds can be chambered.
 SWEP.Primary.ClipSize = 30 -- DefaultClip is automatically set.

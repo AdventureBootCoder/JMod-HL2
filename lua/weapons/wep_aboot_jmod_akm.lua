@@ -20,7 +20,7 @@ SWEP.WorldModelOffset = {
 }
 
 SWEP.DefaultBodygroups = "00000000000"
-JModHL2.ApplyAmmoSpecs(SWEP, "Light Rifle Round", 1)
+JMod.ApplyAmmoSpecs(SWEP, "Light Rifle Round", 1)
 SWEP.CustomToggleCustomizeHUD = false
 
 --[[SWEP.Damage = 15

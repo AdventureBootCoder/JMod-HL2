@@ -27,7 +27,7 @@ SWEP.DoorBreachPower = 1.5
 
 SWEP.DefaultBodygroups = "00000000000"
 
-JModHL2.ApplyAmmoSpecs(SWEP, "Shotgun Round", 1.2)
+JMod.ApplyAmmoSpecs(SWEP, "Shotgun Round", 1.2)
 SWEP.IsShotgun = true
 
 SWEP.Force = 12

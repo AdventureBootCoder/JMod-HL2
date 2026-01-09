@@ -24,7 +24,7 @@ SWEP.DefaultBodygroups = "00000000000"
 SWEP.CustomToggleCustomizeHUD = false
 ---
 
-JModHL2.ApplyAmmoSpecs(SWEP, "RPG Round")
+JMod.ApplyAmmoSpecs(SWEP, "RPG Round")
 SWEP.ManualAction = false
 SWEP.AutoReload = false
 SWEP.ShootEntity = "ent_aboot_gmod_ezhl2rocket"
