@@ -215,6 +215,13 @@ SWEP.Animations = {
 		ShellEjectAt = 0,
 		Mult = 0.8,
         TPAnim = ACT_HL2MP_GESTURE_RELOAD_REVOLVER,
+        SoundTable = {
+            {s = "TFA_MMOD.357.OpenLoader", t = 0.15, v = 65},
+            {s = "TFA_MMOD.357.RemoveLoader", t = 0.35, v = 60},
+            {s = "TFA_MMOD.357.ReplaceLoader", t = 0.65, v = 65},
+            {s = "TFA_MMOD.357.CloseLoader", t = 0.95, v = 65},
+            {s = "TFA_MMOD.357.Spin", t = 1.15, v = 55},
+        }
     },
 }
 

@@ -193,10 +193,16 @@ SWEP.Animations = {
 		ShellEjectAt = 0,
     },
     ["reload"] = {
-		--Time = 2.5,
         Source = "reload",
         TPAnim = ACT_HL2MP_GESTURE_RELOAD_SMG1,
 		Mult = 1,
+        SoundTable = {
+            {s = "Weapon_SMG2.Mag_Release", t = 0.2, v = 60},
+            {s = "Weapon_SMG2.Mag_Out", t = 0.4, v = 65},
+            {s = "Weapon_SMG2.Mag_Futz", t = 0.9, v = 55},
+            {s = "Weapon_SMG2.Mag_In", t = 1.3, v = 65},
+            {s = "Weapon_SMG2.Bolt_Pull", t = 1.7, v = 60},
+        }
     },
 }
 
@@ -233,14 +239,6 @@ sound.Add({
 	level = 60,
 	pitch = 130,
 	sound = "weapon/hmg/handling/hmg_bolt_grab_01.wav"
-})
-sound.Add({
-	name = "Weapon_SMG2.",
-	channel = CHAN_STATIC,
-	volume = 0.5,
-	level = 60,
-	pitch = {97, 103},
-	sound = "weapon//handling/.wav"
 })
 sound.Add({
 	name = "Weapon_SMG2.Bolt_Pull",

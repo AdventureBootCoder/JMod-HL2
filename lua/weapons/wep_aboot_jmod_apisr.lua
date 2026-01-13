@@ -241,6 +241,12 @@ SWEP.Animations = {
 		Mult = 0.8,
 		ShellEjectAt = 0.12,
         TPAnim = ACT_HL2MP_GESTURE_RELOAD_REVOLVER,
+        SoundTable = {
+            {s = "Weapon_SniperRifle.Bolt_Up", t = 0.15, v = 60},
+            {s = "Weapon_SniperRifle.Bolt_Back", t = 0.25, v = 65},
+            {s = "Weapon_SniperRifle.Bolt_Forward", t = 0.55, v = 65},
+            {s = "Weapon_SniperRifle.Bolt_Down", t = 0.65, v = 60},
+        }
     },
 }
 

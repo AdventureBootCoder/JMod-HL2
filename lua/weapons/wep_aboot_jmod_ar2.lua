@@ -205,8 +205,13 @@ SWEP.Animations = {
     },
     ["reload"] = {
         Source = "reload",
-		
         TPAnim = ACT_HL2MP_GESTURE_RELOAD_AR2,
+        SoundTable = {
+            {s = "Project_MMOD_AR2.MagOut", t = 0.3, v = 65},
+            {s = "Project_MMOD_AR2.Reload_Push", t = 0.6, v = 60},
+            {s = "Project_MMOD_AR2.MagIn", t = 1.2, v = 65},
+            {s = "Project_MMOD_AR2.Reload_Tap", t = 1.5, v = 60},
+        }
     },
 }
 

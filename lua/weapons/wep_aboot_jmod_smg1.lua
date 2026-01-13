@@ -211,6 +211,11 @@ SWEP.Animations = {
     ["reload"] = {
         Source = "reload",
         TPAnim = ACT_HL2MP_GESTURE_RELOAD_AR2,
+        SoundTable = {
+            {s = "TFA_MMOD.SMG1.ClipOut", t = 0.3, v = 65},
+            {s = "TFA_MMOD.SMG1.ClipHit", t = 1.1, v = 60},
+            {s = "TFA_MMOD.SMG1.ClipIn", t = 1.4, v = 65},
+        }
     },
 
 }

@@ -167,6 +167,12 @@ SWEP.Animations = {
     ["reload"] = {
         Source = "reload",
         TPAnim = ACT_HL2MP_GESTURE_RELOAD_AR2,
+        SoundTable = {
+            {s = "TFA_MMOD.RPG.Pet1", t = 0.3, v = 60},
+            {s = "TFA_MMOD.RPG.Insert", t = 0.8, v = 65},
+            {s = "TFA_MMOD.RPG.Pet2", t = 1.3, v = 60},
+            {s = "TFA_MMOD.RPG.Button", t = 1.7, v = 55},
+        }
     },
 }
 

@@ -164,6 +164,12 @@ SWEP.Animations = {
     ["reload"] = {
         Source = "reload",
         TPAnim = ACT_HL2MP_GESTURE_RELOAD_PISTOL,
+        SoundTable = {
+            {s = "Weapon_Alyxgun.Mag_Out", t = 0.3, v = 65},
+            {s = "Weapon_Alyxgun.Mag_Futz", t = 0.9, v = 55},
+            {s = "Weapon_Alyxgun.Mag_In", t = 1.3, v = 65},
+            {s = "Weapon_Alyxgun.Slide_Release", t = 1.7, v = 60},
+        }
     },
 }
 

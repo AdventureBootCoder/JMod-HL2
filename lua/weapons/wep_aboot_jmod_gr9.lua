@@ -257,6 +257,13 @@ SWEP.Animations = {
         Source = "reload",
 		Mult = 1.2,
         TPAnim = ACT_HL2MP_GESTURE_RELOAD_AR2,
+        SoundTable = {
+            {s = "Weapon_HMG.Mag_Release", t = 0.2, v = 60},
+            {s = "Weapon_HMG.Mag_Out", t = 0.4, v = 65},
+            {s = "Weapon_HMG.Mag_Futz", t = 1.0, v = 55},
+            {s = "Weapon_HMG.Mag_In", t = 1.5, v = 65},
+            {s = "Weapon_HMG.Bolt_Slap", t = 2.0, v = 60},
+        }
     },
 }
 
