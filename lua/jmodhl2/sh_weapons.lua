@@ -112,13 +112,63 @@ JModHL2.WeaponTable = {
 }
 
 JModHL2.AmmoTable = {
-	{name = "Light Pulse Ammo", resourcetype = "ammo", sizemult = .5, carrylimit = 720, basedmg = 30, effrange = 90, terminaldmg = 5, penetration = 25, tracer = "tfa_mmod_tracer_ar2"},
-	{name = "Heavy Pulse Ammo", resourcetype = false, carrylimit = 100, basedmg = 25, effrange = 95, terminaldmg = 10, penetration = 25, tracer = "tfa_mmod_tracer_ar3", dmgtype = DMG_AIRBOAT},
-	{name = "Sniper Pulse Ammo", resourcetype = false, carrylimit = 50, basedmg = 80, effrange = 200, terminaldmg = 20, penetration = 25, tracer = "tfa_mmod_tracer_ar3", dmgtype = DMG_SNIPER},
-	{name = "Heavy Rifle Round-API", resourcetype = "munitions", sizemult = 24, carrylimit = 25, basedmg = 200, effrange = 300, terminaldmg = 30, penetration = 120},
-	{name = "25mm Grenade", resourcetype = "munitions", carrylimit = 12, basedmg = 80, effrange = 80, terminaldmg = 50, penetration = 1},
-	{name = "RPG Round", resourcetype = "munitions", sizemult = 40, carrylimit = 4, ent = "ent_aboot_gmod_ezhl2rocket", nicename = "EZ RPG Round", basedmg = 350, blastrad = 200, dmgtype = DMG_BLAST},
-	-- Add new ammo types at the end!
+	["Light Pulse Ammo"] = {
+		resourcetype = "ammo",
+		sizemult = .5,
+		carrylimit = 720,
+		basedmg = 30,
+		effrange = 90,
+		terminaldmg = 5,
+		penetration = 25,
+		tracer = "tfa_mmod_tracer_ar2"
+	},
+	["Heavy Pulse Ammo"] = {
+		resourcetype = false,
+		carrylimit = 100,
+		basedmg = 25,
+		effrange = 95,
+		terminaldmg = 10,
+		penetration = 25,
+		tracer = "tfa_mmod_tracer_ar3",
+		dmgtype = DMG_AIRBOAT
+	},
+	["Sniper Pulse Ammo"] = {
+		resourcetype = false,
+		carrylimit = 50,
+		basedmg = 80,
+		effrange = 200,
+		terminaldmg = 20,
+		penetration = 25,
+		tracer = "tfa_mmod_tracer_ar3",
+		dmgtype = DMG_SNIPER
+	},
+	["Heavy Rifle Round-API"] = {
+		resourcetype = "munitions",
+		sizemult = 24,
+		carrylimit = 25,
+		basedmg = 200,
+		effrange = 300,
+		terminaldmg = 30,
+		penetration = 120
+	},
+	["25mm Grenade"] = {
+		resourcetype = "munitions",
+		carrylimit = 12,
+		basedmg = 80,
+		effrange = 80,
+		terminaldmg = 50,
+		penetration = 1
+	},
+	["RPG Round"] = {
+		resourcetype = "munitions",
+		sizemult = 40,
+		carrylimit = 4,
+		ent = "ent_aboot_gmod_ezhl2rocket",
+		nicename = "EZ RPG Round",
+		basedmg = 350,
+		blastrad = 200,
+		dmgtype = DMG_BLAST
+	}
 }
 
 -- Register using the new hook system - runs AFTER JMod base ammo
