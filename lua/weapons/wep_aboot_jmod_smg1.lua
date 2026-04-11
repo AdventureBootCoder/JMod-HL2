@@ -10,8 +10,8 @@ SWEP.WorldModel = "models/weapons/aboot/tfa_mmod/w_smg1.mdl"
 SWEP.ViewModelFOV = 60
 SWEP.MirrorVMWM = true
 SWEP.WorldModelOffset = {
-    pos = Vector(10, 0, -4),
-    ang = Angle(-3, 0, 180)
+	pos = Vector(10, 0, -4),
+	ang = Angle(-3, 0, 180)
 }
 SWEP.DefaultBodygroups = "00000000000"
 
@@ -48,13 +48,13 @@ SWEP.RecoilVMShake = 1.5 -- random viewmodel offset when shooty
 SWEP.Delay = 60 / 800 -- 60 / RPM.
 SWEP.Num = 1 -- number of shots per trigger pull.
 SWEP.Firemodes = {
-    {
-        Mode = 2,
+	{
+		Mode = 2,
 		PrintName = "FULL-AUTO"
-    },
-    {
-        Mode = 0
-    }
+	},
+	{
+		Mode = 0
+	}
 }
 
 SWEP.NPCWeaponType = "weapon_smg1"
@@ -110,11 +110,11 @@ SWEP.Tracer = "arccw_tracer" -- override tracer (hitscan) effect
 SWEP.HullSize = 0 -- HullSize used by FireBullets
 
 SWEP.IronSightStruct = {
-    Pos = Vector( -4.7, -4, 2 ),
-    Ang = Angle( -0.65, 0, 0 ),
-    Magnification = 1.2,
-    SwitchToSound = "", -- sound that plays when switching to this sight
-    CrosshairInSights = false
+	Pos = Vector( -4.7, -4, 2 ),
+	Ang = Angle( -0.65, 0, 0 ),
+	Magnification = 1.2,
+	SwitchToSound = "", -- sound that plays when switching to this sight
+	CrosshairInSights = false
 }
 
 SWEP.HoldtypeHolstered = "passive"
@@ -148,12 +148,12 @@ SWEP.AttachmentElements = {
 SWEP.ExtraSightDist = 10
 
 SWEP.Attachments = {
-    {
-        PrintName = "Grenade Launcher",
-        Slot = {"hl2_gl"},
-        DefaultAttName = "DISABLED",
-        Installed = "ubgl_hl2_gl",
-    },
+	{
+		PrintName = "Grenade Launcher",
+		Slot = {"hl2_gl"},
+		DefaultAttName = "DISABLED",
+		Installed = "ubgl_hl2_gl",
+	},
 	{
 		PrintName = "Perk",
 		Slot = "perk"
@@ -161,38 +161,38 @@ SWEP.Attachments = {
 }
 
 SWEP.Animations = {
-    ["idle"] = {
-        Source = "idle01",
-    },
-    ["enter_sight"] = {
-        Source = "idle01_is",
-    },
-    ["idle_sights"] = {
-        Source = "idle01_is",
-    },
-    ["draw"] = {
-        Source = "draw",
-        LHIK = true,
-        LHIKIn = 0,
-        LHIKOut = 0.5,
-    },
-    ["holster"] = {
-        Source = "holster",
-    },
-    ["fire"] = {
-        Source = {"fire1","fire2","fire3","fire4"},
+	["idle"] = {
+		Source = "idle01",
+	},
+	["enter_sight"] = {
+		Source = "idle01_is",
+	},
+	["idle_sights"] = {
+		Source = "idle01_is",
+	},
+	["draw"] = {
+		Source = "draw",
+		LHIK = true,
+		LHIKIn = 0,
+		LHIKOut = 0.5,
+	},
+	["holster"] = {
+		Source = "holster",
+	},
+	["fire"] = {
+		Source = {"fire1","fire2","fire3","fire4"},
 		ShellEjectAt = 0,
 		
-    },
-    ["fire_sights"] = {
-        Source = {"fire1_is","fire2_is","fire3_is","fire4_is"},
+	},
+	["fire_sights"] = {
+		Source = {"fire1_is","fire2_is","fire3_is","fire4_is"},
 		ShellEjectAt = 0,
-    },
-    ["gl_fire"] = {
-        Source = "altfire",
-        TPAnim = ACT_HL2MP_GESTURE_RANGE_ATTACK_REVOLVER,
-        TPAnimStartTime = 0,
-    },
+	},
+	["gl_fire"] = {
+		Source = "altfire",
+		TPAnim = ACT_HL2MP_GESTURE_RANGE_ATTACK_REVOLVER,
+		TPAnimStartTime = 0,
+	},
 	["enter_ubgl"] = {
 		Source = "lowtoidle",
 		Mult = 0.5,
@@ -208,114 +208,114 @@ SWEP.Animations = {
 			{s = "weapons/arccw/ubgl_exit.wav",  t = 0, c = ci},
 		},
 	},
-    ["reload"] = {
-        Source = "reload",
-        TPAnim = ACT_HL2MP_GESTURE_RELOAD_AR2,
-        SoundTable = {
-            {s = "TFA_MMOD.SMG1.ClipOut", t = 0.3, v = 65},
-            {s = "TFA_MMOD.SMG1.ClipHit", t = 1.1, v = 60},
-            {s = "TFA_MMOD.SMG1.ClipIn", t = 1.4, v = 65},
-        }
-    },
+	["reload"] = {
+		Source = "reload",
+		TPAnim = ACT_HL2MP_GESTURE_RELOAD_AR2,
+		SoundTable = {
+			--{s = "TFA_MMOD.SMG1.ClipOut", t = 0.3, v = 65},
+			--{s = "TFA_MMOD.SMG1.ClipHit", t = 1.1, v = 60},
+			--{s = "TFA_MMOD.SMG1.ClipIn", t = 1.4, v = 65},
+		}
+	},
 
 }
 
 sound.Add( {
-    name = "TFA_MMOD.SMG1.1",
-    channel = CHAN_WEAPON,
-    volume = 1,
-    level = SNDLVL_GUNFIRE,
-    pitch = { 90, 110 },
-    sound =  { "weapons/tfa_mmod/smg1/smg1_fire1.wav", "weapons/tfa_mmod/smg1/smg1_fire2.wav", "weapons/tfa_mmod/smg1/smg1_fire3.wav" }
+	name = "TFA_MMOD.SMG1.1",
+	channel = CHAN_WEAPON,
+	volume = 1,
+	level = SNDLVL_GUNFIRE,
+	pitch = { 90, 110 },
+	sound =  { "weapons/tfa_mmod/smg1/smg1_fire1.wav", "weapons/tfa_mmod/smg1/smg1_fire2.wav", "weapons/tfa_mmod/smg1/smg1_fire3.wav" }
 } )
 
 sound.Add( {
-    name = "TFA_MMOD.SMG1.NPC",
-    channel = CHAN_STATIC,
-    volume = 0.1,
-    level = 140,
-    pitch = { 50, 65 },
-    sound =  { "weapons/tfa_mmod/smg1/smg1_fire1.wav", "weapons/tfa_mmod/smg1/smg1_fire2.wav", "weapons/tfa_mmod/smg1/smg1_fire3.wav" }
+	name = "TFA_MMOD.SMG1.NPC",
+	channel = CHAN_STATIC,
+	volume = 0.1,
+	level = 140,
+	pitch = { 50, 65 },
+	sound =  { "weapons/tfa_mmod/smg1/smg1_fire1.wav", "weapons/tfa_mmod/smg1/smg1_fire2.wav", "weapons/tfa_mmod/smg1/smg1_fire3.wav" }
 } )
 
 sound.Add( {
-    name = "TFA_MMOD.SMG1.2",
-    channel = CHAN_weapon,
-    volume = 1,
-    level = SNDLVL_GUNFIRE,
-    pitch = { 80, 110 },
-    sound =  "weapons/tfa_mmod/smg1/smg1_glauncher.wav"
+	name = "TFA_MMOD.SMG1.2",
+	channel = CHAN_weapon,
+	volume = 1,
+	level = SNDLVL_GUNFIRE,
+	pitch = { 80, 110 },
+	sound =  "weapons/tfa_mmod/smg1/smg1_glauncher.wav"
 } )
 
 sound.Add( {
-    name = "TFA_MMOD.SMG1.Draw",
-    channel = CHAN_AUTO,
-    volume = 1,
-    level = SNDLVL_NORM,
-    pitch = { 95, 105 },
-    sound =  "weapons/tfa_mmod/smg1/smg1_deploy.wav"
+	name = "TFA_MMOD.SMG1.Draw",
+	channel = CHAN_AUTO,
+	volume = 1,
+	level = SNDLVL_NORM,
+	pitch = { 95, 105 },
+	sound =  "weapons/tfa_mmod/smg1/smg1_deploy.wav"
 } )
 
 sound.Add( {
-    name = "TFA_MMOD.SMG1.ClipOut",
-    channel = CHAN_AUTO,
-    volume = 1,
-    level = SNDLVL_NORM,
-    pitch = { 95, 105 },
-    sound =  "weapons/tfa_mmod/smg1/smg1_clipout.wav"
+	name = "TFA_MMOD.SMG1.ClipOut",
+	channel = CHAN_AUTO,
+	volume = 1,
+	level = SNDLVL_NORM,
+	pitch = { 95, 105 },
+	sound =  "weapons/tfa_mmod/smg1/smg1_clipout.wav"
 } )
 
 sound.Add( {
-    name = "TFA_MMOD.SMG1.ClipIn",
-    channel = CHAN_AUTO,
-    volume = 1,
-    level = SNDLVL_NORM,
-    pitch = { 95, 105 },
-    sound =  "weapons/tfa_mmod/smg1/smg1_clipin.wav"
+	name = "TFA_MMOD.SMG1.ClipIn",
+	channel = CHAN_AUTO,
+	volume = 1,
+	level = SNDLVL_NORM,
+	pitch = { 95, 105 },
+	sound =  "weapons/tfa_mmod/smg1/smg1_clipin.wav"
 } )
 
 sound.Add( {
-    name = "TFA_MMOD.SMG1.ClipHit",
-    channel = CHAN_AUTO,
-    volume = 1,
-    level = SNDLVL_NORM,
-    pitch = { 95, 105 },
-    sound =  "weapons/tfa_mmod/smg1/smg1_cliphit.wav"
+	name = "TFA_MMOD.SMG1.ClipHit",
+	channel = CHAN_AUTO,
+	volume = 1,
+	level = SNDLVL_NORM,
+	pitch = { 95, 105 },
+	sound =  "weapons/tfa_mmod/smg1/smg1_cliphit.wav"
 } )
 
 sound.Add( {
-    name = "TFA_MMOD.SMG1.BoltBack",
-    channel = CHAN_AUTO,
-    volume = 1,
-    level = SNDLVL_NORM,
-    pitch = { 95, 105 },
-    sound =  "weapons/tfa_mmod/smg1/smg1_boltback.wav"
+	name = "TFA_MMOD.SMG1.BoltBack",
+	channel = CHAN_AUTO,
+	volume = 1,
+	level = SNDLVL_NORM,
+	pitch = { 95, 105 },
+	sound =  "weapons/tfa_mmod/smg1/smg1_boltback.wav"
 } )
 
 sound.Add( {
-    name = "TFA_MMOD.SMG1.BoltForward",
-    channel = CHAN_AUTO,
-    volume = 1,
-    level = SNDLVL_NORM,
-    pitch = { 95, 105 },
-    sound =  "weapons/tfa_mmod/smg1/smg1_boltforward.wav"
+	name = "TFA_MMOD.SMG1.BoltForward",
+	channel = CHAN_AUTO,
+	volume = 1,
+	level = SNDLVL_NORM,
+	pitch = { 95, 105 },
+	sound =  "weapons/tfa_mmod/smg1/smg1_boltforward.wav"
 } )
 
 sound.Add( {
-    name = "TFA_MMOD.SMG1.GripFold",
-    channel = CHAN_AUTO,
-    volume = 1,
-    level = SNDLVL_NORM,
-    pitch = { 95, 105 },
-    sound =  "weapons/tfa_mmod/smg1/smg1_gripfold.wav"
+	name = "TFA_MMOD.SMG1.GripFold",
+	channel = CHAN_AUTO,
+	volume = 1,
+	level = SNDLVL_NORM,
+	pitch = { 95, 105 },
+	sound =  "weapons/tfa_mmod/smg1/smg1_gripfold.wav"
 } )
 
 sound.Add( {
-    name = "TFA_MMOD.SMG1.GripUnfold",
-    channel = CHAN_AUTO,
-    volume = 1,
-    level = SNDLVL_NORM,
-    pitch = { 95, 105 },
-    sound =  "weapons/tfa_mmod/smg1/smg1_gripunfold.wav"
+	name = "TFA_MMOD.SMG1.GripUnfold",
+	channel = CHAN_AUTO,
+	volume = 1,
+	level = SNDLVL_NORM,
+	pitch = { 95, 105 },
+	sound =  "weapons/tfa_mmod/smg1/smg1_gripunfold.wav"
 } )
 

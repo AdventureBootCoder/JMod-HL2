@@ -9,8 +9,8 @@ SWEP.WorldModel = "models/weapons/aboot/oicw/w_oicw.mdl"
 SWEP.ViewModelFOV = 70
 SWEP.MirrorVMWM = true
 SWEP.WorldModelOffset = {
-    pos = Vector(10, 1, -3),
-    ang = Angle(-4, 180, 180)
+	pos = Vector(10, 1, -3),
+	ang = Angle(-4, 180, 180)
 }
 
 SWEP.DefaultBodygroups = "00000000000"
@@ -46,18 +46,18 @@ SWEP.RecoilVMShake = 0 -- random viewmodel offset when shooty
 SWEP.Delay = 60 / 650 -- 60 / RPM.
 SWEP.Num = 1 -- number of shots per trigger pull.
 SWEP.Firemodes = {
-    {
-        Mode = 2,
-    },
-    {
-        Mode = -3,
+	{
+		Mode = 2,
+	},
+	{
+		Mode = -3,
 		RunawayBurst = true,
 		AutoBurst = true,
 		PostBurstDelay = 0.2,
-    },
-    {
-        Mode = 0
-    }
+	},
+	{
+		Mode = 0
+	}
 }
 
 SWEP.NPCWeaponType = "weapon_ar2"
@@ -108,12 +108,12 @@ SWEP.PhysTracerProfile = 2
 
 
 SWEP.IronSightStruct = {
-    Pos = Vector( -5.5, 0, 3 ),
-    Ang = Angle( 2, 0, 0 ),
-    Magnification = 2,
-    SwitchToSound = JMod.GunHandlingSounds.aim.inn,
+	Pos = Vector( -5.5, 0, 3 ),
+	Ang = Angle( 2, 0, 0 ),
+	Magnification = 2,
+	SwitchToSound = JMod.GunHandlingSounds.aim.inn,
 	SwitchFromSound = JMod.GunHandlingSounds.aim.out,
-    CrosshairInSights = true
+	CrosshairInSights = true
 }
 
 SWEP.HoldtypeHolstered = "passive"
@@ -171,12 +171,12 @@ SWEP.Attachments = {
 		},
 		--Hidden = true, -- attachment cannot be seen in customize menu
 	},
-    {
-        PrintName = "Grenade Launcher",
-        Slot = {"ez_oicw_gl"},
-        DefaultAttName = "DISABLED",
-        Installed = "ubgl_aboot_oicw_gl",
-    },
+	{
+		PrintName = "Grenade Launcher",
+		Slot = {"ez_oicw_gl"},
+		DefaultAttName = "DISABLED",
+		Installed = "ubgl_aboot_oicw_gl",
+	},
 	{
 		PrintName = "Perk",
 		Slot = "perk"
@@ -187,62 +187,69 @@ SWEP.ExtraSightDist = 10
 
 
 SWEP.Animations = {
-    ["idle"] = {
-        Source = "idle",
-    },
-    ["draw"] = {
-        Source = "draw",
-        LHIK = true,
-        LHIKIn = 0,
-        LHIKOut = 0.5,
-    },
-    ["holster"] = {
-        Source = "holster",
-    },
-    ["fire"] = {
-        Source = {"fire1","fire2","fire3","fire4"},
+	["idle"] = {
+		Source = "idle",
+	},
+	["draw"] = {
+		Source = "draw",
+		LHIK = true,
+		LHIKIn = 0,
+		LHIKOut = 0.5,
+	},
+	["holster"] = {
+		Source = "holster",
+	},
+	["fire"] = {
+		Source = {"fire1","fire2","fire3","fire4"},
 		ShellEjectAt = 0,
-    },
-    ["enter_inspect"] = {
+	},
+	["enter_inspect"] = {
 		Mult = 0.8,
-        Source = {"fidget","fidget2"},
-    },
-    ["reload"] = {
-        Source = "reload",
-        TPAnim = ACT_HL2MP_GESTURE_RELOAD_AR2,
-        SoundTable = {
-            {s = "Weapon_OICW.Mag_Release", t = 0.2, v = 60},
-            {s = "Weapon_OICW.Mag_Out", t = 0.4, v = 65},
-            {s = "Weapon_OICW.Mag_Futz", t = 1.0, v = 55},
-            {s = "Weapon_OICW.Mag_In", t = 1.4, v = 65},
-            {s = "Weapon_OICW.Mag_Slap", t = 1.7, v = 60},
-            {s = "Weapon_OICW.Bolt_Release", t = 2.0, v = 60},
-        }
-    },
+		Source = {"fidget","fidget2"},
+	},
+	["reload"] = {
+		Source = "reload",
+		TPAnim = ACT_HL2MP_GESTURE_RELOAD_AR2,
+		SoundTable = {
+			{s = "Weapon_OICW.Mag_Release", t = 0.1, v = 60},
+			{s = "Weapon_OICW.Mag_Out", t = 0.3, v = 65},
+			{s = "Weapon_OICW.Mag_Futz", t = 0.6, v = 55},
+			{s = "Weapon_OICW.Mag_In", t = 1.1, v = 65},
+			{s = "Weapon_OICW.Mag_Slap", t = 1.3, v = 60},
+			{s = "Weapon_OICW.Bolt_Release", t = 1.65, v = 60},
+		}
+	},
 	["altreload"] = {
-        Source = "reloadsecondary",
-        TPAnim = ACT_HL2MP_GESTURE_RELOAD_AR2,
-    },
-    ["gl_fire"] = {
-        Source = "altfire",
-        TPAnim = ACT_HL2MP_GESTURE_RANGE_ATTACK_REVOLVER,
-        TPAnimStartTime = 0,
-    },
-    ["enter_ubgl"] = {
-        Source = "lowtoidle",
+		Source = "reloadsecondary",
+		TPAnim = ACT_HL2MP_GESTURE_RELOAD_AR2,
+		SoundTable = {
+			{s = "Weapon_OICW.Mag_Release", t = 0.1, v = 60},
+			{s = "Weapon_OICW.Mag_Out", t = 0.3, v = 65},
+			{s = "Weapon_OICW.Mag_Futz", t = 0.6, v = 55},
+			{s = "Weapon_OICW.Mag_In", t = 1.1, v = 65},
+			{s = "Weapon_OICW.Mag_Slap", t = 1.3, v = 60},
+		}
+	},
+	["gl_fire"] = {
+		Source = "altfire",
+		TPAnim = ACT_HL2MP_GESTURE_RANGE_ATTACK_REVOLVER,
+		TPAnimStartTime = 0,
+	},
+	["enter_ubgl"] = {
+		Source = "lowtoidle",
 		Mult = 0.5,
 		RestoreAmmo = -1,
-        SoundTable = {
-            {s = "weapons/arccw/ubgl_select.wav",  t = 0, c = ci},
-        },
-    },
-    ["exit_ubgl"] = {
-        Source = "lowtoidle",
+		SoundTable = {
+			{s = "weapons/arccw/ubgl_select.wav",  t = 0, c = ci},
+		},
+	},
+	["exit_ubgl"] = {
+		Source = "lowtoidle",
 		Mult = 0.5,
-        SoundTable = {
-            {s = "weapons/arccw/ubgl_exit.wav",  t = 0, c = ci},
-        },
-    },
+		SoundTable = {
+			{s = "weapons/arccw/ubgl_exit.wav",  t = 0, c = ci},
+		},
+	},
 }
 
 hook.Add( "StartCommand", "JModHL2_OICWscrollCapture", function( ply, cmd )

@@ -231,12 +231,18 @@ SWEP.Hook_Think = function(self)
 	if not SERVER then return end
 	if self.Primary.Ammo == "Heavy Pulse Ammo" then 
 		local Time = CurTime()
-		local SelfAmmo, MaxAmmo = self.Owner:GetAmmoCount("Heavy Pulse Ammo"), game.GetAmmoMax(game.GetAmmoID("Heavy Pulse Ammo")) * JMod.Config.Weapons.AmmoCarryLimitMult
+		local SelfAmmo, MaxAmmo = self.Owner:GetAmmoCount("Heavy Pulse Ammo"), math.floor(game.GetAmmoMax(game.GetAmmoID("Heavy Pulse Ammo")) * JMod.Config.Weapons.AmmoCarryLimitMult)
 
 		self.NextRechargeTime = self.NextRechargeTime or 0
 		if (self.NextRechargeTime < Time) and (Time > self:GetNextPrimaryFire() + 1) and (SelfAmmo < MaxAmmo) then
 			self.NextRechargeTime = Time + .1
 			self.Owner:GiveAmmo(math.min(MaxAmmo - SelfAmmo, 2), "Heavy Pulse Ammo", true)
+			if not(self.CoolReloadSoundPlayed) then
+				self.CoolReloadSoundPlayed = true
+				self.Owner:EmitSound("npc/sniper/reload1.wav", 60, 80, .5)
+			end
+		elseif (SelfAmmo >= MaxAmmo) then
+			self.CoolReloadSoundPlayed = nil
 		end
 	end
 	

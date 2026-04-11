@@ -10,8 +10,8 @@ SWEP.WorldModel = "models/weapons/aboot/w_357.mdl"
 SWEP.ViewModelFOV = 60
 SWEP.MirrorVMWM = true
 SWEP.WorldModelOffset = {
-    pos = Vector(6, 2, -3),
-    ang = Angle(0, 180, 180)
+	pos = Vector(6, 2, -3),
+	ang = Angle(0, 180, 180)
 }
 SWEP.BodyHolsterSlot = "thighs"
 SWEP.BodyHolsterAng = Angle(0, 180, 75)
@@ -101,11 +101,11 @@ SWEP.BodyDamageMults = {
 SWEP.Force = 40
 
 SWEP.IronSightStruct = {
-    Pos = Vector(-3.19, -2, 1.2),
-    Ang = Angle(0.1, 0, 0),
-    Magnification = 1.1,
-    SwitchToSound = "", -- sound that plays when switching to this sight
-    CrosshairInSights = false
+	Pos = Vector(-3.19, -2, 1.2),
+	Ang = Angle(0.1, 0, 0),
+	Magnification = 1.1,
+	SwitchToSound = "", -- sound that plays when switching to this sight
+	CrosshairInSights = false
 }
 
 SWEP.HoldtypeHolstered = "passive"
@@ -182,47 +182,45 @@ SWEP.Attachments = {
 }
 
 SWEP.Animations = {
-    ["idle"] = {
-        Source = "idle1",
-    },
-    ["enter_sight"] = {
-        Source = "idle_ironsighted",
-    },
-    ["idle_sights"] = {
-        Source = "idle_ironsighted",
-    },
-    ["draw"] = {
-        Source = "draw",
-        LHIK = true,
-        LHIKIn = 0,
-        LHIKOut = 0.5,
-    },
-    ["holster"] = {
-        Source = "holster",
-    },
-    ["fire"] = {
-        Source = {"fire"},
-		
-    },
-    ["fire_sights"] = {
-        Source = {"fire_is"},
-    },
-    ["enter_inspect"] = {
-        Source = {"inspect","inspect2"},
-    },
-    ["reload"] = {
-        Source = "reload",
+	["idle"] = {
+		Source = "idle1",
+	},
+	["enter_sight"] = {
+		Source = "idle_ironsighted",
+	},
+	["idle_sights"] = {
+		Source = "idle_ironsighted",
+	},
+	["draw"] = {
+		Source = "draw",
+		LHIK = true,
+		LHIKIn = 0,
+		LHIKOut = 0.5,
+	},
+	["holster"] = {
+		Source = "holster",
+	},
+	["fire"] = {
+		Source = {"fire"},
+	},
+	["fire_sights"] = {
+		Source = {"fire_is"},
+	},
+	["enter_inspect"] = {
+		Source = {"inspect","inspect2"},
+	},
+	["reload"] = {
+		Source = "reload",
 		ShellEjectAt = 0,
 		Mult = 0.8,
-        TPAnim = ACT_HL2MP_GESTURE_RELOAD_REVOLVER,
-        SoundTable = {
-            {s = "TFA_MMOD.357.OpenLoader", t = 0.15, v = 65},
-            {s = "TFA_MMOD.357.RemoveLoader", t = 0.35, v = 60},
-            {s = "TFA_MMOD.357.ReplaceLoader", t = 0.65, v = 65},
-            {s = "TFA_MMOD.357.CloseLoader", t = 0.95, v = 65},
-            {s = "TFA_MMOD.357.Spin", t = 1.15, v = 55},
-        }
-    },
+		TPAnim = ACT_HL2MP_GESTURE_RELOAD_REVOLVER,
+		SoundTable = {
+			{s = "TFA_MMOD.357.OpenLoader", t = 0.2, v = 65},
+			{s = "TFA_MMOD.357.RemoveLoader", t = 0.95, v = 60},
+			{s = "TFA_MMOD.357.ReplaceLoader", t = 1.95, v = 65},
+			{s = "TFA_MMOD.357.CloseLoader", t = 2.5, v = 65},
+		}
+	},
 }
 
 sound.Add({

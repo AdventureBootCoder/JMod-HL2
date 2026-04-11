@@ -10,8 +10,8 @@ SWEP.WorldModel = "models/weapons/annabelle/w_annabelle.mdl"
 SWEP.ViewModelFOV = 70
 SWEP.MirrorVMWM = true
 SWEP.WorldModelOffset = {
-    pos = Vector(16, 0, -3.5),
-    ang = Angle(-10, 180, 180)
+	pos = Vector(16, 0, -3.5),
+	ang = Angle(-10, 180, 180)
 }
 SWEP.BodyHolsterSlot = "back"
 SWEP.BodyHolsterAng = Angle(10, 10, 0)
@@ -46,13 +46,13 @@ SWEP.RecoilVMShake = 2.5 -- random viewmodel offset when shooty
 SWEP.Delay = 60 / 10 -- 60 / RPM.
 SWEP.Num = 1 -- number of shots per trigger pull.
 SWEP.Firemodes = {
-    {
-        Mode = 1,
+	{
+		Mode = 1,
 		PrintName = "LEVER",
-    },
-    {
-        Mode = 0
-    }
+	},
+	{
+		Mode = 0
+	}
 }
 
 SWEP.NPCWeaponType = "weapon_ar2"
@@ -97,11 +97,11 @@ SWEP.ShotgunReload = true
 SWEP.NoLastCycle = false
 
 SWEP.IronSightStruct = {
-    Pos = Vector(-2.73, -9, 2.2),
-    Ang = Angle(0, -0.95, 0),
-    Magnification = 1.4,
-    SwitchToSound = "", -- sound that plays when switching to this sight
-    CrosshairInSights = false
+	Pos = Vector(-2.73, -9, 2.2),
+	Ang = Angle(0, -0.95, 0),
+	Magnification = 1.4,
+	SwitchToSound = "", -- sound that plays when switching to this sight
+	CrosshairInSights = false
 }
 
 SWEP.HoldtypeHolstered = "passive"
@@ -144,38 +144,51 @@ SWEP.Attachments = {
 }
 
 SWEP.Animations = {
-    ["idle"] = {
-        Source = "idle01",
-    },
-    ["draw"] = {
-        Source = "draw",
-        LHIK = true,
-        LHIKIn = 0,
-        LHIKOut = 0.5,
-    },
-    ["holster"] = {
-        Source = "holster",
-    },
-    ["fire"] = {
-        Source = "fire",
+	["idle"] = {
+		Source = "idle01",
+	},
+	["draw"] = {
+		Source = "draw",
+		LHIK = true,
+		LHIKIn = 0,
+		LHIKOut = 0.5,
+	},
+	["holster"] = {
+		Source = "holster",
+	},
+	["fire"] = {
+		Source = "fire",
 		MinProgress = 0.4,
-		
-    },
-    ["cycle"] = {
-        Source = {"lever"},
+	},
+	["cycle"] = {
+		Source = {"lever"},
 		ShellEjectAt = 0.1,
 		Mult = 1.2,
-    },
-    ["sgreload_start"] = {
-        Source = "reload1",
-    },
-    ["sgreload_insert"] = {
-        Source = "reload2",
-        TPAnim = ACT_HL2MP_GESTURE_RELOAD_SHOTGUN,
-    },
-    ["sgreload_finish"] = {
-        Source = "reload3",
-    },
+		SoundTable = {
+			{s = "Weapon_Annabelle.Lever_Down",  t = 0, c = ci},
+			{s = "Weapon_Annabelle.Lever_Up",  t = 0.35, c = ci},
+		},
+	},
+	["sgreload_start"] = {
+		Source = "reload1",
+		SoundTable = {
+			{s = JMod.GunHandlingSounds.cloth.quiet,  t = 0, c = ci},
+		},
+	},
+	["sgreload_insert"] = {
+		Source = "reload2",
+		TPAnim = ACT_HL2MP_GESTURE_RELOAD_SHOTGUN,
+		SoundTable = {
+			{s = "Weapon_Annabelle.Bullet_Load",  t = 0.1, c = ci},
+		},
+	},
+	["sgreload_finish"] = {
+		Source = "reload3",
+		SoundTable = {
+			{s = JMod.GunHandlingSounds.cloth.quiet,  t = 0, c = ci},
+			{s = JMod.GunHandlingSounds.grab,  t = 0.5, c = ci},
+		},
+	},
 }
 
 sound.Add({

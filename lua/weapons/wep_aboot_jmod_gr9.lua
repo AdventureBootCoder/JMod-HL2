@@ -13,8 +13,8 @@ SWEP.DefaultWMBodygroups = "01000000"
 SWEP.MirrorVMWM = false -- Copy the viewmodel, along with all its attachments, to the worldmodel. Super convenient!
 SWEP.MirrorWorldModel = true -- Use this to set the mirrored viewmodel to a different model, without any floating speedloaders or cartridges you may have. Needs MirrorVMWM
 SWEP.WorldModelOffset = {
-    pos = Vector(9, .8, -3.5),
-    ang = Angle(-10, 180, 180),
+	pos = Vector(9, .8, -3.5),
+	ang = Angle(-10, 180, 180),
 	scale = 0.9
 }
 ---
@@ -63,15 +63,15 @@ SWEP.Firemodes = {
 	{
 		Mode = 2
 	},
-    {
-        Mode = -4,
+	{
+		Mode = -4,
 		RunawayBurst = true,
 		AutoBurst = true,
 		PostBurstDelay = 0.01,
-    },
-    {
-        Mode = 0
-    }
+	},
+	{
+		Mode = 0
+	}
 }
 
 SWEP.NPCWeaponType = "weapon_ar2"
@@ -130,11 +130,11 @@ SWEP.HeatFix = true -- when the "fix" animation is played, all heat is restored.
 SWEP.HeatOverflow = nil -- if true, heat is allowed to exceed capacity (this only applies when the default overheat handling is overridden)
 
 SWEP.IronSightStruct = {
-    Pos = Vector( -4.5, -4, 3 ),
-    Ang = Angle( 0, 0, 0 ),
-    Magnification = 2.0,
-    SwitchToSound = "", -- sound that plays when switching to this sight
-    CrosshairInSights = true
+	Pos = Vector( -4.5, -4, 3 ),
+	Ang = Angle( 0, 0, 0 ),
+	Magnification = 2.0,
+	SwitchToSound = "", -- sound that plays when switching to this sight
+	CrosshairInSights = true
 }
 
 --[[SWEP.Bipod_Integral = true -- Integral bipod (ie, weapon model has one)
@@ -236,35 +236,35 @@ SWEP.Attachments = {
 }
 
 SWEP.Animations = {
-    ["idle"] = {
-        Source = "idle",
-    },
-    ["draw"] = {
-        Source = "draw",
-        LHIK = true,
-        LHIKIn = 0,
-        LHIKOut = 0.5,
-    },
-    ["holster"] = {
-        Source = "holster",
-    },
-    ["fire"] = {
-        Source = {"fire","fire2","fire3","fire4"},
+	["idle"] = {
+		Source = "idle",
+	},
+	["draw"] = {
+		Source = "draw",
+		LHIK = true,
+		LHIKIn = 0,
+		LHIKOut = 0.5,
+	},
+	["holster"] = {
+		Source = "holster",
+	},
+	["fire"] = {
+		Source = {"fire","fire2","fire3","fire4"},
 		ShellEjectAt = 0,
 		
-    },
-    ["reload"] = {
-        Source = "reload",
+	},
+	["reload"] = {
+		Source = "reload",
 		Mult = 1.2,
-        TPAnim = ACT_HL2MP_GESTURE_RELOAD_AR2,
-        SoundTable = {
-            {s = "Weapon_HMG.Mag_Release", t = 0.2, v = 60},
-            {s = "Weapon_HMG.Mag_Out", t = 0.4, v = 65},
-            {s = "Weapon_HMG.Mag_Futz", t = 1.0, v = 55},
-            {s = "Weapon_HMG.Mag_In", t = 1.5, v = 65},
-            {s = "Weapon_HMG.Bolt_Slap", t = 2.0, v = 60},
-        }
-    },
+		TPAnim = ACT_HL2MP_GESTURE_RELOAD_AR2,
+		SoundTable = {
+			{s = "Weapon_HMG.Mag_Release", t = 0.2, v = 60},
+			{s = "Weapon_HMG.Mag_Out", t = 0.4, v = 65},
+			{s = "Weapon_HMG.Mag_Futz", t = 1.2, v = 55},
+			{s = "Weapon_HMG.Mag_In", t = 2.0, v = 65},
+			{s = "Weapon_HMG.Bolt_Slap", t = 2.8, v = 60},
+		}
+	},
 }
 
 
@@ -272,7 +272,7 @@ sound.Add({
 	name = "Weapon_HMG.Fire",
 	channel = CHAN_WEAPON,
 	volume = 0.85,
-    level = SNDLVL_GUNFIRE,
+	level = SNDLVL_GUNFIRE,
 	pitch = {97, 103},
 	sound = {
 		"weapon/hmg/hmg_fire_player_01.wav",

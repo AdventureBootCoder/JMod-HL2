@@ -197,11 +197,13 @@ SWEP.Animations = {
         TPAnim = ACT_HL2MP_GESTURE_RELOAD_SMG1,
 		Mult = 1,
         SoundTable = {
-            {s = "Weapon_SMG2.Mag_Release", t = 0.2, v = 60},
-            {s = "Weapon_SMG2.Mag_Out", t = 0.4, v = 65},
-            {s = "Weapon_SMG2.Mag_Futz", t = 0.9, v = 55},
-            {s = "Weapon_SMG2.Mag_In", t = 1.3, v = 65},
-            {s = "Weapon_SMG2.Bolt_Pull", t = 1.7, v = 60},
+			{s = "Weapon_SMG2.Bolt_Pull", t = 0.25, v = 60},
+			{s = "Weapon_SMG2.Bolt_Lock", t = 0.35, v = 60},
+            {s = "Weapon_SMG2.Mag_Release", t = 0.92, v = 60},
+            {s = "Weapon_SMG2.Mag_Out", t = 0.95, v = 65},
+            {s = "Weapon_SMG2.Mag_Futz", t = 1.3, v = 55},
+            {s = "Weapon_SMG2.Mag_In", t = 1.85, v = 65},
+            {s = "Weapon_SMG2.Bolt_Release", t = 2.8, v = 60},
         }
     },
 }

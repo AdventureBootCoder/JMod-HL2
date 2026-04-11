@@ -320,22 +320,25 @@ end
 
 --
 function SWEP:OnDrop()
-	local Kit = ents.Create("ent_aboot_gmod_ezwelder")
-	Kit:SetPos(self:GetPos())
-	Kit:SetAngles(self:GetAngles())
-	Kit:Spawn()
-	Kit:Activate()
+	timer.Simple(0, function()
+		if not IsValid(self) then return end
+		local Kit = ents.Create("ent_aboot_gmod_ezwelder")
+		Kit:SetPos(self:GetPos())
+		Kit:SetAngles(self:GetAngles())
+		Kit:Spawn()
+		Kit:Activate()
 
-	Kit:SetElectricity(self:GetElectricity())
-	Kit:SetGas(self:GetGas())
+		Kit:SetElectricity(self:GetElectricity())
+		Kit:SetGas(self:GetGas())
 
-	local Phys = Kit:GetPhysicsObject()
+		local Phys = Kit:GetPhysicsObject()
 
-	if Phys then
-		Phys:SetVelocity(self:GetPhysicsObject():GetVelocity() / 2)
-	end
+		if Phys then
+			Phys:SetVelocity(self:GetPhysicsObject():GetVelocity() / 2)
+		end
 
-	self:Remove()
+		self:Remove()
+	end)
 end
 
 function SWEP:OnRemove()

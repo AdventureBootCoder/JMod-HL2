@@ -10,8 +10,8 @@ SWEP.WorldModel = "models/weapons/w_rocket_launcher.mdl"
 SWEP.ViewModelFOV = 60
 SWEP.MirrorVMWM = true
 SWEP.WorldModelOffset = {
-    pos = Vector(16, 2, -3),
-    ang = Angle(-15, 180, 180)
+	pos = Vector(16, 2, -3),
+	ang = Angle(-15, 180, 180)
 }
 SWEP.BodyHolsterSlot = "back"
 SWEP.BodyHolsterAng = Angle(-10, 190, 180)
@@ -52,12 +52,12 @@ SWEP.RecoilVMShake = 5 -- random viewmodel offset when shooty
 SWEP.Delay = 60 / 100 -- 60 / RPM.
 SWEP.Num = 1 -- number of shots per trigger pull.
 SWEP.Firemodes = {
-    {
-        Mode = 1,
-    },
-    {
-        Mode = 0
-    }
+	{
+		Mode = 1,
+	},
+	{
+		Mode = 0
+	}
 }
 
 SWEP.NPCWeaponType = "weapon_rpg"
@@ -90,11 +90,11 @@ SWEP.SightTime = 0.44
 SWEP.Force = 40
 
 SWEP.IronSightStruct = {
-    Pos = Vector(-3.19, -2, 1.2),
-    Ang = Angle(0.1, 0, 0),
-    Magnification = 1.2,
-    SwitchToSound = "", -- sound that plays when switching to this sight
-    CrosshairInSights = true
+	Pos = Vector(-3.19, -2, 1.2),
+	Ang = Angle(0.1, 0, 0),
+	Magnification = 1.2,
+	SwitchToSound = "", -- sound that plays when switching to this sight
+	CrosshairInSights = true
 }
 
 SWEP.HoldtypeHolstered = "passive"
@@ -145,35 +145,35 @@ SWEP.Attachments = {
 }
 
 SWEP.Animations = {
-    ["idle"] = {
-        Source = "idle1",
-    },
-    ["draw"] = {
-        Source = "draw",
-        LHIK = true,
-        LHIKIn = 0,
-        LHIKOut = 0.5,
-    },
-    ["holster"] = {
-        Source = "holster",
-    },
-    ["fire"] = {
-        Source = {"fire"},
+	["idle"] = {
+		Source = "idle1",
+	},
+	["draw"] = {
+		Source = "draw",
+		LHIK = true,
+		LHIKIn = 0,
+		LHIKOut = 0.5,
+	},
+	["holster"] = {
+		Source = "holster",
+	},
+	["fire"] = {
+		Source = {"fire"},
 		
-    },
-    ["enter_inspect"] = {
-        Source = {"fidget1","fidget2"},
-    },
-    ["reload"] = {
-        Source = "reload",
-        TPAnim = ACT_HL2MP_GESTURE_RELOAD_AR2,
-        SoundTable = {
-            {s = "TFA_MMOD.RPG.Pet1", t = 0.3, v = 60},
-            {s = "TFA_MMOD.RPG.Insert", t = 0.8, v = 65},
-            {s = "TFA_MMOD.RPG.Pet2", t = 1.3, v = 60},
-            {s = "TFA_MMOD.RPG.Button", t = 1.7, v = 55},
-        }
-    },
+	},
+	["enter_inspect"] = {
+		Source = {"fidget1","fidget2"},
+	},
+	["reload"] = {
+		Source = "reload",
+		TPAnim = ACT_HL2MP_GESTURE_RELOAD_AR2,
+		SoundTable = {
+			--{s = "TFA_MMOD.RPG.Insert", t = 0.0, v = 65},
+			--{s = "TFA_MMOD.RPG.Pet1", t = 0.1, v = 60},
+			--{s = "TFA_MMOD.RPG.Pet2", t = 1.0, v = 60},
+			--{s = "TFA_MMOD.RPG.Button", t = 2.0, v = 55},
+		}
+	},
 }
 
 sound.Add({

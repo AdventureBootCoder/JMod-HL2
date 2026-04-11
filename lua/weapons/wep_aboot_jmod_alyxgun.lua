@@ -11,8 +11,8 @@ SWEP.WorldModel = "models/weapons/alyxgun/alyxgun.mdl"
 SWEP.ViewModelFOV = 70
 SWEP.MirrorVMWM = true
 SWEP.WorldModelOffset = {
-    pos = Vector(5, 1, -2.25),
-    ang = Angle(0, -5, 180)
+	pos = Vector(5, 1, -2.25),
+	ang = Angle(0, -5, 180)
 }
 SWEP.DefaultBodygroups = "00000000000"
 
@@ -42,21 +42,21 @@ SWEP.RecoilVMShake = 1.0 -- random viewmodel offset when shooty
 SWEP.Delay = 60 / 1000 -- 60 / RPM.
 SWEP.Num = 1 -- number of shots per trigger pull.
 SWEP.Firemodes = {
-    {
-        Mode = 2,
-    },
-    {
-        Mode = -3,
+	{
+		Mode = 2,
+	},
+	{
+		Mode = -3,
 		RunawayBurst = true,
 		AutoBurst = true,
 		PostBurstDelay = 0.2,
-    },
-    {
-        Mode = 1,
-    },
-    {
-        Mode = 0
-    }
+	},
+	{
+		Mode = 1,
+	},
+	{
+		Mode = 0
+	}
 }
 
 SWEP.NPCWeaponType = "weapon_pistol"
@@ -104,11 +104,11 @@ SWEP.HullSize = 0 -- HullSize used by FireBullets
 
 
 SWEP.IronSightStruct = {
-    Pos = Vector(-3.775, 4, 2.115),
-    Ang = Angle(0.165, 0.02, 0),
-    Magnification = 1.2,
-    SwitchToSound = "", -- sound that plays when switching to this sight
-    CrosshairInSights = false
+	Pos = Vector(-3.775, 4, 2.115),
+	Ang = Angle(0.165, 0.02, 0),
+	Magnification = 1.2,
+	SwitchToSound = "", -- sound that plays when switching to this sight
+	CrosshairInSights = false
 }
 
 SWEP.HoldtypeHolstered = "passive"
@@ -140,37 +140,51 @@ SWEP.AttachmentElements = {
 SWEP.ExtraSightDist = 10
 
 SWEP.Attachments = {
-
+	-- Basic underbarrel flashlight
+	{
+		PrintName = "Flashlight",
+		DefaultAttName = "No Attachment",
+		Slot = {"flashlight", "light", "ez_tac"},
+		Bone = "smdimport",
+		Offset = {
+			vpos = Vector(0, 3, 0.75), -- offset that the attachment will be relative to the bone
+			vang = Angle(0, 270, 0),
+			wpos = Vector(9, 1.2, -2),
+			wang = Angle(0, -5, 180)
+		},
+		--Hidden = true, -- attachment cannot be seen in customize menu
+	},
 }
 
 SWEP.Animations = {
-    ["idle"] = {
-        Source = "idle01",
-    },
-    ["draw"] = {
-        Source = "draw",
-        LHIK = true,
-        LHIKIn = 0,
-        LHIKOut = 0.5,
-    },
-    ["holster"] = {
-        Source = "holster",
-    },
-    ["fire"] = {
-        Source = {"fire1","fire2","fire3"},
+	["idle"] = {
+		Source = "idle01",
+	},
+	["draw"] = {
+		Source = "draw",
+		LHIK = true,
+		LHIKIn = 0,
+		LHIKOut = 0.5,
+	},
+	["holster"] = {
+		Source = "holster",
+	},
+	["fire"] = {
+		Source = {"fire1","fire2","fire3"},
 		ShellEjectAt = 0,
 		
-    },
-    ["reload"] = {
-        Source = "reload",
-        TPAnim = ACT_HL2MP_GESTURE_RELOAD_PISTOL,
-        SoundTable = {
-            {s = "Weapon_Alyxgun.Mag_Out", t = 0.3, v = 65},
-            {s = "Weapon_Alyxgun.Mag_Futz", t = 0.9, v = 55},
-            {s = "Weapon_Alyxgun.Mag_In", t = 1.3, v = 65},
-            {s = "Weapon_Alyxgun.Slide_Release", t = 1.7, v = 60},
-        }
-    },
+	},
+	["reload"] = {
+		Source = "reload",
+		TPAnim = ACT_HL2MP_GESTURE_RELOAD_PISTOL,
+		Mult = 2,
+		SoundTable = {
+			{s = "Weapon_Alyxgun.Mag_Out", t = 0.0, v = 65},
+			{s = "Weapon_Alyxgun.Mag_Futz", t = 0.6, v = 55},
+			{s = "Weapon_Alyxgun.Mag_In", t = 1.2, v = 65},
+			{s = "Weapon_Alyxgun.Slide_Release", t = 1.8, v = 60},
+		}
+	},
 }
 
 sound.Add({
@@ -210,7 +224,7 @@ sound.Add({
 	channel = CHAN_STATIC,
 	volume = 1,
 	level = 60,
-	sound = "snds_jack_gmod/ez_weapons/pistol/out.ogg"--"weapon/pistol/handling/pistol_mag_out_01.wav"
+	sound = "snds_jack_gmod/ez_weapons/pistol/out.ogg"--
 })
 sound.Add({
 	name = "Weapon_Alyxgun.Mag_Futz",

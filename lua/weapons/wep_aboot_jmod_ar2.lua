@@ -10,8 +10,8 @@ SWEP.WorldModel = "models/weapons/aboot/ar2/w_iiopnirifle.mdl"
 SWEP.ViewModelFOV = 70
 SWEP.MirrorVMWM = true
 SWEP.WorldModelOffset = {
-    pos = Vector(16, 1, -2),
-    ang = Angle(-4, 180, 180)
+	pos = Vector(16, 1, -2),
+	ang = Angle(-4, 180, 180)
 }
 SWEP.DefaultBodygroups = "00000000000"
 
@@ -32,25 +32,25 @@ SWEP.ReducedClipSize = 20
 
 SWEP.PhysBulletMuzzleVelocity = 700
 
-SWEP.Recoil = 0.2
-SWEP.RecoilSide = 0.4
-SWEP.RecoilRise = 0.2
+SWEP.Recoil = 0.1
+SWEP.RecoilSide = 0.2
+SWEP.RecoilRise = 0.1
 SWEP.MaxRecoilBlowback = -1
 SWEP.VisualRecoilMult = 6
 SWEP.RecoilPunch = 3
 SWEP.RecoilPunchBackMax = 4
-SWEP.RecoilPunchBackMaxSights = nil -- may clip with scopes
+SWEP.RecoilPunchBackMaxSights = 0 -- may clip with scopes
 SWEP.RecoilVMShake = 1.5 -- random viewmodel offset when shooty
 
 SWEP.Delay = 60 / 600 -- 60 / RPM.
 SWEP.Num = 1 -- number of shots per trigger pull.
 SWEP.Firemodes = {
-    {
-        Mode = 2,
-    },
-    {
-        Mode = 0
-    }
+	{
+		Mode = 2,
+	},
+	{
+		Mode = 0
+	}
 }
 
 SWEP.Force = 15
@@ -102,14 +102,21 @@ SWEP.TracerCol = Color(0, 0, 255)
 SWEP.HullSize = 0 -- HullSize used by FireBullets
 
 
-
 SWEP.IronSightStruct = {
-    Pos = Vector(-2, -1, 0.3),
-    Ang = Angle(0, 0, 0),
-    Magnification = 1.1,
-    SwitchToSound = "", -- sound that plays when switching to this sight
-    CrosshairInSights = true
+	Pos = Vector(-2, -1, 0.3),
+	Ang = Angle(0, 0, 0),
+	Magnification = 1.1,
+	SwitchToSound = "", -- sound that plays when switching to this sight
+	CrosshairInSights = true
 }
+
+--[[SWEP.IronSightStruct = {
+	Pos = Vector(-4.5, -4, 0.75),
+	Ang = Angle(0, 0, 0),
+	Magnification = 1.1,
+	SwitchToSound = "", -- sound that plays when switching to this sight
+	CrosshairInSights = false
+}--]]
 
 SWEP.HoldtypeHolstered = "passive"
 SWEP.HoldtypeActive = "ar2"
@@ -160,28 +167,30 @@ SWEP.MirrorWorldModel = true -- Use this to set the mirrored viewmodel to a diff
 
 
 SWEP.Animations = {
-    ["idle"] = {
-        Source = "idle",
-    },
-    ["draw"] = {
-        Source = "draw",
-        LHIK = true,
-        LHIKIn = 0,
-        LHIKOut = 0.5,
-    },
-    ["holster"] = {
-        Source = "holster",
-    },
-    ["fire"] = {
-        Source = {"fire1","fire2","fire3"},
+	["idle"] = {
+		Source = "idle",
+	},
+	["draw"] = {
+		Source = "draw",
+		LHIK = true,
+		LHIKIn = 0,
+		LHIKOut = 0.5,
+	},
+	["holster"] = {
+		Source = "holster",
+	},
+	["fire"] = {
+		Mult = .6,
+		Source = {"fire1","fire2","fire3","fire4"},
+		--Source = "idle",
 		ShellEjectAt = 0,
-    },
+	},
 	["charge"] = {
-        Source = {"shake"},
-    },
+		Source = {"shake"},
+	},
 	["fire_alt"] = {
-        Source = {"fire_alt"},
-    },
+		Source = {"fire_alt"},
+	},
 	["enter_ubgl"] = {
 		Source = "lowtoidle",
 		Mult = 0.5,
@@ -198,108 +207,108 @@ SWEP.Animations = {
 		},
 	},
 	["reload_ubgl"] = {
-        Source = {"lowtoidle"}
-    },
-    ["enter_inspect"] = {
-        Source = {"fidget","fidget2"}
-    },
-    ["reload"] = {
-        Source = "reload",
-        TPAnim = ACT_HL2MP_GESTURE_RELOAD_AR2,
-        SoundTable = {
-            {s = "Project_MMOD_AR2.MagOut", t = 0.3, v = 65},
-            {s = "Project_MMOD_AR2.Reload_Push", t = 0.6, v = 60},
-            {s = "Project_MMOD_AR2.MagIn", t = 1.2, v = 65},
-            {s = "Project_MMOD_AR2.Reload_Tap", t = 1.5, v = 60},
-        }
-    },
+		Source = {"lowtoidle"}
+	},
+	["enter_inspect"] = {
+		Source = {"fidget","fidget2"}
+	},
+	["reload"] = {
+		Source = "reload",
+		TPAnim = ACT_HL2MP_GESTURE_RELOAD_AR2,
+		SoundTable = {
+			{s = "Project_MMOD_AR2.MagOut", t = 0.0, v = 65},
+			{s = "Project_MMOD_AR2.MagIn", t = 0.65, v = 65},
+			{s = "Project_MMOD_AR2.Reload_Push", t = 0.8, v = 60},
+			{s = "Project_MMOD_AR2.Reload_Rotate", t = 1.0, v = 60},
+		}
+	},
 }
 
 sound.Add( {
-    name = "Project_MMOD_AR2.Fire",
-    channel = CHAN_WEAPON,
-    volume = 0.8,
-    level = SNDLVL_GUNFIRE,
-    pitch = { 85, 95 },
-    sound =  { "weapons/projectmmod_ar2/fire1.wav", "weapons/projectmmod_ar2/fire2.wav", "weapons/projectmmod_ar2/fire3.wav" }
+	name = "Project_MMOD_AR2.Fire",
+	channel = CHAN_WEAPON,
+	volume = 0.8,
+	level = SNDLVL_GUNFIRE,
+	pitch = { 85, 95 },
+	sound =  { "weapons/projectmmod_ar2/fire1.wav", "weapons/projectmmod_ar2/fire2.wav", "weapons/projectmmod_ar2/fire3.wav" }
 } )
 sound.Add( {
-    name = "Project_MMOD_AR2.NPC",
-    channel = CHAN_STATIC,
-    volume = 0.2,
-    level = 140,
-    pitch = { 70, 80 },
-    sound =  { "weapons/projectmmod_ar2/fire1.wav", "weapons/projectmmod_ar2/fire2.wav", "weapons/projectmmod_ar2/fire3.wav" }
+	name = "Project_MMOD_AR2.NPC",
+	channel = CHAN_STATIC,
+	volume = 0.2,
+	level = 140,
+	pitch = { 70, 80 },
+	sound =  { "weapons/projectmmod_ar2/fire1.wav", "weapons/projectmmod_ar2/fire2.wav", "weapons/projectmmod_ar2/fire3.wav" }
 } )
 sound.Add( {
-    name = "Project_MMOD_AR2.MagOut",
-    channel = CHAN_AUTO,
-    volume = 1.0,
-    level = SNDLVL_NORM,
-    pitch = { 90, 110 },
-    sound =  { "weapons/projectmmod_ar2/ar2_magout.wav" }
+	name = "Project_MMOD_AR2.MagOut",
+	channel = CHAN_AUTO,
+	volume = 1.0,
+	level = SNDLVL_NORM,
+	pitch = { 90, 110 },
+	sound =  { "weapons/projectmmod_ar2/ar2_magout.wav" }
 } )
 sound.Add( {
-    name = "Project_MMOD_AR2.MagIn",
-    channel = CHAN_AUTO,
-    volume = 1.0,
-    level = SNDLVL_NORM,
-    pitch = { 90, 110 },
-    sound =  { "weapons/projectmmod_ar2/ar2_magin.wav" }
+	name = "Project_MMOD_AR2.MagIn",
+	channel = CHAN_AUTO,
+	volume = 1.0,
+	level = SNDLVL_NORM,
+	pitch = { 90, 110 },
+	sound =  { "weapons/projectmmod_ar2/ar2_magin.wav" }
 } )
 sound.Add( {
-    name = "Project_MMOD_AR2.Reload_Push",
-    channel = CHAN_ITEM,
-    volume = 0.9,
-    level = 100,
-    pitch = { 90, 110 },
-    sound =  { "weapons/ar2/ar2_reload_push.wav" }
+	name = "Project_MMOD_AR2.Reload_Push",
+	channel = CHAN_ITEM,
+	volume = 0.9,
+	level = 100,
+	pitch = { 90, 110 },
+	sound =  { "weapons/ar2/ar2_reload_push.wav" }
 } )
 sound.Add( {
-    name = "Project_MMOD_AR2.Reload_Rotate",
-    channel = CHAN_ITEM,
-    volume = 0.9,
-    level = 100,
-    pitch = { 90, 110 },
-    sound =  { "weapons/ar2/ar2_reload_rotate.wav" }
+	name = "Project_MMOD_AR2.Reload_Rotate",
+	channel = CHAN_ITEM,
+	volume = 0.9,
+	level = 100,
+	pitch = { 90, 110 },
+	sound =  { "weapons/ar2/ar2_reload_rotate.wav" }
 } )
 sound.Add( {
-    name = "Project_MMOD_AR2.Draw",
-    channel = CHAN_AUTO,
-    volume = 1.0,
-    level = SNDLVL_NORM,
-    pitch = { 90, 110 },
-    sound =  { "weapons/projectmmod_ar2/ar2_deploy.wav" }
+	name = "Project_MMOD_AR2.Draw",
+	channel = CHAN_AUTO,
+	volume = 1.0,
+	level = SNDLVL_NORM,
+	pitch = { 90, 110 },
+	sound =  { "weapons/projectmmod_ar2/ar2_deploy.wav" }
 } )
 sound.Add( {
-    name = "Project_MMOD_AR2.FidgetPush",
-    channel = CHAN_AUTO,
-    volume = 1.0,
-    level = SNDLVL_NORM,
-    pitch = { 100, 100 },
-    sound =  { "weapons/projectmmod_ar2/ar2_push.wav" }
+	name = "Project_MMOD_AR2.FidgetPush",
+	channel = CHAN_AUTO,
+	volume = 1.0,
+	level = SNDLVL_NORM,
+	pitch = { 100, 100 },
+	sound =  { "weapons/projectmmod_ar2/ar2_push.wav" }
 } )
 sound.Add( {
-    name = "Project_MMOD_AR2.BoltPull",
-    channel = CHAN_AUTO,
-    volume = 0.9,
-    level = SNDLVL_NORM,
-    pitch = { 90, 110 },
-    sound =  { "weapons/projectmmod_ar2/ar2_boltpull.wav" }
+	name = "Project_MMOD_AR2.BoltPull",
+	channel = CHAN_AUTO,
+	volume = 0.9,
+	level = SNDLVL_NORM,
+	pitch = { 90, 110 },
+	sound =  { "weapons/projectmmod_ar2/ar2_boltpull.wav" }
 } )
 sound.Add( {
-    name = "Project_MMOD_AR2.Charge",
-    channel = CHAN_WEAPON,
-    volume = 0.7,
-    level = SNDLVL_NORM,
-    pitch = { 90, 110 },
-    sound =  { "weapons/projectmmod_ar2/ar2_charge.wav" }
+	name = "Project_MMOD_AR2.Charge",
+	channel = CHAN_WEAPON,
+	volume = 0.7,
+	level = SNDLVL_NORM,
+	pitch = { 90, 110 },
+	sound =  { "weapons/projectmmod_ar2/ar2_charge.wav" }
 } )
 sound.Add( {
-    name = "Project_MMOD_AR2.SecondaryFire",
-    channel = CHAN_WEAPON,
-    volume = 0.7,
-    level = SNDLVL_GUNFIRE,
-    pitch = { 90, 110 },
-    sound =  { "weapons/projectmmod_ar2/ar2_secondary_fire.wav" }
+	name = "Project_MMOD_AR2.SecondaryFire",
+	channel = CHAN_WEAPON,
+	volume = 0.7,
+	level = SNDLVL_GUNFIRE,
+	pitch = { 90, 110 },
+	sound =  { "weapons/projectmmod_ar2/ar2_secondary_fire.wav" }
 } )

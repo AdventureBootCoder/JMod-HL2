@@ -9,8 +9,8 @@ SWEP.WorldModel = "models/weapons/aboot/sniper/w_sniper.mdl"
 SWEP.ViewModelFOV = 75
 SWEP.MirrorVMWM = true
 SWEP.WorldModelOffset = {
-    pos = Vector(-2, 0, 1),
-    ang = Angle(180, 0, 0),--Angle(0, 184, 180)
+	pos = Vector(-2, 0, 1),
+	ang = Angle(180, 0, 0),--Angle(0, 184, 180)
 }
 SWEP.NoHideLeftHandInCustomization = true
 
@@ -90,12 +90,12 @@ SWEP.RecoilVMShake = 8 -- random viewmodel offset when shooty
 SWEP.Delay = 60 / 90 -- 60 / RPM.
 SWEP.Num = 0 -- number of shots per trigger pull.
 SWEP.Firemodes = {
-    {
-        Mode = 1,
-    },
-    {
-        Mode = 0
-    }
+	{
+		Mode = 1,
+	},
+	{
+		Mode = 0
+	}
 }
 
 SWEP.NPCWeaponType = "weapon_ar2"
@@ -149,11 +149,11 @@ SWEP.Tracer = "arccw_tracer" -- override tracer (hitscan) effect
 SWEP.HullSize = 1 -- HullSize used by FireBullets
 
 SWEP.IronSightStruct = {
-    Pos = Vector( -2, 0, 2 ),
-    Ang = Angle( 2, 0, 0 ),
-    Magnification = 3,
-    SwitchToSound = "", -- sound that plays when switching to this sight
-    CrosshairInSights = true
+	Pos = Vector( -2, 0, 2 ),
+	Ang = Angle( 2, 0, 0 ),
+	Magnification = 3,
+	SwitchToSound = "", -- sound that plays when switching to this sight
+	CrosshairInSights = true
 }
 
 SWEP.HoldtypeHolstered = "passive"
@@ -221,33 +221,33 @@ SWEP.Attachments = {
 }
 
 SWEP.Animations = {
-    ["idle"] = {
-        Source = "sniper_idle01",
-    },
-    ["draw"] = {
-        Source = "sniper_draw",
+	["idle"] = {
+		Source = "sniper_idle01",
+	},
+	["draw"] = {
+		Source = "sniper_draw",
 		Mult = 1.1,
-        LHIK = true,
-        LHIKIn = 0,
-        LHIKOut = 0.5,
-    },
-    ["fire"] = {
-        Source = {"sniper_fire"},
+		LHIK = true,
+		LHIKIn = 0,
+		LHIKOut = 0.5,
+	},
+	["fire"] = {
+		Source = {"sniper_fire"},
 		
 		
-    },
-    ["reload"] = {
-        Source = "sniper_reload",
+	},
+	["reload"] = {
+		Source = "sniper_reload",
 		Mult = 0.8,
 		ShellEjectAt = 0.12,
-        TPAnim = ACT_HL2MP_GESTURE_RELOAD_REVOLVER,
-        SoundTable = {
-            {s = "Weapon_SniperRifle.Bolt_Up", t = 0.15, v = 60},
-            {s = "Weapon_SniperRifle.Bolt_Back", t = 0.25, v = 65},
-            {s = "Weapon_SniperRifle.Bolt_Forward", t = 0.55, v = 65},
-            {s = "Weapon_SniperRifle.Bolt_Down", t = 0.65, v = 60},
-        }
-    },
+		TPAnim = ACT_HL2MP_GESTURE_RELOAD_REVOLVER,
+		SoundTable = {
+			{s = "Weapon_SniperRifle.Bolt_Up", t = 0.15, v = 60},
+			{s = "Weapon_SniperRifle.Bolt_Back", t = 0.25, v = 65},
+			{s = "Weapon_SniperRifle.Bolt_Forward", t = 1.25, v = 65},
+			{s = "Weapon_SniperRifle.Bolt_Down", t = 1.9, v = 60},
+		}
+	},
 }
 
 sound.Add({

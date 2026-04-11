@@ -15,8 +15,8 @@ SWEP.WorldModel = "models/weapons/aboot/akm/w_akm.mdl"
 SWEP.ViewModelFOV = 60
 SWEP.MirrorVMWM = true
 SWEP.WorldModelOffset = {
-    pos = Vector(17, 1, -2.5),
-    ang = Angle(-6, 180, 180)
+	pos = Vector(17, 1, -2.5),
+	ang = Angle(-6, 180, 180)
 }
 
 SWEP.DefaultBodygroups = "00000000000"
@@ -39,7 +39,7 @@ SWEP.ChamberSize = 1 -- how many rounds can be chambered.
 SWEP.Primary.ClipSize = 30 -- DefaultClip is automatically set.
 SWEP.ExtendedClipSize = 40
 SWEP.ReducedClipSize = 20
- 
+
 SWEP.PhysBulletMuzzleVelocity = 700
 
 SWEP.Recoil = 0.25
@@ -55,15 +55,15 @@ SWEP.RecoilVMShake = 4 -- random viewmodel offset when shooty
 SWEP.Delay = 60 / 600 -- 60 / RPM.
 SWEP.Num = 1 -- number of shots per trigger pull.
 SWEP.Firemodes = {
-    {
-        Mode = 2,
-    },
-    {
-        Mode = 1,
-    },
-    {
-        Mode = 0
-    }
+	{
+		Mode = 2,
+	},
+	{
+		Mode = 1,
+	},
+	{
+		Mode = 0
+	}
 }
 
 SWEP.NPCWeaponType = "weapon_ar2"
@@ -112,11 +112,11 @@ SWEP.HullSize = 0 -- HullSize used by FireBullets
 
 
 SWEP.IronSightStruct = {
-    Pos = Vector(-3.4, -8, 1.455),
-    Ang = Angle(0.707, 0, 0),
-    Magnification = 1.1,
-    SwitchToSound = "", -- sound that plays when switching to this sight
-    CrosshairInSights = false
+	Pos = Vector(-3.4, -8, 1.455),
+	Ang = Angle(0.707, 0, 0),
+	Magnification = 1.1,
+	SwitchToSound = "", -- sound that plays when switching to this sight
+	CrosshairInSights = false
 }
 SWEP.ProceduralIronFire = true
 
@@ -195,38 +195,37 @@ SWEP.Attachments = {
 }
 
 SWEP.Animations = {
-    ["idle"] = {
-        Source = "idle",
-    },
-    ["draw"] = {
-        Source = "draw",
-        LHIK = true,
-        LHIKIn = 0,
-        LHIKOut = 0.5,
-    },
-    ["holster"] = {
-        Source = "holster",
-    },
-    ["enter_inspect"] = {
-        Source = {"fidget","fidget2"},
-    },
-    ["fire"] = {
-        Source = {"fire1","fire2","fire3"},
+	["idle"] = {
+		Source = "idle",
+	},
+	["draw"] = {
+		Source = "draw",
+		LHIK = true,
+		LHIKIn = 0,
+		LHIKOut = 0.5,
+	},
+	["holster"] = {
+		Source = "holster",
+	},
+	["enter_inspect"] = {
+		Source = {"fidget","fidget2"},
+	},
+	["fire"] = {
+		Source = {"fire1","fire2","fire3"},
 		ShellEjectAt = 0,
-		
-    },
-    ["reload"] = {
-        Source = "reload",
-        TPAnim = ACT_HL2MP_GESTURE_RELOAD_AR2,
-        SoundTable = {
-            {s = "Weapon_AKM.Mag_Release", t = 0.2, v = 60},
-            {s = "Weapon_AKM.Mag_Out", t = 0.4, v = 65},
-            {s = "Weapon_AKM.Mag_Futz", t = 1.0, v = 55},
-            {s = "Weapon_AKM.Mag_In", t = 1.4, v = 65},
-            {s = "Weapon_AKM.Bolt_Pull", t = 1.8, v = 60},
-            {s = "Weapon_AKM.Bolt_Release", t = 2.0, v = 60},
-        }
-    },
+	},
+	["reload"] = {
+		Source = "reload",
+		TPAnim = ACT_HL2MP_GESTURE_RELOAD_AR2,
+		SoundTable = {
+			{s = "Weapon_AKM.Mag_Release", t = 0.2, v = 60},
+			{s = "Weapon_AKM.Mag_Out", t = 0.4, v = 65},
+			{s = "Weapon_AKM.Mag_Futz", t = 0.8, v = 55},
+			{s = "Weapon_AKM.Mag_In", t = 1.3, v = 65},
+			{s = "Weapon_AKM.Bolt_Pull", t = 2.0, v = 60},
+			{s = "Weapon_AKM.Bolt_Release", t = 2.2, v = 60},
+		}
+	},
 }
 
 sound.Add({

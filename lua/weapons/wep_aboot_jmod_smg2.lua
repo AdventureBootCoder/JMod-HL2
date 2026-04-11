@@ -10,8 +10,8 @@ SWEP.WorldModel = "models/weapons/aboot/smg2/w_smg1.mdl"
 SWEP.ViewModelFOV = 60
 SWEP.MirrorVMWM = true
 SWEP.WorldModelOffset = {
-    pos = Vector(10, 0.5, -4),
-    ang = Angle(-10, 1, 180)
+	pos = Vector(10, 0.5, -4),
+	ang = Angle(-10, 1, 180)
 }
 
 SWEP.DefaultBodygroups = "00000000000"
@@ -53,13 +53,13 @@ SWEP.Firemodes = {
 		Mode = 2,
 		PrintName = "FULL-AUTO"
 	},
-    {
+	{
 		PrintName = "SINGLE",
-        Mode = 1,
+		Mode = 1,
 		--RunawayBurst = true,
 		--AutoBurst = true,
 		--PostBurstDelay = 0.2,
-    },
+	},
 	{
 		Mode = 0
 	}
@@ -114,11 +114,11 @@ SWEP.Tracer = "arccw_tracer" -- override tracer (hitscan) effect
 SWEP.HullSize = 0 -- HullSize used by FireBullets
 
 SWEP.IronSightStruct = {
-    Pos = Vector(-6.5, -8, 1.75),
-    Ang = Angle(-1.6, -0.05, 0),
-    Magnification = 1.2,
-    SwitchToSound = "", -- sound that plays when switching to this sight
-    CrosshairInSights = false
+	Pos = Vector(-6.5, -8, 1.75),
+	Ang = Angle(-1.6, -0.05, 0),
+	Magnification = 1.2,
+	SwitchToSound = "", -- sound that plays when switching to this sight
+	CrosshairInSights = false
 }
 
 SWEP.ProceduralIronFire = true
@@ -250,32 +250,33 @@ SWEP.Attachments = {
 }
 
 SWEP.Animations = {
-    ["idle"] = {
-        Source = "idle01",
-    },
-    ["draw"] = {
-        Source = "draw",
-        LHIK = true,
-        LHIKIn = 0,
-        LHIKOut = 0.5,
-    },
-    ["holster"] = {
-        Source = "holster",
-    },
-    ["fire"] = {
-        Source = {"fire01","fire02","fire03","fire04"},
+	["idle"] = {
+		Source = "idle01",
+	},
+	["draw"] = {
+		Source = "draw",
+		LHIK = true,
+		LHIKIn = 0,
+		LHIKOut = 0.5,
+	},
+	["holster"] = {
+		Source = "holster",
+	},
+	["fire"] = {
+		Source = {"fire01","fire02","fire03","fire04"},
 		ShellEjectAt = 0,
-    },
-    ["reload"] = {
-        Source = "reload",
-        TPAnim = ACT_HL2MP_GESTURE_RELOAD_SMG1,
+	},
+	["reload"] = {
+		Source = "reload",
+		TPAnim = ACT_HL2MP_GESTURE_RELOAD_SMG1,
 		Mult = 1.5,
-        SoundTable = {
-            {s = "Weapon_SMG1.Mag_Out", t = 0.4, v = 65},
-            {s = "Weapon_SMG1.Mag_Futz", t = 1.0, v = 55},
-            {s = "Weapon_SMG1.Mag_In", t = 1.6, v = 65},
-        }
-    },
+		SoundTable = {
+			{s = "Weapon_SMG1.Mag_Out", t = 0.4, v = 65},
+			{s = "Weapon_SMG1.Mag_Futz", t = 1.0, v = 55},
+			{s = "Weapon_SMG1.Mag_In", t = 1.6, v = 65},
+			{s = "Weapon_SMG1.Grip_Grab", t = 1.65, v = 60},
+		}
+	},
 }
 
 sound.Add({
