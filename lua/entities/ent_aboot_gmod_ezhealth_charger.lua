@@ -35,7 +35,7 @@ if(SERVER)then
 		local ent = ents.Create(self.ClassName)
 		ent:SetAngles(Ang)
 		ent:SetPos(SpawnPos)
-		if JMod.Config.Machines.SpawnMachinesFull then
+		if JMod.Config and JMod.Config.Machines.SpawnMachinesFull then
 			ent.SpawnFull = true
 		end
 		ent:Spawn()

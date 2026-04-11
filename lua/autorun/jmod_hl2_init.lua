@@ -43,6 +43,22 @@ JModHL2.EZ_JUMPSNDS = {
 	BREAK    = tag .. "/jumpmod_break.wav"
 }
 
+function JModHL2.PlyWearingHEVsuit(playa)
+	if not playa.EZarmor then return false end
+	if (playa.EZarmor.effects.HEVsuit) then return true end
+
+	for id, armorData in pairs(playa.EZarmor.items) do
+		local Info = JMod.ArmorTable[armorData.name]
+
+		if Info and (Info.HEVsuit) then
+
+			return true
+		end
+	end
+
+	return false
+end
+
 if(SERVER)then
 	for k,v in ipairs(JModHL2.EZ_JUMPSNDS) do
 		resource.AddSingleFile("sound/" .. v)
@@ -72,22 +88,6 @@ if(SERVER)then
 	hook.Add("PlayerDeath", tag, function(playa)
 		playa:SetNW2Float(tag_counter, 0)
 	end)
-
-	function JModHL2.PlyWearingHEVsuit(playa)
-		if not playa.EZarmor then return false end
-		if (playa.EZarmor.effects.HEVsuit) then return true end
-
-		for id, armorData in pairs(playa.EZarmor.items) do
-			local Info = JMod.ArmorTable[armorData.name]
-
-			if Info and (Info.HEVsuit) then
-
-				return true
-			end
-		end
-
-		return false
-	end
 
 	hook.Add("JMod_EZarmorSync", "ABootHL2ArmorCheck", function(playa)
 		local WearingHEV = JModHL2.PlyWearingHEVsuit(playa)

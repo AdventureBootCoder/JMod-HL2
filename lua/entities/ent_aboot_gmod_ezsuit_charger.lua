@@ -16,7 +16,7 @@ ENT.Mat = "models/aboot/suit_charger002_sheet"
 ENT.JModPreferredCarryAngles = Angle(0, 180, 0)
 ENT.EZconsumes = {JMod.EZ_RESOURCE_TYPES.BASICPARTS, JMod.EZ_RESOURCE_TYPES.POWER}
 ENT.EZupgradable = false
-ENT.EZpowerSocket = Vector(0, 0, -1)
+ENT.EZpowerSocketPos = Vector(0, 0, -1)
 
 local STATE_BROKEN, STATE_OFF, STATE_CHARGIN = -1, 0, 1
 
@@ -27,7 +27,7 @@ if(SERVER)then
 		local ent = ents.Create(self.ClassName)
 		ent:SetAngles(Ang)
 		ent:SetPos(SpawnPos)
-		if JMod.Config.Machines.SpawnMachinesFull then
+		if JMod.Config and JMod.Config.Machines.SpawnMachinesFull then
 			ent.SpawnFull = true
 		end
 		ent:Spawn()

@@ -17,7 +17,7 @@ hook.Add("HUDPaint", "JMOD_HL2_HUDPAINT", function()
 	
 	local Ply = LocalPlayer()
 	if Ply:Alive() and Ply.EZarmor and Ply.EZarmor.effects then
-		if Ply.EZarmor.effects.HEVsuit then
+		if JModHL2.PlyWearingHEVsuit(Ply) then
 			local TrackedEnt = Ply:GetNW2Entity("EZmachineTracking", nil)
 			if IsValid(TrackedEnt) then
 				local InfoX = x_info_offset:GetFloat()
@@ -34,7 +34,7 @@ hook.Add("HUDPaint", "JMOD_HL2_HUDPAINT", function()
 	--
 	local PlyCharge = Ply:GetNW2Float(tag_counter, 0)
 	--
-	if Ply:Alive() and Ply.EZarmor and Ply.EZarmor.effects then
+	if Ply:Alive() and Ply.EZarmor then
 		if Ply.EZarmor.effects.jumpmod then
 			charge = Lerp(FrameTime() * 4.5, charge, PlyCharge + 0.01)
 			if PlyCharge - charge < 0 then
@@ -99,8 +99,8 @@ local COLOR_HOSTILE = Color( 255, 0, 0)
 
 hook.Add("PreDrawHalos", "JMod_HL2_HALOS", function()
 	local Ply = LocalPlayer()
-	if Ply:Alive() and Ply.EZarmor and Ply.EZarmor.effects then
-		if Ply.EZarmor.effects.HEVsuit then
+	if Ply:Alive() and Ply.EZarmor then
+		if JModHL2.PlyWearingHEVsuit(Ply) then
 			local TrackedEnt = Ply:GetNW2Entity("EZturretTarget", nil)
 			if IsValid(TrackedEnt) then
 				halo.Add( {TrackedEnt}, COLOR_HOSTILE, 1, 1, 2, true, true, false)
@@ -127,8 +127,8 @@ end
 
 hook.Add("PostDrawTranslucentRenderables", "JMod_HL2_TRANSREND", function()
 	local Ply = LocalPlayer()
-	if Ply:Alive() and Ply.EZarmor and Ply.EZarmor.effects then
-		if Ply.EZarmor.effects.HEVsuit then
+	if Ply:Alive() and Ply.EZarmor then
+		if JModHL2.PlyWearingHEVsuit(Ply) then
 			local TrackedEnt = Ply:GetNW2Entity("EZmachineTracking", nil)
 			if IsValid(TrackedEnt) and TrackedEnt.ScanResults then
 				if not(TablesEqual(LastTable, TrackedEnt.ScanResults)) then

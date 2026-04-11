@@ -54,7 +54,7 @@ local ScrapArmorProtectionProfile = {
 }
 
 JModHL2.ArmorTable = {
-	["ABoot HEV Suit"]={
+	["HEV Suit"]={
 		PrintName = "EZ HEV Suit",
 		Category = "JMod - EZ HL:2",
 		mdl = "models/aboot/blackmesa/props_generic/bm_hevcrate01.mdl",
@@ -134,7 +134,7 @@ JModHL2.ArmorTable = {
 		HEVsuit = true,
 		ent = "ent_aboot_gmod_ezarmor_hev"
 	},
-	["ABoot Combine Suit"]={
+	["Combine Suit"]={
 		PrintName = "EZ Combine Suit",
 		Category = "JMod - EZ HL:2",
 		mdl = "models/props_junk/cardboard_box002a.mdl",
@@ -177,13 +177,17 @@ JModHL2.ArmorTable = {
 		},
 		eff={
 			speedBoost = 1,
-			flashresistant = true
+			flashresistant = true,
+			HEVsuit = true
 		},
 		blackvisionwhendead = false,
 		tgl = {
 			blackvisionwhendead = true,
 			mskmat = "mats_aboot_gmod_sprites/helmet_vignette2.png",
-			eff = {thermalVision = true},
+			eff = {
+				thermalVision = true, 
+				HEVsuit = true
+			},
 			slots={
 				eyes = 1,
 				mouthnose = 1,
@@ -209,7 +213,7 @@ JModHL2.ArmorTable = {
 		HEVsuit = true,
 		ent = "ent_aboot_gmod_ezarmor_combinesuit"
 	},
-	["ABoot Jump Module"]={
+	["Jump Module"]={
 		PrintName = "EZ Jump Module",
 		Category = "JMod - EZ HL:2",
 		mdl = "models/aboot/blackmesa/hev_suit/w_longjump.mdl",
@@ -251,7 +255,7 @@ JModHL2.ArmorTable = {
 		dur = 100,
 		ent = "ent_aboot_gmod_ezarmor_jumpmodule"
 	},
-	["ABoot Jet Module"]={
+	["Jet Module"]={
 		PrintName = "EZ Jet Module",
 		Category = "JMod - EZ HL:2",
 		mdl = "models/aboot/combine/hev_suit/combinejetmodule.mdl",
@@ -455,12 +459,12 @@ JModHL2.ArmorTable = {
 
 local function HL2LoadAdditionalArmor()
 	if JModHL2.ArmorTable then
-		JModHL2.ArmorTable["Admin Jump Module"] = table.Copy(JModHL2.ArmorTable["ABoot Jump Module"])
+		JModHL2.ArmorTable["Admin Jump Module"] = table.Copy(JModHL2.ArmorTable["Jump Module"])
 		JModHL2.ArmorTable["Admin Jump Module"].PrintName = "Admin Jump Module"
 		JModHL2.ArmorTable["Admin Jump Module"].AdminOnly = true
 		JModHL2.ArmorTable["Admin Jump Module"].eff = { HEVreq = false, jumpmod = true }
 		JModHL2.ArmorTable["Admin Jump Module"].ent = "ent_aboot_gmod_ezarmor_jumpmodule_admin"
-		JModHL2.ArmorTable["Admin Jet Module"] = table.Copy(JModHL2.ArmorTable["ABoot Jet Module"])
+		JModHL2.ArmorTable["Admin Jet Module"] = table.Copy(JModHL2.ArmorTable["Jet Module"])
 		JModHL2.ArmorTable["Admin Jet Module"].PrintName = "Admin Jet Module"
 		JModHL2.ArmorTable["Admin Jet Module"].AdminOnly = true
 		JModHL2.ArmorTable["Admin Jet Module"].eff = { HEVreq = false, jetmod = true }
