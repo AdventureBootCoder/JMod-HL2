@@ -280,7 +280,7 @@ SWEP.Hook_Think = function(self)
 	if not SERVER then return end
 	if self.Primary.Ammo ~= "Sniper Pulse Ammo" then self.NextRechargeTime = nil return end
 	local Time = CurTime()
-	local SelfAmmo, MaxAmmo = self.Owner:GetAmmoCount("Sniper Pulse Ammo"), game.GetAmmoMax(game.GetAmmoID("Sniper Pulse Ammo")) * JMod.Config.Weapons.AmmoCarryLimitMult
+	local SelfAmmo, MaxAmmo = self.Owner:GetAmmoCount("Sniper Pulse Ammo"), math.floor(game.GetAmmoMax(game.GetAmmoID("Sniper Pulse Ammo")) * JMod.Config.Weapons.AmmoCarryLimitMult)
 
 	self.NextRechargeTime = self.NextRechargeTime or 0
 	if (self.NextRechargeTime < Time) and (Time > self:GetNextPrimaryFire() + 1) and (SelfAmmo < MaxAmmo) then

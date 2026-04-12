@@ -209,7 +209,7 @@ if(SERVER)then
 		if (EZammoPickup:GetBool() == true) and (HLtoEZammoTypes[AmmoName]) then
 			local EZammoID = game.GetAmmoID(HLtoEZammoTypes[AmmoName])
 			local Diff = newCount - oldCount
-			local MaxAmmo = game.GetAmmoMax(EZammoID) * JMod.Config.Weapons.AmmoCarryLimitMult
+			local MaxAmmo = math.floor(game.GetAmmoMax(EZammoID) * JMod.Config.Weapons.AmmoCarryLimitMult)
 			local AmmoToGive = math.min(Diff, MaxAmmo - ply:GetAmmoCount(EZammoID))
 			if AmmoToGive > 0 then
 				ply:GiveAmmo(AmmoToGive, EZammoID)
@@ -245,7 +245,7 @@ if(SERVER)then
 
 			if (AmmoID ~= -1) and IsValid(PlayerSWEP) and ((PlayerSWEP:GetPrimaryAmmoType() == AmmoID) or (PlayerSWEP:GetSecondaryAmmoType() == AmmoID)) then
 				local AmmoID = game.GetAmmoID(EZammoConversion[1])
-				local MaxAmmo = game.GetAmmoMax(AmmoID) * JMod.Config.Weapons.AmmoCarryLimitMult
+				local MaxAmmo = math.floor(game.GetAmmoMax(AmmoID) * JMod.Config.Weapons.AmmoCarryLimitMult)
 				local AmmoToGive = math.min(EZammoConversion[2], MaxAmmo - ply:GetAmmoCount(EZammoConversion[1]))
 				if AmmoToGive > 0 then
 					ply:GiveAmmo(AmmoToGive, EZammoConversion[1])

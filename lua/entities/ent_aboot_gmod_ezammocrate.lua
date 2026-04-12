@@ -220,7 +220,7 @@ if SERVER then
 
 			--[[ PRIMARY --]]
 			if PrimName then 
-				PrimMax = PrimMax * JMod.Config.Weapons.AmmoCarryLimitMult * ArmorAmmoCarryMult
+				PrimMax = math.floor(PrimMax * JMod.Config.Weapons.AmmoCarryLimitMult * ArmorAmmoCarryMult)
 				local IsPrimMunitions = table.HasValue(JMod.Config.Weapons.AmmoTypesThatAreMunitions, PrimName)
 				if (IsPrimMunitions == IsMunitionBox) and not(IsAmmoOnTable(PrimName, JMod.Config.Weapons.WeaponAmmoBlacklist)) then
 					if PrimType and (PrimType ~= -1) then
@@ -252,7 +252,7 @@ if SERVER then
 			if self:GetResource() <= 0 then return end
 			--[[ SECONDARY --]]
 			if SecName then 
-				SecMax = SecMax * JMod.Config.Weapons.AmmoCarryLimitMult * ArmorAmmoCarryMult
+				SecMax = math.floor(SecMax * JMod.Config.Weapons.AmmoCarryLimitMult * ArmorAmmoCarryMult)
 				local IsSecMunitions = table.HasValue(JMod.Config.Weapons.AmmoTypesThatAreMunitions, SecName)
 				if (IsSecMunitions == IsMunitionBox) and not(IsAmmoOnTable(SecName, JMod.Config.Weapons.WeaponAmmoBlacklist)) then
 					if SecType and (SecType ~= -1) then
