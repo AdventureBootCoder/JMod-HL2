@@ -58,7 +58,7 @@ SWEP.NPCWeight = 100
 
 SWEP.AccuracyMOA = 0 -- accuracy in Minutes of Angle. There are 60 MOA in a degree.
 SWEP.HipDispersion = 200 -- inaccuracy added by hip firing.
-SWEP.MoveDispersion = 50
+SWEP.MoveDispersion = 200
 SWEP.SightsDispersion = 0
 
 SWEP.ShootVol = 150 -- volume of shoot sound

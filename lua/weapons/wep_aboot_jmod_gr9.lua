@@ -79,7 +79,7 @@ SWEP.NPCWeight = 100
 
 SWEP.AccuracyMOA = 5 -- accuracy in Minutes of Angle. There are 60 MOA in a degree.
 SWEP.HipDispersion = 500 -- inaccuracy added by hip firing.
-SWEP.MoveDispersion = 180
+SWEP.MoveDispersion = 400
 SWEP.SightsDispersion = 150
 
 SWEP.MagID = "GR9" -- the magazine pool this gun draws from

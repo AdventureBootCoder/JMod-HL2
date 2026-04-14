@@ -64,7 +64,7 @@ SWEP.NPCWeaponType = "weapon_rpg"
 SWEP.NPCWeight = 100
 
 SWEP.AccuracyMOA = 0 -- accuracy in Minutes of Angle. There are 60 MOA in a degree.
-SWEP.HipDispersion = 500 -- inaccuracy added by hip firing.
+SWEP.HipDispersion = 400 -- inaccuracy added by hip firing.
 SWEP.MoveDispersion = 500
 SWEP.SightsDispersion = 0
 SWEP.JumpDispersion = 1000 -- dispersion penalty when in the air
