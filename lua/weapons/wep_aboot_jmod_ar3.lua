@@ -15,7 +15,7 @@ SWEP.WorldModelOffset = {
     ang = Angle(-10, 180, 180)
 }
 SWEP.MirrorVMWM = false -- Copy the viewmodel, along with all its attachments, to the worldmodel. Super convenient!
-SWEP.MirrorWorldModel = true -- Use this to set the mirrored viewmodel to a different model, without any floating speedloaders or cartridges you may have. Needs MirrorVMWM
+SWEP.MirrorWorldModel = "" -- Use this to set the mirrored viewmodel to a different model, without any floating speedloaders or cartridges you may have. Needs MirrorVMWM
 SWEP.DefaultBodygroups = "00000000000"
 SWEP.CustomToggleCustomizeHUD = false
 
@@ -99,7 +99,7 @@ SWEP.TracerNum = 1 -- tracer every X
 SWEP.TracerFinalMag = 0 -- the last X bullets in a magazine are all tracers
 SWEP.Tracer = "tfa_mmod_tracer_ar2"--"tfa_mmod_tracer_ar3" -- override tracer (hitscan) effect
 SWEP.TracerCol = Color(0, 0, 255)
-SWEP.HullSize = 0 -- HullSize used by FireBullets
+SWEP.HullSize = .1 -- HullSize used by FireBullets
 
 -- If Jamming is enabled, a heat meter will gradually build up until it reaches HeatCapacity.
 -- Once that happens, the gun will overheat, playing an animation. If HeatLockout is true, it cannot be fired until heat is 0 again.

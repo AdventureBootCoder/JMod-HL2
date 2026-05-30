@@ -15,12 +15,15 @@ att.SortOrder = 100
 att.LHIK = false
 att.LHIK_Animation = false
 
-att.ModelOffset = Vector(8, 0, 0)
-att.OffsetAng = Angle(8, 0, 0)
+att.WorldModel = ""
+att.ViewModel = ""
+att.Model = ""
+--att.ModelOffset = Vector(8, 0, 0)
+--att.OffsetAng = Angle(8, 0, 0)
 
-att.ActivePos = Vector(0, 0, 0)
+--att.ActivePos = Vector(0, 0, 0)
 
-att.MountPositionOverride = 2
+--att.MountPositionOverride = 2
 att.UBGL_BaseAnims = true
 
 att.UBGL = true

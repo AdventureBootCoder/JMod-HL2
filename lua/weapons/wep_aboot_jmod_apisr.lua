@@ -119,7 +119,7 @@ SWEP.ShootSound = "Weapon_SniperRifle.Fire"
 SWEP.DistantShootSound = "Weapon_SniperRifle.NPC"
 
 SWEP.MirrorVMWM = false -- Copy the viewmodel, along with all its attachments, to the worldmodel. Super convenient!
-SWEP.MirrorWorldModel = true -- Use this to set the mirrored viewmodel to a different model, without any floating speedloaders or cartridges you may have. Needs MirrorVMWM
+SWEP.MirrorWorldModel = "" -- Use this to set the mirrored viewmodel to a different model, without any floating speedloaders or cartridges you may have. Needs MirrorVMWM
 
 SWEP.MuzzleEffect = "muzzle_center_M82"
 SWEP.ShellModel = "models/shells/shell_338mag.mdl"
@@ -146,7 +146,7 @@ SWEP.AlwaysFreeAim = nil
 SWEP.TracerNum = 0 -- tracer every X
 SWEP.TracerFinalMag = 0 -- the last X bullets in a magazine are all tracers
 SWEP.Tracer = "arccw_tracer" -- override tracer (hitscan) effect
-SWEP.HullSize = 1 -- HullSize used by FireBullets
+SWEP.HullSize = .1 -- HullSize used by FireBullets
 
 SWEP.IronSightStruct = {
 	Pos = Vector( -2, 0, 2 ),
