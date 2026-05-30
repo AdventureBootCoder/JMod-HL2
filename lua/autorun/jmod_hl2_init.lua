@@ -70,6 +70,7 @@ if(SERVER)then
 	local defaultHEVdisable = CreateConVar("jmod_hl2_disable_hev", "0", FCVAR_ARCHIVE, "Removes the HEV suit from players on spawn and when it's destroyed. \nNo more running around with an invisible HEV suit")
 	local noPowerDraw = CreateConVar("jmod_hl2_infinite_power", "0", FCVAR_ARCHIVE, "Disables jump/jet modules drawing internal power, effectivly making their charge infinite")
 	local EZammoPickup = CreateConVar("jmod_hl2_ammopickup", "0", FCVAR_ARCHIVE, "Turns HL2 ammo pickups into EZ ammo pickups for the weapon you are holding")
+	local EZweldAll = CreateConVar("jmod_hl2_weldall", "0", FCVAR_ARCHIVE, "Allows you to weld non metal entities.")
 
 	local function RemoveHEVsuit(playa) 
 		playa:SetArmor(0)

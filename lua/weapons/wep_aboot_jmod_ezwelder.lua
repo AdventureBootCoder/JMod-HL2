@@ -491,7 +491,7 @@ function SWEP:Think()
 				local EntTwo = nil
 
 				if (Tress.Hit) then
-					if (table.HasValue(WeldMats, Tress.MatType) or JMod.IsDoor(Tress.Entity)) then
+					if (table.HasValue(WeldMats, Tress.MatType) or JMod.IsDoor(Tress.Entity) or GetConVar("jmod_hl2_weldall"):GetBool()) then
 						EntTwo = Tress.Entity
 					elseif IsValid(Tress.Entity) then
 						self:WeldBurn(Tress.Entity, Tress.HitPos, AimVec * 100)
